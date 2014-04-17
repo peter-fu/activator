@@ -8,9 +8,6 @@ import java.io.File
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Promise
 import akka.pattern._
-import com.typesafe.sbtrc.launching.SbtProcessLauncher
-import com.typesafe.sbtrc.DefaultSbtProcessFactory
-import com.typesafe.sbtrc.protocol
 import play.Logger
 import akka.actor._
 import scala.concurrent.Await
@@ -80,7 +77,7 @@ class AppCacheActor extends Actor with ActorLogging {
                 if (!new java.io.File(config.location, "project/build.properties").exists()) {
                   Promise.failed(new RuntimeException(s"${config.location} does not contain a valid sbt project")).future
                 } else {
-                  val app = new snap.App(config, snap.Akka.system, AppManager.sbtChildProcessMaker)
+                  val app = new snap.App(config, snap.Akka.system)
                   log.debug(s"creating a new app for $id, $app")
                   Promise.successful(app).future
                 }
@@ -188,11 +185,6 @@ class KeepAliveActor extends Actor with ActorLogging {
 
 object AppManager {
 
-  // this is supposed to be set by the main() launching the UI.
-  // If not, we know we're running inside the build and we need
-  // to use the default "Debug" version.
-  def sbtChildProcessMaker: SbtProcessLauncher = Global.sbtProcessLauncher
-
   private val keepAlive = snap.Akka.system.actorOf(Props(new KeepAliveActor), name = "keep-alive")
 
   def registerKeepAlive(ref: ActorRef): Unit = {
@@ -268,35 +260,77 @@ object AppManager {
       case None => candidate
     }
   }
+
+  // FIXME we need to send events here or somehow be sure they are displayed
+  // by the client side. Need sbt logs in the UI. Also failure-to-start-sbt
+  // errors should go there.
   private def doInitialAppAnalysis(location: File, eventHandler: Option[JsObject => Unit] = None): Future[ProcessResult[AppConfig]] = {
+    import sbt.client._
+    import sbt.protocol._
+
     val validated = ProcessSuccess(location).validate(
       Validation.isDirectory,
       Validation.looksLikeAnSbtProject)
 
     validated flatMapNested { location =>
-      // NOTE -> We have to use the factory to ensure that shims are installed BEFORE we try to load the app.
-      // While we should consolidate all sbt specific code, right now the child factory is the correct entry point.
-      val factory = new DefaultSbtProcessFactory(location, sbtChildProcessMaker)
-      // TODO - we should actually have ogging of this sucker
-      factory.init(akka.event.NoLogging)
-      val sbt = factory.newChild(snap.Akka.system)
       implicit val timeout = Akka.longTimeoutThatIsAProblem;
 
-      val requestManager = snap.Akka.system.actorOf(
-        Props(new RequestManagerActor("learn-project-name", sbt, false)({
-          event =>
-            eventHandler foreach (_ apply event)
-        })), name = "request-manager-" + requestManagerCount.getAndIncrement())
-      val resultFuture: Future[ProcessResult[AppConfig]] =
-        (requestManager ? protocol.NameRequest(sendEvents = true)) map {
-          case protocol.NameResponse(name, _) => {
-            Logger.info("sbt told us the name is: '" + name + "'")
-            name
+      // TODO factor out the configName / humanReadableName to share with
+      // AppActor
+      val connector = SbtConnector(configName = "activator",
+        humanReadableName = "Activator", location)
+
+      val nameFuture = {
+        val namePromise = Promise[String]()
+        val nameFuture = namePromise.future
+        def onConnect(client: SbtClient): Unit = {
+          client.lookupScopedKey("name") map { keys =>
+            if (keys.isEmpty) {
+              namePromise.tryFailure(new RuntimeException("Project has no 'name' setting"))
+            } else {
+              val sub = client.watch(SettingKey[String](keys.head)) { (key, result) =>
+                result match {
+                  case TaskSuccess(value) if value.value.isDefined => namePromise.trySuccess(value.stringValue)
+                  case TaskSuccess(_) => namePromise.tryFailure(new RuntimeException("Project has no value for name setting"))
+                  case f: TaskFailure[_] => namePromise.tryFailure(new RuntimeException(s"Failed to get name setting from project ${f.message}"))
+                }
+              }
+
+              nameFuture.onComplete { _ => sub.cancel() }
+            }
           }
-          case protocol.ErrorResponse(error) =>
+        }
+        def onError(reconnecting: Boolean, message: String): Unit = {
+          if (reconnecting) {
+            // error for reason other than close
+            Logger.error(s"Error connecting to sbt: ${message}")
+          } else {
+            // this happens on our explicit close, but should be a no-op if we've already
+            // gotten the project name
+            Logger.debug(s"Error connecting to sbt (probably just closed): ${message}")
+            namePromise.tryFailure(new RuntimeException("Connection to sbt closed without acquiring name of project"))
+          }
+        }
+
+        connector.open(onConnect, onError)
+
+        nameFuture.onComplete { _ =>
+          Logger.debug("Closing sbt connector used to get project name")
+          connector.close()
+        }
+
+        nameFuture
+      }
+
+      val resultFuture: Future[ProcessResult[AppConfig]] =
+        nameFuture map { name =>
+          Logger.info("got project name from sbt: '" + name + "'")
+          name
+        } recover {
+          case NonFatal(e) =>
             // here we need to just recover, because if you can't open the app
             // you can't work on it to fix it
-            Logger.info("error getting name from sbt: " + error)
+            Logger.info(s"error getting name from sbt: ${e.getClass.getName}: ${e.getMessage}")
             val name = location.getName
             Logger.info("using file basename as app name: " + name)
             name
@@ -316,10 +350,7 @@ object AppManager {
               .validated(s"Somehow failed to save new app at ${location.getPath} in config")
           }
         }
-      resultFuture onComplete { result =>
-        Logger.debug(s"Stopping sbt child because we got our app config or error ${result}")
-        sbt ! PoisonPill
-      }
+
       // change a future-with-exception into a future-with-value
       // where the value is a ProcessFailure
       resultFuture recover {

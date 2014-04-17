@@ -4,17 +4,16 @@
 package snap
 
 import akka.actor._
-import com.typesafe.sbtrc.launching.SbtProcessLauncher
 import java.util.concurrent.atomic.AtomicInteger
 import activator.properties.ActivatorProperties
 import java.net.URLEncoder
 
-class App(val config: AppConfig, val system: ActorSystem, val sbtProcessLauncher: SbtProcessLauncher) extends ActorWrapper {
+class App(val config: AppConfig, val system: ActorSystem) extends ActorWrapper {
   val appInstance = App.nextInstanceId.getAndIncrement()
   override def toString = s"App(${config.id}@$appInstance})"
   val actorName = "app-" + URLEncoder.encode(config.id, "UTF-8") + "-" + appInstance
 
-  val actor = system.actorOf(Props(new AppActor(config, sbtProcessLauncher)),
+  val actor = system.actorOf(Props(new AppActor(config)),
     name = actorName)
 
   system.actorOf(Props(new ActorWatcher(actor, this)), "app-actor-watcher-" + appInstance)

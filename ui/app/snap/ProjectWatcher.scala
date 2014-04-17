@@ -6,9 +6,7 @@ package snap
 import akka.actor._
 import scala.concurrent.duration._
 import java.io.File
-import com.typesafe.sbtrc.EventSourceActor
 import java.io.IOException
-import com.typesafe.sbtrc.InvalidateSbtBuild
 import play.api.libs.json._
 
 sealed trait ProjectWatcherRequest
@@ -25,8 +23,8 @@ sealed trait ProjectWatcherEvent
 // So this actor is responsible for:
 // - telling the client-side JS to reload sources from sbt
 // - telling its child actor to change the set of sbt build sources
-// - invalidating the sbt pool when sbt build sources change
-class ProjectWatcher(val location: File, val newSourcesSocket: ActorRef, val sbtPool: ActorRef)
+// - reloading the sbt build when sbt build sources change
+class ProjectWatcher(val location: File, val newSourcesSocket: ActorRef, val appActor: ActorRef)
   extends EventSourceActor with ActorLogging {
 
   private val interval = 3.seconds
@@ -76,8 +74,7 @@ class ProjectWatcher(val location: File, val newSourcesSocket: ActorRef, val sbt
         if (source == sourcesWatcher) {
           newSourcesSocket ! NotifyWebSocket(JsObject(Seq("type" -> JsString("FilesChanged"))))
         } else if (source == sbtBuildWatcher) {
-          // we need to reset all our sbts
-          sbtPool ! InvalidateSbtBuild
+          appActor ! ReloadSbtBuild
         } else {
           log.warning("Unknown files changed notification from {}", source)
         }

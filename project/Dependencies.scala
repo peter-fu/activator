@@ -7,14 +7,15 @@ object Dependencies {
   val sbtPluginScalaVersion = "2.11.1"
   val scalaVersion = "2.11.1"
   val luceneVersion = "4.2.1"
-  val templateCacheVersion = "1.0-e9eaed4661e404bea0523f07a81ae5bff1485125"
-  val sbtRcVersion = "1.0-46280b51037faa6d50698c46c8725d33b75cae1e"
+  val templateCacheVersion = "0.3.0"
+  val sbtRcVersion = "1.0-6f4f1b986c53828ab6564e5e6380bf325b275d77"
 
-  val playVersion = "2.3.1"
-  val akkaVersion = "2.3.3"
-  val slickVersion = "2.1.0-M2"
-  val echoPluginVersion = "0.1.3"
-  val activatorAnalyticsVersion = "0.1.5"
+  val playVersion = "2.2.1"
+  val webJarsVersion = "2.2.1"
+  val akkaVersion = "2.2.3"
+  val slickVersion = "2.0.0"
+  val echoPluginVersion = "0.1.1"
+  val activatorAnalyticsVersion = "0.1.3"
   val aspectJVersion = "1.7.3"
 
   val activatorCommon      = "com.typesafe.activator" % "activator-common" % templateCacheVersion
@@ -29,12 +30,8 @@ object Dependencies {
   val sbtProcess           = "org.scala-sbt" % "process" % sbtVersion
 
   // sbtrc projects
-  val sbtrcRemoteController = "com.typesafe.sbtrc" % "sbt-rc-remote-controller" % sbtRcVersion
-
-  // Probes
-  val sbtrcProbe13           = "com.typesafe.sbtrc" % "sbt-rc-probe-0-13" % sbtRcVersion
-  val sbtshimUiInterface13   = "com.typesafe.sbtrc" % "sbt-rc-ui-interface-0-13" % sbtRcVersion
-  val sbtCompletion           = "org.scala-sbt" % "completion" % sbtVersion
+  val sbtrcClient          = "com.typesafe.sbtrc" % "client" % sbtRcVersion
+  val sbtrcIntegration     = "com.typesafe.sbtrc" % "integration-tests" % sbtRcVersion
 
   val akkaActor            = "com.typesafe.akka" %% "akka-actor" % akkaVersion
   val akkaSlf4j            = "com.typesafe.akka" %% "akka-slf4j" % akkaVersion

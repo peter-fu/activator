@@ -72,16 +72,6 @@ object TheActivatorBuild extends Build {
 
   val verboseSbtTests = false
 
-
-
-  // Helpers to let us grab necessary sbt remote control artifacts, but not actually depend on them at
-  // runtime.
-  lazy val SbtProbesConfig = config("sbtprobes")
-  def makeProbeClasspath(update: sbt.UpdateReport): String = {
-    val probeClasspath = update.matching(configurationFilter(SbtProbesConfig.name))
-    Path.makeString(probeClasspath)
-  }
-
   def configureSbtTest(testKey: Scoped) = Seq(
     // set up embedded sbt for tests, we fork so we can set
     // system properties.
@@ -91,9 +81,7 @@ object TheActivatorBuild extends Build {
       Keys.javaOptions in testKey,
       Keys.update) map {
       (launcher, oldOptions, updateReport) =>
-        oldOptions ++ Seq("-Dsbtrc.no-shims=true",
-                          "-Dsbtrc.launch.jar=" + launcher.getAbsoluteFile.getAbsolutePath,
-                          "-Dsbtrc.controller.classpath=" + makeProbeClasspath(updateReport)) ++
+        oldOptions ++
       (if (verboseSbtTests)
         Seq("-Dakka.loglevel=DEBUG",
             "-Dakka.actor.debug.autoreceive=on",
@@ -111,10 +99,8 @@ object TheActivatorBuild extends Build {
     dependsOnRemote(
       requirejs, jquery, knockout, ace, /*requireCss, requireText,*/ keymage, commonsIo, mimeUtil, activatorAnalytics,
       sbtLauncherInterface % "provided",
-      sbtrcRemoteController % "compile;test->test",
-      // Here we hack our probes into the UI project.
-      sbtrcProbe13 % "sbtprobes->default(compile)",
-      sbtshimUiInterface13 % "sbtprobes->default(compile)"
+      sbtrcClient,
+      sbtrcIntegration % "compile;test->test"
     )
     dependsOn(props, uiCommon)
     settings(PlayKeys.playDefaultPort := 8888)
@@ -127,21 +113,13 @@ object TheActivatorBuild extends Build {
     settings(configureSbtTest(Keys.testOnly): _*)
     // set up debug props for "run"
     settings(
-      // Here we hack so that we can see the sbt-rc classes...
-      Keys.ivyConfigurations ++= Seq(SbtProbesConfig),
       Keys.update <<= (
           SbtSupport.sbtLaunchJar,
           Keys.update,
           LocalTemplateRepo.localTemplateCacheCreated in localTemplateRepo) map {
         (launcher, update, templateCache) =>
-          // We register the location after it's resolved so we have it for running play...
-          sys.props("sbtrc.launch.jar") = launcher.getAbsoluteFile.getAbsolutePath
-          // The debug variant of the sbt finder automatically splits the ui + controller jars apart.
-          sys.props("sbtrc.controller.classpath") = makeProbeClasspath(update)
           sys.props("activator.template.cache") = fixFileForURIish(templateCache)
           sys.props("activator.runinsbt") = "true"
-          System.err.println("Updating sbt launch jar: " + sys.props("sbtrc.launch.jar"))
-          System.err.println("Remote probe classpath = " + sys.props("sbtrc.controller.classpath"))
           System.err.println("Template cache = " + sys.props("activator.template.cache"))
           update
       },
@@ -184,7 +162,7 @@ object TheActivatorBuild extends Build {
   lazy val it = (
       ActivatorProject("integration-tests")
       settings(integration.settings:_*)
-      dependsOnRemote(sbtLauncherInterface, sbtIo210, sbtrcRemoteController)
+      dependsOnRemote(sbtLauncherInterface, sbtIo210, sbtrcClient, sbtrcIntegration)
       dependsOn(props)
       settings(
         org.sbtidea.SbtIdeaPlugin.ideaIgnoreModule := true,
@@ -227,7 +205,7 @@ object TheActivatorBuild extends Build {
         "org.scala-lang" % "scala-compiler" % Dependencies.scalaVersion,
 
         // sbt stuff
-        sbtrcRemoteController,
+        sbtrcClient,
 
         // sbt 0.13 plugins
         playSbt13Plugin,
