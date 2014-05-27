@@ -66,3 +66,24 @@
     .trbl(0);
   }
 }
+
+.row() {
+    display: flex;
+    flex-direction: row;
+}
+
+.column() {
+    display: flex;
+    flex-direction: column;
+}
+
+.grow(@size: 1) {
+  flex-grow: @size;
+}
+
+.placeholder(@color) {
+  &::-webkit-input-placeholder { color:@color; }
+  &::-moz-placeholder { color:@color; }
+  &::-ms-placeholder { color:@color; }
+  &::placeholder { color:@color; }
+}

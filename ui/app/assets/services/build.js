@@ -2,8 +2,50 @@
  Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
  */
 
-define(['lib/knockout/knockout', 'commons/settings', 'services/log', 'commons/utils', 'commons/events', './oldSbt', 'commons/markers', './connection', 'services/sbt'],
-    function(ko, settings, Log, utils, events, sbt, markers, Connection, newSbt){
+define([
+  'lib/knockout/knockout',
+  'commons/settings',
+  'services/log',
+  'commons/utils',
+  'commons/events',
+  './oldSbt',
+  'commons/markers',
+  './connection',
+  'services/sbt'
+], function(
+  ko,
+  settings,
+  Log,
+  utils,
+  events,
+  sbt,
+  markers,
+  Connection,
+  newSbt
+){
+
+
+  var newApi = {
+    // Preferences
+    // rerunOnBuild: settings.observable("build.rerunOnBuild", true),
+    // retestOnSuccessfulBuild: settings.observable("build.retestOnSuccessfulBuild", false),
+    // automaticResetInspect: settings.observable("build.automaticResetInspect", true),
+    // recompileOnChange: settings.observable("build.recompileOnChange", true),
+
+    // Statuses
+    started: ko.observable(false),
+    compiling: ko.observable(false),
+    running: ko.observable(false),
+    testing: ko.observable(false),
+
+    running: ko.observable(false),
+    running: ko.observable(false),
+    running: ko.observable(false),
+    running: ko.observable(false),
+    running: ko.observable(false)
+  }
+
+
 
   var rerunOnBuild = settings.observable("build.rerunOnBuild", true);
   var retestOnSuccessfulBuild = settings.observable("build.retestOnSuccessfulBuild", false);

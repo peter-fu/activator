@@ -3,10 +3,15 @@
 //
 
 #omnisearch {
-  float: left;
-  background: @slate url('/public/images/icons/omnisearch.svg') 15px center no-repeat;
   height: 50px;
   width: 50px;
+  .omnisearch-wrapper {
+    position: absolute;
+    top: 0;
+    left: 50px;
+    right: 150px;
+    height: 50px;
+  }
   &.busy:after {
     content: "\27f3";
     color: @blue;
@@ -18,7 +23,7 @@
     display: block;
     position: absolute;
     top: 15px;
-    right: 110px;
+    right: 160px;
     z-index: 12;
     -webkit-animation: spin 1s infinite linear;
     -moz-animation: spin 1s infinite linear;
@@ -34,8 +39,7 @@
   input {
     position: absolute;
     top: 0;
-    left: 50px;
-    right: 100px;
+    left: 0;
     right: 0;
     height: 50px;
     line-height: 50px;
@@ -45,6 +49,7 @@
     max-width: 50px;
     width: 100%;
     .transition(200ms);
+    background: @slate url('/public/images/icons/omnisearch.svg') 15px center no-repeat;
     color: white;
     &:focus {
       background-color: @slate-dkr;
@@ -62,7 +67,7 @@
     position: absolute;
     top: 50px;
     left: 50px;
-    right: 100px;
+    right: 152px;
     overflow-x: hidden;
     overflow-y: auto;
     &.active {

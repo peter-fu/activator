@@ -33,7 +33,7 @@ define([
   var sneakHide = function() {
     sneakTimer = setTimeout(function(){
       sneak(false);
-    }, 500);
+    }, 10);
   }
 
   // Export to UI

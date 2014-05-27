@@ -1,8 +1,9 @@
 @import "../../commons/_base";
 
 .menu {
+  display: flex;
+  flex-direction: column;
   background: @grey;
-  overflow: auto;
   line-height: 22px;
   color: #fff;
   a {
@@ -12,9 +13,12 @@
     }
   }
   header {
-    padding: 0 20px;
+    display: flex;
+    flex-direction: row;
+    
+    align-items: baseline;
     height: 50px;
-    line-height: 54px;
+    padding: 0 13px 0 20px;
     color: @white-dkr;
   }
   footer {
@@ -24,13 +28,11 @@
     background: @grey-dkr;
     color: @white-dkr;
     border-top: 1px solid @grey-ltr;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    order: 10;
   }
   h1 {
-    float: left;
+    flex-grow: 1;
+    .ellipsis();
   }
   h2 {
     background: @grey-ltr;
@@ -44,6 +46,8 @@
   }
   .list {
     border-top: 1px solid @grey-ltr;
+    overflow: auto;
+    flex-grow: 1;
   }
   li {
     position: relative;
@@ -99,6 +103,7 @@
     }
   }
   .options {
+    flex-shrink: 0;
     border-radius: 2px;
     margin: 0 10px 10px;
     padding: 10px;
@@ -126,15 +131,15 @@
     margin-top: 3px;
   }
   li .counter {
-    background: @slate;
+    background: @grey-dkr;
     color: #fff;
     float: right;
+    padding: 0 4px;
+    min-width: 20px;
+    text-align: center;
+    border-radius: 2px;
     &.error {
       background: @red;
-      padding: 0 4px;
-      min-width: 20px;
-      text-align: center;
-      border-radius: 2px;
     }
   }
   .nav-options {

@@ -14,13 +14,12 @@
 }
 
 #header {
+  height: 50px;
+  display: flex;
+  flex-direction: row;
+
   background: @slate;
   color: #fff;
-  position: fixed;
-  top: 0;
-  left: @drawer-width;
-  right: @panel-width;
-  height: 50px;
   box-shadow: 0 3px 0 rgba(0,0,0,.1);
   z-index: 10;
 }
@@ -29,7 +28,6 @@
   display: block;
   height: 50px;
   width: 52px;
-  float: right;
   border-left: 2px solid @slate-dkr;
   z-index: 11;
   dt {
@@ -128,7 +126,6 @@
 #header {
   .toggleNavigation {
     .square(50px);
-    float: left;
     background: @red url(/public/images/icons/stripes.svg) center center no-repeat;
     .transition();
     &:hover, .navigationOpened & {

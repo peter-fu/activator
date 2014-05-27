@@ -147,7 +147,7 @@ define(['commons/streams', 'commons/events', 'commons/utils'], function(streams,
     if (obj.subType in subTypeHandlers) {
       subTypeHandlers[obj.subType](obj.event);
     } else {
-      console.log("not handling sbt event of type " + obj.subType, obj.event);
+      console.warn("not handling sbt event of type " + obj.subType, obj.event);
     }
   }
 

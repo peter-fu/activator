@@ -1,0 +1,435 @@
+<article class="inspect oneColumnAndMenu">
+  <nav class="menu">
+
+    <header>
+      <h1>Run</h1>
+    </header>
+
+    <div class="options">
+      <h3>Options</h3>
+      <ul class="buttons">
+        <li>
+          <input type="checkbox" id="recompileOnChange" class="switch-input" />
+          <label class="switch" for="recompileOnChange">
+            <span class="outer">
+              <span class="inner"></span>
+            </span>
+            Compile on file change
+          </label>
+        </li>
+        <li>
+          <input type="checkbox" id="resetOnRun" class="switch-input" />
+          <label class="switch" for="resetOnRun">
+            <span class="outer">
+              <span class="inner"></span>
+            </span>
+            Reset data on re-run
+          </label>
+        </li>
+      </div>
+    </div>
+
+    <footer>
+      <span>Data collected for</span>
+      <span disabled-data-bind="text: cacheTime()" class="cache counter">&ndash;</span>
+    </footer>
+
+    <ul class="list links">
+      <li class="item">
+        <a class="test" href="#new-inspect/"><span>Overview</span></a>
+      </li>
+      <li class="item">
+        <a class="test" href="#new-inspect/errors"><span>Errors</span></a>
+        <span class="error counter">2</span>
+      </li>
+      <li class="item">
+        <a class="test" href="#new-inspect/actors"><span>Actors</span></a>
+        <span class="error counter">1</span>
+      </li>
+      <li class="item">
+        <a class="test" href="#new-inspect/requests"><span>Requests</span></a>
+        <span class="counter">12</span>
+      </li>
+    </ul>
+
+  </nav>
+  <section id="inspect-wrapper">
+
+    <article class="overview">
+      <header>
+        <h1>Your app is running</h1>
+      </header>
+      <div class="stats">
+        <h2>Runtime stats</h2>
+        <div class="summary">
+          <dl>
+            <dt>Threads</dt>
+            <dd>1k</dd>
+          </dl>
+          <dl>
+            <dt>Actors</dt>
+            <dd>123</dd>
+          </dl>
+          <dl class="error">
+            <dt>Errors</dt>
+            <dd>123</dd>
+          </dl>
+          <dl>
+            <dt>Requests</dt>
+            <dd>123</dd>
+          </dl>
+          <dl>
+            <dt>Websockets</dt>
+            <dd>123</dd>
+          </dl>
+        </div>
+      </div>
+      <div class="">
+        <ul class="logsList">
+          <li class="info">Foo bar</li>
+          <li class="error">Runtime error: no can’t do</li>
+          <li class="error">BruceWillis crashed</li>
+          <li class="error">WebService 500 error code on http://api.github.com/123456/commits</li>
+          <li class="build">Compilation success, Running updated code without resetting debug data</li>
+          <li class="info">Foo bar</li>
+          <li class="info">Foo bar</li>
+          <li class="info">Foo bar</li>
+          <li class="warn">Be careful, there is something weird</li>
+        </ul>
+      </div>
+    </article>
+
+
+    <article class="actors">
+      <header><h1>Actors</h1></header>
+      <div class="divide">
+      <nav class="list-nav">
+        <form class="subheader">
+          <input class="filter" placeholder="Filter actors" />
+        </form>
+        <ul class="list">
+          <li class="actor">
+            <a class="title" href="#">ComputePiActor</a>
+            <p>2 children</p>
+          </li>
+          <li class="dispatcher">
+            <a class="title" href="#">Dispatcher</a>
+            <p>21 children</p>
+          </li>
+          <li class="ActorSystem">
+            <a class="title" href="#">System</a>
+            <p>2 children</p>
+          </li>
+          <li class="actor">
+            <a class="title" href="#">ComputePiActor</a>
+          </li>
+        </ul>
+        <footer>
+          <label><input type="checkbox" checked/> Hide temp actors</label>
+        </footer>
+      </nav>
+      <section>
+        <div class="subheader">
+          <h2>ComputePiActor</h2>
+        </div>
+        <div class="stats">
+          <h3>Overall metrics</h3>
+        </div>
+      </section>
+      </div>
+    </article>
+
+
+    <article class="requests">
+      <header><h1>Requests</h1></header>
+      <div class="divide">
+      <nav class="list-nav">
+        <form class="subheader">
+          <input class="filter" placeholder="Filter request" />
+        </form>
+        <ul class="list">
+          <li class="get">
+            <a class="title" href="#">ComputePiActor</a>
+            <p>2 children</p>
+          </li>
+          <li class="get">
+            <a class="title" href="#">Dispatcher</a>
+            <p>21 children</p>
+          </li>
+          <li class="post">
+            <a class="title" href="#">System</a>
+            <p>2 children</p>
+          </li>
+          <li class="put">
+            <a class="title" href="#">ComputePiActor</a>
+          </li>
+        </ul>
+        <footer>
+          <label><input type="checkbox" checked/> Hide assets</label>
+          <label>
+            <select>
+              <option>Show all requests</option>
+              <option>Show only HTTP</option>
+              <option>Show only WebSockets</option>
+              <option>Show only WebServices</option>
+            </select>
+          </label>
+        </footer>
+      </nav>
+      <section class="stats">
+          <div class="stats-header">
+            <h2><span class="type">GET</span> /user</h2>
+            <div class="options">
+              <dl class="dropdown select">
+                <dt>4</dt>
+                <dd>
+                  <a href="#">200 - Few seconds ago</a>
+                  <a href="#">200 - 2 minutes ago</a>
+                  <a href="#">500 - 3 minutes ago</a>
+                  <a href="#">404 - 4 minutes ago</a>
+                </dd>
+              </dl>
+              <button>E</button>
+              <button>R</button>
+            </div>
+          </div>
+          <div class="summary">
+            <dl>
+              <dt>Response time</dt>
+              <dd>1k</dd>
+            </dl>
+            <dl>
+              <dt>Network</dt>
+              <dd class="network">
+                <span class="down">
+                  2 <span class="unit">kb</span>
+                </span>
+                <span class="up">
+                  5 <span class="unit">kb</span>
+                </span>
+              </dd>
+            </dl>
+            <dl>
+              <dt>Status</dt>
+              <dd>200</dd>
+            </dl>
+          </div>
+          <div class="tabs">
+            <nav>
+              <a href="#" class="active">Headers</a>
+              <a href="#">Response</a>
+              <a href="#">Timing</a>
+            </nav>
+            <div class="pan headers">
+              <h3>Headers</h3>
+              <table>
+                <tr>
+                  <th>Accept</th>
+                  <td>text/html</td>
+                </tr>
+                <tr>
+                  <th>Accept</th>
+                  <td>text/html</td>
+                </tr>
+                <tr>
+                  <th>Accept</th>
+                  <td>text/html</td>
+                </tr>
+                <tr>
+                  <th>Accept</th>
+                  <td>text/html</td>
+                </tr>
+              </table>
+              <h3>Network</h3>
+              <table>
+                <tr>
+                  <th>Accept</th>
+                  <td>text/html</td>
+                </tr>
+                <tr>
+                  <th>Accept</th>
+                  <td>text/html</td>
+                </tr>
+                <tr>
+                  <th>Accept</th>
+                  <td>text/html</td>
+                </tr>
+                <tr>
+                  <th>Accept</th>
+                  <td>text/html</td>
+                </tr>
+              </table>
+              <h3>Request</h3>
+              <table>
+                <tr>
+                  <th>Accept</th>
+                  <td>text/html</td>
+                </tr>
+                <tr>
+                  <th>Accept</th>
+                  <td>text/html</td>
+                </tr>
+                <tr>
+                  <th>Accept</th>
+                  <td>text/html</td>
+                </tr>
+                <tr>
+                  <th>Accept</th>
+                  <td>text/html</td>
+                </tr>
+              </table>
+              <h3>Response</h3>
+              <table>
+                <tr>
+                  <th>Accept</th>
+                  <td>text/html</td>
+                </tr>
+                <tr>
+                  <th>Accept</th>
+                  <td>text/html</td>
+                </tr>
+                <tr>
+                  <th>Accept</th>
+                  <td>text/html</td>
+                </tr>
+                <tr>
+                  <th>Accept</th>
+                  <td>text/html</td>
+                </tr>
+              </table>
+            </div>
+            <div style="display:none" class="pan response"></div>
+            <div style="display:none" class="pan timing"></div>
+          </div>
+
+      </section>
+      </div>
+    </article>
+
+
+    <article class="websockets">
+      <header><h1>Websockets</h1></header>
+      <div class="divide">
+      <nav class="list-nav">
+        <form class="subheader">
+          <input class="filter"/>
+        </form>
+        <ul class="list">
+          <li class="write">
+            <a class="title" href="#">/sock</a>
+            <p>2 children</p>
+          </li>
+          <li>
+            <a class="title" href="#">/sock</a>
+            <p>21 children</p>
+          </li>
+          <li>
+            <a class="title" href="#">/sock</a>
+            <p>2 children</p>
+          </li>
+          <li>
+            <a class="title" href="#">/sock</a>
+          </li>
+        </ul>
+      </nav>
+      <section>
+        <div class="subheader">
+          <h2>ComputePiActor</h2>
+        </div>
+        <div class="stats">
+          <h3>Overall metrics</h3>
+        </div>
+      </section>
+      <footer>
+        <label><input type="checkbox" checked/> Hide assets</label>
+      </footer>
+      </div>
+    </article>
+
+
+    <article class="webservices">
+      <header><h1>Web Services</h1></header>
+      <div class="divide">
+      <nav class="list-nav">
+        <form class="subheader">
+          <input class="filter"/>
+        </form>
+        <ul class="list">
+          <li class="write">
+            <a class="title" href="#">api.github.com/json</a>
+            <p>2 children</p>
+          </li>
+          <li>
+            <a class="title" href="#">api.github.com/json</a>
+            <p>21 children</p>
+          </li>
+          <li>
+            <a class="title" href="#">api.github.com/json</a>
+            <p>2 children</p>
+          </li>
+          <li>
+            <a class="title" href="#">api.github.com/json</a>
+          </li>
+        </ul>
+      </nav>
+      <section>
+        <div class="subheader">
+          <h2>ComputePiActor</h2>
+        </div>
+        <div class="stats">
+          <h3>Overall metrics</h3>
+        </div>
+      </section>
+      <footer>
+        <label><input type="checkbox" checked/> Hide assets</label>
+      </footer>
+      </div>
+    </article>
+
+
+    <article class="errors">
+      <header><h1>Errors</h1></header>
+      <div class="divide">
+      <nav class="list-nav">
+        <form class="subheader">
+          <input class="filter" placeholder="Filter errors" />
+        </form>
+        <ul class="list">
+          <li class="write">
+            <a class="title" href="#new-inspect/errors/1">api.github.com/json</a>
+            <p>2 children</p>
+          </li>
+          <li>
+            <a class="title" href="#new-inspect/errors/1">api.github.com/json</a>
+            <p>21 children</p>
+          </li>
+          <li>
+            <a class="title" href="#new-inspect/errors/1">api.github.com/json</a>
+            <p>2 children</p>
+          </li>
+          <li>
+            <a class="title" href="#new-inspect/errors/1">api.github.com/json</a>
+          </li>
+        </ul>
+        <footer>
+          <label><input type="checkbox" checked/> Hide assets</label>
+        </footer>
+      </nav>
+      <section>
+        <div class="subheader">
+          <h2>ComputePiActor</h2>
+        </div>
+        <div class="stats">
+          <h3>Overall metrics</h3>
+        </div>
+      </section>
+      </div>
+    </article>
+
+
+    <article class="scaffolding ">
+        <header><h1>Scaffolding</h1></header>
+        <div class="wrapper"></div>
+    </article>
+  </section>
+</article>

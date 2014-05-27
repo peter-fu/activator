@@ -24,6 +24,8 @@
 }
 
 #header {
+  position: fixed;
+  top: 0;
   left: 0;
   right: 0;
   .transition();
@@ -33,7 +35,30 @@
   position: fixed;
   bottom: 0;
   right: 0;
-  display: none;
+  .transition();
+
+  body[data-shape='right1'] & ,
+  body[data-shape='right2'] &  {
+    -webkit-transform: translateX(100%);
+    -moz-transform: translateX(100%);
+    transform: translateX(100%);
+    top: 0;
+    width: @panel-width;
+  }
+  body[data-shape='bottom1'] & ,
+  body[data-shape='bottom2'] &  {
+    height: @panel-width;
+    left: 0;
+    -webkit-transform: translateY(100%);
+    -moz-transform: translateY(100%);
+    transform: translateY(100%);
+  }
+}
+body[data-shape='bottom1'],
+body[data-shape='bottom2'] {
+  &.navigationOpened #panels {
+    left: @drawer-width;
+  }
 }
 
 #navigation {
@@ -41,6 +66,7 @@
   -moz-transform: translateX(-100%);
   transform: translateX(-100%);
   .transition();
+  
 }
 
 // Navigation opened
@@ -49,16 +75,16 @@ body.navigationOpened {
     left: @drawer-width;
   }
   #navigation {
-    -webkit-transform: translateX(0);
-    -moz-transform: translateX(0);
-    transform: translateX(0);
+    -webkit-transform: none;
+    -moz-transform: none;
+    transform: none;
   }
 }
 body.navigationSneak {
   #navigation {
-    -webkit-transform: translateX(0);
-    -moz-transform: translateX(0);
-    transform: translateX(0);
+    -webkit-transform: none;
+    -moz-transform: none;
+    transform: none;
   }
 }
 
@@ -66,15 +92,14 @@ body.navigationSneak {
 body.panelOpened {
   #panels {
     display: block;
+    -webkit-transform: none;
+    -moz-transform: none;
+    transform: none;
   }
   &[data-shape='right1'],
   &[data-shape='right2'] {
     #header, #wrapper {
       right: @panel-width;
-    }
-    #panels {
-      top: 0;
-      width: @panel-width;
     }
     main {
       left: @panel-width;
@@ -82,15 +107,6 @@ body.panelOpened {
   }
   &[data-shape='bottom1'],
   &[data-shape='bottom2'] {
-    #panels {
-      height: @panel-width;
-      left: 0;
-    }
-    &.navigationOpened {
-      #panels {
-        left: @drawer-width;
-      }
-    }
     #wrapper {
       bottom: @panel-width;
     }

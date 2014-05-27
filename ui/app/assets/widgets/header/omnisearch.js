@@ -7,7 +7,30 @@ define(['services/search', 'services/sbt'], function(search, sbt) {
   var searchStringLast = "";
   var busy = ko.observable(false);
   var active = ko.observable(false);
-  var options = ko.observableArray([]);
+  var defautOptions = [
+    {
+      "append": "",
+      "title": "compile",
+      "subtitle": "compile",
+      "type": "command",
+      "isEmpty": false
+    },
+    {
+      "append": "",
+      "title": "run",
+      "subtitle": "run",
+      "type": "command",
+      "isEmpty": false
+    },
+    {
+      "append": "",
+      "title": "test",
+      "subtitle": "test",
+      "type": "command",
+      "isEmpty": false
+    }
+  ]
+  var options = ko.observableArray(defautOptions);
   var selected = ko.observable(0);
 
   var combinedSearch = function(keywords) {
@@ -88,12 +111,11 @@ define(['services/search', 'services/sbt'], function(search, sbt) {
             // TODO - Maybe be smarter about how we fill stuff out here?
             options(values);
             busy(false);
-            active(true);
             searchStringLast = keywords;
           });
         } else {
           busy(false);
-          active(false);
+          options(defautOptions);
         }
         break;
     }
@@ -114,6 +136,9 @@ define(['services/search', 'services/sbt'], function(search, sbt) {
       activate(data);
     }
   }
+  var onFocus = function(data, event){
+    active(true);
+  }
   var onBlur = function(data, event){
     var self = this;
     // Delay hiding of omnisearch list to catch mouse click on list before it disappears
@@ -121,7 +146,7 @@ define(['services/search', 'services/sbt'], function(search, sbt) {
       active(false);
       selected(0);
       searchString("");
-    }, 100);
+    }, 200);
   }
   var openSearch = function() {
     $("#omnisearch input")[0].focus();
@@ -134,6 +159,7 @@ define(['services/search', 'services/sbt'], function(search, sbt) {
     scrollToSelected: scrollToSelected,
     onOptionSelected: onOptionSelected,
     onBlur: onBlur,
+    onFocus: onFocus,
     openSearch: openSearch,
     searchString: searchString,
     searchStringLast: searchStringLast,

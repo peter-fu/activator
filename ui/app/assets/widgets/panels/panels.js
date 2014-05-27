@@ -34,6 +34,7 @@ define([
   var toggleShape = function(data, event){
     panelShape(event.target.dataset.panelShape);
     dropdownActive(false);
+    panelOpened(true);
   }
   var toggleDropdown = function(data, event){
     event.stopPropagation();
@@ -49,7 +50,8 @@ define([
     switchPanel: switchPanel,
     toggle: toggle,
     toggleShape: toggleShape,
-    toggleDropdown: toggleDropdown
+    toggleDropdown: toggleDropdown,
+    dropdownActive: dropdownActive
   };
 
   // Default panel:
