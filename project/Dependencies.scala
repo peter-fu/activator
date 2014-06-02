@@ -7,30 +7,31 @@ object Dependencies {
   val sbtPluginScalaVersion = "2.11.1"
   val scalaVersion = "2.11.1"
   val luceneVersion = "4.2.1"
-  val templateCacheVersion = "0.3.0"
-  val sbtRcVersion = "1.0-687cea25e934e60bd9666a5de97f16ba31df86ce"
 
-  val playVersion = "2.2.1"
-  val webJarsVersion = "2.2.1"
-  val akkaVersion = "2.2.3"
-  val slickVersion = "2.0.0"
-  val echoPluginVersion = "0.1.1"
-  val activatorAnalyticsVersion = "0.1.3"
+  val templateCacheVersion = "1.0-5b61a82baa9bb0d9fe161752d6721fe6551eed54"
+  val sbtRcVersion = "1.0-505bbf5905a434292b468fc2ebe5768aef6d3d2e"
+
+  val playVersion = "2.3.0"
+  val akkaVersion = "2.3.3"
+  val slickVersion = "2.1.0-M2"
+  val echoPluginVersion = "0.1.3"
+  val activatorAnalyticsVersion = "0.1.5"
+
   val aspectJVersion = "1.7.3"
 
   val activatorCommon      = "com.typesafe.activator" % "activator-common" % templateCacheVersion
   val templateCache        = "com.typesafe.activator" % "activator-templates-cache" % templateCacheVersion
 
+  // 2.10 sbt
   val sbtIo210             = "org.scala-sbt" % "io" % sbtVersion
   val sbtLauncherInterface = "org.scala-sbt" % "launcher-interface" % sbtVersion
-  val sbtMain              = "org.scala-sbt" % "main" % sbtVersion
-  val sbtTheSbt            = "org.scala-sbt" % "sbt" % sbtVersion
-  val sbtIo                = "org.scala-sbt" % "io" % "0.13.6-MSERVER-1"
-  val sbtLogging           = "org.scala-sbt" % "logging" % sbtVersion
-  val sbtProcess           = "org.scala-sbt" % "process" % sbtVersion
+
+  // 2.11 sbt
+  val sbtIo                = "org.scala-sbt" %% "io" % sbtVersion
+  val sbtCompletion        = "org.scala-sbt" %% "completion" % sbtVersion
 
   // sbtrc projects
-  val sbtrcClient          = "com.typesafe.sbtrc" % "client" % sbtRcVersion
+  val sbtrcClient          = "com.typesafe.sbtrc" % "client-2-11" % sbtRcVersion
   val sbtrcIntegration     = "com.typesafe.sbtrc" % "integration-tests" % sbtRcVersion
 
   val akkaActor            = "com.typesafe.akka" %% "akka-actor" % akkaVersion
