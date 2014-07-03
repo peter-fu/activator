@@ -1,30 +1,7 @@
 /*
  Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
  */
-define(['text!./browse.html', 'commons/utils', 'commons/widget', './files'], function(template, utils, Widget, files) {
-
-  // TODO - Don't duplicate this in both view.js + browse.js...
-  function open(location) {
-    return $.ajax({
-      url: '/api/local/open',
-      type: 'GET',
-      data: {
-        location: location
-      }
-    });
-  }
-
-  function create(location, isDirectory) {
-    return $.ajax({
-      url: '/api/local/create',
-      type: 'PUT',
-      dataType: 'text',
-      data: {
-        location: location,
-        isDirectory: isDirectory
-      }
-    });
-  }
+define(['text!./browse.html', 'commons/utils', 'commons/widget', './files', 'services/sbt', './eclipseGenerator', './ideaGenerator', 'services/ajax'], function(template, utils, Widget, files, sbt, eclipse, idea, ajax) {
 
   var Browser = utils.Class(Widget, {
     id: 'code-browser-view',
@@ -79,6 +56,12 @@ define(['text!./browse.html', 'commons/utils', 'commons/widget', './files'], fun
         alert('Failed to open directory.  This may be unsupported by your system.');
       });
     },
+    generateEclipseProject: function() {
+      eclipse.generate(false);
+    },
+    generateIdeaProject: function() {
+      idea.generate(false);
+    },
     newSomething: function(isDirectory) {
       var self = this;
       var message;
@@ -90,7 +73,7 @@ define(['text!./browse.html', 'commons/utils', 'commons/widget', './files'], fun
       if (typeof(name) == 'string' && name.length > 0) {
         var full = this.directory().location + "/" + name;
         debug && console.log('Creating file or folder: ', full);
-        create(full, isDirectory).done(function () {
+        ajax.create(full, isDirectory).done(function () {
           debug && console.log('Success creating file or folder');
           // reload (since we don't watch for changes...)
           self.directory().loadInfo();
@@ -107,7 +90,7 @@ define(['text!./browse.html', 'commons/utils', 'commons/widget', './files'], fun
           alert(err.responseText);
         });
       } else {
-        debug && console.log('No name entered, got: ', name)
+        debug && console.log('No name entered, got: ', name);
       }
     },
     newFile: function() {

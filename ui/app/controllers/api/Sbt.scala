@@ -41,7 +41,6 @@ object Sbt extends Controller {
 
   def requestExecution() = jsonAction { json =>
     val command = (json \ "command").as[String]
-
     withApp(json) { app =>
       app.actor.ask(snap.RequestExecution(command)) map {
         case executionId: Long =>
@@ -54,7 +53,6 @@ object Sbt extends Controller {
 
   def cancelExecution() = jsonAction { json =>
     val executionId = (json \ "executionId").as[Long]
-
     withApp(json) { app =>
       app.actor.ask(snap.CancelExecution(executionId)) map {
         case result: Boolean =>
@@ -69,7 +67,7 @@ object Sbt extends Controller {
     val partialCommand = (json \ "partialCommand").as[String]
 
     withApp(json) { app =>
-      app.actor.ask(snap.PossibleAutocompletions(partialCommand)) map {
+      app.actor.ask(snap.PossibleAutoCompletions(partialCommand)) map {
         case choicesAny: Set[_] =>
           val choices = choicesAny.map(_.asInstanceOf[sbt.protocol.Completion])
           val jsonChoices = JsArray(choices.toList map { choice =>
@@ -79,6 +77,13 @@ object Sbt extends Controller {
         case other =>
           throw new RuntimeException("Unexpected reply to autocompletions " + other)
       }
+    }
+  }
+
+  def restart() = jsonAction { json =>
+    withApp(json) { app =>
+      app.actor.tell(snap.RequestSelfDestruct, null)
+      Future { Ok(Json.obj("restart" -> "requested")) }
     }
   }
 }
