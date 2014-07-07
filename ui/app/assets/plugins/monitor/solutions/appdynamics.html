@@ -28,12 +28,17 @@
   <div class="row">
     <span class="label">Tier name:</span><input type="text" id="tierName" data-bind="value: tierName, valueUpdate: 'input',  css: {error: tierNameInvalid() }"/>
   </div>
-  <!-- ko ifnot: configured -->
+  <!-- ko if: changed -->
+  <!-- ko if: canSave -->
+  <button class="button" data-bind="click: saveConfig">Save config</button><button data-bind="click: cancelSave">Cancel</button>
+  <!-- /ko -->
+  <!-- ko ifnot: canSave -->
   <section class="warning">
     AppDynamics is not properly configured.  Please correct items marked in red.
   </section>
   <!-- /ko -->
-  <!-- ko if: configured -->
+  <!-- /ko -->
+  <!-- ko ifnot: changed -->
   <section>
     <h2>AppDynamics is properly configured!</h2>
     <p>You can change these values at any time.</p>

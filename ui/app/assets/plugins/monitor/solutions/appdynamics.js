@@ -82,42 +82,6 @@ define(['commons/utils', 'commons/widget', 'services/appdynamics', 'text!./appdy
             appdynamics.deprovision();
           }
         };
-        self.saveNodeName = function (newValue) {
-          if (appdynamics.validNodeName.test(newValue)) {
-            debug && console.log("saving nodeName: "+newValue);
-            appdynamics.nodeName(newValue);
-          }
-        };
-        self.saveTierName = function (newValue) {
-          if (appdynamics.validTierName.test(newValue)) {
-            debug && console.log("saving tierName: "+newValue);
-            appdynamics.tierName(newValue);
-          }
-        };
-        self.saveHostName = function (newValue) {
-          if (appdynamics.validHostName.test(newValue)) {
-            debug && console.log("saving hostName: "+newValue);
-            appdynamics.hostName(newValue);
-          }
-        };
-        self.savePort = function (newValue) {
-          if (appdynamics.validPort.test(newValue)) {
-            debug && console.log("saving port: "+newValue);
-            appdynamics.port(newValue);
-          }
-        };
-        self.saveAccountName = function (newValue) {
-          if (appdynamics.validAccountName.test(newValue)) {
-            debug && console.log("saving accountName: "+newValue);
-            appdynamics.accountName(newValue);
-          }
-        };
-        self.saveAccessKey = function (newValue) {
-          if (appdynamics.validAccessKey.test(newValue)) {
-            debug && console.log("saving accessKey: "+newValue);
-            appdynamics.accessKey(newValue);
-          }
-        };
 
         self.hostName = ko.observable((function () {
           var hn = appdynamics.hostName();
@@ -127,18 +91,78 @@ define(['commons/utils', 'commons/widget', 'services/appdynamics', 'text!./appdy
             return hn;
           }
         })());
-        self.hostName.subscribe(self.saveHostName);
         self.port = ko.observable(appdynamics.port());
-        self.port.subscribe(self.savePort);
-        self.sslEnabled = appdynamics.sslEnabled;
+        self.sslEnabled = ko.observable(appdynamics.sslEnabled());
         self.accountName = ko.observable(appdynamics.accountName());
-        self.accountName.subscribe(self.saveAccountName);
         self.accessKey = ko.observable(appdynamics.accessKey());
-        self.accessKey.subscribe(self.saveAccessKey);
         self.nodeName = ko.observable(appdynamics.nodeName());
-        self.nodeName.subscribe(self.saveNodeName);
         self.tierName = ko.observable(appdynamics.tierName());
-        self.tierName.subscribe(self.saveTierName);
+
+        self.doSaveConfig = function (hostName,port,sslEnabled,accountName,accessKey,nodeName,tierName) {
+          if (appdynamics.validNodeName.test(nodeName) &&
+              appdynamics.validTierName.test(tierName) &&
+              appdynamics.validHostName.test(hostName) &&
+              appdynamics.validPort.test(port) &&
+              appdynamics.validAccountName.test(accountName) &&
+              appdynamics.validAccessKey.test(accessKey)) {
+            appdynamics.nodeName(nodeName);
+            appdynamics.tierName(tierName);
+            appdynamics.hostName(hostName);
+            appdynamics.port(port);
+            appdynamics.accountName(accountName);
+            appdynamics.accessKey(accessKey);
+            appdynamics.sslEnabled(sslEnabled);
+            return true;
+          } else {
+            return false;
+          }
+        };
+        self.saveConfig = function() {
+          return self.doSaveConfig(self.hostName(),self.port(),self.sslEnabled(),self.accountName(),self.accessKey(),self.nodeName(),self.tierName());
+        };
+        self.cancelSave = function() {
+          self.hostName((function () {
+            var hn = appdynamics.hostName();
+            if (typeof(hn) == 'undefined' || hn == null || hn == "") {
+              return ".saas.appdynamics.com";
+            } else {
+              return hn;
+            }
+          })());
+          self.port(appdynamics.port());
+          self.sslEnabled(appdynamics.sslEnabled());
+          self.accountName(appdynamics.accountName());
+          self.accessKey(appdynamics.accessKey());
+          self.nodeName(appdynamics.nodeName());
+          self.tierName(appdynamics.tierName());
+        };
+        self.checkCanSave = function (hostName,port,sslEnabled,accountName,accessKey,nodeName,tierName) {
+          return (appdynamics.validNodeName.test(nodeName) &&
+                  appdynamics.validTierName.test(tierName) &&
+                  appdynamics.validHostName.test(hostName) &&
+                  appdynamics.validPort.test(port) &&
+                  appdynamics.validAccountName.test(accountName) &&
+                  appdynamics.validAccessKey.test(accessKey));
+        };
+        self.checkIsDifferent = function (hostName,port,sslEnabled,accountName,accessKey,nodeName,tierName) {
+          return (appdynamics.nodeName() != nodeName ||
+                  appdynamics.tierName() != tierName ||
+                  appdynamics.sslEnabled() != sslEnabled ||
+                  appdynamics.hostName() != hostName ||
+                  appdynamics.port() != port ||
+                  appdynamics.accountName() != accountName ||
+                  appdynamics.accessKey() != accessKey);
+        };
+
+        self.canSave = ko.computed(function () {
+          return self.checkCanSave(self.hostName(),self.port(),self.sslEnabled(),self.accountName(),self.accessKey(),self.nodeName(),self.tierName());
+        }, self);
+        self.changed = ko.computed(function () {
+          return self.checkIsDifferent(self.hostName(),self.port(),self.sslEnabled(),self.accountName(),self.accessKey(),self.nodeName(),self.tierName());
+        }, self);
+        self.shouldSave = ko.computed(function () {
+          return (self.canSave() && self.changed());
+        }, self);
 
         self.nodeNameInvalid = ko.computed(function() {
           return !appdynamics.validNodeName.test(self.nodeName());
@@ -158,15 +182,6 @@ define(['commons/utils', 'commons/widget', 'services/appdynamics', 'text!./appdy
         self.accessKeyInvalid = ko.computed(function () {
           return (!appdynamics.validAccessKey.test(self.accessKey()));
         },self);
-
-        self.configured = ko.computed(function () {
-          return (appdynamics.validNodeName.test(self.nodeName()) &&
-          appdynamics.validTierName.test(self.tierName()) &&
-          appdynamics.validPort.test(self.port()) &&
-          appdynamics.validAccountName.test(self.accountName()) &&
-          appdynamics.validAccessKey.test(self.accessKey()) &&
-          appdynamics.validHostName.test(self.hostName()));
-        }, self);
       }
     });
 
