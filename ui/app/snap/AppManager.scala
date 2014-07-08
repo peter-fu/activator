@@ -45,7 +45,7 @@ class AppCacheActor extends Actor with ActorLogging {
             // this should be "instant" but 5 seconds to be safe
             val app = Await.result(cached.futureApp, 5.seconds)
             if (Some(app.actor) == deadRef || app.isTerminated) {
-              //log.debug("cleaning up terminated app actor {} {}", id, app.actor)
+              log.debug("cleaning up terminated app actor {} {}", socketId, app.actor)
               false
             } else {
               //log.debug("keeping live app actor {} {}", id, app.actor)
@@ -58,7 +58,7 @@ class AppCacheActor extends Actor with ActorLogging {
           }
         } else {
           // still pending, keep it
-          //log.debug("app actor {} still pending", id)
+          log.debug("app actor {} still pending start", socketId)
           true
         }
     }
@@ -88,6 +88,7 @@ class AppCacheActor extends Actor with ActorLogging {
             // set up to watch the app's actor, or forget the future
             // if the app is never created
             appFuture.onComplete { value =>
+              log.debug(s"Completed app future for ${id} with ${value}")
               value.foreach { app =>
                 context.watch(app.actor)
               }
@@ -107,7 +108,7 @@ class AppCacheActor extends Actor with ActorLogging {
               GotApp(a)
             } pipeTo sender
           case None => {
-            sender ! Status.Failure(new RuntimeException(s"No app found with socket ID $socketId"))
+            sender ! Status.Failure(new RuntimeException(s"No app found with socket ID $socketId, we have these ids: ${appCache.keys}"))
           }
         }
       case ForgetApp(appId) =>
