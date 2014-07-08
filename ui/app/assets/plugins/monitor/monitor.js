@@ -45,8 +45,7 @@ define([
 
   var MonitorState = {
     monitorWidget: new MonitorWidget(),
-    provider: ko.observable()
-
+    provider: ko.observable(null)
   };
 
   return {
