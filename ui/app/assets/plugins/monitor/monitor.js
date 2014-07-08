@@ -20,39 +20,6 @@ define([
   AppDynamics,
   css
 ){
-
-// define([
-//   "main/plugins",
-//   "text!./monitor.html",
-//   "css!./monitor",
-//   "widgets/navigation/menu"
-// ], function(
-//   plugins,
-//   template
-// ) {
-
-//   var MonitorState = {
-//     provider: ko.observable({
-//       name: "Rew Relic",
-//       logo: "/public/images/monitor/newrelic.png",
-//       installed: false
-//     })
-//   }
-
-//   return {
-//     render: function(url) {
-//       var $monitor = $(template)[0];
-//       ko.applyBindings(MonitorState, $monitor);
-//       return $monitor;
-//     },
-
-//     route: plugins.memorizeUrl(function(url, breadcrumb) {
-//       // not used yet
-//     })
-//   }
-
-// });
-
   var MonitorWidget = utils.Class(Widget, {
     id: 'monitor-widget',
     template: widgetTemplate,
