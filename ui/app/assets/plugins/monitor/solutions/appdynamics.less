@@ -1,15 +1,21 @@
 @import 'colors';
 @import '../../../commons/_base';
 
-section {
-  div.row {
-    height: 2.5em;
-    .label {
-      float: left;
-      text-align: right;
-      width: 160px;
-      padding-right: 5px;
-      line-height: 2em;
-    }
+#wrapper  .monitor .appdynamics {
+  form p {
+    padding: 3px 0;
+    margin: 0;
+    .clear-after();
+  }
+  label {
+    display: block;
+    clear: both;
+    float: left;
+    text-align: right;
+    width: 150px;
+    padding: 3px 5px 0 0;
+  }
+  p.err {
+    color: @red;
   }
 }
