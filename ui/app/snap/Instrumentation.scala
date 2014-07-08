@@ -12,6 +12,50 @@ import com.typesafe.config.{ Config => TSConfig }
 
 import scala.concurrent.duration._
 
+sealed abstract class InstrumentationRequestType(val name: String) {
+  def tag: InstrumentationTag
+}
+
+object InstrumentationRequestTypes {
+  case object Inspect extends InstrumentationRequestType(Instrumentations.inspectName) {
+    final val tag: InstrumentationTag = snap.Inspect.tag
+  }
+  case object NewRelic extends InstrumentationRequestType(Instrumentations.newRelicName) {
+    final val tag: InstrumentationTag = snap.NewRelic.Tag
+  }
+  case class AppDynamics(applicationName: String,
+    nodeName: String,
+    tierName: String,
+    accountName: String,
+    accessKey: String,
+    hostName: String,
+    port: Int,
+    sslEnabled: Boolean) extends InstrumentationRequestType(Instrumentations.appDynamicsName) {
+    final val tag: InstrumentationTag = snap.AppDynamics.Tag(applicationName, nodeName, tierName, accountName, accessKey, hostName, port, sslEnabled)
+  }
+
+  def fromParams(params: Map[String, Any]): InstrumentationRequestType =
+    params.get("instrumentation").asInstanceOf[Option[String]].getOrElse(Instrumentations.inspectName) match {
+      case Instrumentations.inspectName => InstrumentationRequestTypes.Inspect
+      case Instrumentations.newRelicName => InstrumentationRequestTypes.NewRelic
+      case Instrumentations.appDynamicsName =>
+        (for {
+          applicationName <- params.get("applicationName").asInstanceOf[Option[String]]
+          nodeName <- params.get("nodeName").asInstanceOf[Option[String]]
+          tierName <- params.get("tierName").asInstanceOf[Option[String]]
+          accountName <- params.get("accountName").asInstanceOf[Option[String]]
+          accessKey <- params.get("accessKey").asInstanceOf[Option[String]]
+          hostName <- params.get("hostName").asInstanceOf[Option[String]]
+          port <- params.get("port").asInstanceOf[Option[BigDecimal]].map(_.intValue())
+          sslEnabled <- params.get("sslEnabled").asInstanceOf[Option[Boolean]]
+        } yield {
+          InstrumentationRequestTypes.AppDynamics(applicationName, nodeName, tierName, accountName, accessKey, hostName, port, sslEnabled)
+        }).getOrElse {
+          throw new InstrumentationRequestException(s"Invalid request for AppDynamics instrumentation.  Request must include: 'applicationName', 'nodeName', 'tierName', 'accountName', 'accessKey', 'hostName', 'port', and 'sslEnabled'.  Got: $params")
+        }
+    }
+}
+
 sealed trait InstrumentationTag {
   def name: String
 }
