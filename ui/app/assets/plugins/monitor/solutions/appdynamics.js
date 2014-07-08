@@ -85,7 +85,7 @@ define(['commons/utils', 'commons/widget', 'services/appdynamics', 'text!./appdy
 
         self.hostName = ko.observable((function () {
           var hn = appdynamics.hostName();
-          if (typeof(hn) == 'undefined' || hn == null || hn == "") {
+          if (hn == "") {
             return ".saas.appdynamics.com";
           } else {
             return hn;
@@ -123,7 +123,7 @@ define(['commons/utils', 'commons/widget', 'services/appdynamics', 'text!./appdy
         self.cancelSave = function() {
           self.hostName((function () {
             var hn = appdynamics.hostName();
-            if (typeof(hn) == 'undefined' || hn == null || hn == "") {
+            if (hn == "") {
               return ".saas.appdynamics.com";
             } else {
               return hn;
