@@ -31,7 +31,7 @@ define(['services/build', 'services/newrelic', 'services/appdynamics', 'text!./r
     });
     self.showMonitoringOptions = ko.computed(function () {
       var options = self.monitoringOptions();
-      return (options != undefined && options.length > 1);
+      return (options.length > 1);
     }, self);
     self.title = ko.observable("Run");
     self.startStopLabel = ko.computed(function() {
