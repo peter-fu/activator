@@ -21,7 +21,7 @@
       </p>
       <p>
         <label></label>
-        <button class="button big install" data-bind="click: provisionAppDynamics, disable: !usernameInvalid() && !passwordInvalid() ">Download</button>
+        <button class="button big install" data-bind="click: provisionAppDynamics, disable: usernameInvalid() || passwordInvalid() ">Download</button>
         <span data-bind="text: downloading"></span>
       </p>
     </form>
