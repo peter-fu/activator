@@ -152,7 +152,7 @@ object Provisioning {
   def simpleDownloadExecutor(client: WSClient,
     downloadUrl: String,
     notificationSink: StatusNotifier,
-    timeout: Timeout = Timeout(30.seconds)): DownloadExecutor = {
+    timeout: Timeout): DownloadExecutor = {
     val dl = downloadUrl
     new DownloadExecutor {
       def downloadUrl: String = dl
