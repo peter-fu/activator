@@ -65,7 +65,7 @@ define(['commons/utils', 'commons/widget', 'services/newrelic', 'text!./newrelic
             self.provisionDownloadSubscription(null);
           }
         };
-        self.error = ko.observable();
+        self.error = ko.observable("");
         self.provisionNewRelic = function () {
           if (self.downloadEnabled()) {
             self.error("");

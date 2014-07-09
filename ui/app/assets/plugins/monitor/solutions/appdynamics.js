@@ -68,7 +68,7 @@ define(['commons/utils', 'commons/widget', 'services/appdynamics', 'text!./appdy
             self.provisionDownloadSubscription(null);
           }
         };
-        self.error = ko.observable();
+        self.error = ko.observable("");
         self.provisionAppDynamics = function () {
           if (self.downloadEnabled()) {
             self.error("");
