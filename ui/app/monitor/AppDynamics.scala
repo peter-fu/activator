@@ -12,7 +12,7 @@ import scala.concurrent.duration._
 import monitor.Provisioning.{ StatusNotifier, DownloadExecutor, DownloadPrepExecutor }
 import play.api.libs.ws.{ WSClient, WSResponse, WSRequestHolder, WSCookie }
 import snap.{ FileHelper, AppDynamics => AD }
-import scala.util.{ Try, Failure, Success }
+import scala.util.{ Success, Failure }
 import scala.concurrent.{ Future, ExecutionContext }
 import akka.event.LoggingAdapter
 
@@ -141,20 +141,22 @@ object AppDynamics {
               // This shouldn't be necessary.  Somewhere an exception if being eaten.
               ns.provisioningError(s"Failure during provisioning: ${error.getMessage}", error)
           }
-      case r @ Deprovision =>
-        Try(AD.deprovision(config.extractRoot())) match {
-          case Success(v) => sender ! r.response
-          case Failure(e) =>
-            log.error(e, "Failure deprovisioning AppDynamics")
-            sender ! r.error(s"Failure deprovisioning AppDynamics: ${e.getMessage}")
-        }
-      case r @ Available =>
-        Try(AD.hasAppDynamics(config.extractRoot())) match {
-          case Success(v) => sender ! r.response(v)
-          case Failure(e) =>
-            log.error(e, "Failure during AppDynamics availability check")
-            sender ! r.error(s"Failure during AppDynamics availability check: ${e.getMessage}")
-        }
+      case r @ Deprovision => try {
+        AD.deprovision(config.extractRoot())
+        sender ! r.response
+      } catch {
+        case e: Exception =>
+          log.error(e, "Failure deprovisioning AppDynamics")
+          sender ! r.error(s"Failure deprovisioning AppDynamics: ${e.getMessage}")
+      }
+      case r @ Available => try {
+        val v = AD.hasAppDynamics(config.extractRoot())
+        sender ! r.response(v)
+      } catch {
+        case e: Exception =>
+          log.error(e, "Failure during AppDynamics availability check")
+          sender ! r.error(s"Failure during AppDynamics availability check: ${e.getMessage}")
+      }
     }
   }
 }
