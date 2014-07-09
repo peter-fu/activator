@@ -74,7 +74,7 @@ define(['commons/utils', 'commons/streams', 'commons/settings', 'services/build'
         });
       };
       self.onStreamOpen(function (event) {
-        console.log("Making initial request to check NR availability");
+        debug && console.log("Making initial request to check NR availability");
         streams.send(nrMessage("available"));
         self.checkIsProjectEnabled();
       });
