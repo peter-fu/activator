@@ -14,6 +14,7 @@ define(['services/search', 'services/sbt'], function(search, sbt) {
     console.log("starting search on " + keywords);
     return ($.when(search.doSearch(keywords), sbt.possibleAutocompletions(keywords))
     .then(function(searchValues, sbtCompletions) {
+        console.log(searchValues, sbtCompletions)
         // TODO not handling errors here...
         var sbtValues = $.map(sbtCompletions[0].choices, function(completion, i) {
           return {
@@ -37,6 +38,12 @@ define(['services/search', 'services/sbt'], function(search, sbt) {
     }
   }
 
+  var onKeyDown = function(data, event){
+    if (event.keyCode != 9) return true;
+    // autocomplete on TAB
+    event.target.value = options()[selected()].execute;
+  }
+
   var onKeyUp = function(data, event){
     switch (event.keyCode) {
       // Escape
@@ -53,21 +60,25 @@ define(['services/search', 'services/sbt'], function(search, sbt) {
         break;
       // Up
       case 38:
+        event.preventDefault();
         if (selected() > 0) {
           selected(selected() - 1);
         } else {
           selected(options().length - 1);
         }
         scrollToSelected();
+        // return false;
         break;
       // Down
       case 40:
+        event.preventDefault();
         if (selected() < options().length - 1) {
           selected(selected() + 1);
         } else {
           selected(0);
         }
         scrollToSelected();
+        // return false;
         break;
       default:
         var keywords = searchString();
@@ -131,6 +142,7 @@ define(['services/search', 'services/sbt'], function(search, sbt) {
 
   return {
     onKeyUp: onKeyUp,
+    onKeyDown: onKeyDown,
     scrollToSelected: scrollToSelected,
     onOptionSelected: onOptionSelected,
     onBlur: onBlur,
