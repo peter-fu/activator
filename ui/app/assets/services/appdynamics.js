@@ -80,7 +80,7 @@ define(['commons/utils', 'commons/streams', 'commons/settings', 'services/build'
         },
         handler: function (event) {
           if (event.type == "availableResponse") {
-            debug && console.log("setting available to: " + event.result);
+            debug && console.log("setting available to: ",event.result);
             self.available(event.result);
           } else if (event.type == "provisioned") {
             debug && console.log("AppDynamics provisioned");

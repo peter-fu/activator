@@ -4,6 +4,14 @@
 define(['commons/utils', 'commons/widget', 'services/appdynamics', 'text!./appdynamics.html', 'css!./appdynamics.css'],
   function(utils, Widget, appdynamics, template, css){
 
+    var downloadDescriptions = {
+      'authenticating': 'Authenticating',
+      'downloadComplete': 'Download complete',
+      'validating': 'Validating',
+      'extracting': 'Extracting',
+      'complete': 'Complete'
+    };
+
     var AppDynamics = utils.Class(Widget,{
       id: 'appdynamics-widget',
       template: template,
@@ -32,7 +40,7 @@ define(['commons/utils', 'commons/widget', 'services/appdynamics', 'text!./appdy
           return !appdynamics.validPassword.test(key);
         }, self);
         self.downloading.subscribe(function(value) {
-          debug && console.log("downloading: "+value);
+          debug && console.log("downloading: ",value);
         });
         self.provisionObserver = function(value) {
           var message = "";
@@ -40,8 +48,6 @@ define(['commons/utils', 'commons/widget', 'services/appdynamics', 'text!./appdy
             message = "Error provisioning AppDynamics: "+value.message;
             self.downloading(message);
             self.error(message);
-          } else if (value.type == "authenticating") {
-            self.downloading("Authenticating");
           } else if (value.type == "downloading") {
             self.downloading("Downloading: "+value.url);
           } else if (value.type == "progress") {
@@ -52,16 +58,9 @@ define(['commons/utils', 'commons/widget', 'services/appdynamics', 'text!./appdy
               message = value.bytes+" bytes";
             }
             self.downloading("Progress: "+message);
-          } else if (value.type == "downloadComplete") {
-            self.downloading("Download complete");
-          } else if (value.type == "validating") {
-            self.downloading("Validating");
-          } else if (value.type == "extracting") {
-            self.downloading("Extracting");
-          } else if (value.type == "complete") {
-            self.downloading("Complete");
           } else {
-            self.downloading("UNKNOWN STATE!!!");
+            var message = downloadDescriptions[value.type] || "UNKNOWN STATE!!!";
+            self.downloading(message);
           }
 
           if (value.type == "complete" || value.type == "provisioningError") {
