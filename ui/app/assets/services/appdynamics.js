@@ -10,6 +10,7 @@ define(['commons/utils', 'commons/streams', 'commons/settings', 'services/build'
   var sslEnabled = settings.observable("appDynamics.sslEnabled", true);
   var accountName = settings.observable("appDynamics.accountName", "");
   var accessKey = settings.observable("appDynamics.accessKey", "");
+  var available = ko.observable("checking");
 
   function adMessage(type) {
     return { request: 'AppDynamicsRequest', type: type };
@@ -17,6 +18,14 @@ define(['commons/utils', 'commons/streams', 'commons/settings', 'services/build'
 
   function adMessageWith(type,attributes) {
     return jQuery.extend(adMessage(type), attributes);
+  }
+
+  function onStreamOpen(handler) {
+    streams.subscribe(function (event) {
+      if (event.type == 'SourcesMayHaveChanged') {
+        handler(event);
+      }
+    });
   }
 
   var validNodeName = /^[0-9a-z@\._-]{1,40}$/i;
@@ -33,91 +42,80 @@ define(['commons/utils', 'commons/streams', 'commons/settings', 'services/build'
   var validAccessKey = /^[0-9a-z]{12}$/i;
   var validHostName = /^[0-9a-z][0-9a-z\.\-$*_]{1,128}/i;
 
-  var appDynamics = utils.Singleton({
-    init: function() {
-      var self = this;
-      self.validNodeName = validNodeName;
-      self.validTierName = validTierName;
-      self.validUsername = validUsername;
-      self.validPassword = validPassword;
-      self.validPort = validPort;
-      self.validAccountName = validAccountName;
-      self.validAccessKey = validAccessKey;
-      self.validHostName = validHostName;
-
-      self.hostName = hostName;
-      self.port = port;
-      self.sslEnabled = sslEnabled;
-      self.accountName = accountName;
-      self.accessKey = accessKey;
-      self.nodeName = nodeName;
-      self.tierName = tierName;
-      self.configured = ko.computed(function () {
-        return (self.validNodeName.test(self.nodeName()) &&
-        self.validTierName.test(self.tierName()) &&
-        self.validPort.test(self.port()) &&
-        self.validAccountName.test(self.accountName()) &&
-        self.validAccessKey.test(self.accessKey()) &&
-        self.validHostName.test(self.hostName()));
-      }, self);
-      self.observeProvision = function(observable) {
-        return streams.subscribe({
-          filter: function(event) {
-            return event.response == 'ProvisioningStatus';
-          },
-          handler: function (event) {
-            observable(event);
-          }
-        });
-      };
-      self.cancelObserveProvision = function(o) {
-        streams.unsubscribe(o);
-      };
-      self.available = ko.observable("checking");
-      streams.subscribe({
-        filter: function(event) {
-          return event.response == 'AppDynamicsResponse';
-        },
-        handler: function (event) {
-          if (event.type == "availableResponse") {
-            debug && console.log("setting available to: ",event.result);
-            self.available(event.result);
-          } else if (event.type == "provisioned") {
-            debug && console.log("AppDynamics provisioned");
-            streams.send(adMessage("available"));
-          } else if (event.type == "deprovisioned") {
-            debug && console.log("AppDynamics de-provisioned");
-            streams.send(adMessage("available"));
-          }
-        }
-      });
-      self.onStreamOpen = function (handler) {
-        streams.subscribe(function (event) {
-          if (event.type == 'SourcesMayHaveChanged') {
-            handler(event);
-          }
-        });
-      };
-      self.onStreamOpen(function (event) {
-        debug && console.log("Making initial request to check AD availability");
+  streams.subscribe({
+    filter: function(event) {
+      return event.response == 'AppDynamicsResponse';
+    },
+    handler: function (event) {
+      if (event.type == "availableResponse") {
+        debug && console.log("setting available to: ",event.result);
+        available(event.result);
+      } else if (event.type == "provisioned") {
+        debug && console.log("AppDynamics provisioned");
         streams.send(adMessage("available"));
-      });
-      self.provision = function(username,password) {
-        streams.send(adMessageWith("provision",{username: username, password: password}))
-      };
-      self.deprovision = function() {
-        streams.send(adMessage("deprovision"));
-      };
-      self.nodeNameSaved = ko.computed(function() {
-        var name = self.nodeName();
-        return self.validNodeName.test(name);
-      }, self);
-      self.tierNameSaved = ko.computed(function() {
-        var name = self.tierName();
-        return self.validTierName.test(name);
-      }, self);
+      } else if (event.type == "deprovisioned") {
+        debug && console.log("AppDynamics de-provisioned");
+        streams.send(adMessage("available"));
+      }
     }
   });
 
-  return appDynamics;
+  onStreamOpen(function (event) {
+    debug && console.log("Making initial request to check AD availability");
+    streams.send(adMessage("available"));
+  });
+
+  return {
+    validNodeName: validNodeName,
+    validTierName: validTierName,
+    validUsername: validUsername,
+    validPassword: validPassword,
+    validPort: validPort,
+    validAccountName: validAccountName,
+    validAccessKey: validAccessKey,
+    validHostName: validHostName,
+    hostName: hostName,
+    port: port,
+    sslEnabled: sslEnabled,
+    accountName: accountName,
+    accessKey: accessKey,
+    nodeName: nodeName,
+    tierName: tierName,
+    configured: ko.computed(function () {
+      return (validNodeName.test(nodeName()) &&
+      validTierName.test(tierName()) &&
+      validPort.test(port()) &&
+      validAccountName.test(accountName()) &&
+      validAccessKey.test(accessKey()) &&
+      validHostName.test(hostName()));
+    }),
+    observeProvision: function(observable) {
+      return streams.subscribe({
+        filter: function(event) {
+          return event.response == 'ProvisioningStatus';
+        },
+        handler: function (event) {
+          observable(event);
+        }
+      });
+    },
+    cancelObserveProvision: function(o) {
+      streams.unsubscribe(o);
+    },
+    available: available,
+    provision: function(username,password) {
+      streams.send(adMessageWith("provision",{username: username, password: password}))
+    },
+    deprovision: function() {
+      streams.send(adMessage("deprovision"));
+    },
+    nodeNameSaved: ko.computed(function() {
+      var name = nodeName();
+      return validNodeName.test(name);
+    }),
+    tierNameSaved: ko.computed(function() {
+      var name = tierName();
+      return validTierName.test(name);
+    })
+  };
 });
