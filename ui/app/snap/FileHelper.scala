@@ -135,11 +135,14 @@ object FileHelper {
 
   def deleteAll(file: File): Unit = {
     if (file.isDirectory) {
-      file.list().toSeq match {
-        case files if files.length == 0 => file.delete()
-        case files =>
-          files.foreach(f => deleteAll(new File(file, f)))
-          file.delete()
+      file.list() match {
+        case null =>
+        case l => l.toSeq match {
+          case files if files.length == 0 => file.delete()
+          case files =>
+            files.foreach(f => deleteAll(new File(file, f)))
+            file.delete()
+        }
       }
     } else {
       file.delete()
