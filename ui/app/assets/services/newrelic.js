@@ -37,16 +37,13 @@ define(['commons/utils', 'commons/streams', 'commons/settings', 'services/build'
       if (event.type == "availableResponse") {
         debug && console.log("setting available to: " + event.result);
         available(event.result);
-      }
-      if (event.type == "provisioned") {
+      } else if (event.type == "provisioned") {
         debug && console.log("New Relic provisioned");
         streams.send(nrMessage("available"));
-      }
-      if (event.type == "isProjectEnabledResponse") {
+      } else if (event.type == "isProjectEnabledResponse") {
         debug && console.log("Setting isProjectEnabled to: " + event.result);
         isProjectEnabled(event.result);
-      }
-      if (event.type == "projectEnabled") {
+      } else if (event.type == "projectEnabled") {
         debug && console.log("Project enabled for New Relic");
         checkIsProjectEnabled();
       }

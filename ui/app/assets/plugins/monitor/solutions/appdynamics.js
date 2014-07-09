@@ -59,7 +59,7 @@ define(['commons/utils', 'commons/widget', 'services/appdynamics', 'text!./appdy
             }
             self.downloading("Progress: "+message);
           } else {
-            var message = downloadDescriptions[value.type] || "UNKNOWN STATE!!!";
+            message = downloadDescriptions[value.type] || "UNKNOWN STATE!!!";
             self.downloading(message);
           }
 

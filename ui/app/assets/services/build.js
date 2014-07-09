@@ -392,7 +392,7 @@ define(['lib/knockout/knockout', 'commons/settings', 'services/log', 'commons/ut
           return true;
         } else if (weWereStopped) {
           debug && console.log("Stopped, restart not requested");
-         log.debug("Stopped");
+          log.debug("Stopped");
           // true = abort abort
           return true;
         } else {
@@ -638,7 +638,7 @@ define(['lib/knockout/knockout', 'commons/settings', 'services/log', 'commons/ut
         task.task = 'echo:' + task.task;
       }
 
-      var baseParams = (typeof task.params == 'undefined' ? {} : task.params);
+      var baseParams = ('params' in task) ? {} : task.params;
       if (build.run.instrumentation() == "newRelic") {
         task.params = $.extend(baseParams, {instrumentation: build.run.instrumentation()});
       } else if (build.run.instrumentation() == "appDynamics") {

@@ -5,7 +5,6 @@ define(['commons/utils', 'commons/widget', 'services/newrelic', 'text!./newrelic
   function(utils, Widget, newrelic, template, css){
 
     var downloadDescriptions = {
-      'authenticating': 'Authenticating',
       'downloadComplete': 'Download complete',
       'validating': 'Validating',
       'extracting': 'Extracting',
@@ -47,6 +46,8 @@ define(['commons/utils', 'commons/widget', 'services/newrelic', 'text!./newrelic
             message = "Error provisioning New Relic: "+value.message
             self.downloading(message);
             self.error(message);
+          } else if (value.type == "downloading") {
+            self.downloading("Downloading: "+value.url);
           } else if (value.type == "progress") {
             message = "";
             if (value.percent) {
@@ -56,7 +57,7 @@ define(['commons/utils', 'commons/widget', 'services/newrelic', 'text!./newrelic
             }
             self.downloading("Progress: "+message);
           } else {
-            var message = downloadDescriptions[value.type] || "UNKNOWN STATE!!!";
+            message = downloadDescriptions[value.type] || "UNKNOWN STATE!!!";
             self.downloading(message);
           }
 
