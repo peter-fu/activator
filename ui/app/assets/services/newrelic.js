@@ -23,10 +23,7 @@ define(['commons/utils', 'commons/streams', 'commons/settings', 'services/build'
       self.checkIsProjectEnabled = function() {
         streams.send(nrMessage("isProjectEnabled"));
       };
-      self.hasPlay = ko.computed(function() {
-        self.isProjectEnabled("unknown");
-        return build.app.hasPlay();
-      }, self);
+      self.hasPlay = build.app.hasPlay;
       self.enableProject = function(key,name) {
         var message = nrMessageWith("enable",{key: key, name: name});
         debug && console.log("message: "+JSON.stringify(message,null,2));

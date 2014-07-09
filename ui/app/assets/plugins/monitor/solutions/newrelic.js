@@ -32,6 +32,7 @@ define(['commons/utils', 'commons/widget', 'services/newrelic', 'text!./newrelic
         self.downloading.subscribe(function(value) {
           debug && console.log("downloading: "+value);
         });
+        self.hasPlay = newrelic.hasPlay;
         self.provisionObserver = function(value) {
           var message = "";
           if (value.type == "provisioningError") {
