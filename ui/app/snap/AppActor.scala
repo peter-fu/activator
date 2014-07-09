@@ -125,6 +125,15 @@ class AppActor(val config: AppConfig, val sbtProcessLauncher: SbtProcessLauncher
 
   override val supervisorStrategy = SupervisorStrategy.stoppingStrategy
 
+  def runWithPool(taskId: String, description: String, pool: ActorRef, sender: ActorRef): Unit = {
+    val task = context.actorOf(Props(new ChildTaskActor(taskId, description, pool)),
+      name = "task-" + URLEncoder.encode(taskId, "UTF-8"))
+    tasks += (taskId -> task)
+    context.watch(task)
+    log.debug("created task {} {}", taskId, task)
+    sender ! TaskActorReply(task)
+  }
+
   override def receive = {
     case Terminated(ref) =>
       if (ref == uninstrumentedSbts || instrumentedSbtPools.values.exists(_ == ref)) {
@@ -147,19 +156,6 @@ class AppActor(val config: AppConfig, val sbtProcessLauncher: SbtProcessLauncher
       }
 
     case req: AppRequest => req match {
-      case m @ GetTaskActor(taskId, description, request) if isRunRequest(request) =>
-        val instrumentation = getRunInstrumentation(request)
-        getSbtPoolFor(instrumentation.tag) match {
-          case None =>
-            self ! ProvisionSbtPool(instrumentation, m, sender)
-          case Some(pool) =>
-            val task = context.actorOf(Props(new ChildTaskActor(taskId, description, pool)),
-              name = "task-" + URLEncoder.encode(taskId, "UTF-8"))
-            tasks += (taskId -> task)
-            context.watch(task)
-            log.debug("created task {} {}", taskId, task)
-            sender ! TaskActorReply(task)
-        }
       case ProvisionSbtPool(instrumentation, originalMessage, originalSender) =>
         getSbtPoolFor(instrumentation.tag) match {
           case Some(_) =>
@@ -184,14 +180,19 @@ class AppActor(val config: AppConfig, val sbtProcessLauncher: SbtProcessLauncher
                 self.tell(originalMessage, originalSender)
             }
         }
-      case GetTaskActor(taskId, description, _) =>
-        val pool = uninstrumentedSbts
-        val task = context.actorOf(Props(new ChildTaskActor(taskId, description, pool)),
-          name = "task-" + URLEncoder.encode(taskId, "UTF-8"))
-        tasks += (taskId -> task)
-        context.watch(task)
-        log.debug("created task {} {}", taskId, task)
-        sender ! TaskActorReply(task)
+      case m @ GetTaskActor(taskId, description, request) =>
+        if (isRunRequest(request)) {
+          val instrumentation = getRunInstrumentation(request)
+          getSbtPoolFor(instrumentation.tag) match {
+            case None =>
+              self ! ProvisionSbtPool(instrumentation, m, sender)
+            case Some(pool) =>
+              runWithPool(taskId, description, pool, sender)
+          }
+        } else {
+          val pool = uninstrumentedSbts
+          runWithPool(taskId, description, pool, sender)
+        }
       case GetWebSocketCreated =>
         sender ! WebSocketCreatedReply(webSocketCreated)
       case CreateWebSocket =>
