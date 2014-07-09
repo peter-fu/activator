@@ -18,6 +18,8 @@ import play.api.libs.functional.syntax._
 import sbt.client._
 import sbt.protocol._
 import scala.reflect.ClassTag
+import scala.concurrent.Future
+import scala.util.control.NonFatal
 
 sealed trait AppRequest
 
@@ -30,7 +32,7 @@ case object ReloadSbtBuild extends AppRequest
 case class OpenClient(client: SbtClient) extends AppRequest
 case object CloseClient extends AppRequest
 
-// requests that need a client
+// requests that need an sbt client
 sealed trait ClientAppRequest extends AppRequest
 
 case class RequestExecution(command: String) extends ClientAppRequest
@@ -87,17 +89,21 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
   log.debug("Opening SbtConnector")
   connector.open({ client =>
     log.debug(s"Opened connection to sbt for ${location} AppActor=${self.path.name}")
-    self ! NotifyWebSocket(Sbt.synthesizeLogEvent(LogMessage.DEBUG, s"Opened sbt at '${location}'"))
+    produceLog(LogMessage.DEBUG, s"Opened sbt at '${location}'")
     self ! OpenClient(client)
   }, { (reconnecting, message) =>
     log.debug(s"sbt client closed reconnecting=${reconnecting}: ${message}")
-    self ! NotifyWebSocket(Sbt.synthesizeLogEvent(LogMessage.INFO, s"Lost or failed sbt connection: ${message}"))
+    produceLog(LogMessage.INFO, s"Lost or failed sbt connection: ${message}")
     self ! CloseClient
     if (!reconnecting) {
       log.info(s"SbtConnector gave up and isn't reconnecting; killing AppActor ${self.path.name}")
       self ! PoisonPill
     }
   })
+
+  def produceLog(level: String, message: String): Unit = {
+    self ! NotifyWebSocket(Sbt.synthesizeLogEvent(level, message))
+  }
 
   override def receive = {
     case Terminated(ref) =>
@@ -153,6 +159,9 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
       case r: ClientAppRequest =>
         pending = pending :+ (sender -> r)
         flushPending()
+        if (pending.nonEmpty) {
+          produceLog(LogMessage.DEBUG, s"request pending until connection to sbt opens: ${r}")
+        }
     }
   }
 
@@ -160,8 +169,13 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
     while (clientActor.isDefined && pending.nonEmpty) {
       val req = pending.head
       pending = pending.tail
-      clientActor.foreach(actor => actor.tell(req._2, req._1))
+      clientActor.foreach { actor =>
+        produceLog(LogMessage.DEBUG, s"sending request to sbt ${req._2}")
+        actor.tell(req._2, req._1)
+      }
     }
+    if (pending.nonEmpty)
+      log.debug(s"Requests waiting for sbt client to be connected: ${pending}")
   }
 
   private def validateEvent(json: JsObject): Boolean = {
@@ -231,6 +245,10 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
       context.parent ! NotifyWebSocket(Sbt.wrapEvent(event))
     }
 
+    def produceLog(level: String, message: String): Unit = {
+      context.parent ! NotifyWebSocket(Sbt.synthesizeLogEvent(level, message))
+    }
+
     override def receive = {
       case event: Event => event match {
         case _: ClosedEvent =>
@@ -251,12 +269,24 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
       case req: ClientAppRequest => {
         req match {
           case RequestExecution(command) =>
+            log.debug("requesting execution of " + command)
             client.requestExecution(command, interaction = None)
           case CancelExecution(executionId) =>
+            log.debug("canceling execution " + executionId)
             client.cancelExecution(executionId)
           case PossibleAutocompletions(partialCommand, detailLevelOption) =>
+            log.debug("possible autocompletions for " + partialCommand)
             client.possibleAutocompletions(partialCommand, detailLevel = detailLevelOption.getOrElse(0))
         }
+      } recover {
+        case NonFatal(e) =>
+          log.error(s"request to sbt failed ${e.getMessage}", e)
+          produceLog(LogMessage.DEBUG, s"request $req failed: ${e.getClass.getName}: ${e.getMessage}")
+          Status.Failure(e)
+      } map { result =>
+        log.debug(s"${req} result: ${result}")
+        produceLog(LogMessage.DEBUG, s"request $req result: ${result}")
+        result
       } pipeTo sender
     }
   }
