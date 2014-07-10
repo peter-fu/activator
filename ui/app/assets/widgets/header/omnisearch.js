@@ -11,10 +11,10 @@ define(['services/search', 'services/sbt'], function(search, sbt) {
   var selected = ko.observable(0);
 
   var combinedSearch = function(keywords) {
-    console.log("starting search on " + keywords);
+    debug && console.log("starting search on " + keywords);
     return ($.when(search.doSearch(keywords), sbt.possibleAutocompletions(keywords))
     .then(function(searchValues, sbtCompletions) {
-        console.log(searchValues, sbtCompletions)
+        debug && console.log(searchValues, sbtCompletions);
         // TODO not handling errors here...
         var sbtValues = $.map(sbtCompletions[0].choices, function(completion, i) {
           return {
@@ -39,13 +39,42 @@ define(['services/search', 'services/sbt'], function(search, sbt) {
   }
 
   var onKeyDown = function(data, event){
-    if (event.keyCode != 9) return true;
+    // Up
+    if (event.keyCode == 38) {
+        event.preventDefault();
+        if (selected() > 0) {
+          selected(selected() - 1);
+        } else {
+          selected(options().length - 1);
+        }
+        scrollToSelected();
+        return false;
+    }
+    // Down
+    else if (event.keyCode == 40) {
+        event.preventDefault();
+        if (selected() < options().length - 1) {
+          selected(selected() + 1);
+        } else {
+          selected(0);
+        }
+        scrollToSelected();
+        return false;
+    }
     // autocomplete on TAB
-    event.target.value = options()[selected()].execute;
+    else if (event.keyCode == 9) {
+      event.target.value = options()[selected()].execute;
+      return false;
+    }
+    else return true;
   }
 
   var onKeyUp = function(data, event){
     switch (event.keyCode) {
+      case 38:
+      case 40:
+      return;
+      break;
       // Escape
       case 27:
         event.target.blur();
@@ -57,28 +86,6 @@ define(['services/search', 'services/sbt'], function(search, sbt) {
           activate(selectedItem);
           event.target.blur();
         }
-        break;
-      // Up
-      case 38:
-        event.preventDefault();
-        if (selected() > 0) {
-          selected(selected() - 1);
-        } else {
-          selected(options().length - 1);
-        }
-        scrollToSelected();
-        // return false;
-        break;
-      // Down
-      case 40:
-        event.preventDefault();
-        if (selected() < options().length - 1) {
-          selected(selected() + 1);
-        } else {
-          selected(0);
-        }
-        scrollToSelected();
-        // return false;
         break;
       default:
         var keywords = searchString();
