@@ -97,7 +97,7 @@ object AppDynamics {
     timeout: Timeout = Timeout(30.seconds))(implicit ec: ExecutionContext): DownloadPrepExecutor = new DownloadPrepExecutor {
     import Provisioning._
     def execute(): Future[DownloadExecutor] = {
-      notificationSink.authenticating(credentials.failureDiagnostics, loginUrl)
+      notificationSink.notify(Authenticating(credentials.failureDiagnostics, loginUrl))
       for {
         login <- credentials(client.url(loginUrl).withFollowRedirects(false).withRequestTimeout(timeout.duration.toMillis.toInt))
         cookies = login.cookies.map(serializeCookie).filter(_.nonEmpty)
@@ -139,7 +139,7 @@ object AppDynamics {
             case Failure(error) =>
               reportError(error, s"Failure during provisioning: ${error.getMessage}", r, sender)
               // This shouldn't be necessary.  Somewhere an exception if being eaten.
-              ns.provisioningError(s"Failure during provisioning: ${error.getMessage}", error)
+              ns.notify(ProvisioningError(s"Failure during provisioning: ${error.getMessage}", error))
           }
       case r @ Deprovision => try {
         AD.deprovision(config.extractRoot())

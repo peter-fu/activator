@@ -28,33 +28,11 @@ object Provisioning {
   val responseTag = "ProvisioningStatus"
 
   trait StatusNotifier {
-    def provisioningError(message: String, exception: Throwable): Unit
-    def authenticating(diagnostics: String, url: String): Unit
-    def downloading(url: String): Unit
-    def progress(value: Either[Int, Double]): Unit
-    def downloadComplete(url: String): Unit
-    def validating(): Unit
-    def extracting(): Unit
-    def complete(): Unit
+    def notify(status: Status): Unit
   }
 
   def actorWrapper(sink: ActorRef): StatusNotifier = new StatusNotifier {
-    def provisioningError(message: String, exception: Throwable): Unit =
-      sink ! ProvisioningError(message, exception)
-    def authenticating(diagnostics: String, url: String): Unit =
-      sink ! Authenticating(diagnostics, url)
-    def extracting(): Unit =
-      sink ! Extracting
-    def progress(value: Either[Int, Double]): Unit =
-      sink ! Progress(value)
-    def downloading(url: String): Unit =
-      sink ! Downloading(url)
-    def validating(): Unit =
-      sink ! Validating
-    def complete(): Unit =
-      sink ! Complete
-    def downloadComplete(url: String): Unit =
-      sink ! DownloadComplete(url)
+    def notify(status: Status): Unit = sink ! status
   }
 
   case class AuthenticationException(message: String, failureDiagnostics: String, url: String) extends Exception(message)
@@ -119,17 +97,17 @@ object Provisioning {
   def notificationProgressBuilder(url: String,
     notificationSink: StatusNotifier): ProgressObserver = new ProgressObserver {
     def onCompleted(): Unit =
-      notificationSink.downloadComplete(url)
+      notificationSink.notify(DownloadComplete(url))
 
     def onError(error: Throwable): Unit =
-      notificationSink.provisioningError(s"Error downloading $url: ${error.getMessage}", error)
+      notificationSink.notify(ProvisioningError(s"Error downloading $url: ${error.getMessage}", error))
 
     def onNext(data: ChunkData): Unit = {
       data.contentLength match {
         case None =>
-          notificationSink.progress(Left(data.total))
+          notificationSink.notify(Progress(Left(data.total)))
         case Some(cl) =>
-          notificationSink.progress(Right((data.total.toDouble / cl.toDouble) * 100.0))
+          notificationSink.notify(Progress(Right((data.total.toDouble / cl.toDouble) * 100.0)))
       }
     }
   }
@@ -170,17 +148,17 @@ object Provisioning {
     targetLocation: File,
     notificationSink: StatusNotifier)(implicit ec: ExecutionContext): Future[File] = {
     expected.transform(x => x, e => DownloadException(e)).map { file =>
-      notificationSink.validating()
+      notificationSink.notify(Validating)
       validator(file)
-      notificationSink.extracting()
+      notificationSink.notify(Extracting)
       FileHelper.unZipFile(file, targetLocation)
     }
     expected.onComplete {
-      case Success(_) => notificationSink.complete()
+      case Success(_) => notificationSink.notify(Complete)
       case Failure(error @ AuthenticationException(message, username, url)) =>
-        notificationSink.provisioningError(s"Cannot login to $url with username: $username and password given: $message", error)
+        notificationSink.notify(ProvisioningError(s"Cannot login to $url with username: $username and password given: $message", error))
       case Failure(DownloadException(_)) => // Already reported
-      case Failure(error) => notificationSink.provisioningError(s"Error provisioning: ${error.getMessage}", error)
+      case Failure(error) => notificationSink.notify(ProvisioningError(s"Error provisioning: ${error.getMessage}", error))
     }
     expected
   }
@@ -189,7 +167,7 @@ object Provisioning {
     validator: File => File,
     targetLocation: File,
     notificationSink: StatusNotifier)(implicit ec: ExecutionContext): Future[File] = {
-    notificationSink.downloading(executor.downloadUrl)
+    notificationSink.notify(Downloading(executor.downloadUrl))
     postprocessResults(executor.execute(),
       validator,
       targetLocation,
