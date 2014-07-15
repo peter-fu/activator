@@ -12,7 +12,7 @@ define(['services/search', 'services/sbt'], function(search, sbt) {
 
   var combinedSearch = function(keywords) {
     debug && console.log("starting search on " + keywords);
-    return ($.when(search.doSearch(keywords), sbt.possibleAutocompletions(keywords))
+    return $.when(search.doSearch(keywords), sbt.possibleAutocompletions(keywords))
     .then(function(searchValues, sbtCompletions) {
         // TODO not handling errors here...
         var sbtValues = $.map(sbtCompletions[0].choices, function(completion, i) {
@@ -26,7 +26,7 @@ define(['services/search', 'services/sbt'], function(search, sbt) {
         });
         var values = sbtValues.concat(searchValues[0]);
         return values;
-    }));
+    });
   };
 
   var activate = function(item) {
@@ -149,6 +149,7 @@ define(['services/search', 'services/sbt'], function(search, sbt) {
 
   return {
     onKeyUp: onKeyUp,
+    onKeyDown: onKeyDown,
     scrollToSelected: scrollToSelected,
     onOptionSelected: onOptionSelected,
     onBlur: onBlur,

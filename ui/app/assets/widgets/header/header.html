@@ -10,7 +10,7 @@
   </dl>
 
   <div id="omnisearch" data-bind="css: {busy: omnisearch.busy()}">
-    <input type="text" name="keywords" placeholder="Type keywords or a command" autocomplete="off" data-bind="value: omnisearch.searchString, valueUpdate: 'keyup', event: {keyup: omnisearch.onKeyUp.bind(omnisearch), blur: omnisearch.onBlur.bind(omnisearch)}">
+    <input type="text" name="keywords" placeholder="Type keywords or a command" autocomplete="off" data-bind="value: omnisearch.searchString, valueUpdate: 'keyup', event: {keyup: omnisearch.onKeyUp.bind(omnisearch), keydown: omnisearch.onKeyDown.bind(omnisearch), blur: omnisearch.onBlur.bind(omnisearch)}">
     <ul data-bind="css: {active: omnisearch.active()}, foreach: omnisearch.options">
       <li data-bind="click: $parent.omnisearch.onOptionSelected, css: {selected: $index() == $parent.omnisearch.selected()}">
         <span class="type" data-bind="text: type"></span>
