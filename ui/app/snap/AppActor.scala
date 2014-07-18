@@ -232,10 +232,34 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
       self ! structure
     }
 
+    // this is a hardcoded hack... we need to control the list of things
+    // to watch from JS, and we should handle build structure changes
+    // by redoing this
+    val valueSub = new Subscription() {
+      val futureValueSubs: Seq[Future[Seq[Subscription]]] =
+        Seq("discoveredMainClasses",
+          "mainClasses",
+          "mainClass",
+          "libraryDependencies") map { name =>
+            client.lookupScopedKey(name) map { scopeds =>
+              scopeds map { scoped =>
+                log.debug(s"Subscribing to key ${scoped}")
+                client.watch(TaskKey[Seq[String]](scoped)) { (key, result) =>
+                  self ! ValueChanged(key, result)
+                }
+              }
+            }
+          }
+      override def cancel(): Unit = {
+        futureValueSubs map { futureSubs => futureSubs map { subs => subs map { sub => sub.cancel() } } }
+      }
+    }
+
     override def postStop(): Unit = {
       log.debug("postStop")
       eventsSub.cancel()
       buildSub.cancel()
+      valueSub.cancel()
       // we were probably stopped because the client closed already,
       // but if not, close here.
       client.close()
@@ -253,8 +277,9 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
       case event: Event => event match {
         case _: ClosedEvent =>
           self ! PoisonPill
-        case _: BuildStructureChanged | _: ValueChanged[_] =>
+        case _: BuildStructureChanged =>
           log.error(s"Received event which should have been filtered out by SbtClient ${event}")
+        case changed: ValueChanged[_] => forwardOverSocket(changed)
         case entry: LogEvent => forwardOverSocket(entry)
         case fail: ExecutionFailure => forwardOverSocket(fail)
         case yay: ExecutionSuccess => forwardOverSocket(yay)
@@ -264,7 +289,8 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
         case started: TaskStarted => forwardOverSocket(started)
         case taskEvent: TaskEvent => forwardOverSocket(taskEvent)
       }
-      case structure: MinimalBuildStructure => // TODO
+      case structure: MinimalBuildStructure =>
+        forwardOverSocket(BuildStructureChanged(structure))
       case req: ClientAppRequest => {
         req match {
           case RequestExecution(command) =>

@@ -134,11 +134,14 @@ define(['commons/streams', 'commons/events', 'commons/utils'], function(streams,
         debug && console.log("ExecutionSuccess ", event);
         removeExecution(event.id, true /* succeeded */);
       },
-      CompilationFailure: function(event) {
-        debug && console.log("CompilationFailure ", event);
+      TaskEvent: function(event) {
+        debug && console.log("TaskEvent ", event);
       },
-      TestEvent: function(event) {
-        debug && console.log("TestEvent ", event);
+      BuildStructureChanged: function(event) {
+        debug && console.log("BuildStructureChanged ", event);
+      },
+      ValueChanged: function(event) {
+        debug && console.log("ValueChanged ", event);
       }
   }
 
