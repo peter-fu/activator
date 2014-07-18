@@ -1,0 +1,67 @@
+<main id="wrapper" class="build">
+  <nav class="menu">
+    <header>
+      <h1>Build</h1>
+      <div class="buttons">
+        <dl class="dropdown">
+          <dt>
+            <svg data-bind="svg: '/assets/icons/gear-mini.svg'"/>
+          </dt>
+          <dd>
+            <a data-bind="click: function(){ sbtExecCommand('compile') }">Compile</a>
+            <a data-bind="click: function(){ sbtExecCommand('reload') }">Reload</a>
+            <a data-bind="click: function(){ sbtExecCommand('clean') }">Clean</a>
+            <a data-bind="click: function(){ sbtExecCommand('publishLocal') }">Publish local</a>
+          </dd>
+        </dl>
+        <button data-bind="click: function(){ sbtExecCommand('compile') }">
+          <svg data-bind="svg: '/assets/icons/build.svg'"/>
+          Compile
+        </button>
+      </div>
+    </header>
+    <div class="options">
+      <ul>
+        <li>
+          <div class="switch" data-bind="switchButton: recompileOnChange">
+            <div class="inner"></div>
+          </div>
+          Compile on file change
+        </li>
+        <!-- ko if: sbt.app.subProjects().length -->
+        <li>
+          <h4>Current Project</h4>
+          <dl class="select dropdown">
+            <dt>
+              <span data-bind="text: sbt.app.currentProject"></span>
+              <span class="arrows">
+                <svg data-bind="svg: '/assets/icons/arrows.svg'"/>
+              </span>
+            </dt>
+            <dd data-bind="foreach: sbt.app.subProjects">
+              <a data-bind="text: $data, click: function(){ $parent.setProject($data); }"></a>
+            </dd>
+          </dl>
+        </li>
+        <!-- /ko -->
+      </ul>
+    </div>
+    <ul class="list links">
+      <li data-bind="isActiveUrl: '#build/tasks'">
+        <a href="#build/tasks">Tasks</a>
+      </li>
+      <li data-bind="isActiveUrl: '#build/console'">
+        <a href="#build/console">Scala console</a>
+      </li>
+      <li data-bind="isActiveUrl: '#build/dependencies'">
+        <a href="#build/dependencies">Dependencies</a>
+      </li>
+      <li data-bind="isActiveUrl: '#build/configuration'">
+        <a href="#build/configuration">Project configuration</a>
+      </li>
+    </ul>
+  </nav>
+  <!-- ko if: subplugin() -->
+    <!-- ko include: subplugin --><!-- /ko -->
+  <!-- /ko -->
+</main>

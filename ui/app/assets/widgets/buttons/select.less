@@ -1,0 +1,60 @@
+@import "../../commons/_base";
+
+.select {
+  border: 1px solid @grey-ltr;
+  border-radius: 3px;
+  &:hover {
+    border-color: @white-dkr;
+  }
+  dt {
+    font-weight: inherit;
+    color: inherit;
+    padding: 0 8px 0 18px;
+    position: relative;
+  }
+  .arrows {
+    position: absolute;
+    display: block;
+    left: 5px;
+    top: 1px;
+    width: 9px;
+    height: 20px;
+    g.svg-down-arrow, g.svg-up-arrow {
+      // position: absolute;
+      .transition();
+      g {
+        fill: @grey-ltr;
+      }
+    }
+    g.svg-down-arrow {
+      transform: translateY(12px);
+    }
+    g.svg-up-arrow {
+      transform: translateY(4px);
+    }
+  }
+  &:hover .arrows {
+    g {
+      fill: @white-dkr;
+    }
+    g.svg-down-arrow {
+      transform: translateY(15px);
+    }
+    g.svg-up-arrow {
+      transform: translateY(1px);
+    }
+  }
+  dd {
+    margin-top: 1px;
+    background: @slate;
+    width: 100%;
+    a {
+      display: block;
+      padding: 4px 10px;
+      &:hover {
+        background: @blue;
+        color: #fff;
+      }
+    }
+  }
+}

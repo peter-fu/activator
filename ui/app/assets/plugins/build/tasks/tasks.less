@@ -1,0 +1,23 @@
+@import "../../../commons/_base";
+
+.tasks {
+  > section {
+    .column();
+  }
+
+  .tasks-wrapper {
+    height: 140px;
+    .failed {
+      background: @red;
+      &, a {
+        color: #fff;
+      }
+      &, &+li {
+        border-color: @red-text !important;
+      }
+    }
+  }
+
+}
+
+

@@ -1,0 +1,65 @@
+@import "../../commons/_base";
+
+#appManager {
+  background: @red;
+  line-height: 50px;
+  height: 50px;
+  dt, dd {
+    color: #fff;
+    width: @drawer-width;
+    cursor: pointer;
+  }
+  dt {
+    background: url('/assets/images/select.svg') 10px 27px no-repeat, url('/assets/images/select.svg') 10px -22px no-repeat;
+    .transition();
+    padding: 0 10px 0 28px;
+    height: 50px;
+  }
+  dd {
+    background: @red-dkr;
+    line-height: 35px;
+    max-height: 320px;
+    overflow: auto;
+  }
+  &:hover dt {
+    background-position: 10px 32px, 10px -27px;
+  }
+  a {
+    display: block;
+    border-top: 1px solid @red;
+    padding: 0 10px;
+    text-decoration: none;
+    color: #fff;
+    &:hover {
+      background: #fff;
+      color: @red;
+    }
+  }
+  .new-app {
+    margin: 5px;
+    border: 0;
+    color: @red;
+    background: #fff;
+    text-align: center;
+    border-radius: 2px;
+    &:hover {
+      color: @red-dkr;
+    }
+  }
+  button {
+    display: block;
+    background: #fff;
+    color: @red;
+    width: 90%;
+    margin: 8px auto;
+    height: 32px;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-radius: 2px;
+    &:hover {
+      color: @red-dkr;
+    }
+  }
+}
+

@@ -1,8 +1,32 @@
-//
-// Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
-//
-
 @import "_vars";
-@import "_helpers";
-@import "_animations";
 @import "_fonts";
+@import "_helpers";
+
+@-webkit-keyframes glow {
+  0% {
+    background: @blue;
+  }
+  100% {
+    background: @grey;
+  }
+}
+@-moz-keyframes glow {
+  0% {
+    background: @blue;
+  }
+  100% {
+    background: @grey;
+  }
+}
+@keyframes glow {
+  0% {
+    background: @blue;
+  }
+  100% {
+    background: @grey;
+  }
+}
+
+.expand {
+  .expand();
+}

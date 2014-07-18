@@ -1,19 +1,37 @@
-/*
- Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
- */
-define(function() {
+define([
+  'services/sbt'
+],function(sbt) {
 
-  // Talk to backend, update omnisearchOptions with result
-  // TODO - Figure out a better way to get this URL!
-  var doSearch = function(keywords){
-    var url = '/app/' + window.serverAppModel.id + '/search/' + keywords;
-    return $.ajax({
-     url: url,
-     dataType: 'json'
+  function searchTasks(argument) {}
+
+  function searchFiles(argument) {}
+
+  function searchDocs(argument) {}
+
+  var combinedSearch = function(keywords, options) {
+    debug && console.log("starting search on " + keywords);
+    return $.when(/*search.doSearch(keywords), */sbt.tasks.possibleAutocompletions(keywords))
+    .then(function(/*searchValues, */sbtCompletions) {
+        console.log(sbtCompletions)
+        // TODO not handling errors here...
+        var sbtValues = $.map(sbtCompletions.choices, function(completion, i) {
+          return {
+            title: completion.display,
+            subtitle: "run sbt task " + completion.display,
+            type: "Sbt",
+            url: false,
+            execute: keywords + completion.append
+          };
+        });
+        // var values = sbtValues.concat(searchValues[0]);
+        options(sbtValues);
+
+        // return values;
     });
   }
 
   return {
-    doSearch: doSearch
+    search:         combinedSearch
   }
+
 });

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="50px" height="50px" viewBox="0 0 50 50" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <title>akka</title>
+    <description>Created with Sketch (http://www.bohemiancoding.com/sketch)</description>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="akka" sketch:type="MSLayerGroup" transform="translate(5.000000, 15.000000)" fill="#FFFFFF">
+            <path d="M26.7982223,0 C29.3484518,6.98061289 34.723954,17.6613441 40,20.3966264 C37.7104214,23.9134922 28.5520076,11.1486683 26.8597621,5.54770992 C21.7196993,16.7107943 16.8054478,22.0899273 14.1176471,20.6571542 C17.6017928,18.7033255 22.4162902,12.092205 26.7982223,0" id="Fill-1" sketch:type="MSShapeGroup"></path>
+            <path d="M13.7870149,9 C14.2649677,9.76283005 14.8859676,10.8605732 15.6862745,11.6868487 L14.1866703,13.4653014 C14.1866703,13.4653014 13.7490616,12.8890975 13.5871872,12.7211463 C8.43001903,18.1518581 1.81508492,21.692933 0,19.1709436 C2.49764691,18.550835 9.09146263,15.0777816 13.7870149,9" id="Fill-2" sketch:type="MSShapeGroup"></path>
+            <path d="M21.0448489,4 C21.5000769,4.59820871 21.8449133,5.37545612 22.745098,6.62585944 L21.8449133,8.50152677 C21.8449133,8.50152677 21.4068374,7.92064841 21.2448899,7.75133465 C17.4108032,15.1288265 10.1099034,22.3782732 7.84313725,19.2551948 C11.5435974,18.3799499 17.9444122,11.3774918 21.0448489,4" id="Fill-3" sketch:type="MSShapeGroup"></path>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,35 @@
+@import "../../commons/_base";
+
+#help {
+  font-size: 14px;
+  line-height: 15px;
+  dt {
+    font-size: 25px;
+    color: @grey;
+  }
+  dd {
+    width: 450px;
+    padding-bottom: 20px;
+  }
+  .group {
+    border-bottom: 1px solid @slate-dkr;
+    padding: 10px 10px 0 50px;
+    background: url(/assets/images/header/typesafe.png) 20px 20px no-repeat;
+    &.documentation {
+      background-image: url(/assets/images/header/documentation.png);
+    }
+    &.community {
+      background-image: url(/assets/images/header/community.png);
+    }
+    a {
+      display: inline-block;
+      &:hover {
+        background: none;
+      }
+    }
+  }
+  h4 {
+    font-size: 16px;
+    color: @blue;
+  }
+}

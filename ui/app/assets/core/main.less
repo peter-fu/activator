@@ -1,0 +1,39 @@
+@import "../commons/_reset";
+@import "../commons/_base";
+
+html, body {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  color: @text;
+  .font();
+
+  overflow: hidden;
+  cursor: default;
+}
+
+a, button {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+a {
+  color: @blue-dkr;
+}
+
+h1, h2, h3, h4, h5, h6, dt {
+  font-weight: 700;
+}
+header, .subheader {
+  h1, h2, h3, h4, h5, h6, dt {
+    .narrow();
+  }
+}
+
+.page {
+  section {
+    padding: 10px 20px;
+  }
+}

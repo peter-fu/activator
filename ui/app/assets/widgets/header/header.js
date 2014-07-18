@@ -1,26 +1,28 @@
 define([
-  "./omnisearch",
+  'widgets/omnisearch/omnisearch',
+  'widgets/breadcrumb/breadcrumb',
+  'widgets/layout/layoutManager',
   'widgets/notifications/notifications',
-  "text!./header.html",
-  "css!./header"
+  'widgets/help/help',
+  'text!./header.html',
+  'css!./header'
 ], function(
   omnisearch,
+  breadcrumb,
+  layoutManager,
   notifications,
-  template
+  help,
+  tpl
 ){
 
-  $header = $(template)[0];
-
-  return {
-    render: function(ViewState) {
-      // Include other states to the view State
-      ViewState.omnisearch = omnisearch;
-      ViewState.notifications = notifications;
-
-      ko.applyBindings(ViewState, $header);
-
-      return $header
-    }
+  var State = {
+    omnisearch: omnisearch,
+    breadcrumb: breadcrumb,
+    layoutManager: layoutManager,
+    notifications: notifications,
+    help: help
   }
+
+  return bindhtml(tpl, State)
 
 });

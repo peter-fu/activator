@@ -1,0 +1,30 @@
+@import "../../commons/_base";
+
+#typesafe {
+  background: @slate-dkr;
+  padding: 0 15px;
+  height: 35px;
+  border-top: 1px solid rgba(0,0,0,.2);
+  .row();
+  .align-items();
+  .website {
+    display: block;
+    height: 18px;
+    .expand();
+  }
+  .infos {
+    display: block;
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+    text-align: center;
+    border-radius: 9px;
+    background: @grey;
+    color: @slate-dkr;
+    font: 900 italic 16px Georgia, serif;
+    text-decoration: none;
+    &:hover {
+      background: #fff;
+    }
+  }
+}
