@@ -60,6 +60,19 @@ define(['commons/streams', 'commons/events', 'commons/utils'], function(streams,
     }
   }
 
+  // update task values when we get ValueChanged
+  // For now this ignores key scopes.
+  var valueUpdaters = {
+    discoveredMainClasses: function(keyName, value) {
+      // TODO use this value
+      console.log("  available main classes ", value);
+    },
+    mainClass: function(keyName, value) {
+      // TODO use this value - note, it might be null
+      console.log("  default configured main class ", value);
+    }
+  };
+
   var subTypeHandlers = {
       LogEvent: function(event) {
         // forward legacy log event TODO this is just a demo hack
@@ -81,7 +94,7 @@ define(['commons/streams', 'commons/events', 'commons/utils'], function(streams,
               finished: ko.observable(false),
               succeeded: ko.observable(false)
           };
-          console.log("Starting task ", task);
+          debug && console.log("Starting task ", task);
           // we want to be in the by-id hash before we notify
           // on the tasks array
           tasksById[task.taskId] = task;
@@ -113,7 +126,7 @@ define(['commons/streams', 'commons/events', 'commons/utils'], function(streams,
             succeeded: ko.observable(false),
             tasks: ko.observableArray()
         };
-        console.log("Waiting execution ", execution);
+        debug && console.log("Waiting execution ", execution);
         // we want to be in the by-id hash before we notify
         // on the executions array
         executionsById[execution.executionId] = execution;
@@ -136,12 +149,25 @@ define(['commons/streams', 'commons/events', 'commons/utils'], function(streams,
       },
       TaskEvent: function(event) {
         debug && console.log("TaskEvent ", event);
+        // TODO replace this log with doing something; this is where
+        // we get task-specific events such as compilation failures
+        console.log("TaskEvent ", event);
       },
       BuildStructureChanged: function(event) {
         debug && console.log("BuildStructureChanged ", event);
+        // TODO replace this log with doing something
+        console.log("BuildStructureChanged projects=", event.structure.projects)
       },
       ValueChanged: function(event) {
         debug && console.log("ValueChanged ", event);
+        var name = event.key.key.name;
+        var value = event.value.value;
+
+        if (name in valueUpdaters) {
+          valueUpdaters[name](name, value);
+        } else {
+          debug && console.log("ignoring ValueChanged on " + name);
+        }
       }
   }
 
