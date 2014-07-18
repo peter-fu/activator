@@ -256,14 +256,13 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
         case _: BuildStructureChanged | _: ValueChanged[_] =>
           log.error(s"Received event which should have been filtered out by SbtClient ${event}")
         case entry: LogEvent => forwardOverSocket(entry)
-        case fail: CompilationFailure => forwardOverSocket(fail)
         case fail: ExecutionFailure => forwardOverSocket(fail)
         case yay: ExecutionSuccess => forwardOverSocket(yay)
         case starting: ExecutionStarting => forwardOverSocket(starting)
         case waiting: ExecutionWaiting => forwardOverSocket(waiting)
         case finished: TaskFinished => forwardOverSocket(finished)
         case started: TaskStarted => forwardOverSocket(started)
-        case test: TestEvent => forwardOverSocket(test)
+        case taskEvent: TaskEvent => forwardOverSocket(taskEvent)
       }
       case structure: MinimalBuildStructure => // TODO
       case req: ClientAppRequest => {
