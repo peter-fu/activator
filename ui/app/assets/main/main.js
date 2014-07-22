@@ -41,7 +41,7 @@ require(vendors, function($, ko) {
   require(commons, function() {
     require(services, function(WS, sbt) {
       WS.connect();
-
+ 
       // require(core, function(view, router) {
       //   view.render();
       //   router.load(window.location.hash)
