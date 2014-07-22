@@ -32,7 +32,7 @@ require(vendors, function($, ko) {
   require(commons, function() {
     require(['commons/websocket'], function(WS) {
       // PRINT EVERYTHING FROM WS
-      websocket
+      WS
         .subscribe()
         .each(function(message){
           console.log(message)
