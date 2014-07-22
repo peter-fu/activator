@@ -1,3 +1,6 @@
+/*
+ Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
+ */
 define([
   'commons/settings',
   "text!./panels.html",
@@ -15,7 +18,6 @@ define([
   // }, []);
   var panels = ['plugins/tutorial/tutorial'];
 
-  $panels = $(template)[0];
   currentPanel = ko.observable();
 
   var panelOpened = settings.observable("app.panelOpened", true);
@@ -59,8 +61,7 @@ define([
 
   return {
     render: function() {
-      ko.applyBindings(PanelState, $panels);
-      return $panels
+      return bindhtml(template, PanelState)
     },
     state: PanelState
   }
