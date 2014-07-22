@@ -1,0 +1,44 @@
+@import "../../commons/_base";
+
+#modal {
+  position: fixed;
+  z-index: 9999;
+  .trbl(0);
+  background: rgba(255, 255, 255, 0.4);
+  .modal-wrapper {
+    position: absolute;
+    .trbl(0);
+    margin: auto;
+    width: 400px;
+    display: table;
+    background: @slate;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .button {
+    margin: 0 5px;
+    border: 1px solid @blue;
+    &.light {
+      background: none;
+      border-color: @grey;
+      color: @grey;
+      &:hover {
+        background: @slate;
+      }
+    }
+  }
+  header, footer, article {
+    padding: 10px 20px;
+  }
+  header {
+    color: #fff;
+    background: @slate-ltr;
+  }
+  footer {
+    text-align: center;
+    background: @slate-ltr;
+  }
+  article {
+    color: @grey-ltr;
+  }
+}
