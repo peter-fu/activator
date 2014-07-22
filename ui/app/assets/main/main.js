@@ -22,30 +22,27 @@ var commons = [
 ]
 
 var services = [
-  'commons/websocket',
-
   'services/sbt'
 ]
 
-// DEBUG
-debug = true;
-
-// var core = [
-//   'main/view',
-//   'main/router',
-//   'main/keyboard'
-// ]
+var core = [
+  'main/view',
+  'main/router',
+  'commons/websocket'
+]
 
 require(vendors, function($, ko) {
   window.ko = ko; // it's used on every page...
   require(commons, function() {
     require(services, function(WS, sbt) {
-      WS.connect();
- 
-      // require(core, function(view, router) {
-      //   view.render();
-      //   router.load(window.location.hash)
-      // })
+      require(core, function(view, router, WS) {
+
+        view.render();
+        router.load(window.location.hash);
+
+        WS.connect();
+
+      })
     })
   })
 })
