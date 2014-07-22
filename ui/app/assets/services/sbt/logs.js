@@ -10,10 +10,11 @@ define([
   var stdout = ko.observableArray([]);
 
   // Websocket Handlers
-  websocket
-    .subscribe({ type: 'sbt', subType: 'LogEvent' })
-    // Filter debug on demand
-    .filter(function(m) {
+  var logEvent = websocket.subscribe({ type:'sbt', subType:'LogEvent' })
+
+  logEvent
+    .match(function(m) {
+      // Filter debug on demand
       return !((m.event.entry.level == "debug" || m.event.entry.type == "stdout") && !(app.settings.showLogDebug() || debug))
     })
     .each(function(message){
@@ -24,8 +25,11 @@ define([
       }
     });
 
-  websocket
-    .subscribe({ type: 'sbt', subType: 'LogEvent', event: { entry: { message: String, type: "stdout" } } })
+  logEvent
+    .match(function(message) {
+      // Standard out
+      return message.subType == 'LogEvent', event: { entry: { message: String, type: "stdout" } } }
+    })
     .each(function(message){
       stdout.push(message);
       // TODO: Put a higher scrollback

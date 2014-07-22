@@ -73,14 +73,12 @@ define([
     }
   }
 
-
-  var sbtEventStream = function(subType) {
-    return websocket.subscribe({ type: 'sbt', subType: subType }).each(function(message) {
-      debug && console.log("Task+"+subType, message);
-    });
+  var sbtEventStream = websocket.subscribe().equal('type','sbt');
+  var subTypeEventStream = function(subType) {
+    return sbtEventStream.fork().equal('subType',subType);
   }
 
-  sbtEventStream("TaskStarted").each(function(message) {
+  subTypeEventStream("TaskStarted").each(function(message) {
     var execution = executionsById[message.event.executionId]
     if (execution) {
       var task = {
@@ -101,7 +99,7 @@ define([
   });
 
 
-  sbtEventStream("TaskFinished").each(function(message) {
+  subTypeEventStream("TaskFinished").each(function(message) {
     var task = tasksById[message.event.taskId];
     if (task) {
       task.execution.tasks.remove(function(item) {
@@ -114,7 +112,7 @@ define([
     }
   });
 
-  sbtEventStream("ExecutionWaiting").each(function(message) {
+  subTypeEventStream("ExecutionWaiting").each(function(message) {
     var execution = {
       executionId: message.event.id,
       command: message.event.command,
@@ -153,30 +151,28 @@ define([
     executions.push(execution);
   });
 
-  sbtEventStream("ExecutionStarting").each(function(message) {
+  subTypeEventStream("ExecutionStarting").each(function(message) {
     var execution = executionsById[message.event.executionId];
     if (execution) {
       execution.started(new Date());
     }
   });
 
-  sbtEventStream("ExecutionFailure").each(function(message) {
+  subTypeEventStream("ExecutionFailure").each(function(message) {
     removeExecution(message.event.id, false /* succeeded */);
   });
 
-  sbtEventStream("ExecutionSuccess").each(function(message) {
+  subTypeEventStream("ExecutionSuccess").each(function(message) {
     removeExecution(message.event.id, true /* succeeded */);
   });
 
-  sbtEventStream("CompilationFailure");
+  // subTypeEventStream("CompilationFailure");
 
-  sbtEventStream("TestEvent");
+  // subTypeEventStream("TestEvent");
 
-  sbtEventStream("BuildStructureChanged").each(function(message) {
-    // console.log("BuildStructureChanged ", message.event);
-  })
+  // subTypeEventStream("BuildStructureChanged")
 
-  var valueChanged = sbtEventStream("ValueChanged").map(function(message) {
+  var valueChanged = subTypeEventStream("ValueChanged").map(function(message) {
     return {
       key: message.event.key.key.name,
       value: message.event.value.value
@@ -184,7 +180,7 @@ define([
   });
 
   // discoveredMainClasses
-  valueChanged.fork().filter(types.curry({ key: 'discoveredMainClasses' })).each(function(message) {
+  valueChanged.equal('key', 'discoveredMainClasses').each(function(message) {
     app.mainClasses(message.value); // All main classes
     if (!app.currentMainClass() && message.value[0]){
       app.currentMainClass(message.value[0]); // Selected main class, if empty
