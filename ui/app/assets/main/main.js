@@ -35,8 +35,10 @@ require(vendors, function($, ko) {
       WS
         .subscribe()
         .each(function(message){
-          console.log(message)
+          console.log(">",message)
         });
+
+      WS.connect();
     })
   })
 })
