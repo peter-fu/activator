@@ -1,0 +1,18 @@
+<div id="appStatus">
+  <button class="running" data-bind="css: {active: onoff.active, working: onoff.working, disabled: onoff.disabled},  click: onoff.click">
+    <svg data-bind="svg: '/assets/icons/onoff.svg'"/>
+    <span data-bind="text: onoff.text"></span>
+  </button>
+  <button class="refresh" data-bind="css: {active: compile.active, working: compile.working, disabled: compile.disabled},  click: compile.click">
+    <svg data-bind="svg: '/assets/icons/build.svg'"/>
+    <span data-bind="text: compile.text"></span>
+  </button>
+  <button class="console" data-bind="css: {active: run.active, working: run.working, disabled: run.disabled},  click: run.click">
+    <svg data-bind="svg: '/assets/icons/run.svg'"/>
+    <span data-bind="text: run.text"></span>
+  </button>
+  <button class="testing" data-bind="css: {active: testing.active, working: testing.working, disabled: testing.disabled},  click: testing.click">
+    <svg data-bind="svg: '/assets/icons/test.svg'"/>
+    <span data-bind="text: testing.text"></span>
+  </button>
+</div>
