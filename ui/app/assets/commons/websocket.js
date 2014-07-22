@@ -20,7 +20,10 @@ define([
   // subscribe({ type: 'Log', subtype: String })
   // See commons/type.js -> is()
   function subscribe(pattern) {
-    return SocketStream.fork().filter(Types.curry(pattern));
+    if (pattern)
+      return SocketStream.fork().filter(Types.curry(pattern));
+    else
+      return SocketStream.fork();
   }
 
   SocketStream.fork().filter(function() {

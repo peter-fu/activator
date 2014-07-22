@@ -22,20 +22,13 @@ var commons = [
 ]
 
 var services = [
-]
+  'commons/websocket',
 
+  'services/sbt'
+]
 
 // DEBUG
 debug = true;
-require(vendors, function($, ko) {
-  window.ko = ko; // it's used on every page...
-  require(commons, function() {
-    require(['commons/websocket'], function(WS) {
-      WS.connect();
-    })
-  })
-})
-
 
 // var core = [
 //   'main/view',
@@ -43,14 +36,16 @@ require(vendors, function($, ko) {
 //   'main/keyboard'
 // ]
 
-// require(vendors, function($, ko) {
-//   window.ko = ko; // it's used on every page...
-//   require(commons, function() {
-//     require(services, function() {
-//       require(core, function(view, router) {
-//         view.render();
-//         router.load(window.location.hash)
-//       })
-//     })
-//   })
-// })
+require(vendors, function($, ko) {
+  window.ko = ko; // it's used on every page...
+  require(commons, function() {
+    require(services, function(WS, sbt) {
+      WS.connect();
+
+      // require(core, function(view, router) {
+      //   view.render();
+      //   router.load(window.location.hash)
+      // })
+    })
+  })
+})
