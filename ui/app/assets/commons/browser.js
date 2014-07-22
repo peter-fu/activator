@@ -7,6 +7,7 @@ define(function() {
     },100)
   }
 
+  // From http://stackoverflow.com/questions/5916900/detect-version-of-browser
   function get_browser(){
     var ua=navigator.userAgent,tem,M=ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
     if(/trident/i.test(M[1])){
@@ -21,7 +22,6 @@ define(function() {
     if((tem=ua.match(/version\/(\d+)/i))!=null) {M.splice(1,1,tem[1]);}
     return M[0];
   }
-
   function get_browser_version(){
     var ua=navigator.userAgent,tem,M=ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
     if(/trident/i.test(M[1])){
@@ -43,7 +43,7 @@ define(function() {
 
   // needs IE11
   if (get_browser() == "IE" && get_browser_version() < 11) {
-    notCompatible("Activator uses functinalities that have a bad support on IE 10.");
+    notCompatible("Activator works poorly in IE 10 and earlier.");
   }
 
   return {

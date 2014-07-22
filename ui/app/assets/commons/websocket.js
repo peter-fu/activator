@@ -80,9 +80,6 @@ define([
       setTimeout(ping, 5000);
     }
 
-    subscribe({ response: 'Pong' }).each(function(message) {
-    });
-
     return ping;
   }());
 
@@ -93,7 +90,7 @@ define([
     websocket.addEventListener('open', onOpen);
     websocket.addEventListener('close', onClose);
     websocket.addEventListener('error', onError);
-    websocket.addEventListener("message", SocketStream.push);
+    websocket.addEventListener("message", SocketStream.push.bind(SocketStream));
   }
   function reconnect() {
     setTimeout(connect, 200);

@@ -31,13 +31,6 @@ require(vendors, function($, ko) {
   window.ko = ko; // it's used on every page...
   require(commons, function() {
     require(['commons/websocket'], function(WS) {
-      // PRINT EVERYTHING FROM WS
-      WS
-        .subscribe()
-        .each(function(message){
-          console.log(">",message)
-        });
-
       WS.connect();
     })
   })

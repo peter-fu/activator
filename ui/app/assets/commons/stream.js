@@ -1,42 +1,43 @@
 define(function() {
 
   function noop() {}
-  var methods = ['push','fail','clone','fork','async','each','map','filter','eachVal','mapVal','filterVal'];
 
   function EventStream() {
     this.callbacks = [];
-    for (i in methods) {
-      this[methods[i]] = this[methods[i]].bind(this);
-    }
   }
 
   // EventStream execution makes the actual runtime way faster
   function EventStreamExecution(callbacks) {
     return function(value) {
       if (callbacks.length > 1) {
-        callbacks[0].call(this, value, EventStreamExecution(callbacks.slice(1)));
+        callbacks[0].call(noop, value, EventStreamExecution(callbacks.slice(1)));
       } else {
-        callbacks[0].call(this, value, noop);
+        callbacks[0].call(noop, value, noop);
       }
     }
   }
 
   EventStream.prototype.push = function(value) {
-    // try {
+    try {
       EventStreamExecution(this.callbacks)(value);
-    // } catch (e){
-    //   if (this.onFail) this.onFail(e);
-    //   else throw("Strem Error:"+e)
-    // }
+    } catch (e){
+      if (this.onFail) this.onFail(e);
+      else throw("Strem Error:"+e)
+    }
     return this;
   }
 
+  // TODO: do we really need this
   EventStream.prototype.fail = function(callback) {
     this.onFail = callback;
   }
 
   EventStream.prototype.clone = function(value) {
-    return new EventStream(this.callbacks.slice(0));
+    var clone = new EventStream(this.callbacks.slice(0));
+    if (this.onFail){
+      clone.onFail = this.onFail;
+    }
+    return clone;
   }
 
   EventStream.prototype.fork = function() {
@@ -58,9 +59,14 @@ define(function() {
   // ----------------------------
   // Manage the FLOW of functions
   // ----------------------------
-  EventStream.prototype.async = function(a) {
-    var _call = a instanceof Array ? a : [].slice.call(arguments);
-    this.callbacks.push(_call);
+  // @asyncCall: function that takes the value and next function in parameters, such as:
+  // mystream.filter(whatever).async(function(value, next){
+  //   myAsyncCall(value, function(newValue){
+  //     next(newValue)
+  //   });
+  // }).map(toSomething);
+  EventStream.prototype.async = function(asyncCall) {
+    this.callbacks.push(asyncCall);
     return this;
   }
 
