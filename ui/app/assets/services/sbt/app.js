@@ -4,7 +4,7 @@ define([
   settings
 ) {
 
-  var subProjects = ko.observableArray([
+  var projects = ko.observableArray([
     "ProjectA",
     "ProjectB",
     "ProjectC",
@@ -12,17 +12,17 @@ define([
   ]);
   var currentProject =  ko.observable("ProjectA");
 
-  var mainFiles = ko.observable([]);
-  var currentMainFile = ko.observable();
+  var mainClasses = ko.observable([]);
+  var currentMainClass = ko.observable();
 
   return {
     name:               "",
     id:                 "",
     location:           "",
-    subProjects:        subProjects,
+    projects:           projects,
     currentProject:     currentProject,
-    mainFiles:          mainFiles,
-    currentMainFile:    currentMainFile,
+    mainClasses:        mainClasses,
+    currentMainClass:   currentMainClass,
     inspectorActivated: ko.observable(true),
     versions: {
       scala:            ko.observable(false),

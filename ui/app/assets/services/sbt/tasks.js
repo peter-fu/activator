@@ -49,8 +49,8 @@ define([
   // -----------
   // Run command
   var runCommand = ko.computed(function() {
-    if (app.currentMainFile()){
-      return "runMain "+ app.currentMainFile();
+    if (app.currentMainClass()){
+      return "runMain "+ app.currentMainClass();
     }
     else {
       return "run";
@@ -66,11 +66,8 @@ define([
   function removeExecution(id, succeeded) {
     var execution = executionsById[id];
     if (execution) {
-      // executions.remove(function(item) {
-      //   return item.executionId == execution.executionId;
-      // });
       // we want succeeded flag up-to-date when finished notifies
-      execution.succeeded("success");
+      execution.succeeded(true);
       execution.finished(new Date());
       delete executionsById[execution.executionId];
     }
@@ -90,8 +87,8 @@ define([
         execution: execution,
         taskId: message.event.taskId,
         key: message.event.key ? message.event.key.key.name : null,
-        finished: ko.observable(false),
-        succeeded: ko.observable(false)
+        finished: ko.observable(0), // 0 here stands for no Date() object
+        succeeded: ko.observable(0) // 0 here stands for no Date() object
       }
       debug && console.log("Starting task ", task);
       // we want to be in the by-id hash before we notify
@@ -122,8 +119,8 @@ define([
       executionId: message.event.id,
       command: message.event.command,
       started: ko.observable(new Date()),
-      finished: ko.observable(false),
-      succeeded: ko.observable(false),
+      finished: ko.observable(0), // 0 here stands for no Date() object
+      succeeded: ko.observable(0), // 0 here stands for no Date() object
       tasks: ko.observableArray([])
     }
     execution.finished.extend({ notify: 'always' });
@@ -142,9 +139,9 @@ define([
         return "Pending...";
       }
     });
-    (function timer() {
+    (function timer() { // Update counters in UI
       if (!execution.finished()){
-        execution.finished(false);
+        execution.finished(0); // 0 here stands for no Date() object
         setTimeout(timer, 100)
       }
     }());
@@ -188,9 +185,9 @@ define([
 
   // discoveredMainClasses
   valueChanged.fork().filter(types.curry({ key: 'discoveredMainClasses' })).each(function(message) {
-    app.mainFiles(message.value);
-    if (!app.currentMainFile()){
-      app.currentMainFile(app.mainFiles()[0]);
+    app.mainClasses(message.value); // All main classes
+    if (!app.currentMainClass() && message.value[0]){
+      app.currentMainClass(message.value[0]); // Selected main class, if empty
     }
   });
 
@@ -199,11 +196,7 @@ define([
     possibleAutocompletions: possibleAutocompletions,
     requestExecution: requestExecution,
     cancelExecution: cancelExecution,
-    executions: {
-      all: executions,
-      ids: executionsById,
-      tasks: tasksById
-    },
+    executions: executions,
     active: {
       turnedOn:     "",
       compiling:    "",

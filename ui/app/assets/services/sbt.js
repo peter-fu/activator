@@ -12,14 +12,12 @@ define([
   tests
 ) {
 
-  window.sbt = {
+  return {
     app:            app,
     dependencies:   dependencies,
     logs:           logs,
     tasks:          tasks,
     tests:          tests
-  }
-
-  return sbt;
+  };
 
 });
