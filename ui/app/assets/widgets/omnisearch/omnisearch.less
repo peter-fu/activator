@@ -1,0 +1,108 @@
+/*
+ Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
+ */
+@import "../../commons/_base";
+
+.omnisearch-wrapper {
+  position: relative;
+  .expand();
+  .row();
+  height: 50px;
+  line-height: 50px;
+}
+
+#omnisearch {
+  background: @slate;
+  height: 50px;
+  width: 50px;
+  input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: @slate url('/assets/images/icons/omnisearch.svg') 15px center no-repeat;
+    font: inherit;
+    width: 50px;
+    line-height: 30px;
+    padding: 10px 10px 10px 40px;
+    .transition(200ms);
+    color: white;
+    &:focus {
+      width: 100%;
+      background-color: @slate-dkr;
+    }
+    .placeholder(@grey);
+  }
+
+  ul {
+    box-shadow: 0 3px 4px rgba(0,0,0,.3);
+    max-height: 600px;
+    display: none;
+    position: absolute;
+    top: 50px;
+    left: 0;
+    right: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: @slate;
+    font-size: 13px;
+    &.active {
+      display: block;
+    }
+    &.empty:before {
+      display: block;
+      content: '(no results found)';
+      color: @grey;
+      padding: 10px 30px;
+    }
+    li {
+      line-height: 15px;
+      padding: 5px 10px;
+      min-height: 30px;
+      overflow: hidden;
+      cursor: pointer;
+      .row();
+      &:nth-child(odd) {
+        background-color: rgba(0,0,0,.05);
+      }
+      &.selected, &:hover {
+        background-color: @red;
+        .subtitle {
+          color: @red-ltr;
+        }
+        .type {
+          color: white;
+        }
+      }
+      .title {
+        color: white;
+        font-weight: 500;
+        padding: 0 30px;
+      }
+      .subtitle {
+        color: @grey;
+        .expand();
+      }
+      .type {
+        color: @blue;
+        text-transform: uppercase;
+        padding: 0 20px;
+      }
+    }
+  }
+
+  .spinner {
+    display: block;
+    position: absolute;
+    z-index: 99;
+    top: 15px;
+    right: 15px;
+    height: 20px;
+    width: 20px;
+    background: red;
+  }
+
+  input:focus + ul {
+    display: block;
+  }
+}
+
