@@ -58,24 +58,23 @@ object ActivatorBuild {
       makeFixWhitespace(Compile),
       makeFixWhitespace(Test),
       compileInputs in (Compile, compile) <<= (compileInputs in (Compile, compile)) dependsOn (fixWhitespace in Compile),
-      compileInputs in (Test, compile) <<= (compileInputs in (Test, compile)) dependsOn (fixWhitespace in Test),
-      // hook both publish and s3Upload to complain if cache index
-      // isn't the latest (but we want to allow integration tests
-      // and offlineTests in that case!)
-      Keys.deliverConfiguration := {
+      compileInputs in (Test, compile) <<= (compileInputs in (Test, compile)) dependsOn (fixWhitespace in Test)
+    ) ++ JavaVersionCheck.javacVersionCheckSettings ++ SbtPgp.settings ++
+    net.virtualvoid.sbt.graph.Plugin.graphSettings ++
+    // these have to be after SbtPgp.settings
+    Seq(
+      PgpKeys.publishSigned := {
         val log = Keys.streams.value.log
         val hash = (LocalTemplateRepo.checkTemplateCacheHash in TheActivatorBuild.localTemplateRepo).value
         log.info("Will publish with template index " + hash)
-        Keys.deliverConfiguration.value
+        PgpKeys.publishSigned.value
       },
-      Keys.deliverLocalConfiguration := {
+      PgpKeys.publishLocalSigned := {
         val log = Keys.streams.value.log
         val hash = (LocalTemplateRepo.checkTemplateCacheHash in TheActivatorBuild.localTemplateRepo).value
         log.info("Will publish locally with template index " + hash)
-        Keys.deliverLocalConfiguration.value
-      }
-    ) ++ JavaVersionCheck.javacVersionCheckSettings ++ SbtPgp.settings ++
-    net.virtualvoid.sbt.graph.Plugin.graphSettings
+        PgpKeys.publishLocalSigned.value
+      })
 
   def sbtShimPluginSettings: Seq[Setting[_]] =
     activatorDefaults ++
