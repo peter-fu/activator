@@ -287,6 +287,12 @@ object TheActivatorBuild extends Build {
       },
       S3.host in S3.upload := "downloads.typesafe.com.s3.amazonaws.com",
       S3.progress in S3.upload := true,
+      S3.upload := {
+        val log = Keys.streams.value.log
+        val hash = (LocalTemplateRepo.checkTemplateCacheHash in TheActivatorBuild.localTemplateRepo).value
+        log.info("Publishing to S3 with template index " + hash)
+        S3.upload.value
+      },
       logDownloadUrls := {
         val log = Keys.streams.value.log
         val version = Keys.version.value
