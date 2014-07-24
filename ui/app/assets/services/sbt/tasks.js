@@ -26,6 +26,19 @@ define([
     // TODO return something better (with the return value already parsed)
     return sbtRequest('possibleAutocompletions', {
       partialCommand: partialCommand
+    }).pipe(function(completions) {
+      return $.map(completions.choices, function(completion){
+        return {
+          title: completion.display,
+          subtitle: "run sbt task " + completion.display,
+          type: "Sbt",
+          url: false,
+          execute: partialCommand + completion.append,
+          callback: function() {
+            requestExecution(partialCommand + completion.append);
+          }
+        }
+      });
     });
   }
 
@@ -73,7 +86,7 @@ define([
     }
   }
 
-  var sbtEventStream = websocket.subscribe().equal('type','sbt');
+  var sbtEventStream = websocket.subscribe().matchOnAttribute('type','sbt');
   var subTypeEventStream = function(subType) {
     return sbtEventStream.fork().matchOnAttribute('subType',subType);
   }
