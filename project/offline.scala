@@ -31,7 +31,23 @@ object offline {
     IO.copyDirectory(templateRepo, testDir)
     runofflinetests(testDir, localIvyRepo, launcher, streams.log)
   }
-  
+
+  private class InterceptErrorsLogger(val underlying: sbt.Logger) extends sbt.Logger {
+    private var backwardErrors: List[String] = Nil
+    override def trace(t: => Throwable): Unit = underlying.trace(t)
+    override def success(message: => String): Unit = underlying.success(message)
+    override def log(level: sbt.Level.Value, message: => String): Unit = {
+      val m = message // eval only once
+      // the child sbt puts errors on stdout it looks like,
+      // so we have to look for error/warn inside the string.
+      if (level == sbt.Level.Error || level == sbt.Level.Warn ||
+          m.indexOf("error") >= 0 || m.indexOf("warn") >= 0)
+        backwardErrors = m :: backwardErrors
+      underlying.log(level, m)
+    }
+    final def errors: List[String] = backwardErrors.reverse
+  }
+
   def runofflinetests(testDir: File, localIvyRepo: File, launcher: File, log: sbt.Logger): Unit = {
     val results =
       for {
@@ -42,13 +58,25 @@ object offline {
         _ = log.info("[OFFLINETEST] Running offline update test for template: " + name)
         _ = log.info("[OFFLINETEST]")
         _ = log.info("[OFFLINETEST]")
-        result = runTest(localIvyRepo, testDir, projectInfo._1, projectInfo._2, launcher, log)
-      } yield name -> result
-    // TODO - Recap failures!
+        logger = new InterceptErrorsLogger(log)
+        result = runTest(localIvyRepo, testDir, projectInfo._1, projectInfo._2, launcher, logger)
+      } yield (name, result, logger.errors)
     if(results exists (_._2 != true)) {
+      // Recap the error messages so people don't have to dig through miles of scrollback
+      log.info(s" [OFFLINETEST] Summary of errors saved from above log output follows.")
+      for((name, _, errors) <- results) {
+        if (errors.nonEmpty) {
+          log.error(s" [OFFLINETEST] $name had errors or warnings (to see them in context, scroll way back):")
+          for (e <- errors) {
+            log.error(s" [OFFLINETEST] $name:     $e")
+          }
+        } else {
+          log.info(s" [OFFLINETEST] $name had no errors or warnings that we captured (scroll back for full output).")
+        }
+      }
       val failureCount = results.filterNot(_._2).length
       log.info("[OFFLINETEST] " + failureCount + " failures in " + results.length + " tests...")
-      for((name, result) <- results) {
+      for((name, result, _) <- results) {
         log.info(" [OFFLINETEST] " + name + " - " + (if (result) "SUCCESS" else "FAILURE"))
       }
       log.info(s"[OFFLINETEST] Problems and dependency graph from building the local repository are in ${localIvyRepo.getParentFile}/local-repo-deps.txt")
