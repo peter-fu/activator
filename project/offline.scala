@@ -136,6 +136,7 @@ object offline {
         "-Dsbt.global.base="+globalBase.getAbsolutePath
       )
       val cmd = Seq("java") ++ jvmargs ++ Seq("-jar", launcher.getCanonicalPath) ++ args
+      log.info(s"Command to update $cwd offline: ${cmd.mkString(" ")}")
       Process(cmd, cwd) ! log match {
         case 0 => true
         case n => false
