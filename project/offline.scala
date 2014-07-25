@@ -43,7 +43,9 @@ object offline {
       for((name, result) <- results) {
         log.info(" [OFFLINETEST] " + name + " - " + (if (result) "SUCCESS" else "FAILURE"))
       }
-      sys.error("Tests were unsuccessful")
+      log.info(s"[OFFLINETEST] Problems and dependency graph from building the local repository are in ${localIvyRepo.getParentFile}/local-repo-deps.txt")
+      log.info(s"[OFFLINETEST] Problems compiling the individual templates are in the logs above")
+      sys.error("Tests were unsuccessful: " + results.filter(_._2 != true).map(_._1).mkString(", "))
     } else {
       log.info("[OFFLINETEST] " + results.length + " tests successful.")
     }

@@ -49,8 +49,8 @@ object Packaging {
     localRepoArtifacts := Seq.empty,
     resolvers in TheActivatorBuild.dontusemeresolvers <+= localRepo apply { f => Resolver.file(lrepoName, f)(Resolver.ivyStylePatterns) },
     localRepoProjectsPublished <<= (TheActivatorBuild.publishedProjects map (publishLocal in _)).dependOn,
-    localRepoCreation <<= (localRepo, localRepoArtifacts, ivySbt in TheActivatorBuild.dontusemeresolvers, streams, localRepoProjectsPublished) map { (r, m, i, s, _) =>
-      val licenses = IvyHelper.createLocalRepository(m, lrepoName, i, s.log)
+    localRepoCreation <<= (localRepo, localRepoArtifacts, ivySbt in TheActivatorBuild.dontusemeresolvers, streams, localRepoProjectsPublished, target) map { (r, m, i, s, _, t) =>
+      val licenses = IvyHelper.createLocalRepository(m, lrepoName, i, t, s.log)
       LocalRepoReport(r, licenses)
     },
     localRepoCreated <<= localRepoCreation map (_.location),
