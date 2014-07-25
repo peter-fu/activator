@@ -60,7 +60,21 @@ object ActivatorBuild {
       compileInputs in (Compile, compile) <<= (compileInputs in (Compile, compile)) dependsOn (fixWhitespace in Compile),
       compileInputs in (Test, compile) <<= (compileInputs in (Test, compile)) dependsOn (fixWhitespace in Test)
     ) ++ JavaVersionCheck.javacVersionCheckSettings ++ SbtPgp.settings ++
-    net.virtualvoid.sbt.graph.Plugin.graphSettings
+    net.virtualvoid.sbt.graph.Plugin.graphSettings ++
+    // these have to be after SbtPgp.settings
+    Seq(
+      PgpKeys.publishSigned := {
+        val log = Keys.streams.value.log
+        val hash = (LocalTemplateRepo.checkTemplateCacheHash in TheActivatorBuild.localTemplateRepo).value
+        log.info("Will publish with template index " + hash)
+        PgpKeys.publishSigned.value
+      },
+      PgpKeys.publishLocalSigned := {
+        val log = Keys.streams.value.log
+        val hash = (LocalTemplateRepo.checkTemplateCacheHash in TheActivatorBuild.localTemplateRepo).value
+        log.info("Will publish locally with template index " + hash)
+        PgpKeys.publishLocalSigned.value
+      })
 
   def sbtShimPluginSettings: Seq[Setting[_]] =
     activatorDefaults ++

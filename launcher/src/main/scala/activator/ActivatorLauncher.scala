@@ -157,7 +157,10 @@ class ActivatorLauncher extends AppMain {
       connection.connect()
       if (ACTIVATOR_PROXY_DEBUG()) System.out.println("Connected to remote connection")
 
-      val in = connection.getInputStream()
+      val responseCode = connection.getResponseCode()
+      if (connection.getResponseCode() != 200)
+        throw new Exception(s"${latestUrl} returned status ${responseCode}")
+
       val reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), Charset.forName("UTF-8")))
       val line = try {
         val line = slurpIntoSingleLine(reader)

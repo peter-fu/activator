@@ -122,7 +122,7 @@ if "%JAVAOK%"=="false" (
 )
 
 rem Check what Java version is being used to determine what memory options to use
-for /f "tokens=3" %%g in ('java -version 2^>^&1 ^| findstr /i "version"') do (
+for /f "tokens=3" %%g in ('"%_JAVACMD%" -version 2^>^&1 ^| findstr /i "version"') do (
     set JAVA_VERSION=%%g
 )
 
@@ -182,7 +182,7 @@ if not "%~1"=="" (
     )
     shift
 
-    set DEBUG_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=!JPDA_PORT!
+    set DEBUG_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=!JPDA_PORT!
     goto argsloop
   )
   rem else
