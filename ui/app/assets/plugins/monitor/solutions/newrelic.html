@@ -23,8 +23,10 @@
   <p>To get your licence key, you need to <a href="https://rpm.newrelic.com/" target="_blank">Login</a> or <a href="https://www.newrelic.com/typesafe" target="_blank">Signup</a> to your New Relic account fist. Then your licence key is available in the application setup screen (<a href="/public/plugins/monitor/solutions/newrelic/LicenseKey.png" target="_blank">see this screenshot</a>)</p>
   <p>
     <input type="text" id="licenseKey" data-bind="value: licenseKey, valueUpdate: 'input', , css: {error: licenseKeyInvalid() }"/>
+    <span data-bind="visible: licenseKeyInvalid()">&nbsp;Licence key invalid.</span>
     <button class="button" data-bind="click: saveLicenseKey, visible: !licenseKeyInvalid()">Save</button>
   </p>
+  <p>Your licence key is a 40-character hexadecimal number.</p>
   <!-- /ko -->
   <!-- ko if: licenseKeySaved -->
   <p><button class="button" data-bind="click: resetKey">Reset key</button></p>
