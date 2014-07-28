@@ -39,7 +39,7 @@
           </div>
           Reset data on run
         </li>
-        <!--if-->
+        <!-- ko if: sbt.app.mainClasses().length > 0 -->
         <li>
           <h4>Main file</h4>
           <dl class="select dropdown">
@@ -54,7 +54,7 @@
             </dd>
           </dl>
         </li>
-        <!--/if-->
+        <!-- /ko -->
       </ul>
     </div>
     <footer>
@@ -63,7 +63,7 @@
         <span class="cache counter">0&ndash;</span>
       <!-- /ko -->
       <!-- ko ifnot: inspectorActivated -->
-        <p class="locked expand"> 
+        <p class="locked"> 
           The inspector is disabled when using an external monitoring tool. You can go on the
           <a href="#monitor">monitor tab</a> to turn it off.
         </p>

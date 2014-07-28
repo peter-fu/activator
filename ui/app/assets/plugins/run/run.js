@@ -20,6 +20,8 @@ define([
     sbt.tasks.requestExecution(cmd);
   }
 
+  window.sbt = sbt;
+
   sbt.app.inspectorActivated.subscribe(function(active) {
     if (!active && window.location.hash.indexOf("#run/system") != 0) {
       window.location.hash = "run/system";
