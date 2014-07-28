@@ -1,7 +1,17 @@
 /*
  Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
  */
-define(['css!./fileselection.css', 'text!./fileselection.html', 'lib/knockout/knockout', 'commons/widget', 'commons/utils'], function(css, template, ko, Widget, utils) {
+define([
+  'css!./fileselection.css',
+  'text!./fileselection.html',
+  'lib/knockout/knockout',
+  'commons/utils'
+], function(
+  css,
+  tpl,
+  ko,
+  utils
+) {
 
   function browse(location) {
     return $.ajax({
@@ -40,9 +50,7 @@ define(['css!./fileselection.css', 'text!./fileselection.html', 'lib/knockout/kn
   };
   function noop() {}
 
-  var FileSelection = utils.Class(Widget, {
-    id: 'file-selection-widget',
-    template: template,
+  var FileSelection = utils.Class({
     init: function(config) {
       var cfg = config || {};
       var self = this;
@@ -77,22 +85,21 @@ define(['css!./fileselection.css', 'text!./fileselection.html', 'lib/knockout/kn
       } else {
         this.loadRoots();
       }
-
-      debug && console.log(config.dom);
-      $(config.dom).on("click", ".directories li", function(e){
-          e.preventDefault();
-          var it = this;
-          var context = ko.contextFor(it);
-          if(context.$data.location) {
-            self.load(context.$data.location);
-          } else {
-            // TODO - Only on windows.
-            self.loadRoots();
-          }
-          return false;
-       });
-
-      self.renderTo(config.dom)
+    },
+    render: function(element) {
+      var self = this;
+      return bindhtml(tpl, self);
+    },
+    clickDir: function(context,event){
+      event.preventDefault();
+      var self = this;
+      if(context.location) {
+        self.load(context.location);
+      } else {
+        // TODO - Only on windows.
+        self.loadRoots();
+      }
+      return false;
     },
     chooseCurrent: function() {
       var self = this;
@@ -169,5 +176,7 @@ define(['css!./fileselection.css', 'text!./fileselection.html', 'lib/knockout/kn
       this.onCancel();
     }
   });
+
   return FileSelection;
+
 });
