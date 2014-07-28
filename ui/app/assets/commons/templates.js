@@ -146,8 +146,17 @@ define(function() {
     var memos = {}
     return {
       init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-      },
-      update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+        var memo = valueAccessor();
+        if (!memo()) {
+          memo([0,0]);
+        }
+        setTimeout(function() {
+          element.scrollLeft = memo()[0];
+          element.scrollTop  = memo()[1];
+        }, 1);// Wait for everything to be displayed
+        element.addEventListener('scroll', function(e) {
+          memo([element.scrollLeft,element.scrollTop]);
+        });
       }
     }
   }());
@@ -159,16 +168,38 @@ define(function() {
       timer = setTimeout(f, 1);
     }
   }
-  ko.bindingHandlers.logScroll = (function(){
-    var memos = {}
-    return {
-      init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-        // if (!allBindings().scrollTrigger) throw("logScroll must have a scrollTrigger, wich is the observable array.")
-      },
-      update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+  ko.bindingHandlers.logScroll = {
+    init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+      var memo = valueAccessor();
+      if (!memo()) {
+        memo('stick');
       }
+      setTimeout(function() {
+        if (memo() == 'stick'){
+          element.scrollTop = 9e9;
+        } else {
+          element.scrollTop = memo();
+        }
+      }, 1);
+
+      // When an element is added to the node, we reactualise the scroll.
+      // This is more efficient than anything else since this callback is
+      // removed when the element is gone.
+      element.addEventListener("DOMNodeInserted", function() {
+        if (memo() == 'stick'){
+          element.scrollTop = 9e9;
+        }
+      }, true);
+
+      element.addEventListener('scroll', function(e) {
+        if ((element.scrollTop + element.offsetHeight) > (element.scrollHeight - 20)) { // 20 is the error margin
+          memo('stick');
+        } else {
+          memo(element.scrollTop);
+        }
+      },true);
     }
-  }());
+  }
 
   // This allows to style SVG in css (including css transition and animations)
   ko.bindingHandlers.svg = {
