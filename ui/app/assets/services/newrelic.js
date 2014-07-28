@@ -27,7 +27,7 @@ define(['commons/utils', 'commons/streams', 'commons/settings', 'services/build'
     streams.send(nrMessage("isProjectEnabled"));
   }
 
-  var validKey = /[0-9A-Za-z]{40}/;
+  var validKey = /^[0-9A-Z]{40}$/i;
 
   streams.subscribe({
     filter: function(event) {

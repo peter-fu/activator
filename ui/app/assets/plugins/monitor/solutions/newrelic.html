@@ -22,8 +22,8 @@
   <h2>Enter your licence key</h2>
   <p>To get your licence key, you need to <a href="https://rpm.newrelic.com/" target="_blank">Login</a> or <a href="https://www.newrelic.com/typesafe" target="_blank">Signup</a> to your New Relic account fist. Then your licence key is available in the application setup screen (<a href="/public/plugins/monitor/solutions/newrelic/LicenseKey.png" target="_blank">see this screenshot</a>)</p>
   <p>
-    <input type="text" id="licenseKey" data-bind="value: licenseKey, valueUpdate: 'input'"/>
-    <button class="button" data-bind="click: saveLicenseKey">Save</button>
+    <input type="text" id="licenseKey" data-bind="value: licenseKey, valueUpdate: 'input', , css: {error: licenseKeyInvalid() }"/>
+    <button class="button" data-bind="click: saveLicenseKey, visible: !licenseKeyInvalid()">Save</button>
   </p>
   <!-- /ko -->
   <!-- ko if: licenseKeySaved -->
