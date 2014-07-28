@@ -106,10 +106,10 @@ define(function() {
   }
 
   // Just pass a function in the template, to call it
-  ko.bindingHandlers['call'] = {
-      init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-          valueAccessor()(element, allBindings, viewModel, bindingContext);
-      }
+  ko.bindingHandlers['exec'] = {
+    init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+      valueAccessor()(element, allBindings, viewModel, bindingContext);
+    }
   };
   // Log
   ko.bindingHandlers['log'] = {
