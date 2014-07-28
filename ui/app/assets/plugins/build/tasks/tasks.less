@@ -10,6 +10,12 @@
     th, td {
       .ellipsis();
     }
+    tr {
+      cursor: pointer;
+      &:hover {
+        background: @slate-ltr;
+      }
+    }
     .failed {
       background: @red;
       &, a {

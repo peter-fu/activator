@@ -17,7 +17,10 @@ define([
     clear: function() {
       sbt.logs.logs([]);
       sbt.tasks.executions([]);
-    }
+    },
+    rerunTask: function(task) {
+      sbt.tasks.requestExecution(task.command);
+    },
   };
 
   return {
