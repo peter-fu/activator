@@ -22,7 +22,9 @@ define(['commons/utils', 'commons/widget', 'services/newrelic', 'text!./newrelic
           return !self.available() || !self.licenseKeySaved();
         }, self);
         self.downloadEnabled = ko.observable(false);
-        self.developerKeyEnabled = ko.observable(false);
+        self.developerKeyEnabled = ko.computed(function() {
+          return (self.available() == true);
+        }, self);
         self.licenseKey = ko.observable(newrelic.licenseKey());
         self.downloadClass = ko.computed(function() {
           var enabled = (self.available() == false);
@@ -30,9 +32,7 @@ define(['commons/utils', 'commons/widget', 'services/newrelic', 'text!./newrelic
           return enabled ? "enabled" : "disabled";
         }, self);
         self.developerKeyClass = ko.computed(function() {
-          var enabled = (self.available() == true);
-          self.developerKeyEnabled(enabled);
-          return enabled ? "enabled" : "disabled";
+          return ((self.available() == true) ? "enabled" : "disabled");
         }, self);
         self.provisionDownloadSubscription = ko.observable(null);
         self.downloading = ko.observable("");
@@ -81,7 +81,7 @@ define(['commons/utils', 'commons/widget', 'services/newrelic', 'text!./newrelic
           }
         };
         self.saveLicenseKey = function () {
-          if (self.developerKeyEnabled() && !self.licenseKeyInvalid()) {
+          if (!self.licenseKeyInvalid()) {
             newrelic.licenseKey(self.licenseKey());
           }
         };
