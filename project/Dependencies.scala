@@ -3,30 +3,28 @@ import Keys._
 
 object Dependencies {
   val sbtVersion = "0.13.5"
+  val sbtLibraryVersion = "0.13.6-MSERVER-4" // for sbtIO on scala 2.11
   val sbtPluginVersion = "0.13"
   val sbtPluginScalaVersion = "2.11.1"
   val scalaVersion = "2.11.1"
   val luceneVersion = "4.2.1"
-  val templateCacheVersion = "1.0-49b8876fe876cfc6874a914722363e845217feff"
+  val templateCacheVersion = "1.0-6830c15252733edf977c869af798d113ad5ac80d"
   val sbtRcVersion = "1.0-27620c52c674e62079a4c8135efba9a24995cb7d"
 
-  val playVersion = "2.3.1"
-  val akkaVersion = "2.3.3"
+  val playVersion = "2.3.2"
+  val akkaVersion = "2.3.4"
   val slickVersion = "2.1.0-M2"
-  val echoPluginVersion = "0.1.3"
+  val echoPluginVersion = "0.1.1.3"
   val activatorAnalyticsVersion = "0.1.5"
   val aspectJVersion = "1.7.3"
 
   val activatorCommon      = "com.typesafe.activator" % "activator-common" % templateCacheVersion
   val templateCache        = "com.typesafe.activator" % "activator-templates-cache" % templateCacheVersion
 
-  val sbtIo210             = "org.scala-sbt" % "io" % sbtVersion
-  val sbtLauncherInterface = "org.scala-sbt" % "launcher-interface" % sbtVersion
-  val sbtMain              = "org.scala-sbt" % "main" % sbtVersion
-  val sbtTheSbt            = "org.scala-sbt" % "sbt" % sbtVersion
-  val sbtIo                = "org.scala-sbt" % "io" % "0.13.6-MSERVER-1"
-  val sbtLogging           = "org.scala-sbt" % "logging" % sbtVersion
-  val sbtProcess           = "org.scala-sbt" % "process" % sbtVersion
+  val sbtIo210                = "org.scala-sbt" % "io" % sbtVersion
+  val sbtLauncherInterface    = "org.scala-sbt" % "launcher-interface" % sbtVersion
+  val sbtIo                   = "org.scala-sbt" %% "io" % sbtLibraryVersion
+  val sbtCompletion           = "org.scala-sbt" %% "completion" % sbtLibraryVersion
 
   // sbtrc projects
   val sbtrcRemoteController = "com.typesafe.sbtrc" % "sbt-rc-remote-controller" % sbtRcVersion
@@ -34,7 +32,6 @@ object Dependencies {
   // Probes
   val sbtrcProbe13           = "com.typesafe.sbtrc" % "sbt-rc-probe-0-13" % sbtRcVersion
   val sbtshimUiInterface13   = "com.typesafe.sbtrc" % "sbt-rc-ui-interface-0-13" % sbtRcVersion
-  val sbtCompletion           = "org.scala-sbt" % "completion" % sbtVersion
 
   val akkaActor            = "com.typesafe.akka" %% "akka-actor" % akkaVersion
   val akkaSlf4j            = "com.typesafe.akka" %% "akka-slf4j" % akkaVersion
