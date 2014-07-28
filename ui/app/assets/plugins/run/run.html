@@ -10,10 +10,9 @@
           <dd>
             <a data-bind="click: function(){ sbtExecCommand('run') }">Run</a>
             <a data-bind="click: function(){ sbtExecCommand('start') }">Start</a>
-            <!-- <a>Options</a> -->
           </dd>
         </dl>
-        <button>
+        <button data-bind="click: function(){ sbtExecCommand('run'); }">
           <svg data-bind="svg: '/assets/icons/run.svg'"/>
           Run
         </button>

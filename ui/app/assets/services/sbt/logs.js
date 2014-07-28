@@ -12,7 +12,7 @@ define([
   // Websocket Handlers
   var logEvent = websocket.subscribe({ type:'sbt', subType:'LogEvent' })
 
-  logEvent
+  logEvent.fork()
     .match(function(m) {
       // Filter debug on demand
       return !((m.event.entry.level == "debug" || m.event.entry.type == "stdout") && !(app.settings.showLogDebug() || debug))
@@ -26,10 +26,10 @@ define([
     });
 
   logEvent
-    .match(function(message) {
+    .filter(function(message) {
       // Standard out
-      return event.entry && event.entry.type == "stdout";
-    })
+      return message.event.entry && message.event.entry.type == "stdout" && message.event.entry.message != "\n";
+    }).fork()
     .each(function(message){
       stdout.push(message);
       // TODO: Put a higher scrollback
