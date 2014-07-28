@@ -40,6 +40,9 @@ define(['commons/utils', 'commons/streams', 'commons/settings', 'services/build'
       } else if (event.type == "provisioned") {
         debug && console.log("New Relic provisioned");
         streams.send(nrMessage("available"));
+      } else if (event.type == "deprovisioned") {
+        debug && console.log("New Relic deprovisioned");
+        streams.send(nrMessage("available"));
       } else if (event.type == "isProjectEnabledResponse") {
         debug && console.log("Setting isProjectEnabled to: " + event.result);
         isProjectEnabled(event.result);
@@ -83,6 +86,9 @@ define(['commons/utils', 'commons/streams', 'commons/settings', 'services/build'
     licenseKey: licenseKey,
     provision: function() {
       streams.send(nrMessage("provision"))
+    },
+    deprovision: function() {
+      streams.send(nrMessage("deprovision"))
     },
     licenseKeySaved: ko.computed(function() {
       var key = licenseKey();

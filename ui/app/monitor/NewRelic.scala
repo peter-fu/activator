@@ -49,6 +49,10 @@ object NewRelic {
     def response: Response = Provisioned(this)
   }
 
+  case object Deprovision extends Request {
+    def response: Response = Deprovisioned
+  }
+
   case object Available extends Request {
     def response(result: Boolean): Response = AvailableResponse(result, this)
   }
@@ -65,6 +69,9 @@ object NewRelic {
     def request: Request
   }
   case class Provisioned(request: Provision) extends Response
+  case object Deprovisioned extends Response {
+    val request: Request = Deprovision
+  }
   case class ErrorResponse(message: String, request: Request) extends Response
   case class AvailableResponse(result: Boolean, request: Request) extends Response
   case class ProjectEnabled(request: Request) extends Response
@@ -90,27 +97,36 @@ object NewRelic {
             case Failure(error) =>
               reportError(error, s"Error processing provisioning request: ${error.getMessage}", r, sender)
           }
-      case r @ Available =>
-        Try(NR.hasNewRelic(config.extractRoot())) match {
-          case Success(v) => sender ! r.response(v)
-          case Failure(e) =>
-            log.error(e, "Failure during New Relic availability check")
-            sender ! r.error(s"Failure during New Relic availability check: ${e.getMessage}")
-        }
-      case r @ EnableProject(destination, key, name) =>
-        Try(NR.provisionNewRelic(config.extractRoot(), destination, key, name)) match {
-          case Success(_) => sender ! r.response
-          case Failure(e) =>
-            log.error(e, "Failure during enabling project")
-            sender ! r.error(s"Failure during enabling project: ${e.getMessage}")
-        }
-      case r @ IsProjectEnabled(destination) =>
-        Try(NR.isProjectEnabled(destination)) match {
-          case Success(x) => sender ! r.response(x)
-          case Failure(e) =>
-            log.error(e, "Failure testing if project enabled for New Relic")
-            sender ! r.error(s"Failure testing if project enabled for New Relic: ${e.getMessage}")
-        }
+      case r @ Deprovision => try {
+        NR.deprovision(config.extractRoot())
+        sender ! r.response
+      } catch {
+        case e: Exception =>
+          log.error(e, "Failure deprovisioning AppDynamics")
+          sender ! r.error(s"Failure deprovisioning AppDynamics: ${e.getMessage}")
+      }
+      case r @ Available => try {
+        sender ! r.response(NR.hasNewRelic(config.extractRoot()))
+      } catch {
+        case e: Exception =>
+          log.error(e, "Failure during New Relic availability check")
+          sender ! r.error(s"Failure during New Relic availability check: ${e.getMessage}")
+      }
+      case r @ EnableProject(destination, key, name) => try {
+        NR.provisionNewRelic(config.extractRoot(), destination, key, name)
+        sender ! r.response
+      } catch {
+        case e: Exception =>
+          log.error(e, "Failure during enabling project")
+          sender ! r.error(s"Failure during enabling project: ${e.getMessage}")
+      }
+      case r @ IsProjectEnabled(destination) => try {
+        sender ! r.response(NR.isProjectEnabled(destination))
+      } catch {
+        case e: Exception =>
+          log.error(e, "Failure testing if project enabled for New Relic")
+          sender ! r.error(s"Failure testing if project enabled for New Relic: ${e.getMessage}")
+      }
     }
   }
 }

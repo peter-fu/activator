@@ -78,6 +78,7 @@ define(['commons/utils', 'commons/widget', 'services/appdynamics', 'text!./appdy
         };
         self.deprovisionAppDynamics = function () {
           if (!self.downloadEnabled()) {
+            self.error("");
             appdynamics.deprovision();
           }
         };

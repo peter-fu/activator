@@ -31,12 +31,18 @@ object NewRelicRequest {
   case object IsProjectEnabled extends Request {
     def response(result: Boolean): Response = IsProjectEnabledResponse(result, this)
   }
+  case object Deprovision extends Request {
+    def response: Response = Deprovisioned
+  }
 
   sealed trait Response {
     def request: Request
   }
   case object Provisioned extends Response {
     final val request: Request = Provision
+  }
+  case object Deprovisioned extends Response {
+    val request: Request = Deprovision
   }
   case class ErrorResponse(message: String, request: Request) extends Response
   case class AvailableResponse(result: Boolean, request: Request) extends Response
@@ -45,6 +51,12 @@ object NewRelicRequest {
 
   implicit val newRelicProvisionReads: Reads[Provision.type] =
     extractRequest[Provision.type](requestTag)(extractTypeOnly("provision", Provision))
+
+  implicit val newRelicDeprovisionReads: Reads[Deprovision.type] =
+    extractRequest[Deprovision.type](requestTag)(extractTypeOnly("deprovision", Deprovision))
+
+  implicit val newRelicDeprovisionWrites: Writes[Deprovision.type] =
+    emitRequest(requestTag)(_ => Json.obj("type" -> "deprovision"))
 
   implicit val newRelicIsProjectEnabledReads: Reads[IsProjectEnabled.type] =
     extractRequest[IsProjectEnabled.type](requestTag)(extractTypeOnly("isProjectEnabled", IsProjectEnabled))
@@ -75,11 +87,16 @@ object NewRelicRequest {
     val ar = newRelicAvailableReads.asInstanceOf[Reads[Request]]
     val epr = newRelicEnableProjectReads.asInstanceOf[Reads[Request]]
     val iper = newRelicIsProjectEnabledReads.asInstanceOf[Reads[Request]]
-    extractRequest[Request](requestTag)(pr.orElse(ar).orElse(epr).orElse(iper))
+    val de = newRelicDeprovisionReads.asInstanceOf[Reads[Request]]
+    extractRequest[Request](requestTag)(pr.orElse(ar).orElse(epr).orElse(iper).orElse(de))
   }
 
   implicit val newRelicProvisionedWrites: Writes[Provisioned.type] =
     emitResponse(responseTag)(in => Json.obj("type" -> "provisioned",
+      "request" -> in.request))
+
+  implicit val newRelicDeprovisionedWrites: Writes[Deprovisioned.type] =
+    emitResponse(responseTag)(in => Json.obj("type" -> "deprovisioned",
       "request" -> in.request))
 
   implicit val newRelicIsProjectEnabledResponseWrites: Writes[IsProjectEnabledResponse] =
@@ -107,6 +124,7 @@ object NewRelicRequest {
       case x @ IsProjectEnabled => newRelicIsProjectEnabledWrites.writes(x)
       case x @ Provision => newRelicProvisionWrites.writes(x)
       case x @ Available => newRelicAvailableWrites.writes(x)
+      case x @ Deprovision => newRelicDeprovisionWrites.writes(x)
     }
 
   implicit val newRelicResponseWrites: Writes[Response] =
@@ -116,6 +134,7 @@ object NewRelicRequest {
       case x: AvailableResponse => newRelicAvailableResponseWrites.writes(x)
       case x: ProjectEnabled => newRelicProjectEnabledWrites.writes(x)
       case x: ErrorResponse => newRelicErrorResponseWrites.writes(x)
+      case x @ Deprovisioned => newRelicDeprovisionedWrites.writes(x)
     }
 
   def unapply(in: JsValue): Option[Request] = Json.fromJson[Request](in).asOpt

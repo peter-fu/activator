@@ -151,6 +151,8 @@ object NewRelic {
     FileHelper.writeToFile(processedConfigFile.toString.getBytes("utf-8"), confRelative(newRelicConfigFile))
   }
 
+  def deprovision(target: File): Unit = FileHelper.deleteAll(target)
+
   def isProjectEnabled(root: File): Boolean = {
     val nrRoot = FileHelper.relativeTo(root)_
     val lib = nrRoot("lib")

@@ -74,6 +74,12 @@ define(['commons/utils', 'commons/widget', 'services/newrelic', 'text!./newrelic
             newrelic.provision();
           }
         };
+        self.deprovisionNewRelic = function () {
+          if (!self.downloadEnabled()) {
+            self.error("");
+            newrelic.deprovision();
+          }
+        };
         self.saveLicenseKey = function () {
           if (self.developerKeyEnabled() && !self.licenseKeyInvalid()) {
             newrelic.licenseKey(self.licenseKey());
