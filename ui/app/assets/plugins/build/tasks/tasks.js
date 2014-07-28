@@ -16,7 +16,7 @@ define([
     sbt: sbt,
     clear: function() {
       sbt.logs.logs([]);
-      sbt.tasks.executions.all([]);
+      sbt.tasks.executions([]);
     }
   };
 
