@@ -1,0 +1,114 @@
+/*
+ Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
+ */
+@import "../../commons/_base";
+
+@-webkit-keyframes glowSvg {
+  0% {
+    fill: @blue;
+  }
+  100% {
+    fill: @grey;
+  }
+}
+@-moz-keyframes glowSvg {
+  0% {
+    fill: @blue;
+  }
+  100% {
+    fill: @grey;
+  }
+}
+@keyframes glowSvg {
+  0% {
+    fill: @blue;
+  }
+  100% {
+    fill: @grey;
+  }
+}
+
+#appStatus {
+  .row();
+  .align-items();
+  justify-content: center;
+  height: 60px;
+  padding: 6px 0 5px;
+  position: relative;
+  button {
+    display: inline-block;
+    background: none;
+    position: relative;
+    .square(30px);
+    .cover();
+    border-radius: 3px;
+    .transition();
+    span {
+      position: absolute;
+      top: 35px;
+      left: 50%;
+      background: @slate-dkr;
+      color: @white-dkr;
+      font-size: 11px;
+      text-transform: uppercase;
+      line-height: 18px;
+      padding: 0 3px;
+      border-radius: 2px;
+      white-space: nowrap;
+      display: none;
+      .transform(translateX(-50%));
+      &:after {
+        .triangle("up", 4px, @slate-dkr);
+        content: " ";
+        position: absolute;
+        top: -4px;
+        left: 50%;
+        .transform(translateX(-50%));
+      }
+    }
+    &:hover {
+      background: @slate-ltr;
+      span {
+        display: block;
+      }
+    }
+    &:active, &.working {
+      background: @slate-dkr;
+    }
+    svg {
+      position: absolute;
+      left: 5px;
+      top: 5px;
+    }
+    g {
+      .transition();
+      fill: @grey;
+    }
+
+    &.working g {
+      -webkit-animation: 300ms glowSvg infinite alternate linear;
+      -moz-animation: 300ms glowSvg infinite alternate linear;
+      animation: 300ms glowSvg infinite alternate linear;
+    }
+    &:hover g {
+      fill: fadeout(@blue, 40%);
+    }
+    &.active g {
+      fill: @blue;
+    }
+    &.disabled {
+      pointer-events: none;
+      cursor: default;
+      opacity: .5;
+      &:hover {
+        background: none !important;
+        span {
+          display: none;
+        }
+      }
+      g {
+        fill: @grey;
+      }
+    }
+  }
+}

@@ -28,7 +28,7 @@ define([
   logEvent
     .match(function(message) {
       // Standard out
-      return message.subType == 'LogEvent', event: { entry: { message: String, type: "stdout" } } }
+      return event.entry && event.entry.type == "stdout";
     })
     .each(function(message){
       stdout.push(message);

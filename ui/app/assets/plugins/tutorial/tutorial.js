@@ -8,7 +8,7 @@ define([
   "text!./tutorial.html",
   "text!./tutorial-panel.html",
   "css!./tutorial",
-  "css!widgets/navigation/menu"
+  "css!widgets/menu/menu"
 ], function(
   plugins,
   router,
