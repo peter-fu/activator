@@ -14,20 +14,20 @@ define([
 
   var SocketStream = Stream().map(function(evt) {
     return JSON.parse(evt.data);
-  });
+  }).log(debug && "Received");
 
   // Pattern checking (optional), eg:
   // subscribe({ type: 'Log', subtype: String })
   // See commons/type.js -> is()
   function subscribe(pattern) {
-    return SocketStream.fork().filter(Types.curry(pattern));
+    if (pattern)
+      return SocketStream.match(pattern);
+    else
+      return SocketStream.fork();
   }
 
-  SocketStream.fork().filter(function() {
-    return debug;
-  }).filterNot(Types.curry({ response: 'Pong' })).log();
-
   function send(msg) {
+    debug && console.debug("Send:", JSON.stringify(msg))
     websocket.send(JSON.stringify(msg));
   }
 
@@ -38,6 +38,7 @@ define([
   }
 
   function onClose(event) {
+    // Todo, bind modal
     debug && console.info("WS closed: " + event.code + ": " + event.reason, event)
     isOpened(false);
     modals.confirm({});
@@ -51,6 +52,7 @@ define([
   }
 
   function onError(event) {
+    // Todo, bind modal
     debug && console.error("WS error: ", event);
     isOpened(false);
     modals.confirm({});

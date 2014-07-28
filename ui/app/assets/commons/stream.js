@@ -1,4 +1,4 @@
-define(function() {
+define(['./types'], function(Types) {
 
   function noop() {}
 
@@ -50,9 +50,37 @@ define(function() {
     return forked;
   }
 
-  EventStream.prototype.log = function(callback) {
+  // A mix between fork and filter,
+  // Do no call next if it matches
+  EventStream.prototype.match = function(process) {
+    var forked = new EventStream();
+    var _call = function(value, next) {
+      if ( (typeof process == "function" && process(value)) || (typeof process == "object" && Types.check(process, value)) ){
+        forked.push(value)
+      } else {
+        next(value);
+      }
+    }
+    this.callbacks.push(_call);
+    return forked;
+  }
+
+  EventStream.prototype.equal = function(attribute, attributeValue) {
+    var forked = new EventStream();
+    var _call = function(value, next) {
+      if (value != undefined && value[attribute] === attributeValue){
+        forked.push(value)
+      } else {
+        next(value);
+      }
+    }
+    this.callbacks.push(_call);
+    return forked;
+  }
+
+  EventStream.prototype.log = function(debug) {
     return this.each(function(e) {
-      console.log(e);
+      debug && console.debug(debug, e);
     });
   }
 
@@ -92,7 +120,9 @@ define(function() {
 
   EventStream.prototype.filter = function(process) {
     var _call = function(value, next) {
-      if (process(value)) next(value);
+      if ( (typeof process == "function" && process(value)) || (typeof process == "object" && Types.check(process, value)) ) {
+        next(value);
+      }
     }
     this.callbacks.push(_call);
     return this;
@@ -100,7 +130,9 @@ define(function() {
 
   EventStream.prototype.filterNot = function(process) {
     var _call = function(value, next) {
-      if (!process(value)) next(value);
+      if ( (typeof process == "function" && !process(value)) || (typeof process == "object" && !Types.check(process, value)) ) {
+        next(value);
+      }
     }
     this.callbacks.push(_call);
     return this;
