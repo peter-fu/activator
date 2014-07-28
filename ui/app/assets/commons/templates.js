@@ -180,7 +180,7 @@ define(function() {
         } else {
           element.scrollTop = memo();
         }
-      }, 1);
+      }, 100);
 
       // When an element is added to the node, we reactualise the scroll.
       // This is more efficient than anything else since this callback is
