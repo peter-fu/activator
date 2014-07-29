@@ -9,7 +9,7 @@
   <div class="col">
     <!-- ko if: needProvision -->
     <h2>Get the AppDynamics Agent</h2>
-    <p>The AppDynamics Agent collects data about your application.  This data is sent to AppDynamics for analysis.</p>
+    <p>The AppDynamics Agent collects performance metrics from your application. This data is sent to AppDynamics for analysis.</p>
     <h3>Enter your AppDynamics account information</h3>
     <p>In order to download the AppDynamics agent you need to supply your AppDynamics credentials (this information will not be stored).  If you do not have an AppDynamics account, you can <a href="https://portal.appdynamics.com/account/signup/signupForm/" target="_blank">signup here</a></p>
     <form>
@@ -28,7 +28,7 @@
     <!-- /ko -->
     <!-- ko ifnot: needProvision-->
     <h2>The AppDynamics tracing agent has been downloaded!</h2>
-    <p>You may enable AppDynamics for from the <a href="#run">run</a> tab.</p>
+    <p>You may enable AppDynamics from the <a href="#run">run</a> tab.</p>
     <p><button class="button" data-bind="click: deprovisionAppDynamics">Re-download agent</button></p>
     <!-- /ko -->
   </div>
