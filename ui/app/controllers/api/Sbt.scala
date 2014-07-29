@@ -68,7 +68,7 @@ object Sbt extends Controller {
     }
 
     val resultFuture = AppManager.loadApp(appId) flatMap { app =>
-      withTaskActor(taskId, taskDescription, app) { taskActor =>
+      withTaskActor(taskId, taskDescription, app, taskMessage) { taskActor =>
         sendRequestGettingAckAndEvents(snap.Akka.system, app, taskId, taskActor, taskMessage) map {
           case protocol.RequestReceivedEvent => protocol.RequestReceivedEvent
           case error: protocol.ErrorResponse => error
@@ -102,20 +102,20 @@ object Sbt extends Controller {
   def watchSources() = jsonAction { json =>
     val appId = (json \ "appId").as[String]
     val taskId = (json \ "taskId").as[String]
+    val message = protocol.WatchTransitiveSourcesRequest(sendEvents = true)
 
     val resultFuture = AppManager.loadApp(appId) flatMap { app =>
-      withTaskActor(taskId, "Finding sources to watch for changes", app) { taskActor =>
-        sendRequestGettingEventsAndResponse(snap.Akka.system, app, taskId, taskActor,
-          protocol.WatchTransitiveSourcesRequest(sendEvents = true)) map {
-            case protocol.WatchTransitiveSourcesResponse(files) =>
-              val filesSet = files.toSet
-              Logger.debug(s"Sending app actor ${filesSet.size} source files")
-              app.actor ! UpdateSourceFiles(filesSet)
-              Ok(JsObject(Seq("type" -> JsString("WatchTransitiveSourcesResponse"),
-                "count" -> JsNumber(filesSet.size))))
-            case message: protocol.Message =>
-              Ok(scalaJsonToPlayJson(protocol.Message.JsonRepresentationOfMessage.toJson(message)))
-          }
+      withTaskActor(taskId, "Finding sources to watch for changes", app, message) { taskActor =>
+        sendRequestGettingEventsAndResponse(snap.Akka.system, app, taskId, taskActor, message) map {
+          case protocol.WatchTransitiveSourcesResponse(files) =>
+            val filesSet = files.toSet
+            Logger.debug(s"Sending app actor ${filesSet.size} source files")
+            app.actor ! UpdateSourceFiles(filesSet)
+            Ok(JsObject(Seq("type" -> JsString("WatchTransitiveSourcesResponse"),
+              "count" -> JsNumber(filesSet.size))))
+          case message: protocol.Message =>
+            Ok(scalaJsonToPlayJson(protocol.Message.JsonRepresentationOfMessage.toJson(message)))
+        }
       }
     }
     resultFuture
@@ -134,8 +134,11 @@ object Sbt extends Controller {
     }
   }
 
-  private def withTaskActor[T](taskId: String, taskDescription: String, app: snap.App)(body: ActorRef => Future[T]): Future[T] = {
-    (app.actor ? GetTaskActor(taskId, taskDescription)) flatMap {
+  private def withTaskActor[T](taskId: String,
+    taskDescription: String,
+    app: snap.App,
+    request: protocol.Request)(body: ActorRef => Future[T]): Future[T] = {
+    (app.actor ? GetTaskActor(taskId, taskDescription, request)) flatMap {
       case TaskActorReply(taskActor) => body(taskActor)
     }
   }

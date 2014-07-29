@@ -36,7 +36,7 @@ define(['text!./console.html', 'css!./console.css', 'commons/utils', 'commons/wi
       }
 
       if (view) this.navigation.active(name);
-      modules = view ? [ this.navigation, view.contents ] : [ this.navigation ]
+      modules = view ? [ this.navigation, view.contents ] : [ this.navigation ];
       Connection.updateModules(modules);
       return view;
     }

@@ -1,0 +1,47 @@
+<header>
+  <a href="#monitor/" class="change">Change provider</a>
+  <img src="/public/images/monitor/newrelic.png">
+</header>
+<section class="warning">
+  Third-party monitoring disables the local inspector.
+</section>
+<!-- ko with: supportedJavaVersion -->
+<section class="error" data-bind="visible: !result">
+  <p>The current version of the New Relic agent doesn't support Java version <span data-bind="text: version"></span></p>
+</section>
+<!-- /ko -->
+<section class="activate">
+  <h2>Get the New Relic Agent</h2>
+  <p>The New Relic Agent collects performance metrics from your application. This data is sent to New Relic for analysis.</p>
+  <!-- ko ifnot: available -->
+  <p>
+    <button class="button big install" data-bind="click: provisionNewRelic">Download</button>
+    <span data-bind="visible: downloading"><span data-bind="text: downloading"></span></span>
+  </p>
+  <!-- /ko -->
+  <!-- ko if: available -->
+  <h2>The New Relic tracing agent has been downloaded!</h2>
+  <p><button class="button" data-bind="click: deprovisionNewRelic">Re-download agent</button></p>
+  <!-- /ko -->
+  <!-- ko ifnot: licenseKeySaved -->
+  <h2>Enter your licence key</h2>
+  <p>To get your licence key, you need to <a href="https://rpm.newrelic.com/" target="_blank">Login</a> or <a href="https://www.newrelic.com/typesafe" target="_blank">Signup</a> to your New Relic account fist. Then your licence key is available in the application setup screen (<a href="/public/plugins/monitor/solutions/newrelic/LicenseKey.png" target="_blank">see this screenshot</a>)</p>
+  <p>
+    <input type="text" id="licenseKey" data-bind="value: licenseKey, valueUpdate: 'input', , css: {error: licenseKeyInvalid() }"/>
+    <span data-bind="visible: licenseKeyInvalid()">&nbsp;Licence key invalid.</span>
+    <button class="button" data-bind="click: saveLicenseKey, visible: !licenseKeyInvalid()">Save</button>
+  </p>
+  <p>Your licence key is a 40-character hexadecimal number.</p>
+  <!-- /ko -->
+  <!-- ko if: licenseKeySaved -->
+  <p><button class="button" data-bind="click: resetKey">Reset key</button></p>
+  <!-- /ko -->
+  <!-- ko ifnot: needProvision-->
+  <h2>You're ready to go!</h2>
+  <p>
+    The New Relic Agent has been downloaded and your key configured.  You may enable New Relic for <a href="http://www.playframework.com/" target="_blank">Play</a>-based templates
+    from the <a href="#run">run</a> tab.
+  </p>
+  <!-- /ko -->
+</section>
+<section class="error" data-bind="visible: error, text: error"></section>

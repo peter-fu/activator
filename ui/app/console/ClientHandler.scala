@@ -173,7 +173,7 @@ trait RequestHelpers { this: ActorLogging =>
             sortDirection = i.sortDirection,
             traceId = i.traceId,
             eventId = i.eventId)
-          case None => sys.error(s"Could not find requested module: ${i.name}")
+          case None => sys.error(s"Could not find requested module: ${i}")
         }
       }
 

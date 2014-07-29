@@ -16,6 +16,19 @@ object JsonHelper {
   import play.api.libs.json.Reads._
   import play.api.libs.json.Writes._
   import play.api.libs.functional.FunctionalBuilder
+  import play.api.data.validation.ValidationError
+  import java.io._
+
+  implicit object FileWrites extends Writes[File] {
+    def writes(file: File) = JsString(file.getPath)
+  }
+
+  implicit object FileReads extends Reads[File] {
+    def reads(json: JsValue) = json match {
+      case JsString(path) => JsSuccess(new File(path))
+      case _ => JsError(Seq(JsPath() -> Seq(ValidationError("validate.error.expected.jsstring"))))
+    }
+  }
 
   def extractTagged[T](key: String, tag: String)(reads: Reads[T]): Reads[T] =
     (__ \ key).read[String](pattern(tag.r)) ~> reads

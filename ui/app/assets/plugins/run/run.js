@@ -1,19 +1,46 @@
 /*
  Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
  */
-define(['services/build', 'text!./run.html', 'css!./run.css', "widgets/navigation/menu"],
-    function(build, template, LogView, css){
+define(['services/build', 'services/newrelic', 'services/appdynamics', 'text!./run.html', 'css!./run.css', "widgets/navigation/menu"],
+    function(build, newrelic, appdynamics, template, LogView, css){
 
   var RunState = (function(){
     var self = {};
-
+    newrelic.checkIsProjectEnabled();
+    self.monitoringOptions = ko.computed(function() {
+      var result = [{ name: "Inspect", id: "inspect", enabled: true}];
+      if (appdynamics.available() && appdynamics.configured()) {
+        result.push({ name: "AppDynamics", id: "appDynamics", enabled: true, enable: function() {
+            self.currentMonitoringOption("appDynamics");
+          }
+        });
+      }
+      if (newrelic.hasPlay() && newrelic.available() && newrelic.licenseKeySaved()) {
+        result.push({ name: "New Relic", id: "newRelic", enabled: newrelic.isProjectEnabled(), enable: function() {
+          newrelic.enableProject(newrelic.licenseKey(), build.app.name());
+          self.currentMonitoringOption("newRelic");
+        }
+        });
+      }
+      return result;
+    }, self);
+    self.currentMonitoringOption = ko.observable("inspect");
+    self.currentMonitoringOption.subscribe(function (newOption) {
+      debug && console.log("run instrumentation changed to: "+newOption);
+      build.run.instrumentation(newOption);
+      build.restartTask('run');
+    });
+    self.showMonitoringOptions = ko.computed(function () {
+      var options = self.monitoringOptions();
+      return (options.length > 1);
+    }, self);
     self.title = ko.observable("Run");
     self.startStopLabel = ko.computed(function() {
       if (build.run.haveActiveTask())
         return "Stop";
       else
         return "Start";
-    }, this);
+    }, self);
 
     self.log = build.run.outputLog;
 
@@ -42,15 +69,15 @@ define(['services/build', 'text!./run.html', 'css!./run.css', "widgets/navigatio
     self.statusMessage = build.run.statusMessage;
 
     self.update = function(parameters){
-    }
+    };
     self.startStopButtonClicked = function(self) {
       debug && console.log("Start or Stop was clicked");
       build.toggleTask('run');
-    }
+    };
     self.restartButtonClicked = function(self) {
       debug && console.log("Restart was clicked");
       build.restartTask('run');
-    }
+    };
 
     return self;
   }());

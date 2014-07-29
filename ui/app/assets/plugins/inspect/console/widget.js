@@ -7,6 +7,6 @@ define(['commons/utils', 'commons/widget'], function(utils, Widget) {
     dataTypes: [],
     dataRequest: function() { return {}; },
     onData: function() {}
-  })
+  });
   return ConsoleWidget;
 });

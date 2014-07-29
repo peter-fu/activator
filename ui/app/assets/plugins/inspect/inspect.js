@@ -5,8 +5,11 @@ define(['commons/streams', 'services/build', './console/console', 'services/conn
   function(streams, build, Console, Connection, template){
 
     var InspectState = {
-        consoleWidget: new Console()
-    }
+      inspectEnabled: ko.computed(function() {
+        return build.run.instrumentation() == "inspect";
+      }),
+      consoleWidget: new Console()
+    };
 
     // Make connection a subscriber to events sent to the streams WS
     streams.subscribe(Connection);

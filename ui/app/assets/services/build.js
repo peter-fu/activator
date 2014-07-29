@@ -2,8 +2,8 @@
  Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
  */
 
-define(['lib/knockout/knockout', 'commons/settings', 'services/log', 'commons/utils', 'commons/events', './sbt', 'commons/markers', './connection'],
-    function(ko, settings, Log, utils, events, sbt, markers, Connection){
+define(['lib/knockout/knockout', 'commons/settings', 'services/log', 'commons/utils', 'commons/events', './sbt', 'commons/markers', './connection', 'services/appdynamics'],
+    function(ko, settings, Log, utils, events, sbt, markers, Connection, appdynamics){
 
   var rerunOnBuild = settings.observable("build.rerunOnBuild", true);
   var retestOnSuccessfulBuild = settings.observable("build.retestOnSuccessfulBuild", false);
@@ -369,6 +369,7 @@ define(['lib/knockout/knockout', 'commons/settings', 'services/log', 'commons/ut
       this.status = ko.observable(Status.IDLE);
       this.statusMessage = ko.observable('Application is stopped.');
       this.outputLog = new Log();
+      this.instrumentation = ko.observable("inspect");
     },
     loadMainClasses: function(success, failure) {
       var self = this;
@@ -633,8 +634,25 @@ define(['lib/knockout/knockout', 'commons/settings', 'services/log', 'commons/ut
         task.task = 'run';
       }
 
-      if (build.app.hasEcho()) {
+      if (build.app.hasEcho() && (build.run.instrumentation() == "inspect")) {
         task.task = 'echo:' + task.task;
+      }
+
+      var baseParams = ('params' in task) ? {} : task.params;
+      if (build.run.instrumentation() == "newRelic") {
+        task.params = $.extend(baseParams, {instrumentation: build.run.instrumentation()});
+      } else if (build.run.instrumentation() == "appDynamics") {
+        task.params = $.extend(baseParams,{
+          instrumentation: build.run.instrumentation(),
+          applicationName: app.name(),
+          nodeName: appdynamics.nodeName(),
+          tierName: appdynamics.tierName(),
+          hostName: appdynamics.hostName(),
+          port: appdynamics.port(),
+          sslEnabled: appdynamics.sslEnabled(),
+          accountName: appdynamics.accountName(),
+          accessKey: appdynamics.accessKey()
+        });
       }
 
       debug && console.log("launching " + task.task + " task");

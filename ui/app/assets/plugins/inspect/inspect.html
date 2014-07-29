@@ -1,1 +1,22 @@
-<article class="inspect oneColumnAndMenu" data-bind="snapView: consoleWidget"></article>
+<div>
+  <!-- ko if: inspectEnabled() -->
+  <article class="inspect oneColumnAndMenu" data-bind="snapView: consoleWidget"></article>
+  <!-- /ko -->
+  <!-- ko if: !(inspectEnabled()) -->
+  <article class="inspect oneColumnAndMenu">
+    <header>
+      <h1>Inspect</h1>
+    </header>
+    <section  class="module viewer">
+      <article>
+        <header>
+          <h1>Disabled</h1>
+        </header>
+        <div id="splash">
+          <p>Inspect disabled while Third-party monitoring in use.</p>
+        </div>
+      </article>
+    </section>
+  </article>
+  <!-- /ko -->
+</div>

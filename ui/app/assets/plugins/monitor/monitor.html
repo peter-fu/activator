@@ -1,0 +1,27 @@
+<article class="monitor fullpage">
+
+  <!-- ko ifnot: provider -->
+  <div class="providers">
+    <aside>
+      <h2>Typesafe subscription</h2>
+      <p>Discover the Developer subscription to get support you can depend on.</p>
+      <a href="http://typesafe.com/how/subscription" target="_blank" class="button">VISIT TYPESAFE.COM</a>
+    </aside>
+    <header>
+      <h1>Application Monitoring</h1>
+      <p>The Typesafe Reactive Platform is supported by the following third-party production monitoring solutions.</p>
+    </header>
+    <section class="choose">
+      <h4>Choose a provider</h4>
+      <p id="providers">
+        <a href="#monitor/appdynamics"><img src="/public/images/monitor/appdynamics.png"></a>
+        <a href="#monitor/newrelic"><img src="/public/images/monitor/newrelic.png"></a>
+      </ul>
+    </section>
+  </div>
+  <!-- /ko -->
+
+  <!-- ko if: provider -->
+  <div class="provider" data-bind="snapView: monitorWidget"></div>
+  <!-- /ko -->
+</article>

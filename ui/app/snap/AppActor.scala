@@ -3,28 +3,36 @@
  */
 package snap
 
+import akka.actor._
+import akka.event.LoggingAdapter
+import akka.pattern._
 import com.typesafe.sbtrc._
 import com.typesafe.sbtrc.launching.SbtProcessLauncher
-import akka.actor._
+import console.ClientController.HandleRequest
 import java.io.File
 import java.net.URLEncoder
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import scala.concurrent.duration._
-import console.ClientController.HandleRequest
+import java.util.concurrent.atomic.AtomicLong
 import JsonHelper._
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import play.api.libs.json.Json._
-import play.api.libs.functional.syntax._
+import scala.concurrent.duration._
+import scala.util.{ Success, Failure }
+import play.api.Play
+import scala.concurrent.ExecutionContext
+import scala.reflect.ClassTag
 
 sealed trait AppRequest
 
-case class GetTaskActor(id: String, description: String) extends AppRequest
+case class GetTaskActor(id: String, description: String, request: protocol.Request) extends AppRequest
 case object GetWebSocketCreated extends AppRequest
 case object CreateWebSocket extends AppRequest
 case class NotifyWebSocket(json: JsObject) extends AppRequest
 case object InitialTimeoutExpired extends AppRequest
 case class ForceStopTask(id: String) extends AppRequest
 case class UpdateSourceFiles(files: Set[File]) extends AppRequest
+case class ProvisionSbtPool(instrumentation: InstrumentationRequestType, originalMessage: GetTaskActor, sender: ActorRef) extends AppRequest
 
 sealed trait AppReply
 
@@ -32,36 +40,82 @@ case class TaskActorReply(ref: ActorRef) extends AppReply
 case object WebSocketAlreadyUsed extends AppReply
 case class WebSocketCreatedReply(created: Boolean) extends AppReply
 
-case class InspectRequest(json: JsValue)
-object InspectRequest {
-  val tag = "InspectRequest"
+class InstrumentationRequestException(message: String) extends Exception(message)
 
-  implicit val inspectRequestReads: Reads[InspectRequest] =
-    extractRequest[InspectRequest](tag)((__ \ "location").read[JsValue].map(InspectRequest.apply _))
+object AppActor {
+  final val runTasks: Set[String] = Set(
+    protocol.TaskNames.run,
+    protocol.TaskNames.runMain,
+    protocol.TaskNames.runEcho,
+    protocol.TaskNames.runMainEcho)
 
-  implicit val inspectRequestWrites: Writes[InspectRequest] =
-    emitRequest(tag)(in => obj("location" -> in.json))
+  final val instrumentedRun: Map[String, String] = Map(
+    protocol.TaskNames.run -> protocol.TaskNames.run,
+    protocol.TaskNames.runMain -> protocol.TaskNames.runMain,
+    protocol.TaskNames.runEcho -> protocol.TaskNames.run,
+    protocol.TaskNames.runMainEcho -> protocol.TaskNames.runMain)
 
-  def unapply(in: JsValue): Option[InspectRequest] = Json.fromJson[InspectRequest](in).asOpt
+  def isRunRequest(request: protocol.Request): Boolean = request match {
+    case protocol.GenericRequest(_, command, _) => runTasks(command)
+    case _ => false
+  }
+
+  def getRunInstrumentation(request: protocol.Request): InstrumentationRequestType = request match {
+    case protocol.GenericRequest(_, command, params) if runTasks(command) => InstrumentationRequestTypes.fromParams(params)
+    case _ => throw new RuntimeException(s"Cannot get instrumentation from a non-run request: $request")
+  }
+
+  def instrumentedRequest(request: protocol.Request): protocol.Request = request match {
+    case r: protocol.GenericRequest =>
+      if (isRunRequest(r)) r.copy(name = instrumentedRun(r.name))
+      else r
+    case r => r
+  }
+
+  val fallbackMachineName = "activator-machine"
 }
 
 class AppActor(val config: AppConfig, val sbtProcessLauncher: SbtProcessLauncher) extends Actor with ActorLogging {
+  import AppActor._
 
   AppManager.registerKeepAlive(self)
 
   def location = config.location
 
-  val childFactory = new DefaultSbtProcessFactory(location, sbtProcessLauncher)
-  val sbts = context.actorOf(Props(new ChildPool(childFactory)), name = "sbt-pool")
-  val socket = context.actorOf(Props(new AppSocketActor()), name = "socket")
-  val projectWatcher = context.actorOf(Props(new ProjectWatcher(location, newSourcesSocket = socket, sbtPool = sbts)),
+  val poolCounter = new AtomicLong(0)
+
+  val uninstrumentedChildFactory = new DefaultSbtProcessFactory(location, sbtProcessLauncher)
+  val uninstrumentedSbts = context.actorOf(Props(new ChildPool(uninstrumentedChildFactory)), name = "sbt-pool")
+
+  private var instrumentedSbtPools: Map[InstrumentationTag, ActorRef] = Map.empty[InstrumentationTag, ActorRef]
+
+  def addInstrumentedSbtPool(tag: InstrumentationTag, factory: SbtProcessFactory): Unit = {
+    tag match {
+      case Inspect.Tag =>
+      case i =>
+        instrumentedSbtPools.get(i).foreach(_ ! PoisonPill)
+        instrumentedSbtPools += (i -> context.actorOf(Props(new ChildPool(factory)), name = s"sbt-pool-${i.name}-${poolCounter.getAndIncrement()}"))
+    }
+  }
+
+  def getSbtPoolFor(tag: InstrumentationTag): Option[ActorRef] = tag match {
+    case Inspect.Tag => Some(uninstrumentedSbts)
+    case i => instrumentedSbtPools.get(i)
+  }
+
+  lazy val newRelicActor: ActorRef = context.actorOf(monitor.NewRelic.props(NewRelic.fromConfig(Play.current.configuration.underlying), defaultContext))
+  lazy val appDynamicsActor: ActorRef = context.actorOf(monitor.AppDynamics.props(AppDynamics.fromConfig(Play.current.configuration.underlying), defaultContext))
+
+  val socket = context.actorOf(Props(new AppSocketActor(newRelicActor, appDynamicsActor)), name = "socket")
+
+  val projectWatcher = context.actorOf(Props(new ProjectWatcher(location, newSourcesSocket = socket, sbtPool = uninstrumentedSbts)),
     name = "projectWatcher")
 
   var webSocketCreated = false
 
   var tasks = Map.empty[String, ActorRef]
 
-  context.watch(sbts)
+  context.watch(uninstrumentedSbts)
   context.watch(socket)
   context.watch(projectWatcher)
 
@@ -71,9 +125,18 @@ class AppActor(val config: AppConfig, val sbtProcessLauncher: SbtProcessLauncher
 
   override val supervisorStrategy = SupervisorStrategy.stoppingStrategy
 
+  def runWithPool(taskId: String, description: String, pool: ActorRef, sender: ActorRef): Unit = {
+    val task = context.actorOf(Props(new ChildTaskActor(taskId, description, pool)),
+      name = "task-" + URLEncoder.encode(taskId, "UTF-8"))
+    tasks += (taskId -> task)
+    context.watch(task)
+    log.debug("created task {} {}", taskId, task)
+    sender ! TaskActorReply(task)
+  }
+
   override def receive = {
     case Terminated(ref) =>
-      if (ref == sbts) {
+      if (ref == uninstrumentedSbts || instrumentedSbtPools.values.exists(_ == ref)) {
         log.info(s"sbt pool terminated, killing AppActor ${self.path.name}")
         self ! PoisonPill
       } else if (ref == socket) {
@@ -93,13 +156,43 @@ class AppActor(val config: AppConfig, val sbtProcessLauncher: SbtProcessLauncher
       }
 
     case req: AppRequest => req match {
-      case GetTaskActor(taskId, description) =>
-        val task = context.actorOf(Props(new ChildTaskActor(taskId, description, sbts)),
-          name = "task-" + URLEncoder.encode(taskId, "UTF-8"))
-        tasks += (taskId -> task)
-        context.watch(task)
-        log.debug("created task {} {}", taskId, task)
-        sender ! TaskActorReply(task)
+      case ProvisionSbtPool(instrumentation, originalMessage, originalSender) =>
+        getSbtPoolFor(instrumentation.tag) match {
+          case Some(_) =>
+            self.tell(originalMessage, originalSender)
+          case None =>
+            instrumentation match {
+              case InstrumentationRequestTypes.Inspect =>
+              case x @ InstrumentationRequestTypes.NewRelic =>
+                val realitiveToRoot = FileHelper.relativeTo(config.location)_
+                val nrConfigFile = realitiveToRoot("conf/newrelic.yml")
+                val nrJar = realitiveToRoot("lib/newrelic.jar")
+                val inst = NewRelic(nrConfigFile, nrJar)
+                val processFactory = new DefaultSbtProcessFactory(location, sbtProcessLauncher, inst.jvmArgs)
+                addInstrumentedSbtPool(x.tag, processFactory)
+                self.tell(originalMessage, originalSender)
+              case x @ InstrumentationRequestTypes.AppDynamics(applicationName, nodeName, tierName, accountName, accessKey, hostName, port, sslEnabled) =>
+                val relativeToActivator = FileHelper.relativeTo(Instrumentation.activatorHome)_
+                val adJar = relativeToActivator("monitoring/appdynamics/javaagent.jar")
+                val inst = AppDynamics(adJar, applicationName, nodeName, tierName, accountName, accessKey, hostName, port, sslEnabled)
+                val processFactory = new DefaultSbtProcessFactory(location, sbtProcessLauncher, inst.jvmArgs)
+                addInstrumentedSbtPool(x.tag, processFactory)
+                self.tell(originalMessage, originalSender)
+            }
+        }
+      case m @ GetTaskActor(taskId, description, request) =>
+        if (isRunRequest(request)) {
+          val instrumentation = getRunInstrumentation(request)
+          getSbtPoolFor(instrumentation.tag) match {
+            case None =>
+              self ! ProvisionSbtPool(instrumentation, m, sender)
+            case Some(pool) =>
+              runWithPool(taskId, description, pool, sender)
+          }
+        } else {
+          val pool = uninstrumentedSbts
+          runWithPool(taskId, description, pool, sender)
+        }
       case GetWebSocketCreated =>
         sender ! WebSocketCreatedReply(webSocketCreated)
       case CreateWebSocket =>
@@ -253,9 +346,139 @@ class AppActor(val config: AppConfig, val sbtProcessLauncher: SbtProcessLauncher
     }
   }
 
-  class AppSocketActor extends WebSocketActor[JsValue] with ActorLogging {
+  case class ProvisioningSinkState(progress: Int = 0)
+
+  class ProvisioningSinkUnderlying(log: LoggingAdapter, produce: JsValue => Unit) {
+    import monitor.Provisioning._
+    def onMessage(state: ProvisioningSinkState, status: Status, sender: ActorRef, self: ActorRef, context: ActorContext): ProvisioningSinkState = status match {
+      case x @ Authenticating(diagnostics, url) =>
+        produce(toJson(x))
+        state
+      case x @ ProvisioningError(message, exception) =>
+        produce(toJson(x))
+        log.error(exception, message)
+        context stop self
+        state
+      case x @ Downloading(url) =>
+        produce(toJson(x))
+        state
+      case x @ Progress(Left(value)) =>
+        val p = state.progress
+        if ((value / 100000) != p) {
+          produce(toJson(x))
+          state.copy(progress = value / 100000)
+        } else state
+      case x @ Progress(Right(value)) =>
+        val p = state.progress
+        if ((value.toInt / 10) != p) {
+          produce(toJson(x))
+          state.copy(progress = value.toInt / 10)
+        } else state
+      case x @ DownloadComplete(url) =>
+        produce(toJson(x))
+        state
+      case x @ Validating =>
+        produce(toJson(x))
+        state
+      case x @ Extracting =>
+        produce(toJson(x))
+        state
+      case x @ Complete =>
+        produce(toJson(x))
+        context stop self
+        state
+    }
+  }
+
+  class ProvisioningSink(init: ProvisioningSinkState,
+    underlyingBuilder: LoggingAdapter => ProvisioningSinkUnderlying) extends Actor with ActorLogging {
+    val underlying = underlyingBuilder(log)
+    import monitor.Provisioning._
+    override def receive: Receive = {
+      var state = init
+
+      {
+        case x: Status =>
+          state = underlying.onMessage(state, x, sender, self, context)
+      }
+    }
+  }
+
+  class AppSocketActor(newRelicActor: ActorRef, appDynamicsActor: ActorRef) extends WebSocketActor[JsValue] with ActorLogging {
+
+    import WebSocketActor.timeout
+
+    def askNewRelic[T <: monitor.NewRelic.Response](msg: monitor.NewRelic.Request, omsg: NewRelicRequest.Request, onFailure: Throwable => String)(body: T => Unit)(implicit tag: ClassTag[T]): Unit = {
+      newRelicActor.ask(msg).mapTo[monitor.NewRelic.Response].onComplete {
+        case Success(r: monitor.NewRelic.ErrorResponse) => produce(toJson(omsg.error(r.message)))
+        case Success(`tag`(r)) => body(r)
+        case Success(r: monitor.NewRelic.Response) =>
+          log.error(s"Unexpected response from request: $msg got: $r expected: ${tag.toString()}")
+        case Failure(f) =>
+          val errorMsg = onFailure(f)
+          log.error(f, errorMsg)
+          produce(toJson(omsg.error(errorMsg)))
+      }
+    }
+
+    def askAppDynamics[T <: monitor.AppDynamics.Response](msg: monitor.AppDynamics.Request, omsg: AppDynamicsRequest.Request, onFailure: Throwable => String)(body: T => Unit)(implicit tag: ClassTag[T]): Unit = {
+      appDynamicsActor.ask(msg).mapTo[monitor.AppDynamics.Response].onComplete {
+        case Success(r: monitor.AppDynamics.ErrorResponse) => produce(toJson(omsg.error(r.message)))
+        case Success(`tag`(r)) => body(r)
+        case Success(r: monitor.AppDynamics.Response) =>
+          log.error(s"Unexpected response from request: $msg got: $r expected: ${tag.toString()}")
+        case Failure(f) =>
+          val errorMsg = onFailure(f)
+          log.error(f, errorMsg)
+          produce(toJson(omsg.error(errorMsg)))
+      }
+    }
+
+    def handleNewRelicRequest(in: NewRelicRequest.Request): Unit = {
+      import monitor.NewRelic._
+      in match {
+        case x @ NewRelicRequest.Provision =>
+          val sink = context.actorOf(Props(new ProvisioningSink(ProvisioningSinkState(), log => new ProvisioningSinkUnderlying(log, produce))))
+          askNewRelic[Provisioned](monitor.NewRelic.Provision(sink), x,
+            f => s"Failed to provision New Relic: ${f.getMessage}")(_ => produce(toJson(x.response)))
+        case x @ NewRelicRequest.Available =>
+          askNewRelic[AvailableResponse](monitor.NewRelic.Available, x,
+            f => s"Failed New Relic availability check: ${f.getMessage}")(r => produce(toJson(x.response(r.result))))
+        case x @ NewRelicRequest.EnableProject(key, name) =>
+          askNewRelic[ProjectEnabled](monitor.NewRelic.EnableProject(config.location, key, name), x,
+            f => s"Failed to enable project[${config.location}] for New Relic: ${f.getMessage}")(_ => produce(toJson(x.response)))
+        case x @ NewRelicRequest.IsProjectEnabled =>
+          askNewRelic[IsProjectEnabledResult](monitor.NewRelic.IsProjectEnabled(config.location), x,
+            f => s"Failed check if New Relic enabled: ${f.getMessage}")(r => produce(toJson(x.response(r.result))))
+        case x @ NewRelicRequest.Deprovision =>
+          askNewRelic[Deprovisioned.type](monitor.NewRelic.Deprovision, x,
+            f => s"Failed New Relic deprovisioning: ${f.getMessage}")(r => produce(toJson(x.response)))
+        case x @ NewRelicRequest.IsSupportedJavaVersion =>
+          askNewRelic[IsSupportedJavaVersionResult](monitor.NewRelic.IsSupportedJavaVersion, x,
+            f => s"Failed checking for supported Java version: ${f.getMessage}")(r => produce(toJson(x.response(r.result, r.version))))
+      }
+    }
+
+    def handleAppDynamicsRequest(in: AppDynamicsRequest.Request): Unit = {
+      import monitor.AppDynamics._
+      in match {
+        case x @ AppDynamicsRequest.Provision(username, password) =>
+          val sink = context.actorOf(Props(new ProvisioningSink(ProvisioningSinkState(), log => new ProvisioningSinkUnderlying(log, produce))))
+          askAppDynamics[Provisioned](monitor.AppDynamics.Provision(sink, username, password), x,
+            f => s"Failed to provision AppDynamics: ${f.getMessage}")(_ => produce(toJson(x.response)))
+        case x @ AppDynamicsRequest.Available =>
+          askAppDynamics[AvailableResponse](monitor.AppDynamics.Available, x,
+            f => s"Failed AppDynamics availability check: ${f.getMessage}")(r => produce(toJson(x.response(r.result))))
+        case x @ AppDynamicsRequest.Deprovision =>
+          askAppDynamics[Deprovisioned.type](monitor.AppDynamics.Deprovision, x,
+            f => s"Failed AppDynamics deprovisioning: ${f.getMessage}")(r => produce(toJson(x.response)))
+      }
+    }
+
     override def onMessage(json: JsValue): Unit = {
       json match {
+        case NewRelicRequest(m) => handleNewRelicRequest(m)
+        case AppDynamicsRequest(m) => handleAppDynamicsRequest(m)
         case InspectRequest(m) => for (cActor <- consoleActor) cActor ! HandleRequest(json)
         case WebSocketActor.Ping(ping) => produce(WebSocketActor.Pong(ping.cookie))
         case _ => log.info("unhandled message on web socket: {}", json)

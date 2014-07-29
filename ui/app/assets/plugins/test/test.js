@@ -55,15 +55,15 @@ define([
         } else {
           this.testFilter('all')
         }
-      }
+      };
       self.startStopButtonClicked = function(self) {
         debug && console.log("Start/Stop was clicked");
         build.toggleTask('test');
-      }
+      };
       self.restartButtonClicked = function(self) {
         debug && console.log("Restart was clicked");
         build.restartTask('test');
-      }
+      };
 
       return self;
 

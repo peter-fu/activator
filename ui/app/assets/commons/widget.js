@@ -44,7 +44,7 @@ var Widget = utils.Class({
 
 // Copied from knockout source..
 var REPLACE_CHILDREN_TEMPLATE_MODE = 'replaceChildren';
-var REPLACE_ELEMENT_TEMPLATE_MODE = 'replaceNode;'
+var REPLACE_ELEMENT_TEMPLATE_MODE = 'replaceNode';
 
 // This little beauty gives us the ability to not have to specify all the knockout render
 // template parameters.
@@ -69,7 +69,7 @@ ko.bindingHandlers.snapView = {
       // get rid of snapViewReplace binding.
       var opts = {
           afterRender: widget.onRender.bind(widget)
-      }
+      };
       ko.renderTemplate(widget.view, widget, opts, element, REPLACE_CHILDREN_TEMPLATE_MODE);
     }
 };
@@ -85,10 +85,10 @@ ko.bindingHandlers.snapViewReplace = {
       var opts = {
           data: widget,
           afterRender: widget.onRender.bind(widget)
-      }
+      };
       ko.renderTemplate(widget.view, widget, opts, element, REPLACE_ELEMENT_TEMPLATE_MODE);
     }
-}
+};
 
 return Widget;
 });

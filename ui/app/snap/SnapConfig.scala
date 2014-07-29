@@ -13,23 +13,16 @@ import scala.concurrent.duration._
 import sbt.IO
 
 // createdTime and usedTime are only optional due to legacy config files
-case class AppConfig(location: File, id: String, createdTime: Option[Long], usedTime: Option[Long], cachedName: Option[String] = None)
+case class AppConfig(location: File,
+  id: String,
+  createdTime: Option[Long],
+  usedTime: Option[Long],
+  cachedName: Option[String] = None)
 
 object AppConfig {
-  import play.api.data.validation.ValidationError
-
-  implicit object FileWrites extends Writes[File] {
-    def writes(file: File) = JsString(file.getPath)
-  }
+  import JsonHelper._
 
   implicit val writes = Json.writes[AppConfig]
-
-  implicit object FileReads extends Reads[File] {
-    def reads(json: JsValue) = json match {
-      case JsString(path) => JsSuccess(new File(path))
-      case _ => JsError(Seq(JsPath() -> Seq(ValidationError("validate.error.expected.jsstring"))))
-    }
-  }
 
   implicit val reads = Json.reads[AppConfig]
 }

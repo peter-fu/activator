@@ -91,7 +91,7 @@ define([], function() {
     // in the prototype, so leave it there.
     if (baseInit && subInit && baseInit !== noOp) {
       M.prototype.init = function() {
-        var args = [].slice.call(arguments, 0)
+        var args = [].slice.call(arguments, 0);
         baseInit.apply(this, args);
         subInit.apply(this, args);
       };

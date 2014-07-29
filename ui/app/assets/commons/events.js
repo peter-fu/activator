@@ -23,7 +23,7 @@ define(function() {
   function send(event) {
     if (!('type' in event))
       throw new Error("event to send must have a 'type' field");
-    debug && console.log("sending event ", event)
+    debug && console.log("sending event ", event);
     $.each(subscribers, function(index, subscriber) {
       try {
         if (subscriber.filter(event))

@@ -9,7 +9,7 @@ object Dependencies {
   val scalaVersion = "2.11.1"
   val luceneVersion = "4.2.1"
   val templateCacheVersion = "1.0-6830c15252733edf977c869af798d113ad5ac80d"
-  val sbtRcVersion = "1.0-7be0ef2928241f9d13137c7cb90f1c30238f1d25"
+  val sbtRcVersion = "1.0-27620c52c674e62079a4c8135efba9a24995cb7d"
 
   val playVersion = "2.3.2"
   val akkaVersion = "2.3.4"

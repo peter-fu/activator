@@ -21,7 +21,7 @@
           Run on successful build
         </label>
       </li>
-       <li>
+      <li>
       <h3>Main Class</h3>
       <ul>
         <!-- ko foreach: mainClasses -->
@@ -35,6 +35,27 @@
         <!-- /ko -->
       </ul>
       </li>
+      <!-- ko if: showMonitoringOptions -->
+      <li>
+        <h3>Monitoring options</h3>
+        <ul id="monitoring-options">
+          <!-- ko foreach: monitoringOptions -->
+          <li>
+            <!-- ko if: $data.enabled -->
+            <input type="radio" name="monitoringOption" data-bind="value: $data.id, checked: $parent.currentMonitoringOption, attr: {id: 'mo-'+$data.id}"  class="radio-input"/>
+            <label class="radio" data-bind="attr: { for: 'mo-'+$data.id }">
+              <span class="outer"><span class="inner"></span></span>
+              <p data-bind="text: $data.name, attr: {title: $data.name}"></p>
+            </label>
+            <!-- /ko -->
+            <!-- ko ifnot: $data.enabled -->
+            <button class="button" data-bind="click: $data.enable">Enable <span data-bind="text: $data.name"></span></button>
+            <!-- /ko -->
+          </li>
+          <!-- /ko -->
+        </ul>
+      </li>
+      <!-- /ko -->
     </ul>
   </nav>
   <section>
