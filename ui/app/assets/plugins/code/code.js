@@ -112,7 +112,31 @@ define([
         breadcrumb(all);
         window.location.hash = "code/";
       }
-    }
+    },
 
+    keyboard: function(key, meta) {
+      var focus = $("#wrapper .browser span.focus");
+      if (key == "BOTTOM"){
+        var all = $("#wrapper .browser span:visible");
+        var index = all.index(focus);
+        focus.removeClass("focus");
+        all.eq( index<all.length?index+1:0 ).addClass("focus");
+      } else if (key == "TOP"){
+        var all = $("#wrapper .browser span:visible");
+        var index = all.index(focus);
+        focus.removeClass("focus");
+        all.eq( index>0?index-1:all.length ).addClass("focus");
+      } else if (key == "RIGHT"){
+        if (!focus.parent().hasClass("open"))
+          focus.trigger("click");
+      } else if (key == "LEFT"){
+        if(focus.parent().is(".directory.open")) focus.trigger("click");
+        else {
+          if (focus.parents(".directory.open:first").find("span:first").addClass("focus").length)
+            focus.removeClass("focus");
+        }
+      }
+
+    }
   }
 });

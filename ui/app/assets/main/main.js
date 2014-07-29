@@ -28,7 +28,8 @@ var services = [
 var core = [
   'main/view',
   'main/router',
-  'commons/websocket'
+  'commons/websocket',
+  'main/keyboard'
 ]
 
 require(vendors, function($, ko) {

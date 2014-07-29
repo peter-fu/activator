@@ -1,32 +1,73 @@
-// this file is a simple keymage wrapper to control our usage of it
-// and offer some convenience functionality.
-define([ 'lib/keymage/keymage' ], function(key) {
-  return {
-    installBindingsInScope: function(scope, keybindings) {
-      $.each(keybindings, function(i, params) {
-        // we need to decide if there's a sub-scope in the parameter list,
-        // which would look like key('scope', 'ctrl-c', function(){})
-        var adjusted = null;
-        if (params.length > 2 && typeof(params[2]) == 'function') {
-          adjusted = params.slice(0);
-          adjusted[0] = scope + '.' + params[0];
-        } else {
-          adjusted = params.slice(0);
-          adjusted.unshift(scope);
+define(['./router'], function(router) {
+
+  var isMac = navigator.platform.toUpperCase().indexOf('MAC')>=0;
+  var activeKeyboard = true;
+  var currentFocus;
+
+  var keyCodes = {
+    13:  'ENTER',
+    27:  'ESC',
+    37:  'LEFT',
+    39:  'RIGHT',
+    38:  'TOP',
+    40:  'BOTTOM',
+    82:  'R',
+    83:  'S',
+    84:  'T',
+    86:  'V',
+    87:  'W',
+    219: '[',
+    221: ']',
+    191: '/',
+    49:  '1',
+    50:  '2',
+    51:  '3',
+    52:  '4',
+    53:  '5',
+    54:  '6',
+    55:  '7'
+  }
+
+  function modifierKey(e){
+    return ((isMac && e.metaKey) || e.ctrlKey)
+  }
+
+  function notEditing(e){
+    // if we're editing something we cancel
+    return !(!activeKeyboard || e.target.tagName == 'INPUT' || e.target.tagName == 'TEXTAREA');
+  }
+
+  // Careful, order matters here
+  $(document)
+    .keydown(function(e){
+      // ESCAPE blurs
+      if(e.keyCode == 27) {
+        if (e.target.tagName == 'INPUT' || e.target.tagName == 'TEXTAREA') {
+          e.target.blur();
+          $(document.body).scrollReveal();
+          return false;
         }
-        debug && console.log("in scope " + scope + " creating keybinding ", adjusted);
-        key.apply(null, adjusted);
-      });
-    },
-    pushScope: function(scope) {
-      debug && console.log("pushing scope " + scope);
-      key.pushScope(scope);
-      debug && console.log("key scope is now: " + key.getScope());
-    },
-    popScope: function(scope) {
-      debug && console.log("popping scope " + scope);
-      key.popScope(scope);
-      debug && console.log("key scope is now: " + key.getScope());
+      }
+    }).keydown(function(e){
+      // Check if key is registered in current plugin, or in main view
+      if (notEditing(e) && router.current().keyboard){
+        return router.current().keyboard(keyCodes[e.keyCode], modifierKey(e), e)
+      }
+    }).keydown(function(e){
+      // ALL shortcuts
+      var key = keyCodes[e.keyCode];
+      if (notEditing(e)){
+        if (key == "T"){
+          e.preventDefault();
+          e.stopPropagation();
+          $("#omnisearch input").focus();
+        }
+      }
+    });
+
+    return {
+      activeKeyboard: activeKeyboard,
+      currentFocus: currentFocus
     }
-  };
+
 });
