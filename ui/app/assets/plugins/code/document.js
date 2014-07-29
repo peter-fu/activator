@@ -26,14 +26,18 @@ define([
 
     // Sync Ace content with local value
     self.edited = ko.observable(false);
-    self.body.on("change", function(value) {
+    self.body.subscribe(function(value) {
       // TODO: check if document is edited, then ask for confirmation
       self.session.setValue(value);
     });
 
+    fs.open(self.location).then(function(data) {
+      self.body(data);
+    })
+
     // Annotation (error, warning...)
     self.annotations = ko.observable([]);
-    self.annotations.on("change", function(_) {
+    self.annotations.subscribe(function(_) {
       self.session.setAnnotations(_.map(function(m) {
         // Translate sbt error kinds, to ace annotations types
         var aceLevel = m.kind == 'error' ? 'error': m.kind == 'warn' ? 'warning': 'info';
@@ -76,16 +80,16 @@ define([
     }
 
     // Formatting:
-    self.chosenSoftTabs = ko.observable(true);
-    doOnChange(self.chosenSoftTabs, function(t) {
-      self.session.setUseSoftTabs(t);
-    });
+    // self.chosenSoftTabs = ko.observable(true);
+    // doOnChange(self.chosenSoftTabs, function(t) {
+    //   self.session.setUseSoftTabs(t);
+    // });
 
-    self.tabSizes = [1,2,3,4,8];
-    self.chosenTabSize = ko.observable(2);
-    doOnChange(self.chosenTabSize, function(t) {
-      self.session.setTabSize(t);
-    });
+    // self.tabSizes = [1,2,3,4,8];
+    // self.chosenTabSize = ko.observable(2);
+    // doOnChange(self.chosenTabSize, function(t) {
+    //   self.session.setTabSize(t);
+    // });
   }
 
   function highlightModeFor(filename) {

@@ -51,6 +51,7 @@ define(function() {
         elem.parentNode.insertBefore(placeholder, elem.nextSibling);
       }
       var inc = ko.utils.unwrapObservable(valueAccessor());
+      console.log(inc)
       setTimeout(function(){
         $(placeholder).replaceWith(inc);
       },0);
@@ -70,7 +71,7 @@ define(function() {
       }
     }
   }
-  ko.virtualElements.allowedBindings.include = true;
+  ko.virtualElements.allowedBindings.insert = true;
   // -------------
 
   // toggle Booleans from binding

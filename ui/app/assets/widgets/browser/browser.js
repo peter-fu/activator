@@ -1,10 +1,11 @@
 define([
   "services/fs",
+  "text!./item.html",
   "text!./browser.html",
   "widgets/buttons/contextmenu",
   "css!./browser",
   "css!widgets/menu/menu"
-], function(fs, tpl){
+], function(fs, item, tpl){
 
   function makeChildren(path, parent) {
     var container = parent.children;
@@ -63,6 +64,10 @@ define([
     var name = prompt("File's new name?");
     if (!name) return;
     fs.newName(this.location, name).success(this.parent.load.bind(this.parent));
+  }
+  FileNode.prototype.openFile = function() {
+    console.log("#code"+this.location)
+    window.location.hash = "#code/"+this.location;
   }
 
   function TreeNode(node, parent) {
@@ -158,7 +163,6 @@ define([
     tree.createFile();
   }
 
-
   State = {
     tree: tree,
     revealProject: revealProject,
@@ -166,7 +170,6 @@ define([
     newFileAtRoot: newFileAtRoot,
     refreshProject: refreshProject
   }
-
 
   return {
     tree: tree,

@@ -1,35 +1,35 @@
 define([
   "services/fs",
-  "./document",
   "main/plugins",
   "text!./code.html",
   "widgets/layout/layout",
   "widgets/browser/browser",
-  // "widgets/editor/editor",
+  "./document",
+  "widgets/editor/editor",
   "css!./code",
   "css!widgets/intro/intro",
   "css!widgets/buttons/button"
 ], function(
   fs,
-  documentState,
   plugins,
   tpl,
   layout,
   browser,
+  documentState,
   editor
 ){
 
   var openedDocuments = ko.observableArray([]);
   var selectedDocument = ko.observable();
   var visible = ko.computed(function(){
-    return !!openedDocuments.length;
+    return !!openedDocuments().length;
   });
 
   var openFile = function(e) {
     var foundDocIndex, doc;
     // Is it loaded already?
-    for (var index in openedDocuments.all()){
-      doc = openedDocuments.at(index);
+    for (var index in openedDocuments()){
+      doc = openedDocuments()[index];
       if (doc.location == e.data.scope.location){
         foundDocIndex = parseInt(index);
         break;
@@ -56,10 +56,10 @@ define([
     if (foundDocIndex !== undefined ){
       var sel = selectedDocument();
       if (doc.location == sel.location){
-        if (openedDocuments.all().length > 1){
+        if (openedDocuments().length > 1){
           makeActive(openedDocuments.at(
             // Activate the closest document
-            foundDocIndex == openedDocuments.all().length -1
+            foundDocIndex == openedDocuments().length -1
               ? foundDocIndex-1
               : foundDocIndex+1
           ));
@@ -86,6 +86,7 @@ define([
 
   var State = {
     browser: browser,
+    editor: editor,
     openedDocuments: openedDocuments,
     openFile: openFile,
     closeFile: closeFile,

@@ -32,5 +32,20 @@
     </script>
     <script data-main="@routes.Assets.at("main/main.js")" type="text/javascript" src="@routes.Assets.at("lib/requirejs/require.js")"></script>
   </head>
-  <body style="background: #97ABB8;"></body>
+  <body style="background: #97ABB8;">
+
+  <script type="text/html" id="nodetemplate">
+    <li data-bind="css: {directory: isDirectory, hiddenNode: isHidden, open: isOpened}">
+      <!-- ko if: isDirectory -->
+      <span data-bind="text: name, click: toggleOpen, contextmenu: contextmenu"></span>
+      <ul data-bind="template: { name: 'nodetemplate', foreach: children }">
+      </ul>
+      <!-- /ko -->
+      <!-- ko ifnot: isDirectory -->
+      <span data-bind="text: name, click: openFile, contextmenu: contextmenu"></span>
+      <!-- /ko -->
+    </li>
+  </script>
+
+  </body>
 </html>

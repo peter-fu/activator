@@ -1,16 +1,6 @@
 <main id="wrapper" class="code">
-  <!-- this template is here to fix a race condition in the browser.html template (!!) -->
-  <script type="text/html" id="node-template">
-    <li data-bind="css: {directory: isDirectory, hiddenNode: isHidden, open: isOpened}">
-      <span data-bind="text: name, click: toggleOpen, contextmenu: contextmenu"></span>
-      <!-- ko if: isDirectory -->
-      <ul data-bind="template: { name: 'node-template', foreach: children }">
-      </ul>
-      <!-- /ko -->
-    </li>
-  </script>
   <!-- ko include: browser.render() --><!-- /ko -->
-  <!--ifnot-->
+  <!-- ko ifnot: visible -->
   <article class="intro typo">
     <div class="description">
       <h1>Your app's code</h1>
@@ -22,7 +12,18 @@
       </p>
     </div>
   </article>
-  <!--/ifnot-->
-  <!--if-->
-  <!--/if-->
+  <!-- /ko -->
+  <!-- ko if: visible -->
+    <div class="editorWrapper">
+      <header>
+        <ul class="tabs" data-bind="foreach: openedDocuments">
+          <li data-bind="css: {active: active}">
+            <button class="close"></button>
+            <span data-bind="text: title"></span>
+          </li>
+        </ul>
+      </header>
+      <!-- ko include: editor.render(selectedDocument) --><!-- /ko -->
+    </div>
+  <!-- /ko -->
 </main>

@@ -19,15 +19,7 @@
     <span>Options</span>
   </footer>
   <div class="browser">
-    <ul data-bind="template: { name: 'node-template', foreach: tree.children }">
-      <li class="directory">
-        <span>app</span>
-        <ul>
-        </ul>
-      </li>
-      <li>
-        <span>README</span>
-      </li>
+    <ul data-bind="template: { name: 'nodetemplate', foreach: tree.children }" id="nodetemplate">
     </ul>
   </div>
 </nav>

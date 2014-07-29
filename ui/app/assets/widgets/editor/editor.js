@@ -7,16 +7,15 @@ define([
   tpl
 ) {
 
+
   // Create the editor instance once and for all
   var editor = ace.edit(document.createElement('div'));
 
-  // Function to add the Editor dom to an element, and bind the document
+  // Function to bind the document
   var bind = function(doc) {
-    this.element.appendChild(editor.container)
     editor.setSession(doc.session);
     editor.focus();
   }
-
 
   // Theme and font
   var themes = {
@@ -55,6 +54,7 @@ define([
     "Vibrant Ink": "ace/theme/vibrant_ink",
     "Xcode": "ace/theme/xcode"
   }
+  var chosenTheme = ko.observable("");
   // var chosenTheme = ko.observable("widgets/editor/themes/activator-light");//themes[Object.keys(themes)[0]]);
   // doOnChange(chosenTheme, function(t) {
   //   editor.setTheme(t)
@@ -75,19 +75,23 @@ define([
   // Because ace editor requires them to be attached to an EditSession
   // ------------------------------------------------------
 
-  var style = {
+  var State = {
     themes: themes,
     chosenTheme: chosenTheme,
     fontSizes: fontSizes,
-    chosenFontSize: chosenFontSize
+    chosenFontSize: chosenFontSize,
+    editorContainer: editor.container
   }
 
   return {
-    render: function(doc) {
-      return bindhtml(tpl, {});
-    },
-    bind: bind,
-    style: style
+    render: function(selectedDocument) {
+      State.selectedDocument = selectedDocument;
+      selectedDocument.subscribe(bind)
+      if (selectedDocument()){
+        bind(selectedDocument());
+      }
+      return bindhtml(tpl, State);
+    }
   }
 
 })
