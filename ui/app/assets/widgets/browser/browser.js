@@ -57,7 +57,7 @@ define([
     fs.show(this.location);
   }
   FileNode.prototype.delete = function() {
-    fs.delete(this.location).success(this.parent.load.bind(this.parent));
+    if(confirm("You are about to delete "+this.name)) fs.delete(this.location).success(this.parent.load.bind(this.parent));
   }
   FileNode.prototype.rename = function() {
     var name = prompt("File's new name?");
@@ -118,7 +118,7 @@ define([
     fs.show(this.location);
   }
   TreeNode.prototype.delete = function() {
-    fs.delete(this.location).success(this.parent.load.bind(this.parent));
+    if(confirm("You are about to delete "+this.name)) fs.delete(this.location).success(this.parent.load.bind(this.parent));
   }
   TreeNode.prototype.rename = function() {
     var name = prompt("Folder's new name?");
