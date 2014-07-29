@@ -4,7 +4,7 @@
 define(['commons/utils', 'commons/streams', 'commons/settings', 'services/build'], function(utils, streams, settings, build) {
 
   var licenseKey = settings.observable("newrelic.licenseKey", "");
-  var isProjectEnabled = ko.observable("unknown");
+  var isProjectEnabled = ko.observable(false);
   var available = ko.observable("checking");
 
   function nrMessage(type) {

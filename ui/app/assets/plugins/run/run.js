@@ -6,6 +6,7 @@ define(['services/build', 'services/newrelic', 'services/appdynamics', 'text!./r
 
   var RunState = (function(){
     var self = {};
+    newrelic.checkIsProjectEnabled();
     self.monitoringOptions = ko.computed(function() {
       var result = [{ name: "Inspect", id: "inspect", enabled: true}];
       if (appdynamics.available() && appdynamics.configured()) {
