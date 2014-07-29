@@ -8,10 +8,11 @@
             <svg data-bind="svg: '/assets/icons/gear-mini.svg'"/>
           </dt>
           <dd>
-            <a>Noop</a>
+            <a data-bind="click: function(){ sbtExecCommand('test') }">Test</a>
+            <a data-bind="click: showTests">Load tests</a>
           </dd>
         </dl>
-        <button>
+        <button data-bind="click: function(){ sbtExecCommand('test') }">
           <svg data-bind="svg: '/assets/icons/test.svg'"/>
           Test
         </button>
@@ -40,30 +41,10 @@
       <h1>Test suite</h1>
     </header>
     <section>
-      <ul class="suite">
+      <ul class="suite" data-bind="foreach: TestClasses, click: function(){ runTest($data); }">
         <li data-status="waiting">
-          <label>
-            <input type="checkbox" id="a2280419556" class="889683" checked="true">First test first
-          </label>
-        </li>
-        <li data-status="pending">
-          <label>
-            <input type="checkbox" id="a1286942312" class="9595816" checked="true">Second test second
-          </label>
-        </li>
-        <li data-status="failed">
-          <label>
-            <input type="checkbox" id="a8360849085" class="9623995" checked="true">Third test third
-          </label>
-        </li>
-        <li data-status="passed">
-          <label>
-            <input type="checkbox" id="a1033511243" class="9934164" checked="true">Fourth test fourth
-          </label>
-        </li>
-        <li data-status="" class="disabled">
-          <label>
-            <input type="checkbox" id="a3676637357" class="5665054">Fifth test fifth
+          <label data-bind="text: $data">
+            
           </label>
         </li>
       </ul>

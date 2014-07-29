@@ -15,24 +15,35 @@ define([
   layout
 ){
 
-  var suite = [
-    { title: "First test first", status: ko.observable("waiting"), disabled: ko.observable(false) },
-    { title: "Second test second", status: ko.observable("pending"), disabled: ko.observable(false) },
-    { title: "Third test third", status: ko.observable("failed"), disabled: ko.observable(false) },
-    { title: "Fourth test fourth", status: ko.observable("passed"), disabled: ko.observable(false) },
-    { title: "Fifth test fifth", status: ko.observable(""), disabled: ko.observable(true) }
-  ]
+  var TestClasses = ko.observable();
 
-  var enabled = function(e){
-    var o = ko.observable(!e());
-    e.on("change", function(v){ return o(!v) });
-    o.on("change", function(v){ return e(!v) });
-    return o;
+  function compileTest(){
+    sbt.tasks.requestExecution("test:compile");
+  }
+
+  compileTest();
+
+
+
+  var State = {
+    TestClasses: TestClasses,
+    runTest: function(testClass) {
+      sbt.tasks.requestExecution("testOnly "+ testClass);
+    },
+    showTests: function(){
+      sbt.tasks.possibleAutocompletions("testOnly ").then(function(data) {
+        console.log(data)
+        TestClasses(data.choices.map(function(t) { return t.display; }).filter(function(t){ return t != "--"}));
+      })
+    },
+    sbtExecCommand: function(cmd){
+      sbt.tasks.requestExecution(cmd);
+    }
   }
 
   return {
     render: function(url){
-      layout.renderPlugin(bindhtml(tpl, {}))
+      layout.renderPlugin(bindhtml(tpl, State))
     },
 
     route: function(url, breadcrumb){

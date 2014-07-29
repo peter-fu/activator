@@ -70,9 +70,9 @@ define(['./types'], function(Types) {
     var _call = function(value, next) {
       if (value != undefined && value[attribute] === attributeValue){
         forked.push(value)
-      } else {
-        next(value);
+      // } else {
       }
+        next(value);
     }
     this.callbacks.push(_call);
     return forked;
