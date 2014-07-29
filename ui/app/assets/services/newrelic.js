@@ -6,6 +6,7 @@ define(['commons/utils', 'commons/streams', 'commons/settings', 'services/build'
   var licenseKey = settings.observable("newrelic.licenseKey", "");
   var isProjectEnabled = ko.observable(false);
   var available = ko.observable("checking");
+  var supportedJavaVersion = ko.observable({result:true,version:"Unknown"});
 
   function nrMessage(type) {
     return { request: 'NewRelicRequest', type: type };
@@ -27,6 +28,10 @@ define(['commons/utils', 'commons/streams', 'commons/settings', 'services/build'
     streams.send(nrMessage("isProjectEnabled"));
   }
 
+  function checkIsSupportedJavaVersion() {
+    streams.send(nrMessage("isSupportedJavaVersion"));
+  }
+
   var validKey = /^[0-9A-Z]{40}$/i;
 
   streams.subscribe({
@@ -46,6 +51,9 @@ define(['commons/utils', 'commons/streams', 'commons/settings', 'services/build'
       } else if (event.type == "isProjectEnabledResponse") {
         debug && console.log("Setting isProjectEnabled to: " + event.result);
         isProjectEnabled(event.result);
+      } else if (event.type == "isSupportedJavaVersionResult") {
+        debug && console.log("Setting supportedJavaVersion to: ",event);
+        supportedJavaVersion(event);
       } else if (event.type == "projectEnabled") {
         debug && console.log("Project enabled for New Relic");
         checkIsProjectEnabled();
@@ -56,12 +64,14 @@ define(['commons/utils', 'commons/streams', 'commons/settings', 'services/build'
   onStreamOpen(function (event) {
     debug && console.log("Making initial request to check NR availability");
     streams.send(nrMessage("available"));
+    checkIsSupportedJavaVersion();
     checkIsProjectEnabled();
   });
 
   return {
     validKey: validKey,
     isProjectEnabled: isProjectEnabled,
+    checkIsSupportedJavaVersion: checkIsSupportedJavaVersion,
     checkIsProjectEnabled: checkIsProjectEnabled,
     hasPlay: build.app.hasPlay,
     enableProject: function(key,name) {
@@ -80,6 +90,7 @@ define(['commons/utils', 'commons/streams', 'commons/settings', 'services/build'
       });
     },
     available: available,
+    supportedJavaVersion: supportedJavaVersion,
     cancelObserveProvision: function(o) {
       streams.unsubscribe(o);
     },

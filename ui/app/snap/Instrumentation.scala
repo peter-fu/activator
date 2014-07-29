@@ -5,6 +5,7 @@ package snap
 
 import java.io._
 import java.util.concurrent.TimeUnit
+import java.util.regex.Pattern
 
 import activator.properties.ActivatorProperties
 import akka.util.Timeout
@@ -127,7 +128,8 @@ object NewRelic {
         version = config.getString("version"),
         sha = config.getString("checksum"),
         timeout = Timeout(config.getDuration("timeout", TimeUnit.MILLISECONDS).intValue.millis),
-        extractRootTemplate = config.getString("extract-root-template"))
+        extractRootTemplate = config.getString("extract-root-template"),
+        supportJavaVersionsPattern = Pattern.compile(config.getString("supported-java-versions")))
     }
   }
 
@@ -272,7 +274,8 @@ object NewRelic {
     version: String,
     sha: String,
     timeout: Timeout,
-    extractRootTemplate: String) {
+    extractRootTemplate: String,
+    supportJavaVersionsPattern: Pattern) {
     import Instrumentation._
 
     val url: String = versionRegex.replaceAllIn(downloadUrlTemplate, version)

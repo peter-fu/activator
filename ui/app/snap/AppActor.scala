@@ -453,6 +453,9 @@ class AppActor(val config: AppConfig, val sbtProcessLauncher: SbtProcessLauncher
         case x @ NewRelicRequest.Deprovision =>
           askNewRelic[Deprovisioned.type](monitor.NewRelic.Deprovision, x,
             f => s"Failed New Relic deprovisioning: ${f.getMessage}")(r => produce(toJson(x.response)))
+        case x @ NewRelicRequest.IsSupportedJavaVersion =>
+          askNewRelic[IsSupportedJavaVersionResult](monitor.NewRelic.IsSupportedJavaVersion, x,
+            f => s"Failed checking for supported Java version: ${f.getMessage}")(r => produce(toJson(x.response(r.result, r.version))))
       }
     }
 

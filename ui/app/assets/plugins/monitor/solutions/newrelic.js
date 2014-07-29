@@ -16,8 +16,10 @@ define(['commons/utils', 'commons/widget', 'services/newrelic', 'text!./newrelic
       template: template,
       init: function(args) {
         var self = this;
+        newrelic.checkIsSupportedJavaVersion();
         self.licenseKeySaved = newrelic.licenseKeySaved;
         self.available = newrelic.available;
+        self.supportedJavaVersion = newrelic.supportedJavaVersion;
         self.needProvision = ko.computed(function() {
           return !self.available() || !self.licenseKeySaved();
         }, self);

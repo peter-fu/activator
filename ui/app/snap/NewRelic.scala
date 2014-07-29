@@ -34,6 +34,9 @@ object NewRelicRequest {
   case object Deprovision extends Request {
     def response: Response = Deprovisioned
   }
+  case object IsSupportedJavaVersion extends Request {
+    def response(result: Boolean, version: String): Response = IsSupportedJavaVersionResult(result, version, this)
+  }
 
   sealed trait Response {
     def request: Request
@@ -48,6 +51,7 @@ object NewRelicRequest {
   case class AvailableResponse(result: Boolean, request: Request) extends Response
   case class ProjectEnabled(request: Request) extends Response
   case class IsProjectEnabledResponse(result: Boolean, request: Request) extends Response
+  case class IsSupportedJavaVersionResult(result: Boolean, version: String, request: Request) extends Response
 
   implicit val newRelicProvisionReads: Reads[Provision.type] =
     extractRequest[Provision.type](requestTag)(extractTypeOnly("provision", Provision))
@@ -61,11 +65,17 @@ object NewRelicRequest {
   implicit val newRelicIsProjectEnabledReads: Reads[IsProjectEnabled.type] =
     extractRequest[IsProjectEnabled.type](requestTag)(extractTypeOnly("isProjectEnabled", IsProjectEnabled))
 
+  implicit val newRelicIsSupportedJavaVersionReads: Reads[IsSupportedJavaVersion.type] =
+    extractRequest[IsSupportedJavaVersion.type](requestTag)(extractTypeOnly("isSupportedJavaVersion", IsSupportedJavaVersion))
+
   implicit val newRelicProvisionWrites: Writes[Provision.type] =
     emitRequest(requestTag)(_ => Json.obj("type" -> "provision"))
 
   implicit val newRelicIsProjectEnabledWrites: Writes[IsProjectEnabled.type] =
     emitRequest(requestTag)(_ => Json.obj("type" -> "isProjectEnabled"))
+
+  implicit val newRelicIsSupportedJavaVersionWrites: Writes[IsSupportedJavaVersion.type] =
+    emitRequest(requestTag)(_ => Json.obj("type" -> "isSupportedJavaVersion"))
 
   implicit val newRelicAvailableReads: Reads[Available.type] =
     extractRequest[Available.type](requestTag)(extractTypeOnly("available", Available))
@@ -88,7 +98,8 @@ object NewRelicRequest {
     val epr = newRelicEnableProjectReads.asInstanceOf[Reads[Request]]
     val iper = newRelicIsProjectEnabledReads.asInstanceOf[Reads[Request]]
     val de = newRelicDeprovisionReads.asInstanceOf[Reads[Request]]
-    extractRequest[Request](requestTag)(pr.orElse(ar).orElse(epr).orElse(iper).orElse(de))
+    val ijs = newRelicIsSupportedJavaVersionReads.asInstanceOf[Reads[Request]]
+    extractRequest[Request](requestTag)(pr.orElse(ar).orElse(epr).orElse(iper).orElse(de).orElse(ijs))
   }
 
   implicit val newRelicProvisionedWrites: Writes[Provisioned.type] =
@@ -102,6 +113,12 @@ object NewRelicRequest {
   implicit val newRelicIsProjectEnabledResponseWrites: Writes[IsProjectEnabledResponse] =
     emitResponse(responseTag)(in => Json.obj("type" -> "isProjectEnabledResponse",
       "result" -> in.result,
+      "request" -> in.request))
+
+  implicit val newRelicIsSupportedJavaVersionResultWrites: Writes[IsSupportedJavaVersionResult] =
+    emitResponse(responseTag)(in => Json.obj("type" -> "isSupportedJavaVersionResult",
+      "result" -> in.result,
+      "version" -> in.version,
       "request" -> in.request))
 
   implicit val newRelicAvailableResponseWrites: Writes[AvailableResponse] =
@@ -125,6 +142,7 @@ object NewRelicRequest {
       case x @ Provision => newRelicProvisionWrites.writes(x)
       case x @ Available => newRelicAvailableWrites.writes(x)
       case x @ Deprovision => newRelicDeprovisionWrites.writes(x)
+      case x @ IsSupportedJavaVersion => newRelicIsSupportedJavaVersionWrites.writes(x)
     }
 
   implicit val newRelicResponseWrites: Writes[Response] =
@@ -134,6 +152,7 @@ object NewRelicRequest {
       case x: AvailableResponse => newRelicAvailableResponseWrites.writes(x)
       case x: ProjectEnabled => newRelicProjectEnabledWrites.writes(x)
       case x: ErrorResponse => newRelicErrorResponseWrites.writes(x)
+      case x: IsSupportedJavaVersionResult => newRelicIsSupportedJavaVersionResultWrites.writes(x)
       case x @ Deprovisioned => newRelicDeprovisionedWrites.writes(x)
     }
 

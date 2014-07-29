@@ -65,6 +65,10 @@ object NewRelic {
     def response(result: Boolean): Response = IsProjectEnabledResult(result, this)
   }
 
+  case object IsSupportedJavaVersion extends Request {
+    def response(result: Boolean, version: String): Response = IsSupportedJavaVersionResult(result, version, this)
+  }
+
   sealed trait Response {
     def request: Request
   }
@@ -76,6 +80,7 @@ object NewRelic {
   case class AvailableResponse(result: Boolean, request: Request) extends Response
   case class ProjectEnabled(request: Request) extends Response
   case class IsProjectEnabledResult(result: Boolean, request: Request) extends Response
+  case class IsSupportedJavaVersionResult(result: Boolean, version: String, request: Request) extends Response
 
   class Underlying(config: NR.Config)(log: LoggingAdapter)(implicit ec: ExecutionContext) {
     import Provisioning._
@@ -126,6 +131,14 @@ object NewRelic {
         case e: Exception =>
           log.error(e, "Failure testing if project enabled for New Relic")
           sender ! r.error(s"Failure testing if project enabled for New Relic: ${e.getMessage}")
+      }
+      case r @ IsSupportedJavaVersion => try {
+        val version = System.getProperty("java.version")
+        sender ! r.response(config.supportJavaVersionsPattern.matcher(version).matches(), version)
+      } catch {
+        case e: Exception =>
+          log.error(e, "Failure checking for supported Java version for New Relic")
+          sender ! r.error(s"Failure checking for supported Java version for New Relic: ${e.getMessage}")
       }
     }
   }
