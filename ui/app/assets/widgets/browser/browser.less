@@ -2,6 +2,7 @@
 
 .browser {
   .expand();
+  .no-select();
   overflow: auto;
   border-top: 1px solid @grey-ltr;
   h3 {
@@ -10,22 +11,32 @@
   }
   li {
     position: relative;
-    padding-left: 20px;
-  }
-  .directory {
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAMAAAAoyzS7AAAAA1BMVEV7j53Ne9EWAAAADUlEQVR42gECAP3/AAAAAgABUyucMAAAAABJRU5ErkJggg==);
     background-repeat: repeat-y;
-    background-position: 10px 0;
+  }
+
+  // Create columns
+  .generate-columns(@n, @i: 1) when (@i =< @n) {
+    li {
+      background-position: (20px * @i - 30px) 0;
+      span { padding-left: (20px * @i); }
+      .generate-columns(@n, (@i + 1));
+    }
+  }
+  .generate-columns(20);
+
+  .hiddenNode > span {
+    opacity: .6; 
+  }
+  .directory {
     > span:before {
       content: " ";
-      display: block;
-      position: absolute;
-      left: 0;
-      top: 0;
+      display: inline-block;
+      margin-left: -20px;
       width: 20px;
       height: 20px;
       vertical-align: middle;
-      background: @grey url("/assets/images/browser-type.svg") -20px 0;
+      background: url("/assets/images/browser-type.svg") -20px 0;
     }
     ul {
       display: none;
@@ -41,22 +52,8 @@
   }
   span {
     display: block;
-  }
-  .options {
-    display: block;
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 20px;
-    height: 20px;
-    background: url("/assets/images/icons/gear.svg") center center no-repeat;
-    opacity: 0;
-    .transition();
-  }
-  li:hover > .options {
-    opacity: .3;
-  }
-  li .options:hover {
-    opacity: 1;
+    &:hover {
+      background: @grey-dkr;
+    }
   }
 }

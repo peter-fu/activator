@@ -7,10 +7,10 @@
           <svg data-bind="svg: '/assets/icons/gear-mini.svg'"/>
         </dt>
         <dd>
-          <a>Refresh folders</a>
-          <a>Reveal folder</a>
-          <a>Open in Eclipse</a>
-          <a>Open in Idea</a>
+          <a data-bind="click: newDirAtRoot">New folder</a>
+          <a data-bind="click: newFileAtRoot">New file</a>
+          <a data-bind="click: refreshProject">Refresh project</a>
+          <a data-bind="click: revealProject">Reveal in system</a>
         </dd>
       </dl>
     </div>
@@ -19,70 +19,10 @@
     <span>Options</span>
   </footer>
   <div class="browser">
-    <ul>
+    <ul data-bind="template: { name: 'node-template', foreach: tree.children }">
       <li class="directory">
         <span>app</span>
         <ul>
-          <li class="directory">
-            <span>controllers</span>
-            <ul>
-              <li>
-                <span>application.scala</span>
-              </li>
-            </ul>
-          </li>
-          <li class="directory">
-            <span>models</span>
-            <ul>
-              <li>
-                <span>model.scala</span>
-              </li>
-            </ul>
-          </li>
-          <li class="directory">
-            <span>views</span>
-            <ul>
-              <li>
-                <span>index.scala.html</span>
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-      <li class="directory">
-        <span>conf</span>
-        <ul>
-          <li>
-            <span>application.conf</span>
-          </li>
-          <li>
-            <span>routes</span>
-          </li>
-        </ul>
-      </li>
-      <li class="directory">
-        <span>project</span>
-        <ul>
-          <li>
-            <span>build.properties</span>
-          </li>
-        </ul>
-      </li>
-      <li class="directory">
-        <span>public</span>
-        <ul>
-          <li class="directory">
-            <span>javascripts</span>
-            <ul></ul>
-          </li>
-          <li class="directory">
-            <span>images</span>
-            <ul></ul>
-          </li>
-          <li class="directory">
-            <span>stylesheets</span>
-            <ul></ul>
-          </li>
         </ul>
       </li>
       <li>

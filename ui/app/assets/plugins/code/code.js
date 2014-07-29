@@ -5,7 +5,7 @@ define([
   "text!./code.html",
   "widgets/layout/layout",
   "widgets/browser/browser",
-  "widgets/editor/editor",
+  // "widgets/editor/editor",
   "css!./code",
   "css!widgets/intro/intro",
   "css!widgets/buttons/button"
@@ -19,7 +19,6 @@ define([
   editor
 ){
 
-  var tree = fs.tree();
   var openedDocuments = ko.observableArray([]);
   var selectedDocument = ko.observable();
   var visible = ko.computed(function(){
@@ -86,7 +85,7 @@ define([
   }
 
   var State = {
-    tree: tree,
+    browser: browser,
     openedDocuments: openedDocuments,
     openFile: openFile,
     closeFile: closeFile,
@@ -98,7 +97,6 @@ define([
   return {
 
     render: function(url) {
-      console.log(">>>>>>>")
       layout.renderPlugin(bindhtml(tpl, State))
     },
 

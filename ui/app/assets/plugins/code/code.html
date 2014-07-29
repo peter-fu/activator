@@ -1,26 +1,15 @@
 <main id="wrapper" class="code">
-  <nav class="menu">
-    <header>
-      <h1>Browse Code</h1>
-      <div class="buttons">
-        <dl class="dropdown">
-          <dt>
-            <svg data-bind="svg: '/assets/icons/gear-mini.svg'"/>
-          </dt>
-          <dd>
-            <a>Refresh folders</a>
-            <a>Reveal folder</a>
-            <a>Open in Eclipse</a>
-            <a>Open in Idea</a>
-          </dd>
-        </dl>
-      </div>
-    </header>
-    <footer>
-      <span>Options</span>
-    </footer>
-    <div class="browser"></div>
-  </nav>
+  <!-- this template is here to fix a race condition in the browser.html template (!!) -->
+  <script type="text/html" id="node-template">
+    <li data-bind="css: {directory: isDirectory, hiddenNode: isHidden, open: isOpened}">
+      <span data-bind="text: name, click: toggleOpen, contextmenu: contextmenu"></span>
+      <!-- ko if: isDirectory -->
+      <ul data-bind="template: { name: 'node-template', foreach: children }">
+      </ul>
+      <!-- /ko -->
+    </li>
+  </script>
+  <!-- ko include: browser.render() --><!-- /ko -->
   <!--ifnot-->
   <article class="intro typo">
     <div class="description">
