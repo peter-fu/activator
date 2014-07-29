@@ -1,5 +1,7 @@
 package snap
 
+import java.util.regex.Pattern
+
 import org.junit.Assert._
 import org.junit._
 import akka.util.Timeout
@@ -43,7 +45,8 @@ class NewRelicTest {
       "3.5.1",
       "1c8cb0ba31142d62d10620c8b6f78b0e2d0a6725e4ef23d5a4cc9a22067a01c2",
       Timeout(10.seconds),
-      "new-relic/{version}")
+      "new-relic/{version}",
+      Pattern.compile("^1\\.[67]\\..*$"))
 
     //    val result: File = Await.result(config.downloadAgent(HttpHelper.devNullBuilder), config.timeout.duration * 2.0)
     //    assertTrue("Downloaded New Relic agent passes validation", result.exists() && result.isFile())
