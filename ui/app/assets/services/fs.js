@@ -2,6 +2,13 @@ define(function() {
 
   return {
 
+    relative: function(path) {
+      return path.replace(window.serverAppModel.location,"");
+    },
+    absolute: function(path) {
+      return window.serverAppModel.location + path;
+    },
+
     browse: function(path) {
       return $.ajax({
         url: '/api/local/browse',

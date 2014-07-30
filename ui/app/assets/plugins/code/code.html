@@ -17,8 +17,8 @@
     <div class="editorWrapper">
       <header>
         <ul class="tabs" data-bind="foreach: openedDocuments">
-          <li data-bind="css: {active: active}">
-            <button class="close"></button>
+          <li data-bind="css: {active: active}, click: $root.makeActive">
+            <button class="close" data-bind="click: $root.closeFile"></button>
             <span data-bind="text: title"></span>
           </li>
         </ul>

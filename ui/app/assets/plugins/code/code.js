@@ -42,33 +42,26 @@ define([
     makeActive(doc);
   }
 
-  var closeFile = function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    var foundDocIndex, doc;
-    for (var index in openedDocuments.all()){
-      doc = openedDocuments.at(index);
-      if (doc.location == e.data.scope.location){
-        foundDocIndex = parseInt(index);
-        break;
-      }
-    }
-    if (foundDocIndex !== undefined ){
+  var closeFile = function(doc, event) {
+    event.preventDefault();
+    event.stopPropagation();
+    var docIndex = openedDocuments.indexOf(doc);
+    if (docIndex >= 0){
       var sel = selectedDocument();
       if (doc.location == sel.location){
         if (openedDocuments().length > 1){
-          makeActive(openedDocuments.at(
+          makeActive(openedDocuments()[
             // Activate the closest document
-            foundDocIndex == openedDocuments().length -1
-              ? foundDocIndex-1
-              : foundDocIndex+1
-          ));
+            docIndex == openedDocuments().length -1
+              ? docIndex-1
+              : docIndex+1
+          ]);
         } else {
           // It was the only document, nothing to activate
           makeActive(null);
         }
       }
-      openedDocuments.splice(foundDocIndex, 1);
+      openedDocuments.splice(docIndex, 1);
     }
   }
 
@@ -77,7 +70,7 @@ define([
     if (sel) sel.active(false);
     if (doc){
       doc.active(true);
-      window.location.hash = "code"+doc.location;
+      window.location.hash = "code"+fs.relative(doc.location);
     } else {
       window.location.hash = "code/";
     }
@@ -107,7 +100,7 @@ define([
       if (url.parameters[0]){
         openFile({data:{scope:{
           title: url.parameters[url.parameters.length-1],
-          location: "/"+url.parameters.join("/")
+          location: fs.absolute("/"+url.parameters.join("/"))
         }}});
       } else if (!selectedDocument()){
         breadcrumb(all);

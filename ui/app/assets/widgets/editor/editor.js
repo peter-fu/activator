@@ -15,8 +15,10 @@ define([
 
   // Function to bind the document
   var bind = function(doc) {
-    editor.setSession(doc.session);
-    editor.focus();
+    if (doc) {
+      editor.setSession(doc.session);
+      editor.focus();
+    }
   }
 
   // Theme and font
