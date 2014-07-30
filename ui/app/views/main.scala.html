@@ -4,6 +4,9 @@
 @import play.api.libs.json.Json
 @import snap.WebSocketUtil.webSocketURLWithCSRF
 
+@import play.api.libs.json.JsString
+@import java.io.File
+
 @name(app: snap.AppConfig) = {
   @app.cachedName.getOrElse(app.id)
 }
@@ -20,6 +23,7 @@
     <script type="text/javascript">
       // put ?debug in your query string to enable debug mode
       window.debug = (location.search.indexOf("debug") >= 0);
+      window.separator = @Html(JsString(File.separator).toString())
       window.wsUrl = '@webSocketURLWithCSRF(routes.Application.connectApp(model.socketId))';
       window.consoleWsUrl = '@webSocketURLWithCSRF(routes.ConsoleController.connectConsole(model.id))';
       @* The @Html thing prevents the Json from being escaped *@
@@ -28,5 +32,20 @@
     </script>
     <script data-main="@routes.Assets.at("main/main.js")" type="text/javascript" src="@routes.Assets.at("lib/requirejs/require.js")"></script>
   </head>
-  <body style="background: #97ABB8;"></body>
+  <body style="background: #97ABB8;">
+
+  <script type="text/html" id="nodetemplate">
+    <li data-bind="css: {directory: isDirectory, hiddenNode: isHidden, open: isOpened}">
+      <!-- ko if: isDirectory -->
+      <span data-bind="text: name, click: toggleOpen, contextmenu: contextmenu"></span>
+      <ul data-bind="template: { name: 'nodetemplate', foreach: children }">
+      </ul>
+      <!-- /ko -->
+      <!-- ko ifnot: isDirectory -->
+      <span data-bind="text: name, click: openFile, contextmenu: contextmenu"></span>
+      <!-- /ko -->
+    </li>
+  </script>
+
+  </body>
 </html>

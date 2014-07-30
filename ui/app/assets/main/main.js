@@ -7,10 +7,10 @@ require.config({
 
 var vendors = [
   'lib/jquery/jquery',
-  'lib/knockout/knockout',
+  'lib/knockout/knockout.debug',
   'css',
   'text',
-  'lib/ace/src/ace'
+  // 'ace/ace'
 ]
 
 var commons = [
@@ -28,7 +28,8 @@ var services = [
 var core = [
   'main/view',
   'main/router',
-  'commons/websocket'
+  'commons/websocket',
+  'main/keyboard'
 ]
 
 require(vendors, function($, ko) {

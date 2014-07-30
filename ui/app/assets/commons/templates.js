@@ -70,7 +70,7 @@ define(function() {
       }
     }
   }
-  ko.virtualElements.allowedBindings.include = true;
+  ko.virtualElements.allowedBindings.insert = true;
   // -------------
 
   // toggle Booleans from binding
