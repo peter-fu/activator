@@ -1,40 +1,53 @@
-<article class="test oneColumnAndMenu">
+<main id="wrapper" class="test">
   <nav class="menu">
     <header>
       <h1>Test</h1>
+      <div class="buttons">
+        <dl class="dropdown">
+          <dt>
+            <svg data-bind="svg: '/assets/icons/gear-mini.svg'"/>
+          </dt>
+          <dd>
+            <a data-bind="click: function(){ sbtExecCommand('test') }">Test</a>
+            <a data-bind="click: showTests">Load tests</a>
+          </dd>
+        </dl>
+        <button data-bind="click: function(){ sbtExecCommand('test') }">
+          <svg data-bind="svg: '/assets/icons/test.svg'"/>
+          Test
+        </button>
+      </div>
     </header>
     <div class="options">
-      <div class="buttons">
-        <span class="button start groupLeft" data-bind="click: startStopButtonClicked">
-          <span class="icon" data-bind="visible: !haveActiveTask()">&#x25b6;</span>
-          <span class="icon" data-bind="visible: haveActiveTask">&#x25a0;</span>
-          <span data-bind="text: startStopLabel"></span>
-        </span>
-        <span class="button restart groupMid" data-bind="enable: haveActiveTask() && !restartPending(), click: restartButtonClicked">Restart</span>
-      </div>
+      <ul>
+        <li>
+          <div class="switch">
+            <div class="inner"></div>
+          </div>
+          Test on build</li>
+      </ul>
     </div>
-    <ul class="list">
-      <li>
-        <input type="checkbox" data-bind="checked: rerunOnBuild" id="retestOnSuccessfulBuild" class="switch-input" />
-        <label class="switch" for="retestOnSuccessfulBuild">
-          <span class="outer">
-            <span class="inner"></span>
-          </span>
-          Test on sucessful build
-        </label>
+    <ul class="list links">
+      <li><a href="#test/results">Test results</a>
+      </li>
+      <li><a href="#test/editor">Test editor</a>
+      </li>
+      <li><a href="#test/history">History</a>
       </li>
     </ul>
   </nav>
-  <section>
-    <header class="tallHeader">
-      <h1>Test</h1>
-      <p class="subheader">
-        <span data-bind="text: testStatus"></span> -
-        <strong data-bind="text: resultStats().passed"></strong> Passed, <strong data-bind="text: resultStats().failed"></strong> Failed
-      </p>
+  <article class="plugin">
+    <header>
+      <h1>Test suite</h1>
     </header>
-    <ul class="wrapper results" data-bind="foreach: displayedResults">
-      <li data-bind="text: name, css: outcomeClass"></li>
-    </ul>
-  </section>
-</article>
+    <section>
+      <ul class="suite" data-bind="foreach: TestClasses, click: function(){ runTest($data); }">
+        <li data-status="waiting">
+          <label data-bind="text: $data">
+            
+          </label>
+        </li>
+      </ul>
+    </section>
+  </article>
+</main>
