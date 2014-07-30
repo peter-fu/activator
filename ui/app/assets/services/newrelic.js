@@ -5,7 +5,7 @@ define(['commons/utils', 'commons/streams', 'commons/settings', 'services/build'
 
   var licenseKey = settings.observable("newrelic.licenseKey", "");
   var isProjectEnabled = ko.observable(false);
-  var available = ko.observable("checking");
+  var available = ko.observable(false);
   var supportedJavaVersion = ko.observable({result:true,version:"Unknown"});
 
   function nrMessage(type) {
@@ -30,6 +30,10 @@ define(['commons/utils', 'commons/streams', 'commons/settings', 'services/build'
 
   function checkIsSupportedJavaVersion() {
     streams.send(nrMessage("isSupportedJavaVersion"));
+  }
+
+  function checkAvailable() {
+    streams.send(nrMessage("available"));
   }
 
   var validKey = /^[0-9A-Z]{40}$/i;
@@ -63,7 +67,7 @@ define(['commons/utils', 'commons/streams', 'commons/settings', 'services/build'
 
   onStreamOpen(function (event) {
     debug && console.log("Making initial request to check NR availability");
-    streams.send(nrMessage("available"));
+    checkAvailable();
     checkIsSupportedJavaVersion();
     checkIsProjectEnabled();
   });
@@ -72,6 +76,7 @@ define(['commons/utils', 'commons/streams', 'commons/settings', 'services/build'
     validKey: validKey,
     isProjectEnabled: isProjectEnabled,
     checkIsSupportedJavaVersion: checkIsSupportedJavaVersion,
+    checkAvailable: checkAvailable,
     checkIsProjectEnabled: checkIsProjectEnabled,
     hasPlay: build.app.hasPlay,
     enableProject: function(key,name) {
