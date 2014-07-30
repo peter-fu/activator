@@ -2,7 +2,6 @@ define(['./router'], function(router) {
 
   var isMac = navigator.platform.toUpperCase().indexOf('MAC')>=0;
   var activeKeyboard = true;
-  var currentFocus;
 
   var keyCodes = {
     13:  'ENTER',
@@ -49,9 +48,10 @@ define(['./router'], function(router) {
         }
       }
     }).keydown(function(e){
+      var isMeta = modifierKey(e);
       // Check if key is registered in current plugin, or in main view
-      if (notEditing(e) && router.current().keyboard){
-        return router.current().keyboard(keyCodes[e.keyCode], modifierKey(e), e)
+      if ((notEditing(e) || isMeta) && router.current().keyboard){
+        return router.current().keyboard(keyCodes[e.keyCode], isMeta, e);
       }
     }).keydown(function(e){
       // ALL shortcuts
@@ -66,8 +66,7 @@ define(['./router'], function(router) {
     });
 
     return {
-      activeKeyboard: activeKeyboard,
-      currentFocus: currentFocus
+      activeKeyboard: activeKeyboard
     }
 
 });

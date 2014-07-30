@@ -30,6 +30,7 @@ define(function() {
       });
     },
 
+    // Get file's content
     open: function(location) {
       return $.ajax({
         url: '/api/local/show', // Not reflecting the REST API
@@ -82,7 +83,7 @@ define(function() {
         dataType: 'text',
         data: {
           location: location,
-          contentcontent: content
+          content: content
         }
       });
     }

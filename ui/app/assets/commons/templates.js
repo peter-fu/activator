@@ -51,7 +51,6 @@ define(function() {
         elem.parentNode.insertBefore(placeholder, elem.nextSibling);
       }
       var inc = ko.utils.unwrapObservable(valueAccessor());
-      console.log(inc)
       setTimeout(function(){
         $(placeholder).replaceWith(inc);
       },0);

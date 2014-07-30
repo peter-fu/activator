@@ -26,14 +26,14 @@ define([
 
     // Sync Ace content with local value
     self.edited = ko.observable(false);
-    self.body.subscribe(function(value) {
-      // TODO: check if document is edited, then ask for confirmation
-      self.session.setValue(value);
+    // self.body.subscribe(function(value) {
+    //   // TODO: check if document is edited, then ask for confirmation
+    //   self.session.setValue(value);
+    // });
+    self.session.on("change", function(e){
+      self.edited(self.session.getValue() != self.body());
     });
 
-    fs.open(self.location).then(function(data) {
-      self.body(data);
-    })
 
     // Annotation (error, warning...)
     self.annotations = ko.observable([]);
@@ -54,30 +54,24 @@ define([
     self.save = function(callback){
       self.working(self.working()+1);
       var content = self.session.getValue();
-      fs.save(self.location, content, function() {
+      fs.save(self.location, content).success(function() {
         self.body(content);
+        self.edited(false);
         self.working(self.working()-1);
       });
     }
 
     // Get saved version
-    self.restore = function(){
+    self.revert = function(){
       self.working(self.working()+1);
-      fs.get(self.location, function(data) {
-        self.body(data, true);
+      fs.open(self.location).then(function(content) {
+        self.body(content);
+        self.edited(false);
+        self.session.setValue(content);
         self.working(self.working()-1);
       });
     }
-    // self.restore(); // Getting the server version right away
-
-    // Move == Rename
-    self.move = function(newLocation){
-      self.working(self.working()+1);
-      fs.moveFile(self.location, newLocation, function() {
-        self.working(self.working()-1);
-        // More to do... in the tree
-      });
-    }
+    self.revert(); // Getting the server version right away
 
     // Formatting:
     self.chosenSoftTabs = ko.observable(true);
@@ -90,6 +84,12 @@ define([
     doOnChange(self.chosenTabSize, function(t) {
       self.session.setTabSize(t);
     });
+
+    // Right click on the tab
+    self.contextmenu = {
+      'Save':     self.save.bind(self),
+      'Revert':   self.revert.bind(self)
+    }
   }
 
   function highlightModeFor(filename) {

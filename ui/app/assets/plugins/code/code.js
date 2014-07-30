@@ -108,9 +108,17 @@ define([
       }
     },
 
-    keyboard: function(key, meta) {
+    keyboard: function(key, meta, e) {
       var focus = $("#wrapper .browser span.focus");
-      if (key == "BOTTOM"){
+      if (meta){
+        if (key == "S"){
+          console.log("SAVE")
+          selectedDocument().save();
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }
+      } else if (key == "BOTTOM"){
         var all = $("#wrapper .browser span:visible");
         var index = all.index(focus);
         focus.removeClass("focus");
