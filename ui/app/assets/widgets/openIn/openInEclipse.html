@@ -1,0 +1,9 @@
+<div class="open-in-eclipse">
+  <ul class="logs" data-bind="logScroll: ko.observable(), foreach: logs, visible: !complete()">
+    <li data-bind="text: message"></li>
+  </ul>
+  <div class="howto" data-bind="visible: complete">
+    <p>Done!</p>
+    <p>Now you can open ...</p>
+  </div>
+</div>
