@@ -1,74 +1,30 @@
-/*
- Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
- */
+@import "../../commons/_base";
 
-/*
-run
-*/
-
-@import '../../commons/_base.less';
-
-.run .subheader {
-  p {
-    display: inline-block;
-    a {
-      color: #fff;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-  }
-  &.consoleAvailable {
-    border-bottom: 1px solid #E4EAEF;
-  }
-}
-.run .wrapper {
-  background: #fff;
-}
-
-.run .wrapper > .subsubheader.consoleAvailable {
-  height: 40px;
-  background-color: #46BCD9;
-  line-height: 40px;
-  padding-left: 20px;
-  color: #246C7E;
-  p {
-    display: inline-block;
-    a {
-      color: #fff;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-  }
-  button {
-    float: right;
-    margin-top: 5px;
-  }
-}
-
-.run .wrapper > .content {
-    position: absolute;
+.run .plugin section {
+  .row();
+  overflow: hidden;
+  .list-col {
+    min-width: 300px;
     overflow: auto;
-    font-family: Monaco, monospace;
-    font-size: 12px;
-    color: #6F7F89;
-    line-height: 16px;
-    top: 0px;
-    right: 0px;
-    left: 0px;
-    bottom: 0px;
+    .expand(1);
+  }
+  .stats {
+    .expand(5);
+  }
+  .logs-wrapper {
+    width: 100%;
+  }
 }
 
-.run .wrapper > article > div {
-  max-height: 100%;
-  overflow: auto;
-}
-
-.run div.output {
-    left: 0;
-}
-.run div.logs {
-    right: 0;
-    box-shadow: -2px 0 0 rgba(100, 100, 100, 0.2);
+.run .locked {
+  .expand();
+  background: @red;
+  color: #fff;
+  padding: 10px;
+  margin: 0 -10px;
+  line-height: 17px;
+  a {
+    color: @white;
+    text-decoration: underline;
+  }
 }

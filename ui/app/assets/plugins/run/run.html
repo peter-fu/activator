@@ -1,58 +1,85 @@
-<article class="run oneColumnAndMenu">
+<main id="wrapper" class="run">
   <nav class="menu">
     <header>
       <h1>Run</h1>
+      <div class="buttons">
+        <dl class="dropdown">
+          <dt>
+            <svg data-bind="svg: '/assets/icons/gear-mini.svg'"/>
+          </dt>
+          <dd>
+            <a data-bind="click: function(){ sbtExecCommand('run') }">Run</a>
+            <a data-bind="click: function(){ sbtExecCommand('start') }">Start</a>
+          </dd>
+        </dl>
+        <button data-bind="click: function(){ sbtExecCommand('run'); }">
+          <svg data-bind="svg: '/assets/icons/run.svg'"/>
+          Run
+        </button>
+      </div>
     </header>
     <div class="options">
-      <div class="buttons">
-        <span class="start button groupLeft" data-bind="click: startStopButtonClicked">
-          <span class="icon" data-bind="visible: !haveActiveTask()">&#x25b6;</span>
-          <span class="icon" data-bind="visible: haveActiveTask">&#x25a0;</span>
-          <span data-bind="text: startStopLabel"></span>
-        </span>
-        <span class="restart button groupMid" data-bind="enable: haveActiveTask() && !restartPending(), click: restartButtonClicked">Restart</span>
-      </div>
-    </div>
-    <ul class="list">
-      <li>
-        <input type="checkbox" id="reloadOnChange" data-bind="checked: rerunOnBuild" class="switch-input">
-        <label class="switch" for="reloadOnChange">
-          <span class="outer"><span class="inner"></span></span>
-          Run on sucessful build
-        </label>
-      </li>
-       <li>
-      <h3>Main Class</h3>
       <ul>
-        <!-- ko foreach: mainClasses -->
         <li>
-          <input type="radio" name="mainClass" data-bind="value: $data, checked: $parent.currentMainClass, attr: {id: $data}"  class="radio-input">
-          <label class="radio" data-bind="attr: { for: $data }">
-            <span class="outer"><span class="inner"></span></span>
-            <p data-bind="text: $data, attr: {title: $data}"></p>
-          </label>
+          <div class="switch" data-bind="switchButton: rerunOnBuild">
+            <div class="inner"></div>
+          </div>
+          Run on build
+        </li>
+        <li>
+          <div class="switch" data-bind="switchButton: inspectorActivated">
+            <div class="inner"></div>
+          </div>
+          [debug] Activate inspector
+        </li>
+        <li>
+          <div class="switch" data-bind="switchButton: automaticResetInspect">
+            <div class="inner"></div>
+          </div>
+          Reset data on run
+        </li>
+        <!-- ko if: sbt.app.mainClasses().length > 0 -->
+        <li>
+          <h4>Main file</h4>
+          <dl class="select dropdown">
+            <dt>
+              <span data-bind="text: sbt.app.currentMainClass"></span>
+              <span class="arrows">
+                <svg data-bind="svg: '/assets/icons/arrows.svg'"/>
+              </span>
+            </dt>
+            <dd data-bind="foreach: sbt.app.mainClasses">
+              <a data-bind="text: $data, click: function(){ sbt.app.currentMainClass($data) }"></a>
+            </dd>
+          </dl>
         </li>
         <!-- /ko -->
       </ul>
+    </div>
+    <footer>
+      <!-- ko if: inspectorActivated -->
+        <span class="expand">Data collected for</span>
+        <span class="cache counter">0&ndash;</span>
+      <!-- /ko -->
+      <!-- ko ifnot: inspectorActivated -->
+        <p class="locked"> 
+          The inspector is disabled when using an external monitoring tool. You can go on the
+          <a href="#monitor">monitor tab</a> to turn it off.
+        </p>
+      <!-- /ko -->
+    </footer>
+    <ul class="list links">
+      <li class="system"><a href="#run/system">System</a>
+      </li>
+      <li class="actors" data-bind="visible: inspectorActivated"><a href="#run/actors">Actors</a>
+      </li>
+      <li class="requests" data-bind="visible: inspectorActivated"><a href="#run/requests">Requests</a>
+      </li>
+      <li class="deviations" data-bind="visible: inspectorActivated"><a href="#run/deviations">Deviations</a>
       </li>
     </ul>
   </nav>
-  <section>
-    <header class="tallHeader">
-      <h1>Logs</h1>
-      <div class="subheader" data-bind="css: { consoleAvailable: consoleCompatible }">
-        <p data-bind="text: status"></p>
-        <p data-bind="visible: playAppStarted">Open the app: <a data-bind="attr: {href: playAppLink}, text: playAppLink" target="_blank"></a></p>
-      </div>
-    </header>
-    <article class="wrapper content" data-bind="css: { consoleAvailable: consoleCompatible }, logScroll: 'runLog', scrollTrigger: log.entries">
-      <div class="output">
-        <div class="runapp">
-          <ul class="logsList" data-bind="foreach: log.entries">
-            <li data-bind="css: level, compilerMessage: $data"></li>
-          </ul>
-        </div>
-      </div>
-    </article>
-  </section>
-</article>
+  <!-- ko if: subplugin() -->
+    <!-- ko include: subplugin --><!-- /ko -->
+  <!-- /ko -->
+</main>
