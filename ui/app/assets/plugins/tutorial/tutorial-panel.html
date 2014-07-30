@@ -6,14 +6,14 @@
       <dl class="dropdown">
         <dt data-bind="text: page().title"></dt>
         <dd data-bind="foreach: table">
-            <div class="step" data-bind="click: function(){$root.gotoPage($index())}">
-              <span class="step" data-bind="text: $index"></span>
-              <span data-bind="text: $data"></span>
-            </div>
+          <div class="step" data-bind="click: function(){$root.gotoPage($index())}">
+            <span class="step" data-bind="text: $index"></span>
+            <span data-bind="text: $data"></span>
+          </div>
         </dd>
   </nav>
     <article class="page">
-      <section class="typo" data-bind="html: page().page, memoScroll_: 'tutorialPanel'"></section>
+      <section class="typo" data-bind="html: page().page"></section>
     </article>
   <!-- /ko -->
   <!-- ko ifnot: hasTutorial -->
