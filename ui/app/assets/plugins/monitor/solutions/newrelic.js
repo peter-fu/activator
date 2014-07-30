@@ -17,6 +17,7 @@ define(['commons/utils', 'commons/widget', 'services/newrelic', 'text!./newrelic
       init: function(args) {
         var self = this;
         newrelic.checkIsSupportedJavaVersion();
+        newrelic.checkAvailable();
         self.licenseKeySaved = newrelic.licenseKeySaved;
         self.available = newrelic.available;
         self.supportedJavaVersion = newrelic.supportedJavaVersion;
