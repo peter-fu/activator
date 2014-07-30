@@ -45,6 +45,7 @@ define([
   var closeFile = function(doc, event) {
     event.preventDefault();
     event.stopPropagation();
+    if (doc.edited() && !confirm("This file has unsaved changes, do you confirm closing without saving?")) return;
     var docIndex = openedDocuments.indexOf(doc);
     if (docIndex >= 0){
       var sel = selectedDocument();
@@ -75,6 +76,11 @@ define([
       window.location.hash = "code/";
     }
     selectedDocument(doc);
+  }
+
+  window.onbeforeunload = function() {
+    if (openedDocuments().filter(function(doc) { return doc.edited(); }).length)
+      return "You have unsaved files, do you confirm leaving?";
   }
 
   var State = {
