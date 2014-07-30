@@ -153,7 +153,7 @@ define(function() {
         setTimeout(function() {
           element.scrollLeft = memo()[0];
           element.scrollTop  = memo()[1];
-        }, 1);// Wait for everything to be displayed
+        }, 100);// Wait for everything to be displayed
         element.addEventListener('scroll', function(e) {
           memo([element.scrollLeft,element.scrollTop]);
         });

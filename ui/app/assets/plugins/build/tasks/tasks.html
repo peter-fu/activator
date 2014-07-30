@@ -1,0 +1,36 @@
+<article class="plugin tasks logsPlugin">
+  <header>
+    <h1>Build tasks</h1>
+  </header>
+  <section>
+    <div class="pluginBlock tasks-wrapper dark">
+      <div class="subheader">
+        <h2>Tasks</h2>
+      </div>
+      <div class="table-wrapper" data-bind="logScroll: memoTaskScroll">
+        <table data-bind="foreach: sbt.tasks.executions">
+          <tr data-bind="css: { active: running, error: error }, click: function(){ $root.rerunTask($data) }">
+            <th data-bind="text: command"></th>
+            <td data-bind="text: time"></td>
+            <td class="status"></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div class="pluginBlock logs-wrapper dark">
+      <div class="subheader">
+        <h2>Full output</h2>
+        <div class="group">
+          <label>
+            <input type="checkbox" data-bind="checked: sbt.app.settings.showLogDebug" />
+            Show debug
+          </label>
+          <button data-bind="click: clear">Clear</button>
+        </div>
+      </div>
+      <ul class="logs" data-bind="logScroll: memoLogsScroll, foreach: sbt.logs.logs">
+        <li data-bind="text: event.entry.message, attr: { 'data-level': event.entry.level, 'data-type': event.entry.type }"></li>
+      </ul>
+    </div>
+  </section>
+</article>
