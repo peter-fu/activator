@@ -1,10 +1,12 @@
 define([
   "ace/ace",
   "text!./editor.html",
+  "commons/settings",
   "css!./editor"
 ], function(
   ace,
-  tpl
+  tpl,
+  settings
 ) {
 
 
@@ -19,8 +21,8 @@ define([
 
   // Theme and font
   var themes = {
-    "Activator Dark": 'widgets/editor/themes/activator-dark',
     "Activator Light": 'widgets/editor/themes/activator-light',
+    "Activator Dark": 'widgets/editor/themes/activator-dark',
     "Ambiance": "ace/theme/ambiance",
     "Chaos": "ace/theme/chaos",
     "Chrome": "ace/theme/chrome",
@@ -54,21 +56,22 @@ define([
     "Vibrant Ink": "ace/theme/vibrant_ink",
     "Xcode": "ace/theme/xcode"
   }
-  var chosenTheme = ko.observable("");
-  // var chosenTheme = ko.observable("widgets/editor/themes/activator-light");//themes[Object.keys(themes)[0]]);
-  // doOnChange(chosenTheme, function(t) {
-  //   editor.setTheme(t)
-  // })
+
+  var chosenTheme = settings.observable("code.theme", Object.keys(themes)[0]);
+  doOnChange(chosenTheme, function(t) {
+    editor.setTheme(themes[t]);
+  });
+
   var fontSizes = {
     "Small": "12px",
     "Medium": "14px",
-    "Large": "20px",
-    "XLarge": "25px"
+    "Large": "17px",
+    "XLarge": "22px"
   }
-  var chosenFontSize = ko.observable(fontSizes[Object.keys(fontSizes)[0]]);
-  // doOnChange(chosenFontSize, function(t) {
-  //   editor.container.style.fontSize = t;
-  // })
+  var chosenFontSize = settings.observable("code.fontSize", Object.keys(fontSizes)[0]);
+  doOnChange(chosenFontSize, function(t) {
+    editor.container.style.fontSize = fontSizes[t];
+  });
 
   // ------------------------ NOTE ------------------------
   // TAB SIZE and SOFT TABS are defined in `plugins/code/document.js`
@@ -76,9 +79,9 @@ define([
   // ------------------------------------------------------
 
   var State = {
-    themes: themes,
+    themes: Object.keys(themes),
     chosenTheme: chosenTheme,
-    fontSizes: fontSizes,
+    fontSizes: Object.keys(fontSizes),
     chosenFontSize: chosenFontSize,
     editorContainer: editor.container
   }

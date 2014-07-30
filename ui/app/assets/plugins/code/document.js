@@ -12,7 +12,7 @@ define([
     self.title = doc.title;
     self.location = doc.location;
     self.active = ko.observable(false); // == displayed document
-    self.body = ko.observable("loading");
+    self.body = ko.observable("");
 
     // Indicates a network activity on the file
     self.working = ko.observable(0);
@@ -80,16 +80,16 @@ define([
     }
 
     // Formatting:
-    // self.chosenSoftTabs = ko.observable(true);
-    // doOnChange(self.chosenSoftTabs, function(t) {
-    //   self.session.setUseSoftTabs(t);
-    // });
+    self.chosenSoftTabs = ko.observable(true);
+    doOnChange(self.chosenSoftTabs, function(t) {
+      self.session.setUseSoftTabs(t);
+    });
 
-    // self.tabSizes = [1,2,3,4,8];
-    // self.chosenTabSize = ko.observable(2);
-    // doOnChange(self.chosenTabSize, function(t) {
-    //   self.session.setTabSize(t);
-    // });
+    self.tabSizes = [1,2,3,4,8];
+    self.chosenTabSize = ko.observable(2);
+    doOnChange(self.chosenTabSize, function(t) {
+      self.session.setTabSize(t);
+    });
   }
 
   function highlightModeFor(filename) {
