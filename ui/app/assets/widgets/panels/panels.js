@@ -25,10 +25,10 @@ define([
   var dropdownActive = ko.observable(false);
 
   var switchPanel = function(panel) {
-    require([panel], function(p) {
-      $("#panelWrapper").replaceWith(p.renderPanel());
-      currentPanel(panel);
-    });
+    // require([panel], function(p) {
+    //   $("#panelWrapper").replaceWith(p.renderPanel());
+    //   currentPanel(panel);
+    // });
   }
   var toggle = function() {
     panelOpened(!panelOpened());
