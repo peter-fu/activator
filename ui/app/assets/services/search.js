@@ -14,7 +14,6 @@ define([
     debug && console.log("starting search on " + keywords);
     return $.when(fs.search(keywords), sbt.tasks.possibleAutocompletions(keywords))
       .then(function(searchValues, sbtCompletions) {
-        console.log(searchValues, sbtCompletions)
         options( searchValues.concat(sbtCompletions) );
     });
   }

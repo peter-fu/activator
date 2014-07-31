@@ -33,7 +33,10 @@ define([
           subtitle: "run sbt task " + completion.display,
           type: "Sbt",
           url: false,
-          execute: partialCommand + completion.append
+          execute: partialCommand + completion.append,
+          callback: function() {
+            requestExecution(partialCommand + completion.append);
+          }
         }
       });
     });
