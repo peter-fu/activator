@@ -24,6 +24,7 @@ define([
   var visible = ko.computed(function(){
     return !!openedDocuments().length;
   });
+  editor.setDocument(selectedDocument);
 
   var openFile = function(e) {
     var foundDocIndex, doc;

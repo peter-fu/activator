@@ -13,14 +13,6 @@ define([
   // Create the editor instance once and for all
   var editor = ace.edit(document.createElement('div'));
 
-  // Function to bind the document
-  var bind = function(doc) {
-    if (doc) {
-      editor.setSession(doc.session);
-      editor.focus();
-    }
-  }
-
   // Theme and font
   var themes = {
     "Activator Light": 'widgets/editor/themes/activator-light',
@@ -89,12 +81,18 @@ define([
   }
 
   return {
-    render: function(selectedDocument) {
+    setDocument: function(selectedDocument) {
       State.selectedDocument = selectedDocument;
-      selectedDocument.subscribe(bind)
-      if (selectedDocument()){
-        bind(selectedDocument());
-      }
+      // bind the document
+      doOnChange(selectedDocument, function(doc) {
+        if (doc && doc.session != editor.getSession()) {
+          editor.setSession(doc.session);
+          editor.focus();
+        }
+      });
+    },
+
+    render: function() {
       return bindhtml(tpl, State);
     }
   }
