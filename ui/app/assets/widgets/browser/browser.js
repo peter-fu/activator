@@ -32,7 +32,10 @@ define([
         container.remove(function(node) { return defaultList.indexOf(node.location) >= 0; })
       }
       // Finally, clean everything with a sort.
-      container.sort(function(node) { return !node.isDirectory;});
+      container.sort(function(left, right) {
+        if (right.isDirectory == left.isDirectory) return right.name.toLowerCase() < left.name.toLowerCase();
+        else return right.isDirectory;
+      });
     });
   }
 
