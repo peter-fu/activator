@@ -131,7 +131,9 @@ define([
       console.log(option)
       option.callback(option);
       options([]);
-      selectedItem(0);
+      selected(0);
+      searchString("");
+      document.body.focus();
     }
   }
 
