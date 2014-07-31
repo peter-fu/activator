@@ -6,6 +6,7 @@ define([
   "widgets/browser/browser",
   "./document",
   "widgets/editor/editor",
+  "commons/settings",
   "css!./code",
   "css!widgets/intro/intro",
   "css!widgets/buttons/button"
@@ -16,7 +17,8 @@ define([
   layout,
   browser,
   documentState,
-  editor
+  editor,
+  settings
 ){
 
   var openedDocuments = ko.observableArray([]);
@@ -84,6 +86,26 @@ define([
       return "You have unsaved files, do you confirm leaving?";
   }
 
+  function saveAll() {
+    openedDocuments().forEach(function(doc) {
+      if (doc.edited()){
+        doc.save();
+      }
+    })
+  }
+
+  function closeAll() {
+    selectedDocument(null);
+    openedDocuments([]);
+  }
+
+  var autoSave = settings.observable("code.autoSave", false);
+  document.addEventListener("visibilitychange", function() {
+    if (autoSave() && document.hidden){
+      saveAll();
+    }
+  });
+
   var State = {
     browser: browser,
     editor: editor,
@@ -92,7 +114,10 @@ define([
     closeFile: closeFile,
     selectedDocument: selectedDocument,
     makeActive: makeActive,
-    visible: visible
+    visible: visible,
+    closeAll: closeAll,
+    saveAll: saveAll,
+    autoSave: autoSave
   }
 
   return {
