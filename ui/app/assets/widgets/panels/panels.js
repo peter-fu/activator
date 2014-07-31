@@ -16,7 +16,7 @@ define([
   //     return it.panel;
   //   }));
   // }, []);
-  var panels = ['plugins/tutorial/tutorial'];
+  var panels = ['plugins/tutorial/tutorialPanel'];
 
   currentPanel = ko.observable();
 
@@ -25,10 +25,10 @@ define([
   var dropdownActive = ko.observable(false);
 
   var switchPanel = function(panel) {
-    // require([panel], function(p) {
-    //   $("#panelWrapper").replaceWith(p.renderPanel());
-    //   currentPanel(panel);
-    // });
+    require([panel], function(p) {
+      $("#panelWrapper").replaceWith(p.render());
+      currentPanel(panel);
+    });
   }
   var toggle = function() {
     panelOpened(!panelOpened());

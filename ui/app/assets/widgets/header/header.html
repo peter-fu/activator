@@ -6,11 +6,11 @@
   </div>
   <!-- ko include: notifications --><!-- /ko -->
   <!-- ko include: help --><!-- /ko -->
-  <dl id="layoutManager" class="dropdown">
-    <dt>
-      <span class="all-options"></span>
+  <dl id="layoutManager" data-bind="click: layoutManager.closePanelOptions">
+    <dt data-bind="click: layoutManager.panelToggle">
+      <span class="all-options" data-bind="click: layoutManager.togglePanelOptions"></span>
     </dt>
-    <dd>
+    <dd style="display:none;">
       <button class="right1" data-bind="click: layoutManager.panelChange"></button>
       <button class="bottom1" data-bind="click: layoutManager.panelChange"></button>
     </dd>

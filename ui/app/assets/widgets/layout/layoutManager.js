@@ -17,25 +17,23 @@ define([
     panelOpened: panelOpened,
     navigationOpened: navigationOpened,
 
-    panelChange: function(e) {
+    panelChange: function(o,e) {
       panelShape(e.target.className);
       panelOpened(true);
     },
-    panelToggle: function(e) {
+    panelToggle: function() {
       panelOpened(!panelOpened());
     },
-    navigationToggle: function(e) {
+    navigationToggle: function() {
       navigationOpened(!navigationOpened());
     },
-    openpanelOptions: function(e) {
+    togglePanelOptions: function(o,e) {
       e.preventDefault();
       e.stopPropagation();
-      $("#layoutManager").toggleClass("opened");
+      $("#layoutManager dd").toggle();
     },
-    closepanelOptions: function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      $("#layoutManager").removeClass("opened");
+    closePanelOptions: function() {
+      $("#layoutManager dd").hide();
     }
   }
 

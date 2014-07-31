@@ -20,8 +20,12 @@
 
   nav {
     background: @light;
-    border-bottom: 1px solid @white-ltr;
+    border-bottom: 1px solid @white-dkr;
     height: 50px;
+    .row();
+    a {
+      padding: 20px;
+    }
     .previous, .next {
       color: @grey-dkr;
       display: block;
@@ -35,22 +39,28 @@
       position: relative;
       z-index: 9;
       &:hover {
-        background: @white-ltr;
         color: @grey-dkr;
+        g {
+          fill: @grey-dkr;
+        }
       }
       &.disabled {
         background: none;
         color: @white-dkr;
         cursor: default;
+        g {
+          fill: @white-dkr;
+        }
       }
     }
     .previous {
-      float: left;
-      border-right: 1px solid @white-ltr;
+      border-right: 1px solid @white-dkr;
     }
     .next {
-      float: right;
-      border-left: 1px solid @white-ltr;
+      border-left: 1px solid @white-dkr;
+    }
+    dl {
+      .expand();
     }
     dt {
       font-size: 16px;
@@ -67,16 +77,17 @@
       // display: none;
       position: absolute;
       top: 50px;
-      right: 50px;
-      left: 50px;
+      right: 0;
+      left: 0;
       background: white;
       max-height: 500px;
       overflow: auto;
       box-shadow: 0 2px 5px rgba(0, 0, 0, .2);
-      div {
+      z-index: 999;
+      .step {
+        display: block;
         position: relative;
         background: white;
-        z-index: 999;
         padding: 5px 10px;
         border-bottom: 1px solid #eee;
         cursor: pointer;
@@ -85,7 +96,7 @@
           color: #fff;
         }
       }
-      span.step {
+      .step-number {
         opacity: 0.5;
         display: inline-block;
         text-align: right;
