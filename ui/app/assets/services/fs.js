@@ -1,5 +1,12 @@
 define(function() {
 
+  function buildItems(item) {
+    item.callback = function() {
+      window.location.hash = item.url;
+    }
+    return item;
+  }
+
   return {
     search: function(keywords){
       var url = '/app/' + window.serverAppModel.id + '/search/' + keywords;
@@ -7,7 +14,7 @@ define(function() {
        url: url,
        dataType: 'json'
       }).pipe(function(data) {
-        return data || [];
+        return data.map(buildItems) || [];
       });
     },
 
