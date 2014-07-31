@@ -10,9 +10,9 @@
       <div class="table-wrapper" data-bind="logScroll: memoTaskScroll">
         <table data-bind="foreach: sbt.tasks.executions">
           <tr data-bind="css: { active: running, error: error }, click: function(){ $root.rerunTask($data) }">
+            <td class="status"><span></span></td>
             <th data-bind="text: command"></th>
             <td data-bind="text: time"></td>
-            <td class="status"></td>
           </tr>
         </table>
       </div>
