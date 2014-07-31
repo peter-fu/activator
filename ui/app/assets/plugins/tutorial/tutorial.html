@@ -1,5 +1,5 @@
 <main id="wrapper" class="tutorial">
-  <!--if-->
+  <!-- ko if: hasTutorial -->
   <nav class="menu">
     <header>
       <h1>Tutorial</h1>
@@ -47,7 +47,11 @@
     </section>
   </article>
   <!-- /ko -->
-  <!--/if-->
-  <!--ifnot-->
-  <!--/ifnot-->
+  <!-- /ko -->
+  <!-- ko ifnot: hasTutorial -->
+  <div id="noTutorial">
+    <p>No tutorial available.</p>
+    <p>You can find tutorials <a href="/home">on the home page</a></p>
+  </div>
+  <!-- /ko -->
 </main>
