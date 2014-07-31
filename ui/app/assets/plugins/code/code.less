@@ -15,49 +15,79 @@
   position: relative;
   .column();
   > header {
-    padding-left: 35px;
+    padding: 7px 5px 0;
+    .row();
+  }
+  .code-options {
+    width: 30px;
+    height: 20px;
+    .align-self(center);
+    dd {
+      background: #fff;
+      min-width: 120px;
+      padding: 5px 0;
+      border-radius: 3px;
+    }
+    dt svg {
+      margin: 2px 4px;
+      g {
+        fill: @white-dkr;
+      }
+    }
+    label, a {
+      display: block;
+      padding: 0 10px;
+    }
+    a:hover {
+      background: @blue;
+      color: #fff;
+    }
   }
   .tabs {
     .row();
-    padding: 7px 0 0;
+    .expand();
     .close {
+      .align-self(center);
       display: block;
-      float: left;
-      margin: 7px 7px 0 -7px;
       width: 16px;
       height: 16px;
+      margin-right: 4px;
       background: url(/assets/images/icons/close.svg) center center no-repeat;
+      border-radius: 8px;
       background-color: @grey-ltr;
       color: @white-dkr;
-      border-radius: 8px;
       &:hover {
         background-color: @grey-dkr;
       }
     }
     li {
-      display: inline-block;
+      .row();
+      .expand();
+      .no-select();
       margin: 0 7px 0 0;
-      padding: 0 15px;
+      padding: 0 5px;
       line-height: 30px;
-      min-width: 150px;
       background: @grey-ltr;
       color: #fff;
+      max-width: 200px;
       span {
+        .expand();
         .ellipsis();
       }
-      &.active {
-        background: #fff;
-        color: @grey-dkr;
-        .close {
-          background-color: @white-dkr;
-          color: #fff;
-          &:hover {
-            background-color: @grey-dkr;
-          }
+    }
+    li.active {
+      background: #fff;
+      color: @grey-dkr;
+      .close {
+        background-color: @white-dkr;
+        color: #fff;
+        &:hover {
+          background-color: @grey-dkr;
         }
       }
     }
   }
+
   .editor {
     .expand();
     .column();
@@ -81,3 +111,4 @@
     }
   }
 }
+

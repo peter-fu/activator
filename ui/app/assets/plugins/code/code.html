@@ -16,8 +16,16 @@
   <!-- ko if: visible -->
     <div class="editorWrapper">
       <header>
+        <dl class="code-options dropdown">
+          <dt><svg data-bind="svg: '/assets/icons/gear-mini.svg'"/></dt>
+          <dd>
+            <a data-bind="click: closeAll">Close all</a>
+            <a data-bind="click: saveAll">Save all</a>
+            <label><input type="checkbox" data-bind="checked: autoSave"> Auto-save</label>
+          </dd>
+        </dl>
         <ul class="tabs" data-bind="foreach: openedDocuments">
-          <li data-bind="css: {active: active}, click: $root.makeActive, contextmenu: contextmenu">
+          <li data-bind="css: {active: active}, click: $root.makeActive, contextmenu: contextmenu, attr: {title: location}">
             <button class="close" data-bind="click: $root.closeFile"></button>
             <span data-bind="text: title"></span>
             <span class="edited" data-bind="visible: edited">*</span>
