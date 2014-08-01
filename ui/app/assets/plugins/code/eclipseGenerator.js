@@ -3,15 +3,15 @@
  */
 define(['./generator', 'widgets/openIn/openIn'], function (generator, openIn) {
   var projectFile = ".project";
-  var projectLocation = "/project/eclipse.sbt";
-  var pluginFileContent = "addSbtPlugin(\"com.typesafe.sbteclipse\" % \"sbteclipse-plugin\" % \"2.3.0\")";
+  var pluginFileLocation = "/project/eclipse.sbt";
+  var pluginFileContent = "addSbtPlugin(\"com.typesafe.sbteclipse\" % \"sbteclipse-plugin\" % \"2.5.0\")";
   var sbtCommand = "eclipse";
 
   var generate = function(overrideExisting) {
     generator.startProcess(
       overrideExisting,
       projectFile,
-      projectLocation,
+      pluginFileLocation,
       pluginFileContent,
       sbtCommand);
 

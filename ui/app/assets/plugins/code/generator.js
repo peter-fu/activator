@@ -18,7 +18,7 @@
  */
 define(['commons/streams', 'services/sbt', 'services/ajax'], function (stream, sbt, ajax) {
   var projectFile;
-  var projectLocation;
+  var pluginFileLocation;
   var pluginFileContent;
   var sbtCommand;
 
@@ -47,12 +47,12 @@ define(['commons/streams', 'services/sbt', 'services/ajax'], function (stream, s
     }
 
     // If the process takes more than n seconds we generate a message that it might be good to retry
-    maxProcessTime = setInterval(function() { logs.push({message: "The process seems stuck. Press OK and please retry."})}, 30 * 1000);
+    maxProcessTime = setInterval(function() { logs.push({message: "The process seems stuck. Press OK and please retry."})}, 120 * 1000);
   };
 
   var startProcess = function(overrideExisting, projFile, projLocation, pluginContent, sbtCmd) {
     projectFile = projFile;
-    projectLocation = projLocation;
+    pluginFileLocation = projLocation;
     pluginFileContent = pluginContent;
     sbtCommand = sbtCmd;
 
@@ -109,10 +109,9 @@ define(['commons/streams', 'services/sbt', 'services/ajax'], function (stream, s
 
   var generateFile = function() {
     currentState = generatingFile;
-    logs.push({message: "Creating the sbt IDE plugin file."});
-    var fileLocation = serverAppModel.location + projectLocation;
-    var fileContent = pluginFileContent;
-    ajax.createContent(fileLocation, fileContent).done(function () {
+    var fileLocation = serverAppModel.location + pluginFileLocation;
+    logs.push({message: "Creating sbt IDE plugin file (" + fileLocation + ")."});
+    ajax.createContent(fileLocation, pluginFileContent).done(function () {
       restartSbt();
     }).fail(function(err) {
       resetState("Could not create sbt IDE plugin file. Please try again.");
@@ -144,7 +143,7 @@ define(['commons/streams', 'services/sbt', 'services/ajax'], function (stream, s
         // State : After checking if the 'eclipse' command is available in sbt
         if (currentState === checkingCommand) {
           if (msg.subType === 'ExecutionFailure') {
-            logs.push({message: "Command not available - adding it to sbt and retrying."});
+            logs.push({message: "Command not available - trying to add it."});
             generateFile();
           } else if (msg.subType === 'ExecutionSuccess') {
             setNewTimeout();
@@ -163,6 +162,7 @@ define(['commons/streams', 'services/sbt', 'services/ajax'], function (stream, s
         }
         // State: After executing the eclipse command
         else if (currentState === runningCommand) {
+          console.log("*** msg: ", msg);
           if (msg.subType === 'ExecutionFailure') {
             resetState("Could not run the eclipse command. Please try again.");
           } else if (msg.subType === 'ExecutionSuccess') {

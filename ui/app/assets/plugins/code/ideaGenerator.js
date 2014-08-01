@@ -3,7 +3,7 @@
  */
 define(['./generator', 'widgets/openIn/openIn'], function (generator, openIn) {
   var projectFile = ".idea";
-  var projectLocation = "/project/idea.sbt";
+  var pluginFileLocation = "/project/idea.sbt";
   var pluginFileContent = "addSbtPlugin(\"com.github.mpeltonen\" % \"sbt-idea\" % \"1.6.0\")";
   var sbtCommand = "gen-idea";
 
@@ -11,7 +11,7 @@ define(['./generator', 'widgets/openIn/openIn'], function (generator, openIn) {
     generator.startProcess(
       overrideExisting,
       projectFile,
-      projectLocation,
+      pluginFileLocation,
       pluginFileContent,
       sbtCommand);
 
