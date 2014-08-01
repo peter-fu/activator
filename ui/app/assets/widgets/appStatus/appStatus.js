@@ -94,8 +94,7 @@ define([
         command = "testing";
         break;
       default:
-        command = "running";
-        break;
+        return true;
     }
     var el = $("#appStatus ."+command+" .success").removeClass('animate');
     setTimeout(function(){
