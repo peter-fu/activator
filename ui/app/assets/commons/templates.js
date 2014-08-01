@@ -205,8 +205,13 @@ define(function() {
   ko.bindingHandlers.svg = {
     init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
       $.get(valueAccessor(), function(data) {
-        var img = document.adoptNode(data.querySelector('svg'));
-        $(element).replaceWith(img);
+        var img = $(document.adoptNode(data.querySelector('svg')));
+        $(element)
+          .html(img.html())
+          .attr({
+            width: img.attr('width'),
+            height: img.attr('height')
+          });
       }, 'xml');
     }
   }

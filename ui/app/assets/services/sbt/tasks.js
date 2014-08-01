@@ -1,11 +1,13 @@
 define([
   'commons/websocket',
   'commons/types',
-  './app'
+  './app',
+  'widgets/notifications/notifications'
 ], function(
   websocket,
   types,
-  app
+  app,
+  notifications
 ) {
 
   // -------------
@@ -88,7 +90,10 @@ define([
       // we want succeeded flag up-to-date when finished notifies
       execution.succeeded(true);
       execution.finished(new Date());
-      delete executionsById[execution.executionId];
+
+      var event = new CustomEvent('TaskSuccess', { detail: { command: execution.command } });
+      document.body.dispatchEvent(event);
+
       switch(execution.command){
         case "compile":
           workingTasks.compile(false);
@@ -100,6 +105,8 @@ define([
           workingTasks.test(false);
           break;
       }
+
+      delete executionsById[execution.executionId];
     }
   }
 
