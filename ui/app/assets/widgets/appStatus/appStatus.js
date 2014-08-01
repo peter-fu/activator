@@ -4,7 +4,8 @@
 define([
   'services/sbt',
   'text!./appStatus.html',
-  'css!./appStatus'
+  'css!./appStatus',
+  'css!widgets/stickers/stickers'
 ], function(
   sbt,
   tpl
@@ -73,6 +74,34 @@ define([
     } else {
       return "Testing";
     }
+  });
+
+  document.body.addEventListener("TaskSuccess", function(e){
+    var command;
+    switch(e.detail.command){
+      case "compile":
+      case "clean":
+      case "reload":
+      case "compile":
+        command = "refresh";
+        break;
+      case "start":
+      case "run":
+        command = "console";
+        break;
+      case "test":
+      case "testOnly":
+        command = "testing";
+        break;
+      default:
+        command = "running";
+        break;
+    }
+    var el = $("#appStatus ."+command+" .success").removeClass('animate');
+    setTimeout(function(){
+      el.addClass('animate');
+    },50);
+
   });
 
   var State = {

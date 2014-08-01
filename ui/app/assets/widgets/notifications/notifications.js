@@ -10,7 +10,14 @@ define([
 ){
 
   var State = {}
+  var dom;
+  document.body.addEventListener("TaskSuccess",function(){
+    dom.classList.remove("success");
+    setTimeout(function(){
+      dom.classList.add("success");
+    },50);
+  });
 
-  return bindhtml(tpl, State);
+  return dom = bindhtml(tpl, State);
 
 })
