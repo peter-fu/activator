@@ -4,17 +4,18 @@
 define([
   'text!./notifications.html',
   'css!widgets/buttons/dropdown',
-  'css!./notifications'
+  'css!./notifications',
+  'css!widgets/stickers/stickers'
 ], function(
   tpl
 ){
 
   var State = {}
-  var dom;
+
   document.body.addEventListener("TaskSuccess",function(){
-    dom.classList.remove("success");
+    var el = $("#notifications .success").removeClass('animate');
     setTimeout(function(){
-      dom.classList.add("success");
+      el.addClass('animate');
     },50);
   });
 
