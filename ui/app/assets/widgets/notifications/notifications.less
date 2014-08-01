@@ -3,92 +3,6 @@
  */
 @import "../../commons/_base";
 
-@-webkit-keyframes success {
-  0% {
-    top: 100%;
-    bottom: 0;
-  }
-  50% {
-    top: 0;
-    bottom: 0;
-  }
-  100% {
-    top: 0;
-    bottom: 100%;
-  }
-}
-@-moz-keyframes success {
-  0% {
-    top: 100%;
-    bottom: 0;
-  }
-  50% {
-    top: 0;
-    bottom: 0;
-  }
-  100% {
-    top: 0;
-    bottom: 100%;
-  }
-}
-@keyframes success {
-  0% {
-    top: 100%;
-    bottom: 0;
-  }
-  50% {
-    top: 0;
-    bottom: 0;
-  }
-  100% {
-    top: 0;
-    bottom: 100%;
-  }
-}
-
-@-webkit-keyframes counter {
-  0% {
-    -webkit-transform: translateY(0);
-  }
-  49.9999% {
-    -webkit-transform: translateY(-50px);
-  }
-  50% {
-    -webkit-transform: translateY(50px);
-  }
-  100% {
-    -webkit-transform: translateY(0);
-  }
-}
-@-moz-keyframes counter {
-  0% {
-    -moz-trnsform: translateY(0);
-  }
-  49.9999% {
-    -moz-trnsform: translateY(-50px);
-  }
-  50% {
-    -moz-trnsform: translateY(50px);
-  }
-  100% {
-    -moz-trnsform: translateY(0);
-  }
-}
-@keyframes counter {
-  0% {
-    transform: translateY(0);
-  }
-  49.9999% {
-    transform: translateY(-50px);
-  }
-  50% {
-    transform: translateY(50px);
-  }
-  100% {
-    transform: translateY(0);
-  }
-}
-
 #notifications {
   dt {
     text-align: center;
@@ -96,22 +10,20 @@
     overflow: hidden;
   }
   .success {
-    background: @green;
-    position: absolute;
-    z-index: 999;
-    width: 100%;
-    top: 0;
-    bottom: 100%;
-    left: 0;
-    overflow: hidden;
-    .mark {
-      margin: 19px;
-    }
-    g {
-      fill: white;
+    top: 16px;
+    left: 16px;
+    width: 20px;
+    height: 20px;
+    .shape {
+      background: @blue;
+      padding: 4px;
+      g {
+        fill: white;
+      }
     }
   }
-  span {
+
+  .counter {
     display: inline-block;
     .square(30px);
     line-height: 24px;
@@ -120,16 +32,4 @@
     font-size: 11px;
   }
 
-  &.success {
-    .success {
-      -webkit-animation: 700ms success 1 linear;
-      -moz-animation: 700ms success 1 linear;
-      animation: 700ms success 1 linear;
-    }
-    span {
-      -webkit-animation: 700ms  counter 1 linear;
-      -moz-animation: 700ms  counter 1 linear;
-      animation:  700ms counter 1 linear;
-    }
-  }
 }
