@@ -266,6 +266,16 @@
       opacity: 1;
       background-color: @blue;
     }
+    &.disabled {
+      opacity: .3;
+      background-color: @grey;
+      cursor: not-allowed;
+      &:hover {
+        + .tooltip {
+          display: none;
+        }
+      }
+    }
   }
   .tooltip {
     display: none;

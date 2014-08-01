@@ -65,6 +65,19 @@ define(['commons/streams', 'commons/events', 'commons/utils'], function(streams,
     }
   }
 
+  // update task values when we get ValueChanged
+  // For now this ignores key scopes.
+  var valueUpdaters = {
+    discoveredMainClasses: function(keyName, value) {
+      // TODO use this value
+      console.log("  available main classes ", value);
+    },
+    mainClass: function(keyName, value) {
+      // TODO use this value - note, it might be null
+      console.log("  default configured main class ", value);
+    }
+  };
+
   var subTypeHandlers = {
       LogEvent: function(event) {
         // forward legacy log event TODO this is just a demo hack
@@ -139,11 +152,27 @@ define(['commons/streams', 'commons/events', 'commons/utils'], function(streams,
         debug && console.log("ExecutionSuccess ", event);
         removeExecution(event.id, true /* succeeded */);
       },
-      CompilationFailure: function(event) {
-        debug && console.log("CompilationFailure ", event);
+      TaskEvent: function(event) {
+        debug && console.log("TaskEvent ", event);
+        // TODO replace this log with doing something; this is where
+        // we get task-specific events such as compilation failures
+        console.log("TaskEvent ", event);
       },
-      TestEvent: function(event) {
-        debug && console.log("TestEvent ", event);
+      BuildStructureChanged: function(event) {
+        debug && console.log("BuildStructureChanged ", event);
+        // TODO replace this log with doing something
+        console.log("BuildStructureChanged projects=", event.structure.projects)
+      },
+      ValueChanged: function(event) {
+        debug && console.log("ValueChanged ", event);
+        var name = event.key.key.name;
+        var value = event.value.value;
+
+        if (name in valueUpdaters) {
+          valueUpdaters[name](name, value);
+        } else {
+          debug && console.log("ignoring ValueChanged on " + name);
+        }
       }
   }
 

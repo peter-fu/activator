@@ -16,6 +16,8 @@ import play.api.libs.json.Json._
 import sbt.client._
 import sbt.protocol._
 import scala.reflect.ClassTag
+import scala.concurrent.Future
+import scala.util.control.NonFatal
 
 sealed trait AppRequest
 case object GetWebSocketCreated extends AppRequest
@@ -27,7 +29,7 @@ case object ReloadSbtBuild extends AppRequest
 case class OpenClient(client: SbtClient) extends AppRequest
 case object CloseClient extends AppRequest
 
-// requests that need a client
+// requests that need an sbt client
 sealed trait ClientAppRequest extends AppRequest
 case class RequestExecution(command: String) extends ClientAppRequest
 case class CancelExecution(executionId: Long) extends ClientAppRequest
@@ -83,17 +85,24 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
   log.debug("Opening SbtConnector")
   connector.open({ client =>
     log.debug(s"Opened connection to sbt for ${location} AppActor=${self.path.name}")
-    self ! NotifyWebSocket(Sbt.synthesizeLogEvent(LogMessage.DEBUG, s"Opened sbt at '${location}'"))
+    produceLog(LogMessage.DEBUG, s"Opened sbt at '${location}'")
     self ! OpenClient(client)
   }, { (reconnecting, message) =>
     log.debug(s"sbt client closed reconnecting=${reconnecting}: ${message}")
-    self ! NotifyWebSocket(Sbt.synthesizeLogEvent(LogMessage.INFO, s"Lost or failed sbt connection: ${message}"))
+    produceLog(LogMessage.INFO, s"Lost or failed sbt connection: ${message}")
     self ! CloseClient
     if (!reconnecting) {
       log.info(s"SbtConnector gave up and isn't reconnecting; killing AppActor ${self.path.name}")
       self ! PoisonPill
     }
   })
+
+  def produceLog(level: String, message: String): Unit = {
+    // self can be null after we are destroyed
+    val selfCopy = self
+    if (selfCopy != null)
+      selfCopy ! NotifyWebSocket(Sbt.synthesizeLogEvent(level, message))
+  }
 
   override def receive = {
     case Terminated(ref) =>
@@ -151,6 +160,9 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
       case r: ClientAppRequest =>
         pending = pending :+ (sender -> r)
         flushPending()
+        if (pending.nonEmpty) {
+          produceLog(LogMessage.DEBUG, s"request pending until connection to sbt opens: ${r}")
+        }
     }
   }
 
@@ -158,8 +170,13 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
     while (clientActor.isDefined && pending.nonEmpty) {
       val req = pending.head
       pending = pending.tail
-      clientActor.foreach(actor => actor.tell(req._2, req._1))
+      clientActor.foreach { actor =>
+        produceLog(LogMessage.DEBUG, s"sending request to sbt ${req._2}")
+        actor.tell(req._2, req._1)
+      }
     }
+    if (pending.nonEmpty)
+      log.debug(s"Requests waiting for sbt client to be connected: ${pending}")
   }
 
   private def validateEvent(json: JsObject): Boolean = {
@@ -216,10 +233,34 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
       self ! structure
     }
 
+    // this is a hardcoded hack... we need to control the list of things
+    // to watch from JS, and we should handle build structure changes
+    // by redoing this
+    val valueSub = new Subscription() {
+      val futureValueSubs: Seq[Future[Seq[Subscription]]] =
+        Seq("discoveredMainClasses",
+          "mainClasses",
+          "mainClass",
+          "libraryDependencies") map { name =>
+            client.lookupScopedKey(name) map { scopeds =>
+              scopeds map { scoped =>
+                log.debug(s"Subscribing to key ${scoped}")
+                client.watch(TaskKey[Seq[String]](scoped)) { (key, result) =>
+                  self ! ValueChanged(key, result)
+                }
+              }
+            }
+          }
+      override def cancel(): Unit = {
+        futureValueSubs map { futureSubs => futureSubs map { subs => subs map { sub => sub.cancel() } } }
+      }
+    }
+
     override def postStop(): Unit = {
       log.debug("postStop")
       eventsSub.cancel()
       buildSub.cancel()
+      valueSub.cancel()
       // we were probably stopped because the client closed already,
       // but if not, close here.
       client.close()
@@ -229,38 +270,55 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
       context.parent ! NotifyWebSocket(Sbt.wrapEvent(event))
     }
 
+    def produceLog(level: String, message: String): Unit = {
+      context.parent ! NotifyWebSocket(Sbt.synthesizeLogEvent(level, message))
+    }
+
     override def receive = {
       case event: Event => event match {
         case _: ClosedEvent =>
           self ! PoisonPill
-        case _: BuildStructureChanged | _: ValueChanged[_] =>
+        case _: BuildStructureChanged =>
           log.error(s"Received event which should have been filtered out by SbtClient ${event}")
+        case changed: ValueChanged[_] => forwardOverSocket(changed)
         case entry: LogEvent => forwardOverSocket(entry)
-        //case fail: CompilationFailure => forwardOverSocket(fail)
         case fail: ExecutionFailure => forwardOverSocket(fail)
         case yay: ExecutionSuccess => forwardOverSocket(yay)
         case starting: ExecutionStarting => forwardOverSocket(starting)
         case waiting: ExecutionWaiting => forwardOverSocket(waiting)
         case finished: TaskFinished => forwardOverSocket(finished)
         case started: TaskStarted => forwardOverSocket(started)
-        //case test: TestEvent => forwardOverSocket(test)
+        case taskEvent: TaskEvent => forwardOverSocket(taskEvent)
       }
-      case structure: MinimalBuildStructure => // TODO
+      case structure: MinimalBuildStructure =>
+        forwardOverSocket(BuildStructureChanged(structure))
       // The RequestSelfDestruct must be before the ClientAppRequest check below or else it will slurp up the RSD as well (see hierarchy)
       case RequestSelfDestruct =>
         client.requestSelfDestruct()
       case req: ClientAppRequest => {
         req match {
           case RequestExecution(command) =>
+            log.debug("requesting execution of " + command)
             client.requestExecution(command, interaction = None)
           case CancelExecution(executionId) =>
+            log.debug("canceling execution " + executionId)
             client.cancelExecution(executionId)
           case PossibleAutoCompletions(partialCommand, detailLevelOption) =>
+            log.debug("possible autocompletions for " + partialCommand)
             client.possibleAutocompletions(partialCommand, detailLevel = detailLevelOption.getOrElse(0))
           case _ =>
             // not supposed to happen - will remove compilation warning though
             null
         }
+      } recover {
+        case NonFatal(e) =>
+          log.error(s"request to sbt failed ${e.getMessage}", e)
+          produceLog(LogMessage.DEBUG, s"request $req failed: ${e.getClass.getName}: ${e.getMessage}")
+          Status.Failure(e)
+      } map { result =>
+        log.debug(s"${req} result: ${result}")
+        produceLog(LogMessage.DEBUG, s"request $req result: ${result}")
+        result
       } pipeTo sender
     }
   }

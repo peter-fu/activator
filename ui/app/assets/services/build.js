@@ -1051,23 +1051,21 @@ define(['lib/knockout/knockout', 'commons/settings', 'services/log', 'commons/ut
     return executionExists(name);
   };
 
-  // a different way to view status with just booleans
+  var makeTaskComputed = function(name) {
+    return ko.computed(function() {
+      return isTaskActive(name)
+    })
+  }
+
+  var powered = ko.observable(true);
+  // =================
+  // TASKS ACTIVITY
+  // =================
   var activity = {
-      // TODO ideally "compiling" would mean "an execution is running
-      // which has the compile task involved and we aren't up to the compile
-      // task yet" or something like that, so that when doing "test" we would
-      // also show for a bit that we are doing a compile.
-      compiling: ko.computed(function() {
-        return isTaskActive('compile');
-      }),
-      running: ko.computed(function() {
-        // TODO see 'launching' below, this needs to be sorted out.
-        return isTaskActive('run');
-      }),
-      testing: ko.computed(function() {
-        return isTaskActive('test');
-      }),
-      inspecting: ko.observable(false) // FIXME
+      powered: powered,
+      compiling: makeTaskComputed("compile"),
+      running: makeTaskComputed("run"),
+      testing: makeTaskComputed("test")
   };
   activity.busy = ko.computed(function() {
     return newSbt.executions().length > 0;
@@ -1084,6 +1082,8 @@ define(['lib/knockout/knockout', 'commons/settings', 'services/log', 'commons/ut
       return status != Status.IDLE && status != Status.FAILED;
     }
   });
+
+  // ===================
 
   var startTask = function(name) {
     newSbt.requestExecution(name);
@@ -1125,35 +1125,40 @@ define(['lib/knockout/knockout', 'commons/settings', 'services/log', 'commons/ut
     });
   };
 
-  var statusTooltips = {
-      run: ko.computed(function() {
-        if (activity.running())
-          return "Application running (click to stop)";
-        else if (activity.launching())
-          return "Launching application (click to stop)";
-        else if (run.status() == Status.FAILED)
-          return "Application failed to start or was killed (click to re-run)";
-        else if (rerunOnBuild())
-          return "Application stopped (will auto-run when build completes)";
-        else
-          return "Application stopped (click to run it)";
-      })
-  };
-
-  var onToggleRun = function() {
-    debug && console.log("onToggleRun, run active=" + isTaskActive('run'))
-    // whenever we manually run, we set to auto-run
-    // on build; when we manually stop, we set to
-    // not auto run. Not sure whether this will
-    // work out nicely but let's try it.
-    if (isTaskActive('run')) {
-      rerunOnBuild(false);
-      stopTask('run');
-    } else {
-      rerunOnBuild(true);
-      startTask('run');
+  var makeTaskExec = function(name, computed) {
+    return function() {
+      if (powered() && !computed()) {
+        startTask(name);
+      } else if(powered() && computed()) {
+        stopTask(name);
+      }
     }
-  };
+  }
+
+  // =================
+  // TASKS ACTIONS
+  // =================
+  var actions = {
+    mainPower: function() {
+      activity.powered(!activity.powered());
+      if(!activity.powered()){
+        stopAllTasks();
+      }
+    },
+    compile: makeTaskExec("compile", activity.compiling),
+    run: makeTaskExec("run", activity.running),
+    test: makeTaskExec("test", activity.testing)
+  }
+
+
+
+
+
+
+
+
+
+
 
   var build = utils.Singleton({
     init: function() {
@@ -1163,8 +1168,8 @@ define(['lib/knockout/knockout', 'commons/settings', 'services/log', 'commons/ut
     errors: errors, // errors.{compile,run,etc} = observable array of Error
     Status: Status,
     status: statuses, // status.{compile,run,etc} = observable Status.FOO strings
-    statusTooltips: statusTooltips, // statusTooltips.{run} = tooltip describing status
     activity: activity, // convenience booleans when full status detail isn't needed
+    actions: actions,
     log: log,
     app: app,
     TestOutcome: TestOutcome,
@@ -1178,7 +1183,6 @@ define(['lib/knockout/knockout', 'commons/settings', 'services/log', 'commons/ut
     restartTask: restartTask,
     stopAllTasks: stopAllTasks,
     restartAllTasks: restartAllTasks,
-    onToggleRun: onToggleRun,
     // these three are the old clunky APIs, probably
     // best to wrap them with a new nicer API above,
     // rather than use directly. The problem with these
