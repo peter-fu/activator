@@ -82,7 +82,8 @@ case class NewRelic(configFile: File, agentJar: File, environment: String = "dev
   def jvmArgs: Seq[String] = Seq(
     s"-javaagent:${agentJar.getPath}",
     s"-Dnewrelic.config.file=${configFile.getPath}",
-    s"-Dnewrelic.environment=$environment")
+    s"-Dnewrelic.environment=$environment",
+    "-Dnewrelic.enable.java.8") // needed to enable experimental Java 8 support
   val tag: InstrumentationTag = NewRelic.Tag
 }
 
