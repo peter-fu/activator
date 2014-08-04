@@ -146,17 +146,20 @@ define(function() {
     var memos = {}
     return {
       init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+        element.addEventListener('scroll', function(e) {
+          var memo = valueAccessor();
+          memos[memo] = [element.scrollLeft,element.scrollTop];
+        });
+      },
+      update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
         var memo = valueAccessor();
-        if (!memo()) {
-          memo([0,0]);
+        if (!memos[memo]) {
+          memos[memo] = [0,0];
         }
         setTimeout(function() {
-          element.scrollLeft = memo()[0];
-          element.scrollTop  = memo()[1];
-        }, 100);// Wait for everything to be displayed
-        element.addEventListener('scroll', function(e) {
-          memo([element.scrollLeft,element.scrollTop]);
-        });
+          element.scrollLeft = memos[memo][0];
+          element.scrollTop  = memos[memo][1];
+        }, 1);// Wait for everything to be displayed
       }
     }
   }());

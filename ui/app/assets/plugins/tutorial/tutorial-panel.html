@@ -14,7 +14,7 @@
       <a class="next" data-bind="css: {disabled: noNextPage}, click: gotoNextPage"><svg data-bind="svg: '/assets/icons/next.svg'" /></a>
   </nav>
   <!-- ko if: page -->
-  <article class="page">
+  <article class="page" data-bind="memoScroll: 'tutorial-pane-'+page().index">
     <section class="typo" data-bind="html: page().page"></section>
   </article>
   <!-- /ko -->
