@@ -41,9 +41,7 @@
     <header>
       <h1 data-bind="text: page().title"></h1>
     </header>
-    <section>
-      <div class="typo page" data-bind="html: page().page">
-      </div>
+    <section class="typo page" data-bind="html: page().page, memoScroll: 'tutorial-'+page().index">
     </section>
   </article>
   <!-- /ko -->
