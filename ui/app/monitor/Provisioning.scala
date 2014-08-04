@@ -144,27 +144,27 @@ object Provisioning {
   }
 
   private def postprocessResults(expected: Future[File],
-    validator: File => File,
+    validator: File => Unit,
     targetLocation: File,
     notificationSink: StatusNotifier)(implicit ec: ExecutionContext): Future[File] = {
-    expected.transform(x => x, e => DownloadException(e)).map { file =>
+    val newExpected = expected.transform(x => x, e => DownloadException(e)).map { file =>
       notificationSink.notify(Validating)
       validator(file)
       notificationSink.notify(Extracting)
       FileHelper.unZipFile(file, targetLocation)
     }
-    expected.onComplete {
-      case Success(_) => notificationSink.notify(Complete)
+    newExpected.onComplete {
+      case Success(x) => notificationSink.notify(Complete)
       case Failure(error @ AuthenticationException(message, username, url)) =>
         notificationSink.notify(ProvisioningError(s"Cannot login to $url with username: $username and password given: $message", error))
       case Failure(DownloadException(_)) => // Already reported
       case Failure(error) => notificationSink.notify(ProvisioningError(s"Error provisioning: ${error.getMessage}", error))
     }
-    expected
+    newExpected
   }
 
   def provision(executor: DownloadExecutor,
-    validator: File => File,
+    validator: File => Unit,
     targetLocation: File,
     notificationSink: StatusNotifier)(implicit ec: ExecutionContext): Future[File] = {
     notificationSink.notify(Downloading(executor.downloadUrl))

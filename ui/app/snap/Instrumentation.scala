@@ -282,7 +282,7 @@ object NewRelic {
 
     def extractRoot(relativeTo: File = activatorHome): File = new File(relativeTo, versionRegex.replaceAllIn(extractRootTemplate, version))
 
-    def verifyFile(in: File): File =
+    def verifyFile(in: File): Unit =
       FileHelper.verifyFile(in, sha)
 
     def extractFile(in: File, relativeTo: File = activatorHome): File =
@@ -305,12 +305,16 @@ object AppDynamics {
   sealed abstract class CheckResult(val message: String)
   case object IncompleteProvisioning extends CheckResult("AppDynamics provisioning incomplete")
 
+  final val versionRegex = "\\{version\\}".r
+
   def fromConfig(in: TSConfig): Config = {
     import snap.Instrumentations.withMonitoringConfig
     withMonitoringConfig(in) { configRoot =>
       val config = configRoot.getConfig("appdynamics")
       Config(loginUrl = config.getString("login-url"),
         downloadUrlTemplate = config.getString("download-template"),
+        version = config.getString("version"),
+        sha = config.getString("checksum"),
         timeout = Timeout(config.getDuration("timeout", TimeUnit.MILLISECONDS).intValue.millis),
         extractRootTemplate = config.getString("extract-root-template"))
     }
@@ -324,13 +328,18 @@ object AppDynamics {
   case class Config(
     loginUrl: String,
     downloadUrlTemplate: String,
+    version: String,
+    sha: String,
     timeout: Timeout,
     extractRootTemplate: String) {
     import Instrumentation._
 
-    val url: String = downloadUrlTemplate
+    val url: String = versionRegex.replaceAllIn(downloadUrlTemplate, version)
 
-    def extractRoot(relativeTo: File = activatorHome): File = new File(relativeTo, extractRootTemplate)
+    def extractRoot(relativeTo: File = activatorHome): File = new File(relativeTo, versionRegex.replaceAllIn(extractRootTemplate, version))
+
+    def verifyFile(in: File): Unit =
+      FileHelper.verifyFile(in, sha)
 
     def extractFile(in: File, relativeTo: File = activatorHome): File =
       FileHelper.unZipFile(in, extractRoot(relativeTo = relativeTo))

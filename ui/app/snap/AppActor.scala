@@ -104,7 +104,8 @@ class AppActor(val config: AppConfig, val sbtProcessLauncher: SbtProcessLauncher
   }
 
   lazy val newRelicActor: ActorRef = context.actorOf(monitor.NewRelic.props(NewRelic.fromConfig(Play.current.configuration.underlying), defaultContext))
-  lazy val appDynamicsActor: ActorRef = context.actorOf(monitor.AppDynamics.props(AppDynamics.fromConfig(Play.current.configuration.underlying), defaultContext))
+  lazy val appDynamicsConfig = AppDynamics.fromConfig(Play.current.configuration.underlying)
+  lazy val appDynamicsActor: ActorRef = context.actorOf(monitor.AppDynamics.props(appDynamicsConfig, defaultContext))
 
   val socket = context.actorOf(Props(new AppSocketActor(newRelicActor, appDynamicsActor)), name = "socket")
 
@@ -173,7 +174,7 @@ class AppActor(val config: AppConfig, val sbtProcessLauncher: SbtProcessLauncher
                 self.tell(originalMessage, originalSender)
               case x @ InstrumentationRequestTypes.AppDynamics(applicationName, nodeName, tierName, accountName, accessKey, hostName, port, sslEnabled) =>
                 val relativeToActivator = FileHelper.relativeTo(Instrumentation.activatorHome)_
-                val adJar = relativeToActivator("monitoring/appdynamics/javaagent.jar")
+                val adJar = relativeToActivator(s"monitoring/appdynamics/${appDynamicsConfig.version}/javaagent.jar")
                 val inst = AppDynamics(adJar, applicationName, nodeName, tierName, accountName, accessKey, hostName, port, sslEnabled)
                 val processFactory = new DefaultSbtProcessFactory(location, sbtProcessLauncher, inst.jvmArgs)
                 addInstrumentedSbtPool(x.tag, processFactory)

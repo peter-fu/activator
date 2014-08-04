@@ -103,7 +103,7 @@ object FileHelper {
 
   def verifyFile(in: File,
     targetDigest: String,
-    md: MessageDigest = MessageDigest.getInstance("SHA-256")): File = {
+    md: MessageDigest = MessageDigest.getInstance("SHA-256")): Unit = {
     withFileInputStream(in) { fis =>
       val buffer = new Array[Byte](1024)
       var readCount: Int = fis.read(buffer)
@@ -113,8 +113,7 @@ object FileHelper {
       }
       val digest = md.digest()
       val digestString = bytesToHex(digest).toLowerCase
-      if (digestString == targetDigest.toLowerCase) in
-      else throw new RuntimeException(s"input file: $in failed checksum.  Looking for ${targetDigest.toLowerCase} got $digestString")
+      if (digestString != targetDigest.toLowerCase) throw new RuntimeException(s"input file: $in failed checksum.  Looking for ${targetDigest.toLowerCase} got $digestString")
     }
   }
 

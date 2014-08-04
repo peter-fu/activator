@@ -96,7 +96,7 @@ object NewRelic {
         provision(
           simpleDownloadExecutor(defaultWSClient,
             config.url, ns, config.timeout),
-          FileHelper.verifyFile(_, config.sha),
+          config.verifyFile,
           config.extractRoot(), ns) onComplete {
             case Success(_) => sender ! r.response
             case Failure(error) =>

@@ -134,7 +134,7 @@ object AppDynamics {
           config.loginUrl,
           config.url,
           ns,
-          config.timeout).execute().flatMap(de => provision(de, x => x, config.extractRoot(), ns)) onComplete {
+          config.timeout).execute().flatMap(de => provision(de, config.verifyFile, config.extractRoot(), ns)) onComplete {
             case Success(_) => sender ! r.response
             case Failure(error) =>
               reportError(error, s"Failure during provisioning: ${error.getMessage}", r, sender)
@@ -161,10 +161,10 @@ object AppDynamics {
   }
 }
 
-class AppDynamics(newRelicBuilder: LoggingAdapter => AppDynamics.Underlying) extends Actor with ActorLogging {
-  val newRelic = newRelicBuilder(log)
+class AppDynamics(appDynamicsBuilder: LoggingAdapter => AppDynamics.Underlying) extends Actor with ActorLogging {
+  val appDynamics = appDynamicsBuilder(log)
 
   def receive: Receive = {
-    case r: AppDynamics.Request => newRelic.onMessage(r, sender, self, context)
+    case r: AppDynamics.Request => appDynamics.onMessage(r, sender, self, context)
   }
 }
