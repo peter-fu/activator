@@ -85,7 +85,7 @@ define([
       State.selectedDocument = selectedDocument;
       // bind the document
       doOnChange(selectedDocument, function(doc) {
-        if (doc && doc.session != editor.getSession()) {
+        if (doc && doc.isText && doc.session != editor.getSession()) {
           editor.setSession(doc.session);
           editor.focus();
         }

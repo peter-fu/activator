@@ -5,6 +5,7 @@ define([
   "widgets/layout/layout",
   "widgets/browser/browser",
   "./document",
+  "./bin-file",
   "widgets/editor/editor",
   "commons/settings",
   "css!./code",
@@ -17,6 +18,7 @@ define([
   layout,
   browser,
   documentState,
+  fileState,
   editor,
   settings
 ){
@@ -39,10 +41,27 @@ define([
       }
     }
     if (foundDocIndex === undefined){
-      doc = new documentState(e.data.scope);
-      openedDocuments.push(doc);
+      fs.browse(e.data.scope.location).success(function(data) {
+        switch(data.type){
+          case 'code':
+            doc = new documentState(e.data.scope);
+            openedDocuments.push(doc);
+            makeActive(doc);
+            break;
+          case 'directory':
+            console.log("REVEAL", data)
+            browser.reveal(data.location);
+            break;
+          default:
+            doc = new fileState(e.data.scope,data.type);
+            openedDocuments.push(doc);
+            makeActive(doc);
+            break;
+        }
+      });
+    } else {
+      makeActive(doc);
     }
-    makeActive(doc);
   }
 
   var closeFile = function(doc, event) {
