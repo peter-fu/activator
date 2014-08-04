@@ -1,0 +1,47 @@
+@import "../../commons/_base";
+
+.pluginBlock {
+  .column();
+  .subheader {
+    .row();
+    h2 {
+      .expand();
+      font-size: 16px;
+    }
+    .group {
+      font-size: 12px;
+      border: none;
+      color: @grey-dkr;
+      label, dl, button, select {
+        margin: 0 0 0 5px;
+      }
+    }
+    button {
+      padding: 2px 4px;
+      background: @grey-dkr;
+      color: @slate-dkr;
+    }
+  }
+  h3 {
+    padding: 0 20px;
+    height: 25px;
+    line-height: 25px;
+    background: @white-dkr;
+    color: @grey-dkr;
+    font-size: 13px;
+    text-transform: uppercase;
+  }
+
+  &.dark {
+    background: @slate;
+    color: @grey;
+    .subheader {
+      background: @slate-dkr;
+      color: #fff;
+    }
+    h3 {
+      background: @grey-dkr;
+      color: @slate-dkr;
+    }
+  }
+}
