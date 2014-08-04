@@ -32,7 +32,16 @@
           </li>
         </ul>
       </header>
-      <!-- ko include: editor.render() --><!-- /ko -->
+      <!-- ko if: selectedDocument() -->
+        <!-- ko if: selectedDocument().isText -->
+          <!-- ko include: editor.render() --><!-- /ko -->
+        <!-- /ko -->
+        <!-- ko ifnot: selectedDocument().isText -->
+          <div class="bin-file">
+            <p>We cannot display this content</p>
+          </div>
+        <!-- /ko -->
+      <!-- /ko -->
     </div>
   <!-- /ko -->
 </main>

@@ -93,17 +93,17 @@ define([
   }
 
   TreeNode.prototype.load = function() {
-    makeChildren(this.location, this);
+    return makeChildren(this.location, this);
   }
 
   TreeNode.prototype.toggleOpen = function(data, event) {
-    event.stopPropagation();
+    event && event.stopPropagation();
     if (!this.isOpened()) {
+      this.isOpened(true);
       if (!this.children().length) {
         askForRefresh.push(this);
-        this.load();
+        return this.load();
       }
-      this.isOpened(true);
     } else {
       this.isOpened(false);
     }
@@ -155,6 +155,27 @@ define([
       });
   }
 
+  function revealInSideBar(path){
+    function revealNode(node) {
+      node.children().forEach(function(child) {
+        if (path.indexOf(child.location) == 0){
+          if (!child.isOpened()){
+            var promise = child.toggleOpen();
+            if (promise.complete) {
+              promise.complete(function() {
+                revealNode(child);
+              });
+            } else {
+              revealNode(child);
+            }
+          } else {
+            revealNode(child);
+          }
+        }
+      });
+    }
+    revealNode(tree);
+  }
   function revealProject() {
     tree.show();
   }
@@ -175,6 +196,7 @@ define([
 
   return {
     tree: tree,
+    reveal: revealInSideBar,
     render: function(){
       return bindhtml(tpl, State);
     }
