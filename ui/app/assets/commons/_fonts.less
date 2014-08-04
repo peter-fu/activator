@@ -21,32 +21,132 @@
   word-break: break-all;
 }
 
-.typo {
+.typo() {
   &.page {
     font: 16.5px/1.6em "Georgia","Times new roman", serif;
   }
   p, h1, h2, h3, h4 {
     margin: .5em 0;
   }
-  a{
+  // a{
+  //   &[href^="#code"] {
+  //     background: url(/assets/images/icons/doc.svg) 0 center no-repeat;
+  //     padding: 0 0 0 14px;
+  //     margin: 0 3px;
+  //   }
+  // }
+  // p code, pre {
+  //   background: @white-ltr;
+  //   border: 1px solid @white-dkr;
+  //   color: @slate-ltr;
+  //   padding: 0 3px;
+  //   margin: 0 3px;
+  // }
+  // pre {
+  //   margin: 12px -5px;
+  //   padding: 3px 5px;
+  // }
+
+
+
+
+
+
+
+
+
+
+
+
+
+  a {
+    color: @blue-text;
     &:hover {
       text-decoration: underline;
     }
-    &[href^="#code"] {
-      background: url(/assets/images/icons/doc.svg) 0 center no-repeat;
-      padding: 0 0 0 14px;
+  }
+  a.shortcut {
+    white-space: nowrap;
+    &:before {
+      border-radius: 2px;
+      padding: 4px;
       margin: 0 3px;
+      background: @blue;
+      color: #fff;
+      display: inline-block;
+      content: url(/public/images/icons/shortcut.svg);
+      display: inline-block;
+      vertical-align: 3px;
     }
+    &:hover:before {
+      background: @red;
+    }
+  }
+  .monospace {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+    font-size: .9em;
+  }
+  code {
+    .monospace;
+    padding: 0 3px;
+    margin: 0 3px;
+  }
+  pre {
+    .monospace;
+    overflow-x: auto;
+    margin: 12px -5px;
+    padding: 3px 5px;
   }
   p code, pre {
     background: @white-ltr;
     border: 1px solid @white-dkr;
     color: @slate-ltr;
-    padding: 0 3px;
-    margin: 0 3px;
   }
-  pre {
-    margin: 12px -5px;
-    padding: 3px 5px;
+  h1, h2, h3 {
+    background-color: transparent;
+    color: #364550;
+    font-weight: 600;
+    padding: 0;
+    margin: 0;
+    white-space: nowrap;
+  }
+  h1 {
+    height: 40px;
+    line-height: 40px;
+    font-size: 1.4em;
+  }
+  h2 {
+    height: 30px;
+    line-height: 30px;
+    font-size: 1.2em;
+  }
+  h3 {
+    height: 25px;
+    line-height: 25px;
+    font-size: 1.1em;
+  }
+  p {
+    margin: 1em 0;
+  }
+  ul, ol {
+    margin: 10px 0;
+    padding-left: 40px;
+    li {
+      margin: 5px 0;
+    }
+  }
+  ul li {
+    list-style-type: square;
+  }
+  ol li {
+    list-style-type: decimal;
+  }
+  strong {
+    font-weight: 600;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+    cursor: pointer;
   }
 }
