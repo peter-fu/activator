@@ -121,6 +121,22 @@ object Application extends Controller {
     }
   }
 
+  def debug(id: String) = CSRFAddToken {
+    Action.async { implicit request =>
+      // TODO - Different results of attempting to load the application....
+      Logger.debug("Loading app for /app html page")
+      AppManager.getOrCreateApp(snap.AppIdSocketId(id, UUID.randomUUID())).map { theApp =>
+        Logger.debug(s"loaded for html page: ${theApp}")
+        Ok(views.html.debug(getApplicationModel(theApp)))
+      } recover {
+        case e: Exception =>
+          // display it on home screen
+          Logger.error("Failed to load app id " + id + ": " + e.getMessage)
+          Redirect(routes.Application.forceHome).flashing("error" -> e.getMessage)
+      }
+    }
+  }
+
   /** Loads an application model and pushes to the view by id. */
   def app(id: String) = CSRFAddToken {
     Action.async { implicit request =>

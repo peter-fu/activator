@@ -1,0 +1,65 @@
+<article class="plugin ajax">
+  <header>
+    <h1>Ajax requests</h1>
+  </header>
+  <section>
+    <div class="pluginBlock list-col">
+      <footer>
+        <p>Show all</p>
+      </footer>
+
+      <form data-bind="submit: doRequestOnSumbit">
+        <div class="line">
+          <div>
+            <select name="method" data-bind="value: method">
+              <option value"GET">GET</option>
+              <option value"POST">POST</option>
+              <option value"PUT">PUT</option>
+              <option value"DELETE">DELETE</option>
+            </select>
+          </div>
+          <div class="search">
+            <input type="text" list="entities" placeholder="url" data-bind="value: url"/>
+            <datalist id="entities"></datalist>
+          </div>
+          <div>
+            <input class="button" type="submit" value="AJAX" />
+          </div>
+        </div>
+        <textarea placeholder="(facultative) data in Json format{}" data-bind="value: data"></textarea>
+      </form>
+      <ul class="history list" data-bind="foreach: history">
+        <li data-bind="click: $root.fillFromHistory, attr: {'data-status': status}">
+          <span class="method" data-bind="text: method"></span>
+          <span class="url"    data-bind="text: url"></span>
+          <span class="data"   data-bind="text: data"></span>
+          <span class="delete" data-bind="click: $root.removeFromHistory">×</span>
+        </li>
+      </ul>
+
+    </div>
+    <div class="pluginBlock dark stats request">
+      <!-- ko if: active() -->
+      <!-- ko with: active() -->
+      <div class="summary">
+        <h4>Request</h4>
+        <p class="summary-line">
+          <span class="status" data-bind="text: status"></span>
+          <span class="method" data-bind="text: method"></span>
+          <span class="url"    data-bind="text: url"></span>
+        </p>
+        <h4>Request data</h4>
+        <p class="data"        data-bind="text: data"></p>
+        <h4>Response headers</h4>
+        <pre class="headers"     data-bind="text: headers"></pre>
+      </div>
+      <pre id="result" contenteditable="true" data-bind="css: {json: isJsonResult}, text: result"></pre>
+      <!-- /ko -->
+      <!-- /ko -->
+      <!-- ko ifnot: active() -->
+        <p>Make a request.</p>
+      <!-- /ko -->
+
+    </div>
+  </section>
+</article>

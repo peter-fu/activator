@@ -1,0 +1,21 @@
+<main id="wrapper" class="run">
+  <nav class="menu">
+    <header>
+      <h1>Debug</h1>
+      <div class="buttons">
+        <button xxdata-bind="click: function(){ sbtExecCommand('run'); }">
+          Clear data
+        </button>
+      </div>
+    </header>
+    <ul class="list links">
+      <li class="system"><a href="#run/system">Ajax</a>
+      </li>
+      <li class="actors" xxdata-bind="visible: inspectorActivated"><a href="#run/actors">Websocket</a>
+      </li>
+      <li class="requests" xxdata-bind="visible: inspectorActivated"><a href="#run/requests">JS console</a>
+      </li>
+    </ul>
+  </nav>
+  <!-- ko include: subplugin --><!-- /ko -->
+</main>

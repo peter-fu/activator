@@ -1,0 +1,74 @@
+<div id="wrapper">
+  <section>
+    <header>
+      <h1>Monitor</h1>
+    </header>
+    <form>
+      <ul class="tabs">
+        <li>AJAX</li>
+        <li>WEBSOCKET</li>
+        <li>REPL</li>
+      </ul>
+      <div class="ajax">
+        <div class="line">
+          <div>
+            <select name="method" data-bind="value: selectedMethod">
+              <option value"GET">GET</option>
+              <option value"POST">POST</option>
+              <option value"PUT">PUT</option>
+              <option value"DELETE">DELETE</option>
+            </select>
+          </div>
+          <div class="search">
+            <input type="text" list="entities" placeholder="url"/>
+          </div>
+          <div>
+            <input type="submit" value="AJAX" />
+          </div>
+        </div>
+        <textarea data-bind="visible: showData" placeholder="(facultative) Data, Json format{}"></textarea>
+        <datalist id="entities"></datalist>
+      </div>
+      <div class="websocket">
+        <div class="line">
+          <div class="status">
+            <span class="light"></span>
+            <span class="">Websocket is open and running</span>
+          </div>
+          <div>
+            <input type="submit" value="SEND" />
+          </div>
+        </div>
+        <textarea placeholder="(facultative) Data, Json format{}"></textarea>
+      </div>
+      <div class="repl">
+        <div class="line">
+          <div>Execute some JS code</div>
+          <div>
+            <input type="submit" value="EXEC" />
+          </div>
+        </div>
+        <textarea placeholder="Type JS code to be executed">// Some variables are already injected in the scope:
+  // sbt = require('services/sbt')
+  // fs = require('services/fs')
+  // ko = require('konockout')
+  // print() = print to output panel on the right
+  // help() = print this</textarea>
+      </div>
+    </form>
+    <ul id="history" data-bind="foreach: history">
+      <li data-bind="click: $root.fillFromHistory, attr: {'data-status': status}">
+        <span class="method" data-bind="text: method"></span>
+        <span class="url" data-bind="text: url"></span>
+        <span class="data" data-bind="text: data"></span>
+        <span class="delete" data-bind="click: $root.removeFromHistory">Delete</span>
+      </li>
+    </ul>
+  </section>
+  <section>
+    <header>
+      <h1>Result</h1>
+    </header>
+    <pre contenteditable="true" data-bind="isValidJson"></pre>
+  </section>
+</div>

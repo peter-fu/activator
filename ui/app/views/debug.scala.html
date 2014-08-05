@@ -1,0 +1,20 @@
+@(model: controllers.ApplicationModel)(implicit request: RequestHeader)
+
+@import play.api.libs.json.Json
+@import snap.WebSocketUtil.webSocketURLWithCSRF
+
+<!-- Copyright (C) 2013 Typesafe, Inc <http://typesafe.com> -->
+<html>
+  <head>
+    <title>Typesafe Activator</title>
+    <link href="@routes.Assets.at("main/main.css")" rel="stylesheet" type="text/css">
+    <script type="text/javascript">
+      // put ?debug in your query string to enable debug mode
+      window.debug = (location.search.indexOf("debug") >= 0);
+      window.wsUrl = '@webSocketURLWithCSRF(routes.Application.connectApp(model.socketId))';
+    </script>
+    <script data-main="@routes.Assets.at("debug/debug.js")" type="text/javascript" src="@routes.Assets.at("lib/requirejs/require.js")"></script>
+  </head>
+  <body style="background: #97ABB8;">
+  </body>
+</html>

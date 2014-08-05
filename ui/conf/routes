@@ -38,6 +38,7 @@ GET         /app/:id/                                    controllers.Application
 GET         /app/:id/search/*query                       controllers.Application.search(id, query)
 GET         /app/:id/tutorial/*location                  controllers.Application.appTutorialFile(id, location)
 GET         /home/stream                                 controllers.Application.homeStream
+GET         /debug/:id/                                  controllers.Application.debug(id)
 
 # Console
 GET         /api/console/:id                             controllers.ConsoleController.connectConsole(id)
