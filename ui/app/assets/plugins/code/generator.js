@@ -37,17 +37,13 @@ define(['commons/streams', 'services/sbt', 'services/ajax'], function (stream, s
   var logs = ko.observableArray([]);
   var complete = ko.observable(false);
 
-  // Used to monitor how long the process has been running
-  var maxProcessTime;
+  var processTimeIntervalId = 0;
 
   var setNewTimeout = function() {
-    // Delete the old timeout (if available)
-    if (maxProcessTime !== undefined) {
-      clearInterval(maxProcessTime);
-    }
-
+    // Delete existing timeout
+    clearInterval(processTimeIntervalId);
     // If the process takes more than n seconds we generate a message that it might be good to retry
-    maxProcessTime = setInterval(function() { logs.push({message: "The process seems stuck. Press OK and please retry."})}, 120 * 1000);
+    processTimeIntervalId = setInterval(function() { logs.push({message: "The process seems stuck. Press OK and please retry."})}, 120 * 1000);
   };
 
   var startProcess = function(overrideExisting, projFile, projLocation, pluginContent, sbtCmd) {
