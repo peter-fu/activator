@@ -18,18 +18,8 @@ define(['./types'], function(Types) {
   }
 
   EventStream.prototype.push = function(value) {
-    try {
-      EventStreamExecution(this.callbacks)(value);
-    } catch (e){
-      if (this.onFail) this.onFail(e);
-      else throw("Strem Error:"+e)
-    }
+    EventStreamExecution(this.callbacks)(value);
     return this;
-  }
-
-  // TODO: do we really need this
-  EventStream.prototype.fail = function(callback) {
-    this.onFail = callback;
   }
 
   EventStream.prototype.clone = function(value) {
