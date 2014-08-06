@@ -75,7 +75,7 @@ define([
 
   var sbtEventStream = websocket.subscribe().equal('type','sbt');
   var subTypeEventStream = function(subType) {
-    return sbtEventStream.fork().equal('subType',subType);
+    return sbtEventStream.fork().matchOnAttribute('subType',subType);
   }
 
   subTypeEventStream("TaskStarted").each(function(message) {
@@ -180,7 +180,7 @@ define([
   });
 
   // discoveredMainClasses
-  valueChanged.equal('key', 'discoveredMainClasses').each(function(message) {
+  valueChanged.matchOnAttribute('key', 'discoveredMainClasses').each(function(message) {
     app.mainClasses(message.value); // All main classes
     if (!app.currentMainClass() && message.value[0]){
       app.currentMainClass(message.value[0]); // Selected main class, if empty

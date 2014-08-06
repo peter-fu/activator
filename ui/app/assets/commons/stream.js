@@ -55,7 +55,8 @@ define(['./types'], function(Types) {
     return forked;
   }
 
-  EventStream.prototype.equal = function(attribute, attributeValue) {
+  // A faster match, that check strick equality for an attribute
+  EventStream.prototype.matchOnAttribute = function(attribute, attributeValue) {
     var forked = new EventStream();
     var _call = function(value, next) {
       if (value != undefined && value[attribute] === attributeValue){
