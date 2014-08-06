@@ -143,13 +143,15 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
       case UpdateSourceFiles(files) =>
         projectWatcher ! SetSourceFilesRequest(files)
       case ReloadSbtBuild =>
-      // TODO : implement
-      //clientActor.foreach(_ ! RequestSelfDestruct)
+        clientActor.foreach(_ ! RequestSelfDestruct)
       case OpenClient(client) =>
         log.debug(s"Old client actor was ${clientActor}")
         clientActor.foreach(_ ! PoisonPill) // shouldn't happen - paranoia
-        clientCount += 1
+
         log.debug(s"Opening new client actor for sbt client ${client}")
+        clientCount += 1
+        // Hacky JSON creation here since Sbt.wrapEvent expects an Event (and that is package private to sbt.protocol)
+        self ! NotifyWebSocket(JsObject(Seq("type" -> JsString("sbt"), "subType" -> JsString("ClientOpened"), "event" -> JsArray())))
         clientActor = Some(context.actorOf(Props(new SbtClientActor(client)), name = s"client-$clientCount"))
         clientActor.foreach(context.watch(_))
         flushPending()
@@ -211,6 +213,7 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
     override def subReceive: Receive = {
       case NotifyWebSocket(json) =>
         log.debug("sending message on web socket: {}", json)
+
         produce(json)
     }
 

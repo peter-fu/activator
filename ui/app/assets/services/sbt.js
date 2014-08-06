@@ -38,11 +38,6 @@ define(['commons/streams', 'commons/events', 'commons/utils'], function(streams,
     });
   }
 
-  function requestRestart() {
-    return sbtRequest('restart', {
-    });
-  }
-
   var executionsById = {};
   var executions = ko.observableArray();
   var tasksById = {};
@@ -173,6 +168,9 @@ define(['commons/streams', 'commons/events', 'commons/utils'], function(streams,
         } else {
           debug && console.log("ignoring ValueChanged on " + name);
         }
+      },
+      ClientOpened: function(event) {
+        debug && console.log("Client opened")
       }
   }
 
@@ -198,7 +196,6 @@ define(['commons/streams', 'commons/events', 'commons/utils'], function(streams,
     possibleAutocompletions: possibleAutocompletions,
     requestExecution: requestExecution,
     cancelExecution: cancelExecution,
-    requestRestart: requestRestart,
     legacySubscribeLog: legacySubscribeLog,
     executions: executions
   };

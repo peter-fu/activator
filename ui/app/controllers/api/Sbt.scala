@@ -79,11 +79,4 @@ object Sbt extends Controller {
       }
     }
   }
-
-  def restart() = jsonAction { json =>
-    withApp(json) { app =>
-      app.actor.tell(snap.RequestSelfDestruct, null)
-      Future { Ok(Json.obj("restart" -> "requested")) }
-    }
-  }
 }
