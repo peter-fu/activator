@@ -32,6 +32,7 @@ define(['commons/streams', 'services/sbt', 'services/ajax'], function (stream, s
 
   // State flags used to drive the process
   var currentState = idle;
+  var currentProcessId = 0;
 
   // Modal Window
   var logs = ko.observableArray([]);
@@ -89,18 +90,24 @@ define(['commons/streams', 'services/sbt', 'services/ajax'], function (stream, s
     currentState = checkingCommand;
     logs.push({message: "Checking if the " + sbtCommand + " command is available in sbt..."});
     var result = runSbtCommand();
-    if (result === undefined) {
+    result.done(function(data) {
+      currentProcessId = data.id;
+    });
+    result.fail(function() {
       resetState("Did not receive any response from server. Please try again.");
-    }
+    });
   };
 
   var runCommand = function() {
     currentState = runningCommand;
     logs.push({message: "Running the " + sbtCommand + " command."});
     var result = runSbtCommand();
-    if (result === undefined) {
+    result.done(function(data) {
+      currentProcessId = data.id;
+    });
+    result.fail(function() {
       resetState("Did not receive any response from server. Please try again.");
-    }
+    });
   };
 
   var generateFile = function() {
@@ -124,10 +131,11 @@ define(['commons/streams', 'services/sbt', 'services/ajax'], function (stream, s
   };
 
   var resetState = function(msg) {
-    clearInterval(maxProcessTime);
+    clearInterval(processTimeIntervalId);
     debug && console.log(msg);
     logs.push({message: msg});
     currentState = idle;
+    currentProcessId = 0;
   };
 
   /**
@@ -136,8 +144,11 @@ define(['commons/streams', 'services/sbt', 'services/ajax'], function (stream, s
   stream.subscribe({
     handler: function (msg) {
       if (msg.type === 'sbt') {
+        // This is the id of the task that has been handled by sbt
+        var executionId = msg.event.id;
+
         // State : After checking if the 'eclipse' command is available in sbt
-        if (currentState === checkingCommand) {
+        if (currentState === checkingCommand && currentProcessId == executionId) {
           if (msg.subType === 'ExecutionFailure') {
             logs.push({message: "Command not available - trying to add it."});
             generateFile();
@@ -157,7 +168,7 @@ define(['commons/streams', 'services/sbt', 'services/ajax'], function (stream, s
           }
         }
         // State: After executing the eclipse command
-        else if (currentState === runningCommand) {
+        else if (currentState === runningCommand && currentProcessId == executionId) {
           console.log("*** msg: ", msg);
           if (msg.subType === 'ExecutionFailure') {
             resetState("Could not run the eclipse command. Please try again.");
