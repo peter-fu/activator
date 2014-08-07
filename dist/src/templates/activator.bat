@@ -76,6 +76,9 @@ set _JAVACMD=%JAVACMD%
 if "%_JAVACMD%"=="" (
   if not "%JAVA_HOME%"=="" (
     if exist "%JAVA_HOME%\bin\java.exe" set "_JAVACMD=%JAVA_HOME%\bin\java.exe"
+
+    rem if there is a java home set we make sure it is the first picked up when invoking 'java'
+    SET "PATH=%JAVA_HOME%\bin;%PATH%"
   )
 )
 
@@ -122,7 +125,7 @@ if "%JAVAOK%"=="false" (
 )
 
 rem Check what Java version is being used to determine what memory options to use
-for /f "tokens=3" %%g in ('"%_JAVACMD%" -version 2^>^&1 ^| findstr /i "version"') do (
+for /f "tokens=3" %%g in ('java -version 2^>^&1 ^| findstr /i "version"') do (
     set JAVA_VERSION=%%g
 )
 
