@@ -1,18 +1,22 @@
 <div id="appStatus">
   <button class="running" data-bind="css: {active: onoff.active, working: onoff.working, disabled: onoff.disabled},  click: onoff.click">
-    <svg data-bind="svg: '/assets/icons/onoff.svg'"/>
-    <span data-bind="text: onoff.text"></span>
+    <svg class="icon" data-bind="svg: '/assets/icons/onoff.svg'"/>
+    <span class="tooltip" data-bind="text: onoff.text"></span>
+    <span class="sticker success"><span class="shape"><svg class="mark" data-bind="svg: '/assets/icons/success-mini.svg'"/></span></span>
   </button>
   <button class="refresh" data-bind="css: {active: compile.active, working: compile.working, disabled: compile.disabled},  click: compile.click">
-    <svg data-bind="svg: '/assets/icons/build.svg'"/>
-    <span data-bind="text: compile.text"></span>
+    <svg class="icon" data-bind="svg: '/assets/icons/build.svg'"/>
+    <span class="tooltip" data-bind="text: compile.text"></span>
+    <span class="sticker success"><span class="shape"><svg class="mark" data-bind="svg: '/assets/icons/success-mini.svg'"/></span></span>
   </button>
   <button class="console" data-bind="css: {active: run.active, working: run.working, disabled: run.disabled},  click: run.click">
-    <svg data-bind="svg: '/assets/icons/run.svg'"/>
-    <span data-bind="text: run.text"></span>
+    <svg class="icon" data-bind="svg: '/assets/icons/run.svg'"/>
+    <span class="tooltip" data-bind="text: run.text"></span>
+    <span class="sticker success"><span class="shape"><svg class="mark" data-bind="svg: '/assets/icons/success-mini.svg'"/></span></span>
   </button>
   <button class="testing" data-bind="css: {active: testing.active, working: testing.working, disabled: testing.disabled},  click: testing.click">
-    <svg data-bind="svg: '/assets/icons/test.svg'"/>
-    <span data-bind="text: testing.text"></span>
+    <svg class="icon" data-bind="svg: '/assets/icons/test.svg'"/>
+    <span class="tooltip" data-bind="text: testing.text"></span>
+    <span class="sticker success"><span class="shape"><svg class="mark" data-bind="svg: '/assets/icons/success-mini.svg'"/></span></span>
   </button>
 </div>

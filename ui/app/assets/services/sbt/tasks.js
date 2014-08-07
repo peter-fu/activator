@@ -1,11 +1,13 @@
 define([
   'commons/websocket',
   'commons/types',
-  './app'
+  './app',
+  'widgets/notifications/notifications'
 ], function(
   websocket,
   types,
-  app
+  app,
+  notifications
 ) {
 
   // -------------
@@ -76,12 +78,34 @@ define([
   var executions = ko.observableArray([]);
   var tasksById = {};
 
+  var workingTasks = {
+    compile: ko.observable(false),
+    run: ko.observable(false),
+    test: ko.observable(false)
+  }
+
   function removeExecution(id, succeeded) {
     var execution = executionsById[id];
     if (execution) {
       // we want succeeded flag up-to-date when finished notifies
       execution.succeeded(true);
       execution.finished(new Date());
+
+      var event = new CustomEvent('TaskSuccess', { detail: { command: execution.command } });
+      document.body.dispatchEvent(event);
+
+      switch(execution.command){
+        case "compile":
+          workingTasks.compile(false);
+          break;
+        case "run":
+          workingTasks.run(false);
+          break;
+        case "test":
+          workingTasks.test(false);
+          break;
+      }
+
       delete executionsById[execution.executionId];
     }
   }
@@ -157,6 +181,18 @@ define([
       }
     }());
 
+    switch(execution.command){
+      case "compile":
+        workingTasks.compile(true);
+        break;
+      case "run":
+        workingTasks.run(true);
+        break;
+      case "test":
+        workingTasks.test(true);
+        break;
+    }
+
     debug && console.log("Waiting execution ", execution);
     // we want to be in the by-id hash before we notify
     // on the executions array
@@ -206,6 +242,7 @@ define([
     requestExecution: requestExecution,
     cancelExecution: cancelExecution,
     executions: executions,
+    workingTasks: workingTasks,
     active: {
       turnedOn:     "",
       compiling:    "",

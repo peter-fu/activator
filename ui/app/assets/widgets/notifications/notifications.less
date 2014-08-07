@@ -6,8 +6,24 @@
 #notifications {
   dt {
     text-align: center;
+    position: relative;
+    overflow: hidden;
   }
-  span {
+  .success {
+    top: 16px;
+    left: 16px;
+    width: 20px;
+    height: 20px;
+    .shape {
+      background: @blue;
+      padding: 4px;
+      g {
+        fill: white;
+      }
+    }
+  }
+
+  .counter {
     display: inline-block;
     .square(30px);
     line-height: 24px;
@@ -15,4 +31,5 @@
     border: 3px solid @grey-dkr;
     font-size: 11px;
   }
+
 }
