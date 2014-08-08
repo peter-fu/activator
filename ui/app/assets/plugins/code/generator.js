@@ -20,18 +20,18 @@ define(['commons/utils', 'commons/streams', 'services/sbt', 'services/ajax'], fu
       this.pluginFileLocation = args.projectFileLocation;
       this.pluginFileContent = args.pluginFileContent;
       this.sbtCommand = args.sbtCommand;
-      this.processTimeIntervalId = -1;
+      this.processTimeoutId = -1;
       this.currentState = idle;
-      this.currentProcessId = 0;
+      this.currentExecutionId = 0;
       this.subscription = null;
     }
   });
 
   var setNewTimeout = function() {
     // Delete existing timeout
-    clearInterval(generator.processTimeIntervalId);
+    clearTimeout(generator.processTimeoutId);
     // If the process takes more than n seconds we generate a message that it might be good to retry
-    generator.processTimeIntervalId = setInterval(function() { logs.push({message: "The process seems stuck. Press OK and please retry."})}, 120 * 1000);
+    generator.processTimeoutId = setTimeout(function() { logs.push({message: "The process seems stuck. Press OK and please retry."})}, 60 * 1000);
   };
 
   var start = function() {
@@ -51,7 +51,7 @@ define(['commons/utils', 'commons/streams', 'services/sbt', 'services/ajax'], fu
         logs.push({message: "Cannot start process since is already in progress."});
       } else {
         generator.currentState = checkingProjectFile;
-        logs.push({message: "Looking for an existing project files."});
+        logs.push({message: "Looking for existing project files."});
 
         // Look for a ".project" file in the home directory to see if there already is an existing Eclipse project
         ajax.browse(serverAppModel.location + "/" + generator.projectFile).done(function (data) {
@@ -71,10 +71,11 @@ define(['commons/utils', 'commons/streams', 'services/sbt', 'services/ajax'], fu
 
   var checkCommand = function() {
     generator.currentState = checkingCommand;
-    logs.push({message: "Checking if the " + generator.sbtCommand + " command is available in sbt..."});
+    logs.push({message: "Trying to run \'" + generator.sbtCommand + "\'..."});
     var result = runSbtCommand();
     result.done(function(data) {
-      generator.currentProcessId = data.id;
+      // Note: the result from sbt is asynchronous and the stream subscription below will continue to drive the process
+      generator.currentExecutionId = data.id;
     }).fail(function() {
       resetState("Did not receive any response from server. Please try again.");
     });
@@ -85,7 +86,8 @@ define(['commons/utils', 'commons/streams', 'services/sbt', 'services/ajax'], fu
     logs.push({message: "Running the " + generator.sbtCommand + " command."});
     var result = runSbtCommand();
     result.done(function(data) {
-      generator.currentProcessId = data.id;
+      // Note: the result from sbt is asynchronous and the stream subscription below will continue to drive the process
+      generator.currentExecutionId = data.id;
     }).fail(function() {
       resetState("Did not receive any response from server. Please try again.");
     });
@@ -97,6 +99,7 @@ define(['commons/utils', 'commons/streams', 'services/sbt', 'services/ajax'], fu
     logs.push({message: "Creating sbt IDE plugin file (" + fileLocation + ")."});
     ajax.createContent(fileLocation, generator.pluginFileContent).done(function () {
       // Adding the plugin file should trigger an automatic restart of sbt hence the state shift here
+      // Note: the result from sbt is asynchronous and the stream subscription below will continue to drive the process
       generator.currentState = restartingSbt;
       setNewTimeout();
       logs.push({message: "Waiting for sbt to restart..."});
@@ -106,7 +109,7 @@ define(['commons/utils', 'commons/streams', 'services/sbt', 'services/ajax'], fu
   };
 
   var resetState = function(msg) {
-    clearInterval(generator.processTimeIntervalId);
+    clearInterval(generator.processTimeoutId);
     debug && console.log(msg);
     logs.push({message: msg});
     stream.unsubscribe(generator.subscription);
@@ -124,14 +127,14 @@ define(['commons/utils', 'commons/streams', 'services/sbt', 'services/ajax'], fu
           var executionId = msg.event.id;
           var subType = msg.subType;
 
-          // State : After checking if the 'eclipse' command is available in sbt
-          if (generator.currentState === checkingCommand && generator.currentProcessId == executionId) {
+          // State : After checking if the command is available in sbt
+          if (generator.currentState === checkingCommand && generator.currentExecutionId == executionId) {
             if (subType === 'ExecutionFailure') {
-              logs.push({message: "Command not available - trying to add it."});
+              logs.push({message: "\'" + generator.sbtCommand + "\' not available, trying to add a plugin to provide it."});
               generateFile();
             } else if (subType === 'ExecutionSuccess') {
               setNewTimeout();
-              logs.push({message: "sbt command existed and has been executed."});
+              logs.push({message: "\'" + generator.sbtCommand + "\' command was available and has been run."});
               resetState("Required files generated. Open your IDE and import project.");
             }
           }
@@ -142,12 +145,12 @@ define(['commons/utils', 'commons/streams', 'services/sbt', 'services/ajax'], fu
             runCommand();
           }
 
-          // State: After executing the eclipse command
-          else if (generator.currentState === runningCommand && generator.currentProcessId == executionId) {
+          // State: After running the command
+          else if (generator.currentState === runningCommand && generator.currentExecutionId == executionId) {
             if (subType === 'ExecutionFailure') {
-              resetState("Could not run the eclipse command. Please try again.");
+              resetState("Could not run the \'" + generator.sbtCommand + "\' command. Please try again.");
             } else if (subType === 'ExecutionSuccess') {
-              logs.push({message: "eclipse sbt command has been executed."});
+              logs.push({message: "\'" + generator.sbtCommand + "\' command has been executed."});
               resetState("Required files generated. Open your IDE and import project.");
             }
           }

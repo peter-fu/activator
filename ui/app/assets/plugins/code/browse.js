@@ -57,10 +57,10 @@ define(['text!./browse.html', 'commons/utils', 'commons/widget', './files', 'ser
       });
     },
     generateEclipseProject: function() {
-      eclipse.generate(true);
+      eclipse.generate(true); // overrideExisting = true
     },
     generateIdeaProject: function() {
-      idea.generate(true);
+      idea.generate(true); // overrideExisting = true
     },
     newSomething: function(isDirectory) {
       var self = this;

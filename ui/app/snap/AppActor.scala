@@ -150,8 +150,7 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
 
         log.debug(s"Opening new client actor for sbt client ${client}")
         clientCount += 1
-        // Hacky JSON creation here since Sbt.wrapEvent expects an Event (and that is package private to sbt.protocol)
-        self ! NotifyWebSocket(JsObject(Seq("type" -> JsString("sbt"), "subType" -> JsString("ClientOpened"), "event" -> JsArray())))
+        self ! NotifyWebSocket(AppActor.clientOpenedJsonResponse)
         clientActor = Some(context.actorOf(Props(new SbtClientActor(client)), name = s"client-$clientCount"))
         clientActor.foreach(context.watch(_))
         flushPending()
@@ -308,8 +307,7 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
             client.possibleAutocompletions(partialCommand, detailLevel = detailLevelOption.getOrElse(0))
           case RequestSelfDestruct =>
             client.requestSelfDestruct()
-            // just return something since the map clause expects a Future
-            Future(0L)
+            Future.successful()
         }
       } recover {
         case NonFatal(e) =>
@@ -323,4 +321,8 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
       } pipeTo sender
     }
   }
+}
+
+object AppActor {
+  val clientOpenedJsonResponse = JsObject(Seq("type" -> JsString("sbt"), "subType" -> JsString("ClientOpened"), "event" -> JsObject(Nil)))
 }
