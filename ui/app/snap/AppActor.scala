@@ -295,9 +295,6 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
       }
       case structure: MinimalBuildStructure =>
         forwardOverSocket(BuildStructureChanged(structure))
-      // The RequestSelfDestruct must be before the ClientAppRequest check below or else it will slurp up the RSD as well (see hierarchy)
-      case RequestSelfDestruct =>
-        client.requestSelfDestruct()
       case req: ClientAppRequest => {
         req match {
           case RequestExecution(command) =>
@@ -309,9 +306,10 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
           case PossibleAutoCompletions(partialCommand, detailLevelOption) =>
             log.debug("possible autocompletions for " + partialCommand)
             client.possibleAutocompletions(partialCommand, detailLevel = detailLevelOption.getOrElse(0))
-          case _ =>
-            // not supposed to happen - will remove compilation warning though
-            null
+          case RequestSelfDestruct =>
+            client.requestSelfDestruct()
+            // just return something since the map clause expects a Future
+            Future(0L)
         }
       } recover {
         case NonFatal(e) =>

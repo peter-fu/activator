@@ -15,7 +15,6 @@ define(['commons/utils', 'commons/streams', 'services/sbt', 'services/ajax'], fu
   var Generator = utils.Class("Generator", {
     // all the stuff in here
     init: function (args) {
-      var self = this;
       this.overrideExisting = args.overrideExisting;
       this.projectFile = args.projectFile;
       this.pluginFileLocation = args.projectFileLocation;
@@ -100,7 +99,7 @@ define(['commons/utils', 'commons/streams', 'services/sbt', 'services/ajax'], fu
       // Adding the plugin file should trigger an automatic restart of sbt hence the state shift here
       generator.currentState = restartingSbt;
       setNewTimeout();
-      logs.push({message: "Waiting for sbt to restart"});
+      logs.push({message: "Waiting for sbt to restart..."});
     }).fail(function(err) {
       resetState("Could not create sbt IDE plugin file. Please try again.");
     });
@@ -110,10 +109,8 @@ define(['commons/utils', 'commons/streams', 'services/sbt', 'services/ajax'], fu
     clearInterval(generator.processTimeIntervalId);
     debug && console.log(msg);
     logs.push({message: msg});
-    generator.currentState = idle;
-    generator.currentProcessId = 0;
     stream.unsubscribe(generator.subscription);
-    // theGenerator = null ?
+    generator = null;
   };
 
   /**
