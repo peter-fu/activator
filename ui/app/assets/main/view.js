@@ -5,12 +5,14 @@ define([
   'widgets/header/header',
   'widgets/navigation/navigation',
   'widgets/layout/layout',
-  'widgets/panels/panels'
+  'widgets/panels/panels',
+  'widgets/modals/modals'
 ], function(
   header,
   navigation,
   layout,
-  panels
+  panels,
+  modals
 ) {
 
   // Get the internal states from navigation and pannels
@@ -29,7 +31,8 @@ define([
         .append(navigation.render())
         .append(header.render(ViewState))
         .append(layout.render())
-        .append(panels.render());
+        .append(panels.render())
+        .append(modals.render());
     }
   }
 

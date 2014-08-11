@@ -168,6 +168,9 @@ define(['commons/streams', 'commons/events', 'commons/utils'], function(streams,
         } else {
           debug && console.log("ignoring ValueChanged on " + name);
         }
+      },
+      ClientOpened: function(event) {
+        debug && console.log("Client opened")
       }
   }
 

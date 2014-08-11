@@ -193,6 +193,40 @@ define(function() {
     }
   }());
 
+  ko.bindingHandlers.scrollToBottom = {
+    init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+      setTimeout(function() {
+        element.scrollTop = 9e9;
+      }, 100);
+      element.addEventListener("DOMNodeInserted", function() {
+        element.scrollTop = 9e9;
+      }, true);
+    }
+  }
+
+  ko.bindingHandlers.include = {
+    init: function(elem, valueAccessor) {
+    },
+    update: function(elem, valueAccessor) {
+      var placeholder = ko.virtualElements.firstChild(elem);
+      if (!placeholder){
+        placeholder = document.createComment("placeholder");
+        elem.parentNode.insertBefore(placeholder, elem.nextSibling);
+      }
+      var inc = ko.utils.unwrapObservable(valueAccessor());
+      setTimeout(function(){
+        $(placeholder).replaceWith(inc);
+      },0);
+    }
+  }
+  ko.virtualElements.allowedBindings.include = true;
+
+  window.bindhtml = function(html, model) {
+    var dom = $(html)[0];
+    ko.applyBindings(model, dom);
+    return dom;
+  }
+
   return {
     registerTemplate: registerTemplate,
     templates: templates
