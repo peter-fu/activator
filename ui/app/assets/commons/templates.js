@@ -147,13 +147,20 @@ define(function() {
     return {
       init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
         var memo = valueAccessor();
+
+        // a little hack to work around a bug while we figure out the real fix
+        if (typeof(memo) != 'function') {
+          console.error("This is a bug - memo isn't a function, it is: ", typeof(memo), memo);
+          return;
+        }
+
         if (!memo()) {
           memo([0,0]);
         }
         setTimeout(function() {
           element.scrollLeft = memo()[0];
           element.scrollTop  = memo()[1];
-        }, 1);// Wait for everything to be displayed
+        }, 100);// Wait for everything to be displayed
         element.addEventListener('scroll', function(e) {
           memo([element.scrollLeft,element.scrollTop]);
         });
