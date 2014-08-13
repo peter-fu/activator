@@ -2,15 +2,16 @@ import sbt._
 import Keys._
 
 object Dependencies {
-  val sbtVersion = "0.13.6-MSERVER-4"
-  val sbtLibraryVersion = "0.13.6-MSERVER-4" // for sbtIO on scala 2.11
+  val sbtVersion = "0.13.6-M1"
+  val sbtLibraryVersion = "0.13.6-M1" // for sbtIO on scala 2.11
+
   val sbtPluginVersion = "0.13"
   val sbtPluginScalaVersion = "2.11.1"
   val scalaVersion = "2.11.1"
   val luceneVersion = "4.2.1"
 
   val templateCacheVersion = "1.0-5b61a82baa9bb0d9fe161752d6721fe6551eed54"
-  val sbtRcVersion = "1.0-7c56ef772a213042f90fefb9cc8717b7bfa6732f"
+  val sbtRcVersion = "1.0-1639bb1219d804b8365c0a760493eca1c5bc1223"
 
   val playVersion = "2.3.2"
   val akkaVersion = "2.3.4"

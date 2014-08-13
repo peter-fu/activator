@@ -221,6 +221,10 @@ define([
 
   // subTypeEventStream("BuildStructureChanged")
 
+  subTypeEventStream("ClientOpened").each(function(message) {
+    debug && console.log("Client opened");
+  });
+
   var valueChanged = subTypeEventStream("ValueChanged").map(function(message) {
     return {
       key: message.event.key.key.name,
