@@ -137,7 +137,6 @@ class EventActor extends Actor {
       // Note: We don't have to keep track of it, because our context monitors our children.
       sender ! (context actorOf newListenerProps)
     case msg: String =>
-      println(s"Sending msg to ${context.children.toIndexedSeq.size} children")
       context.children foreach (_ ! msg)
     // TODO - Take in event messages we can adapt into JSON strings...
   }

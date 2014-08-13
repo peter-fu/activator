@@ -79,7 +79,7 @@ define([
       if (!isOpened()) return;
       pendingPing = { request: 'Ping', cookie: randomShort().toString() };
       send(pendingPing);
-      setTimeout(ping, 5000);
+      setTimeout(ping, 1000*25); // IE11 needs < 30s ping time, see: https://projects.tigase.org/boards/15/topics/1982?r=1985
     }
 
     return ping;

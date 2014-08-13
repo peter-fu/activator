@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="12px" height="12px" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.0.4 (8053) - http://www.bohemiancoding.com/sketch -->
+    <title>success-mini</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="success-mini" sketch:type="MSArtboardGroup" fill="#899CA9">
+            <path d="M0,5.05719096 L0,9.05719096 C0,10.3905243 1.33333333,13.057191 4,10.3905243 L11.3333333,3.05719096 C12.6666667,1.72385763 10.6666667,0.390524292 9.33333333,1.72385763 C8,3.05719096 4,7.05719096 3.33333333,7.05719096 C2.66666667,7.05719096 2.66666667,6.39052429 2.66666667,5.05719096 C2.66666667,3.72385763 0,3.05719096 0,5.05719096 L0,5.05719096 Z" id="shape" sketch:type="MSShapeGroup"></path>
+        </g>
+    </g>
+</svg>

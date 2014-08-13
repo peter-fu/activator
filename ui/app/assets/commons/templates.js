@@ -106,10 +106,10 @@ define(function() {
   }
 
   // Just pass a function in the template, to call it
-  ko.bindingHandlers['call'] = {
-      init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-          valueAccessor()(element, allBindings, viewModel, bindingContext);
-      }
+  ko.bindingHandlers['exec'] = {
+    init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+      valueAccessor()(element, allBindings, viewModel, bindingContext);
+    }
   };
   // Log
   ko.bindingHandlers['log'] = {
@@ -205,8 +205,13 @@ define(function() {
   ko.bindingHandlers.svg = {
     init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
       $.get(valueAccessor(), function(data) {
-        var img = document.adoptNode(data.querySelector('svg'));
-        $(element).replaceWith(img);
+        var img = $(document.adoptNode(data.querySelector('svg')));
+        $(element)
+          .html(img.html())
+          .attr({
+            width: img.attr('width'),
+            height: img.attr('height')
+          });
       }, 'xml');
     }
   }
