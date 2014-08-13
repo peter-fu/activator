@@ -2,8 +2,8 @@ import sbt._
 import Keys._
 
 object Dependencies {
-  val sbtVersion = "0.13.6-M1"
-  val sbtLibraryVersion = "0.13.6-M1" // for sbtIO on scala 2.11
+  val sbtVersion = "0.13.6-M2"
+  val sbtLibraryVersion = "0.13.6-M2" // for sbtIO on scala 2.11
 
   val sbtPluginVersion = "0.13"
   val sbtPluginScalaVersion = "2.11.1"
