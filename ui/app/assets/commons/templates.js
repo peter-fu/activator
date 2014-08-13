@@ -147,6 +147,13 @@ define(function() {
     return {
       init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
         var memo = valueAccessor();
+
+        // a little hack to work around a bug while we figure out the real fix
+        if (typeof(memo) != 'function') {
+          console.error("This is a bug - memo isn't a function, it is: ", typeof(memo), memo);
+          return;
+        }
+
         if (!memo()) {
           memo([0,0]);
         }

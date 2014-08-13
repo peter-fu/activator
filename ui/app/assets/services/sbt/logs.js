@@ -26,9 +26,9 @@ define([
     });
 
   logEvent
-    .match(function(message) {
+    .match(function(m) {
       // Standard out
-      return event.entry && event.entry.type == "stdout";
+      return m.event.entry && m.event.entry.type == "stdout";
     })
     .each(function(message){
       stdout.push(message);
