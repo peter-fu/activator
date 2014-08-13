@@ -1,11 +1,13 @@
 define([
   'commons/websocket',
   'commons/types',
-  './app'
+  './app',
+  'widgets/notifications/notifications'
 ], function(
   websocket,
   types,
-  app
+  app,
+  notifications
 ) {
 
   // -------------
@@ -26,6 +28,19 @@ define([
     // TODO return something better (with the return value already parsed)
     return sbtRequest('possibleAutocompletions', {
       partialCommand: partialCommand
+    }).pipe(function(completions) {
+      return $.map(completions.choices, function(completion){
+        return {
+          title: completion.display,
+          subtitle: "run sbt task " + completion.display,
+          type: "Sbt",
+          url: false,
+          execute: partialCommand + completion.append,
+          callback: function() {
+            requestExecution(partialCommand + completion.append);
+          }
+        }
+      });
     });
   }
 
@@ -63,19 +78,41 @@ define([
   var executions = ko.observableArray([]);
   var tasksById = {};
 
+  var workingTasks = {
+    compile: ko.observable(false),
+    run: ko.observable(false),
+    test: ko.observable(false)
+  }
+
   function removeExecution(id, succeeded) {
     var execution = executionsById[id];
     if (execution) {
       // we want succeeded flag up-to-date when finished notifies
       execution.succeeded(true);
       execution.finished(new Date());
+
+      var event = new CustomEvent('TaskSuccess', { detail: { command: execution.command } });
+      document.body.dispatchEvent(event);
+
+      switch(execution.command){
+        case "compile":
+          workingTasks.compile(false);
+          break;
+        case "run":
+          workingTasks.run(false);
+          break;
+        case "test":
+          workingTasks.test(false);
+          break;
+      }
+
       delete executionsById[execution.executionId];
     }
   }
 
-  var sbtEventStream = websocket.subscribe().equal('type','sbt');
+  var sbtEventStream = websocket.subscribe().matchOnAttribute('type','sbt');
   var subTypeEventStream = function(subType) {
-    return sbtEventStream.fork().equal('subType',subType);
+    return sbtEventStream.fork().matchOnAttribute('subType',subType);
   }
 
   subTypeEventStream("TaskStarted").each(function(message) {
@@ -144,6 +181,18 @@ define([
       }
     }());
 
+    switch(execution.command){
+      case "compile":
+        workingTasks.compile(true);
+        break;
+      case "run":
+        workingTasks.run(true);
+        break;
+      case "test":
+        workingTasks.test(true);
+        break;
+    }
+
     debug && console.log("Waiting execution ", execution);
     // we want to be in the by-id hash before we notify
     // on the executions array
@@ -172,6 +221,10 @@ define([
 
   // subTypeEventStream("BuildStructureChanged")
 
+  subTypeEventStream("ClientOpened").each(function(message) {
+    debug && console.log("Client opened");
+  });
+
   var valueChanged = subTypeEventStream("ValueChanged").map(function(message) {
     return {
       key: message.event.key.key.name,
@@ -180,7 +233,7 @@ define([
   });
 
   // discoveredMainClasses
-  valueChanged.equal('key', 'discoveredMainClasses').each(function(message) {
+  valueChanged.matchOnAttribute('key', 'discoveredMainClasses').each(function(message) {
     app.mainClasses(message.value); // All main classes
     if (!app.currentMainClass() && message.value[0]){
       app.currentMainClass(message.value[0]); // Selected main class, if empty
@@ -193,6 +246,7 @@ define([
     requestExecution: requestExecution,
     cancelExecution: cancelExecution,
     executions: executions,
+    workingTasks: workingTasks,
     active: {
       turnedOn:     "",
       compiling:    "",

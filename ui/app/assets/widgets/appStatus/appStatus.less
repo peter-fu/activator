@@ -35,6 +35,19 @@
   height: 60px;
   padding: 6px 0 5px;
   position: relative;
+  .success {
+    top: 5px;
+    left: 5px;
+    width: 20px;
+    height: 20px;
+    .shape {
+      background: @blue;
+      padding: 4px;
+      g {
+        fill: white;
+      }
+    }
+  }
   button {
     display: inline-block;
     background: none;
@@ -43,7 +56,7 @@
     .cover();
     border-radius: 3px;
     .transition();
-    span {
+    .tooltip {
       position: absolute;
       top: 35px;
       left: 50%;
@@ -68,32 +81,28 @@
     }
     &:hover {
       background: @slate-ltr;
-      span {
+      .tooltip {
         display: block;
       }
     }
     &:active, &.working {
       background: @slate-dkr;
     }
-    svg {
+    .icon {
       position: absolute;
       left: 5px;
       top: 5px;
     }
-    g {
-      .transition();
-      fill: @grey;
-    }
 
-    &.working g {
+    &.working .icon g {
       -webkit-animation: 300ms glowSvg infinite alternate linear;
       -moz-animation: 300ms glowSvg infinite alternate linear;
       animation: 300ms glowSvg infinite alternate linear;
     }
-    &:hover g {
+    &:hover .icon g {
       fill: fadeout(@blue, 40%);
     }
-    &.active g {
+    &.active .icon g {
       fill: @blue;
     }
     &.disabled {
@@ -102,11 +111,11 @@
       opacity: .5;
       &:hover {
         background: none !important;
-        span {
+        .tooltip {
           display: none;
         }
       }
-      g {
+      .icon g {
         fill: @grey;
       }
     }
