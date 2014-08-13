@@ -307,7 +307,7 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
             client.possibleAutocompletions(partialCommand, detailLevel = detailLevelOption.getOrElse(0))
           case RequestSelfDestruct =>
             client.requestSelfDestruct()
-            Future.successful()
+            Future.successful(None)
         }
       } recover {
         case NonFatal(e) =>
