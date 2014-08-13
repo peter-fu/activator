@@ -1,0 +1,56 @@
+@import "../../commons/_base";
+
+article.logsPlugin {
+
+  table {
+    .monospace();
+    table-layout: fixed;
+    width: 100%;
+    th, td {
+      padding: 3px 5px 3px 20px;
+      border-top: 1px solid @slate-ltr;
+    }
+    th {
+      text-align: left;
+      width: 60%;
+    }
+    tr.error {
+      background: @red;
+      color: #fff;
+    }
+    tr.active {
+      color: #fff;
+    }
+  }
+
+  .logs-wrapper {
+    .expand(5);
+  }
+
+  .logs {
+
+    li {
+      padding: 4px 16px;
+      box-shadow: 0 1px 0 @slate-ltr;
+      border-left: 3px solid @grey;
+      .monospace();
+      color: @grey;
+      line-height: 16px;
+    }
+
+    li[data-type='success'] { border-color: #6AB729; color: #D7F3AC; }
+    li[data-type='stderr']  { border-color: #E25758; color: @red-ltr; }
+    li[data-level='error']  { border-color: #E25758; color: @red-ltr; }
+    li[data-level='warn']   { border-color: #F89614; }
+    li[data-level='info']   { border-color: #53cdec; }
+    li[data-level='debug']  { border-color: @slate; color: @grey-dkr; }
+  }
+
+
+  .table-wrapper, ul {
+    .expand();
+    overflow: auto;
+  }
+
+
+}
