@@ -16,6 +16,7 @@ define([
 ) {
 
   var subplugin = ko.observable();
+
   var sbtExecCommand = function(cmd){
     sbt.tasks.requestExecution(cmd);
   }
