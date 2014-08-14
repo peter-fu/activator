@@ -16,7 +16,7 @@ define([
   //     return it.panel;
   //   }));
   // }, []);
-  var panels = ['plugins/tutorial/tutorial'];
+  var panels = ['plugins/tutorial/tutorialPanel'];
 
   currentPanel = ko.observable();
 
@@ -26,7 +26,7 @@ define([
 
   var switchPanel = function(panel) {
     require([panel], function(p) {
-      $("#panelWrapper").replaceWith(p.renderPanel());
+      $("#panelWrapper").replaceWith(p.render());
       currentPanel(panel);
     });
   }

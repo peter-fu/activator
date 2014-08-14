@@ -146,7 +146,15 @@ define(function() {
     var memos = {}
     return {
       init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+        element.addEventListener('scroll', function(e) {
+          var memo = valueAccessor();
+          memos[memo] = [element.scrollLeft,element.scrollTop];
+        });
+      },
+      update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
         var memo = valueAccessor();
+        if (!memos[memo]) {
+          memos[memo] = [0,0];
 
         // a little hack to work around a bug while we figure out the real fix
         if (typeof(memo) != 'function') {
@@ -158,15 +166,13 @@ define(function() {
           memo([0,0]);
         }
         setTimeout(function() {
-          element.scrollLeft = memo()[0];
-          element.scrollTop  = memo()[1];
-        }, 100);// Wait for everything to be displayed
-        element.addEventListener('scroll', function(e) {
-          memo([element.scrollLeft,element.scrollTop]);
-        });
+          debug && console.log(memo, memos[memo])
+          element.scrollLeft = memos[memo][0];
+          element.scrollTop  = memos[memo][1];
+        }, 1);// Wait for everything to be displayed
       }
     }
-  }());
+  }});
 
   function throttle(f){
     var timer;
@@ -175,6 +181,7 @@ define(function() {
       timer = setTimeout(f, 1);
     }
   }
+
   ko.bindingHandlers.logScroll = {
     init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
       var memo = valueAccessor();
