@@ -27,7 +27,7 @@ define([
           TutorialState.page(null);
           TutorialState.index(null);
         } else {
-          var id = parseFloat(url.parameters[0]);
+          var id = parseInt(url.parameters[0]);
           var p = TutorialState.pages()[id];
           TutorialState.page(p);
           TutorialState.index(id);
