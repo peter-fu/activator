@@ -172,7 +172,7 @@ define(function() {
         }, 1);// Wait for everything to be displayed
       }
     }
-  }());
+  }});
 
   function throttle(f){
     var timer;
@@ -181,6 +181,7 @@ define(function() {
       timer = setTimeout(f, 1);
     }
   }
+
   ko.bindingHandlers.logScroll = {
     init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
       var memo = valueAccessor();
