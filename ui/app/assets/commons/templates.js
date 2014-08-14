@@ -106,10 +106,10 @@ define(function() {
   }
 
   // Just pass a function in the template, to call it
-  ko.bindingHandlers['call'] = {
-      init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-          valueAccessor()(element, allBindings, viewModel, bindingContext);
-      }
+  ko.bindingHandlers['exec'] = {
+    init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+      valueAccessor()(element, allBindings, viewModel, bindingContext);
+    }
   };
   // Log
   ko.bindingHandlers['log'] = {
@@ -155,9 +155,18 @@ define(function() {
         var memo = valueAccessor();
         if (!memos[memo]) {
           memos[memo] = [0,0];
+
+        // a little hack to work around a bug while we figure out the real fix
+        if (typeof(memo) != 'function') {
+          console.error("This is a bug - memo isn't a function, it is: ", typeof(memo), memo);
+          return;
+        }
+
+        if (!memo()) {
+          memo([0,0]);
         }
         setTimeout(function() {
-          console.log(memo, memos[memo])
+          debug && console.log(memo, memos[memo])
           element.scrollLeft = memos[memo][0];
           element.scrollTop  = memos[memo][1];
         }, 1);// Wait for everything to be displayed
@@ -209,8 +218,13 @@ define(function() {
   ko.bindingHandlers.svg = {
     init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
       $.get(valueAccessor(), function(data) {
-        var img = document.adoptNode(data.querySelector('svg'));
-        $(element).replaceWith(img);
+        var img = $(document.adoptNode(data.querySelector('svg')));
+        $(element)
+          .html(img.html())
+          .attr({
+            width: img.attr('width'),
+            height: img.attr('height')
+          });
       }, 'xml');
     }
   }

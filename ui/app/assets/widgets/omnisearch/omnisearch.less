@@ -45,12 +45,13 @@
     overflow-y: auto;
     background-color: @slate;
     font-size: 13px;
+    .transform(translate3d(0,0,0)); /* fix a glitch in chrome rendering, TODO remove */
     &.active {
       display: block;
     }
     &.empty:before {
       display: block;
-      content: '(no results found)';
+      content: 'no results found';
       color: @grey;
       padding: 10px 30px;
     }
@@ -69,23 +70,21 @@
         .subtitle {
           color: @red-ltr;
         }
-        .type {
-          color: white;
+        svg g {
+          fill: white;
         }
       }
       .title {
         color: white;
         font-weight: 500;
-        padding: 0 30px;
+        padding: 0 30px 0 10px;
       }
       .subtitle {
         color: @grey;
         .expand();
       }
-      .type {
-        color: @blue;
-        text-transform: uppercase;
-        padding: 0 20px;
+      svg {
+        margin: 1px 0 0;
       }
     }
   }
@@ -94,15 +93,13 @@
     display: block;
     position: absolute;
     z-index: 99;
-    top: 15px;
-    right: 15px;
-    height: 20px;
-    width: 20px;
-    background: red;
+    top: 20px;
+    right: 20px;
+    height: 10px;
+    width: 10px;
+    background: @blue;
+    border-radius: 10px;
   }
 
-  input:focus + ul {
-    display: block;
-  }
 }
 

@@ -13,28 +13,46 @@ define([
   var defaultSuggestions = [],
       searchString = ko.observable("").extend({ throttle: 200 }),
       searchStringLast = "",
-      busy = ko.observable(false),
+      pendingQueries = ko.observable(0),
       active = ko.observable(false),
-      options = ko.observable([]),
-      selected = ko.observable(0);
+      options = ko.observable([]).extend({ notify: 'always' }),
+      selected = ko.observable(0),
+      empty = ko.computed(function() {
+        return searchString().length >= 2 && options().length == 0;
+      });
+
+  options.subscribe(function() {
+    pendingQueries(pendingQueries()-1);
+  })
 
   searchString.subscribe(function(keywords) {
     // Don't search until at least two characters are entered and search string isn't the same as last
+    pendingQueries(pendingQueries()+1);
     if (keywords.length >= 2) {
-      busy(true);
-      search.search(keywords, options);
+      search.combinedSearch(keywords, options);
     } else {
       options([]);
-      busy(false);
-      active(false);
+      pendingQueries(0);
     }
   });
+
+  function scrollToSelected(){
+    var $omnisearch = $('#omnisearch ul');
+    var $selected = $omnisearch.find('li.selected');
+    if ($selected.position().top < 0) {
+      $omnisearch.scrollTop($omnisearch.scrollTop() + $selected.position().top);
+    } else if ($selected.position().top + $selected.outerHeight() >= $omnisearch.height()) {
+      $omnisearch.scrollTop($omnisearch.scrollTop() + $selected.position().top + $selected.outerHeight() - $omnisearch.height());
+    }
+  }
 
   var State = {
 
     options: options,
-    busy: busy,
+    pendingQueries: pendingQueries,
     selected: selected,
+    active: active,
+    empty: empty,
     searchString: searchString,
 
     keyDown: function(state,e) {
@@ -81,34 +99,25 @@ define([
           break;
         // Return
         case 13:
+          e.preventDefault();
           var selectedItem = options()[selected()];
           if (selectedItem) {
-            activate(selectedItem);
+            State.exec(selectedItem);
             e.target.blur();
           }
           break;
       }
     },
 
-    focus: function() {},
+    focus: function() {
+      active(true);
+    },
 
     blur: function() {
       // Delay hiding of omnisearch list to catch mouse click on list before it disappears
       setTimeout(function(){
         active(false);
-        selected(0);
-        searchString("");
-      }, 3500);
-    },
-
-    scrollToSelected: function() {
-      var $omnisearch = $('#omnisearch ul');
-      var $selected = $omnisearch.find('li.selected');
-      if ($selected.position().top < 0) {
-        $omnisearch.scrollTop($omnisearch.scrollTop() + $selected.position().top);
-      } else if ($selected.position().top + $selected.outerHeight() >= $omnisearch.height()) {
-        $omnisearch.scrollTop($omnisearch.scrollTop() + $selected.position().top + $selected.outerHeight() - $omnisearch.height());
-      }
+      }, 100);
     },
 
     onOptionSelected: function(data){
@@ -119,10 +128,12 @@ define([
     },
 
     exec: function(option) {
-      return function() {
-        option.callback(option);
-        options([]);
-      }
+      console.log(option)
+      option.callback(option);
+      options([]);
+      selected(0);
+      searchString("");
+      document.body.focus();
     }
   }
 

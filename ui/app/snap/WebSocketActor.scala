@@ -220,7 +220,7 @@ abstract class WebSocketActor[MessageType](implicit frameFormatter: FrameFormatt
 }
 
 object WebSocketActor {
-  implicit val timeout = Timeout(20.seconds)
+  implicit val timeout = Timeout(30.seconds)
   import play.api.mvc.WebSocket
   import play.api.libs.json._
 

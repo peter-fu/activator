@@ -8,7 +8,6 @@ define([
   './files',
   './browse',
   './view',
-  './openIn',
   'text!./home.html',
   'css!./code.css',
   "widgets/navigation/menu"
@@ -18,7 +17,6 @@ define([
   files,
   Browser,
   Viewer,
-  openIn,
   template
 ){
 
@@ -62,13 +60,9 @@ define([
       else return file;
     });
     self.status = ko.observable('');
-    self.openInEclipse = new openIn.OpenInEclipse();
-    self.openInIdea = new openIn.OpenInIdea();
     self.browser = new Browser({
       directory: self.currentDirectory,
-      rootAppPath: serverAppModel.location,
-      openInEclipse: self.openInEclipse.open.bind(self.openInEclipse),
-      openInIdea: self.openInIdea.open.bind(self.openInIdea)
+      rootAppPath: serverAppModel.location
     });
     self.viewer = new Viewer({
       file: self.currentFile
