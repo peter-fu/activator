@@ -10,7 +10,7 @@ var vendors = [
   'lib/knockout/knockout.debug',
   'css',
   'text',
-  // 'ace/ace'
+  'lib/ace/src/ace'
 ]
 
 var commons = [
