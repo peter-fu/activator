@@ -291,6 +291,8 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
         case finished: TaskFinished => forwardOverSocket(finished)
         case started: TaskStarted => forwardOverSocket(started)
         case taskEvent: TaskEvent => forwardOverSocket(taskEvent)
+        case loaded: BuildLoaded => forwardOverSocket(loaded)
+        case failed: BuildFailedToLoad => forwardOverSocket(failed)
       }
       case structure: MinimalBuildStructure =>
         forwardOverSocket(BuildStructureChanged(structure))

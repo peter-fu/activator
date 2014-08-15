@@ -40,32 +40,16 @@ define([
     Ping();
   }
 
-  function onClose(event) {
-    // Todo, bind modal
-    debug && console.info("WS closed: " + event.code + ": " + event.reason, event)
-    isOpened(false);
-    modals.confirm({});
-    // modals.confirm(reconnect,{
-    //   title: "WebSocket is closed",
-    //   body: noir.Template(function() {
-    //     this.p(function(){ return "Click OK to try to re-connect." })
-    //     this.p(function(){ return "You may have to refresh your this page in your browser." })
-    //   })
-    // });
-  }
-
   function onError(event) {
-    // Todo, bind modal
     debug && console.error("WS error: ", event);
     isOpened(false);
-    modals.confirm({});
-    // modals.confirm(reconnect,{
-    //   title: "WebSocket is closed",
-    //   body: noir.Template(function() {
-    //     this.p(function(){ return "Click OK to try to re-connect." })
-    //     this.p(function(){ return "You may have to refresh your this page in your browser." })
-    //   })
-    // });
+    modals.show({
+      title: "WebSocket is closed",
+      text: "Click OK to try to re-connect. You may have to refresh your this page in your browser.",
+      ok: "Try again",
+      callback: reconnect,
+      cancel: "hide"
+    });
   }
 
   // ---------------------------
@@ -93,7 +77,7 @@ define([
     debug && console.info("WS opening: " + window.wsUrl);
     websocket = new WS(window.wsUrl);
     websocket.addEventListener('open', onOpen);
-    websocket.addEventListener('close', onClose);
+    websocket.addEventListener('close', onError);
     websocket.addEventListener('error', onError);
     websocket.addEventListener("message", SocketStream.push.bind(SocketStream));
   }
