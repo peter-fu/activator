@@ -1,3 +1,7 @@
+/*
+ Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
+ */
+
 define([
   "services/fs",
   "main/plugins",
@@ -140,7 +144,6 @@ define([
   }
 
   return {
-
     render: function(url) {
       layout.renderPlugin(bindhtml(tpl, State))
     },
@@ -189,7 +192,6 @@ define([
             focus.removeClass("focus");
         }
       }
-
     }
   }
 });

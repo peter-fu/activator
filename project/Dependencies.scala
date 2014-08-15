@@ -2,19 +2,21 @@ import sbt._
 import Keys._
 
 object Dependencies {
-  val sbtVersion = "0.13.6-MSERVER-4"
+  val sbtVersion = "0.13.6-M2"
+  val sbtLibraryVersion = "0.13.6-M2" // for sbtIO on scala 2.11
+
   val sbtPluginVersion = "0.13"
   val sbtPluginScalaVersion = "2.11.1"
   val scalaVersion = "2.11.1"
   val luceneVersion = "4.2.1"
 
   val templateCacheVersion = "1.0-5b61a82baa9bb0d9fe161752d6721fe6551eed54"
-  val sbtRcVersion = "1.0-7c56ef772a213042f90fefb9cc8717b7bfa6732f"
+  val sbtRcVersion = "1.0-390beac5be1e4c188004906b8ac2ed2ad9ed9da7"
 
-  val playVersion = "2.3.0"
-  val akkaVersion = "2.3.3"
+  val playVersion = "2.3.2"
+  val akkaVersion = "2.3.4"
   val slickVersion = "2.1.0-M2"
-  val echoPluginVersion = "0.1.3"
+  val echoPluginVersion = "0.1.1.3"
   val activatorAnalyticsVersion = "0.1.5"
 
   val aspectJVersion = "1.7.3"
@@ -28,8 +30,8 @@ object Dependencies {
   val sbtLauncherInterface = "org.scala-sbt" % "launcher-interface" % sbtVersion
 
   // 2.11 sbt
-  val sbtIo                = "org.scala-sbt" %% "io" % sbtVersion
-  val sbtCompletion        = "org.scala-sbt" %% "completion" % sbtVersion
+  val sbtIo                = "org.scala-sbt" %% "io" % sbtLibraryVersion
+  val sbtCompletion        = "org.scala-sbt" %% "completion" % sbtLibraryVersion
 
   // sbtrc projects
   val sbtrcClient          = "com.typesafe.sbtrc" % "client-2-11" % sbtRcVersion

@@ -1,0 +1,54 @@
+@import "../../../commons/_base";
+@import "../../../commons/_animations";
+
+.tasks {
+  > section {
+    .column();
+  }
+
+  table {
+    width: 100%;
+  }
+
+  .tasks-wrapper {
+    height: 140px;
+    th, td {
+      .ellipsis();
+    }
+    tr {
+      cursor: pointer;
+      &:hover {
+        background: @slate-ltr;
+        .status span {
+          opacity: .7;
+        }
+      }
+    }
+    .failed {
+      background: @red;
+      &, a {
+        color: #fff;
+      }
+      &, &+li {
+        border-color: @red-text !important;
+      }
+    }
+    .status {
+      width: 40px;
+      span {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        opacity: .2;
+        background: url(/assets/icons/working-mini.svg) center center no-repeat;
+      }
+    }
+    .active .status span {
+      opacity: 1;
+      .spin();
+    }
+  }
+
+}
+
+

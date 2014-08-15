@@ -122,7 +122,7 @@ if "%JAVAOK%"=="false" (
 )
 
 rem Check what Java version is being used to determine what memory options to use
-for /f "tokens=3" %%g in ('java -version 2^>^&1 ^| findstr /i "version"') do (
+for /f "tokens=3" %%g in ('"%_JAVACMD%" -version 2^>^&1 ^| findstr /i "version"') do (
     set JAVA_VERSION=%%g
 )
 
@@ -136,11 +136,11 @@ for /f "delims=. tokens=1-3" %%v in ("%JAVA_VERSION%") do (
     set BUILD=%%x
 
     set META_SIZE=-XX:MetaspaceSize=64M -XX:MaxMetaspaceSize=256M
-    if "%MINOR%" LSS "8" (
+    if "!MINOR!" LSS "8" (
       set META_SIZE=-XX:PermSize=64M -XX:MaxPermSize=256M
     )
 
-    set MEM_OPTS=%META_SIZE%
+    set MEM_OPTS=!META_SIZE!
  )
 
 rem We use the value of the JAVA_OPTS environment variable if defined, rather than the config.
@@ -153,6 +153,16 @@ rem Loop through the arguments, building remaining args in args variable
 set args=
 :argsloop
 if not "%~1"=="" (
+  rem Checks if the argument contains "-D" and if true, adds argument 1 with 2 and puts an equal sign between them.
+  rem This is done since batch considers "=" to be a delimiter so we need to circumvent this behavior with a small hack.
+  set arg1=%~1
+  if "!arg1:~0,2!"=="-D" (
+   	set "args=%args% "%~1"="%~2""
+    shift
+    shift
+    goto argsloop
+  )
+
   if "%~1"=="-jvm-debug" (
     if not "%~2"=="" (
       rem This piece of magic somehow checks that an argument is a number
@@ -172,7 +182,7 @@ if not "%~1"=="" (
     )
     shift
 
-    set DEBUG_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=!JPDA_PORT!
+    set DEBUG_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=!JPDA_PORT!
     goto argsloop
   )
   rem else
