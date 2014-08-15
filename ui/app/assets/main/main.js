@@ -7,7 +7,7 @@ require.config({
 
 var vendors = [
   'lib/jquery/jquery',
-  'lib/knockout/knockout.debug',
+  'lib/knockout/knockout',
   'css',
   'text',
   'lib/ace/src/ace'
