@@ -1,3 +1,6 @@
+/*
+ Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
+ */
 define([
   "commons/settings"
 ], function(

@@ -1,0 +1,25 @@
+<nav class="menu">
+  <header>
+    <h1>Browse Code</h1>
+    <div class="buttons">
+      <dl class="dropdown">
+        <dt>
+          <svg data-bind="svg: '/assets/icons/gear-mini.svg'"/>
+        </dt>
+        <dd>
+          <a data-bind="click: newDirAtRoot">New folder</a>
+          <a data-bind="click: newFileAtRoot">New file</a>
+          <a data-bind="click: refreshProject">Refresh project</a>
+          <a data-bind="click: revealProject">Reveal in system</a>
+        </dd>
+      </dl>
+    </div>
+  </header>
+  <footer>
+    <span>Options</span>
+  </footer>
+  <div class="browser">
+    <ul data-bind="template: { name: 'nodetemplate', foreach: tree.children }">
+    </ul>
+  </div>
+</nav>
