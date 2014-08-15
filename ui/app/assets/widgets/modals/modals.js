@@ -5,11 +5,32 @@ define([
 
   var modal = $('<div id="modal"></div>').hide();
 
+  function modalKeyboard(e){
+    switch(e.keyCode){
+      case 13:
+        var main = $("button.main",modal);
+        if (main.is(":visible")){
+          main.trigger("click");
+        }
+        break;
+      case 27:
+        var light = $("button.light",modal);
+        if (light.is(":visible")){
+          light.trigger("click");
+        } else {
+          $("button.main",modal).trigger("click");
+        }
+        break;
+    }
+  }
+
   function show(){
     modal.fadeIn("fast");
+    $(document.body).on("keydown", modalKeyboard);
   }
 
   function hide(){
+    $(document.body).off("keydown", modalKeyboard);
     modal.fadeOut("fast", function(){
       modal.html("");
     });

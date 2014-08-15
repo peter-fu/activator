@@ -1,7 +1,7 @@
 /*
  Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
  */
-define([], function() {
+define(['widgets/modals'], function(modals) {
 
   function browse(location) {
     return $.ajax({
@@ -72,6 +72,32 @@ define([], function() {
         content: content
       }
     });
+
+    function buildItems(item) {
+      item.callback = function() {
+        window.location.hash = item.url;
+      }
+      return item;
+    }
+
+    function showError(err){
+      return function() {
+        modals.show({
+          title: "Oops. Something went wrong",
+          text: err,
+          cancel: "hide"
+        })
+      }
+    }
+    function search(keywords) {
+      var url = '/app/' + window.serverAppModel.id + '/search/' + keywords;
+      return $.ajax({
+        url: url,
+        dataType: 'json'
+      }).error(showError("We could not search for:" + keywords)).pipe(function (data) {
+        return data.map(buildItems) || [];
+      });
+    }
   }
 
   return {
