@@ -1,8 +1,4 @@
-define([
-  'widgets/modals/modals'
-],function(
-  modals
-) {
+define(function() {
 
   function buildItems(item) {
     item.callback = function() {

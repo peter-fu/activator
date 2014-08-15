@@ -1,9 +1,8 @@
-<dt><span data-bind="text: count"></span></dt>
-<dd>
-  <!-- ko foreach: items -->
-  <a data-bind="css: kind, text: message, attr: { href: href, title: message }"></a>
-  <!-- /ko -->
-  <!-- ko ifnot: items().length -->
-  <p>No notifications.</p>
-  <!-- /ko -->
-</dd>
+<dl id="notifications" class="dropdown">
+  <dt>
+    <span class="counter">0</span>
+    <div class="sticker success"><span class="shape"><svg class="mark" data-bind="svg: '/assets/icons/success-mini.svg'"/></span></div>
+  </dt>
+  <dd><a href="/">Notification</a><a href="/">Notification</a><a href="/">Notification</a>
+  </dd>
+</dl>

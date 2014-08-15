@@ -18,18 +18,8 @@ define(['./types'], function(Types) {
   }
 
   EventStream.prototype.push = function(value) {
-    try {
-      EventStreamExecution(this.callbacks)(value);
-    } catch (e){
-      if (this.onFail) this.onFail(e);
-      else throw("Strem Error:"+e)
-    }
+    EventStreamExecution(this.callbacks)(value);
     return this;
-  }
-
-  // TODO: do we really need this
-  EventStream.prototype.fail = function(callback) {
-    this.onFail = callback;
   }
 
   EventStream.prototype.clone = function(value) {
@@ -65,7 +55,8 @@ define(['./types'], function(Types) {
     return forked;
   }
 
-  EventStream.prototype.equal = function(attribute, attributeValue) {
+  // A faster match, that check strick equality for an attribute
+  EventStream.prototype.matchOnAttribute = function(attribute, attributeValue) {
     var forked = new EventStream();
     var _call = function(value, next) {
       if (value != undefined && value[attribute] === attributeValue){

@@ -1,0 +1,23 @@
+@import "../../commons/_base";
+
+.list {
+  .expand();
+  overflow: auto;
+  h2, h3 {
+    font-size: 16px;
+  }
+  .list-border-color(@white-ltr, @grey);
+  li {
+    position: relative;
+    padding: 10px 20px;
+    &:hover, &.active {
+      background-color: @grey-ltr;
+      &, a {
+        color: #fff;
+      }
+    }
+  }
+  a {
+    .fullBox();
+  }
+}

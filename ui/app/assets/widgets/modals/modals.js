@@ -60,7 +60,6 @@ define([
     // bodies.cancel = "Text" or bodies.onCancel = f()
     show: function(bodies) {
       // Default values
-      bodies.body = bodies.body || false;
       bodies.text = bodies.text || false;
       bodies.ok =  bodies.callback ? bodies.ok || "OK": bodies.ok || false;
       bodies.cancel = bodies.onCancel ? bodies.cancel || "Cancel" : bodies.cancel || false;

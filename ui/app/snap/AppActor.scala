@@ -7,14 +7,12 @@ import com.typesafe.sbtrc._
 import akka.actor._
 import akka.pattern._
 import java.io.File
-import java.net.URLEncoder
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.duration._
 import console.ClientController.HandleRequest
 import JsonHelper._
 import play.api.libs.json._
 import play.api.libs.json.Json._
-import play.api.libs.functional.syntax._
 import sbt.client._
 import sbt.protocol._
 import scala.reflect.ClassTag
@@ -22,7 +20,6 @@ import scala.concurrent.Future
 import scala.util.control.NonFatal
 
 sealed trait AppRequest
-
 case object GetWebSocketCreated extends AppRequest
 case object CreateWebSocket extends AppRequest
 case class NotifyWebSocket(json: JsObject) extends AppRequest
@@ -34,17 +31,16 @@ case object CloseClient extends AppRequest
 
 // requests that need an sbt client
 sealed trait ClientAppRequest extends AppRequest
-
 case class RequestExecution(command: String) extends ClientAppRequest
 case class CancelExecution(executionId: Long) extends ClientAppRequest
-case class PossibleAutocompletions(partialCommand: String, detailLevel: Option[Int] = None) extends ClientAppRequest
+case class PossibleAutoCompletions(partialCommand: String, detailLevel: Option[Int] = None) extends ClientAppRequest
+case object RequestSelfDestruct extends ClientAppRequest
 
 sealed trait AppReply
-
 case object WebSocketAlreadyUsed extends AppReply
 case class WebSocketCreatedReply(created: Boolean) extends AppReply
-
 case class InspectRequest(json: JsValue)
+
 object InspectRequest {
   val tag = "InspectRequest"
 
@@ -146,12 +142,15 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
         }
       case UpdateSourceFiles(files) =>
         projectWatcher ! SetSourceFilesRequest(files)
-      case ReloadSbtBuild => // TODO FIXME
+      case ReloadSbtBuild =>
+        clientActor.foreach(_ ! RequestSelfDestruct)
       case OpenClient(client) =>
         log.debug(s"Old client actor was ${clientActor}")
         clientActor.foreach(_ ! PoisonPill) // shouldn't happen - paranoia
-        clientCount += 1
+
         log.debug(s"Opening new client actor for sbt client ${client}")
+        clientCount += 1
+        self ! NotifyWebSocket(AppActor.clientOpenedJsonResponse)
         clientActor = Some(context.actorOf(Props(new SbtClientActor(client)), name = s"client-$clientCount"))
         clientActor.foreach(context.watch(_))
         flushPending()
@@ -213,6 +212,7 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
     override def subReceive: Receive = {
       case NotifyWebSocket(json) =>
         log.debug("sending message on web socket: {}", json)
+
         produce(json)
     }
 
@@ -302,9 +302,12 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
           case CancelExecution(executionId) =>
             log.debug("canceling execution " + executionId)
             client.cancelExecution(executionId)
-          case PossibleAutocompletions(partialCommand, detailLevelOption) =>
+          case PossibleAutoCompletions(partialCommand, detailLevelOption) =>
             log.debug("possible autocompletions for " + partialCommand)
             client.possibleAutocompletions(partialCommand, detailLevel = detailLevelOption.getOrElse(0))
+          case RequestSelfDestruct =>
+            client.requestSelfDestruct()
+            Future.successful(None)
         }
       } recover {
         case NonFatal(e) =>
@@ -318,4 +321,8 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
       } pipeTo sender
     }
   }
+}
+
+object AppActor {
+  val clientOpenedJsonResponse = JsObject(Seq("type" -> JsString("sbt"), "subType" -> JsString("ClientOpened"), "event" -> JsObject(Nil)))
 }

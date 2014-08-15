@@ -1,3 +1,6 @@
+/*
+ Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
+ */
 define([
   'commons/settings',
   "text!./panels.html",
@@ -13,9 +16,8 @@ define([
   //     return it.panel;
   //   }));
   // }, []);
-  var panels = ['plugins/tutorial/tutorial'];
+  var panels = ['plugins/tutorial/tutorialPanel'];
 
-  $panels = $(template)[0];
   currentPanel = ko.observable();
 
   var panelOpened = settings.observable("app.panelOpened", true);
@@ -24,7 +26,7 @@ define([
 
   var switchPanel = function(panel) {
     require([panel], function(p) {
-      $("#panelWrapper").replaceWith(p.renderPanel());
+      $("#panelWrapper").replaceWith(p.render());
       currentPanel(panel);
     });
   }
@@ -59,8 +61,7 @@ define([
 
   return {
     render: function() {
-      ko.applyBindings(PanelState, $panels);
-      return $panels
+      return bindhtml(template, PanelState)
     },
     state: PanelState
   }
