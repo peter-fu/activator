@@ -1,3 +1,6 @@
+/*
+ Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
+ */
 define(['commons/utils', 'commons/streams', 'services/sbt', 'services/ajax'], function (utils, stream, sbt, ajax) {
 
   // available states

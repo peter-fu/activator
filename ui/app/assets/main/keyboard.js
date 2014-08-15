@@ -1,3 +1,6 @@
+/*
+ Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
+ */
 define(['./router'], function(router) {
 
   var isMac = navigator.platform.toUpperCase().indexOf('MAC')>=0;
