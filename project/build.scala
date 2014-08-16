@@ -211,8 +211,8 @@ object TheActivatorBuild extends Build {
     settings(
       Keys.scalaBinaryVersion <<= Keys.scalaBinaryVersion in ui,
       Keys.resolvers ++= Seq(
-        "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
-        Resolver.url("typesafe-ivy-releases", new URL("http://repo.typesafe.com/typesafe/releases/"))(Resolver.ivyStylePatterns),
+        "Typesafe repository" at "https://repo.typesafe.com/typesafe/releases/",
+        Resolver.url("typesafe-ivy-releases", new URL("https://repo.typesafe.com/typesafe/releases/"))(Resolver.ivyStylePatterns),
         Resolver.url("sbt-plugin-releases", new URL("http://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/"))(Resolver.ivyStylePatterns)
       ),
       // TODO - Do this better - This is where we define what goes in the local repo cache.
