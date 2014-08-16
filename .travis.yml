@@ -1,13 +1,13 @@
 language: scala
 
 scala:
-  - 2.10.3
+  - 2.10.4
 
 jdk:
   - openjdk6
 
 script:
-  - sbt $TASKS
+  - sbt -J-Xms1024M -J-Xmx3072M $TASKS
 
 env:
   - TASKS=test
