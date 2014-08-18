@@ -100,13 +100,23 @@ define(['widgets/modals/modals'], function(modals) {
     }
   }
 
+  // Path utilities
+  function relative(path) {
+    return path.replace(window.serverAppModel.location,"");
+  }
+  function absolute(path) {
+    return window.serverAppModel.location + path;
+  }
+
   return {
     browse: browse,
     show: show,
     save: save,
     rename: rename,
     create: create,
-    createContent: createContent
+    createContent: createContent,
+    relative: relative,
+    absolute: absolute
   };
 
 });
