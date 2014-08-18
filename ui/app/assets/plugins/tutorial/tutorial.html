@@ -12,7 +12,7 @@
         </button>
       </div>
     </header>
-    <ul class="list links" data-bind="foreach: table">
+    <ul class="list links" data-bind="foreach: table, memoScroll: 'tutorial-index'">
       <li data-bind="isActiveUrl: '#tutorial/'+$index()">
         <a data-bind="href: '#tutorial/'+$index(), text: $data"></a>
       </li>

@@ -6,13 +6,13 @@ define([
   'services/ajax'
 ], function(
   sbt,
-  ajax
+  fs
 ) {
 
   // options is the observable where we put the results
   var combinedSearch = function(keywords, options) {
     debug && console.log("starting search on " + keywords);
-    return $.when(ajax.search(keywords), sbt.tasks.possibleAutocompletions(keywords))
+    return $.when(fs.search(keywords), sbt.tasks.possibleAutocompletions(keywords))
       .then(function(searchValues, sbtCompletions) {
         options( searchValues.concat(sbtCompletions) );
     });

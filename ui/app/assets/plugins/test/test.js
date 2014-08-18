@@ -10,6 +10,7 @@ define([
   "css!widgets/buttons/switch",
   "css!widgets/menu/menu",
   "css!widgets/buttons/select",
+  "css!widgets/buttons/button",
   "css!widgets/modules/modules"
 ], function(
   plugins,

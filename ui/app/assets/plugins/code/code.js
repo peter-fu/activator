@@ -3,7 +3,7 @@
  */
 
 define([
-  "services/fs",
+  "services/ajax",
   "main/plugins",
   "text!./code.html",
   "widgets/layout/layout",

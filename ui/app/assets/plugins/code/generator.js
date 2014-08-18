@@ -100,7 +100,7 @@ define(['commons/utils', 'commons/streams', 'services/sbt', 'services/ajax'], fu
     generator.currentState = generatingFile;
     var fileLocation = serverAppModel.location + generator.pluginFileLocation;
     logs.push({message: "Creating sbt IDE plugin file (" + fileLocation + ")."});
-    ajax.createContent(fileLocation, generator.pluginFileContent).done(function () {
+    ajax.create(fileLocation, false, generator.pluginFileContent).done(function () {
       // Adding the plugin file should trigger an automatic restart of sbt hence the state shift here
       // Note: the result from sbt is asynchronous and the stream subscription below will continue to drive the process
       generator.currentState = restartingSbt;

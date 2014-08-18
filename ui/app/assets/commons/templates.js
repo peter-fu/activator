@@ -155,16 +155,8 @@ define(function() {
         var memo = valueAccessor();
         if (!memos[memo]) {
           memos[memo] = [0,0];
-
-        // a little hack to work around a bug while we figure out the real fix
-        if (typeof(memo) != 'function') {
-          console.error("This is a bug - memo isn't a function, it is: ", typeof(memo), memo);
-          return;
         }
 
-        if (!memo()) {
-          memo([0,0]);
-        }
         setTimeout(function() {
           debug && console.log(memo, memos[memo])
           element.scrollLeft = memos[memo][0];
@@ -172,7 +164,7 @@ define(function() {
         }, 1);// Wait for everything to be displayed
       }
     }
-  }});
+  }());
 
   function throttle(f){
     var timer;

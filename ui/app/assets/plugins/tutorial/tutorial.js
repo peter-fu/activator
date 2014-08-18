@@ -9,6 +9,7 @@ define([
   "css!./tutorial",
   "css!widgets/menu/menu",
   "css!widgets/modules/modules",
+  "css!widgets/buttons/button",
   "css!widgets/intro/intro"
 ], function(
   plugins,

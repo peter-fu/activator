@@ -2,7 +2,7 @@
  Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
  */
 define([
-  "services/fs",
+  "services/ajax",
   'ace/ace'
 ],function(
   fs,
@@ -67,7 +67,7 @@ define([
     // Get saved version
     self.revert = function(){
       self.working(self.working()+1);
-      fs.open(self.location).then(function(content) {
+      fs.show(self.location).then(function(content) {
         self.body(content);
         self.edited(false);
         self.session.setValue(content);
