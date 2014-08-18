@@ -9,6 +9,7 @@ define([
   "css!./build",
   "css!widgets/buttons/switch",
   "css!widgets/menu/menu",
+  "css!widgets/buttons/button",
   "css!widgets/buttons/select",
   "css!widgets/lists/logs"
 ], function(

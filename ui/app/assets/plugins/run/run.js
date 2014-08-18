@@ -8,6 +8,7 @@ define([
   "text!./run.html",
   "css!./run",
   "css!widgets/buttons/switch",
+  "css!widgets/buttons/button",
   "css!widgets/menu/menu",
   "css!widgets/buttons/select"
 ], function(
