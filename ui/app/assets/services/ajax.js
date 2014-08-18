@@ -11,17 +11,28 @@ define(['widgets/modals/modals'], function(modals) {
       data: {
         location: location
       }
-    });
+    }).error(showError("Can not browse "+location+"."));
   }
 
-  // Fetch utility
-  function show(location){
+  // Reveal / open
+  function open(location){
     return $.ajax({
-      url: '/api/local/show',
+      url: '/api/local/open',
       type: 'GET',
       dataType: 'text',
       data: { location: location }
-    });
+    }).error(showError("Can not reveal "+location+"."));
+  }
+
+  // Get file's content
+  function show(location) {
+    return $.ajax({
+      url: '/api/local/show',
+      type: 'GET',
+      data: {
+        location: location
+      }
+    }).error(showError("Can not open "+location+"."));
   }
 
   function save(location, code) {
@@ -33,7 +44,7 @@ define(['widgets/modals/modals'], function(modals) {
         location: location,
         content: code
       }
-    });
+    }).error(showError("Can not save "+location+"."));
   }
 
   function rename(location, newName) {
@@ -45,10 +56,10 @@ define(['widgets/modals/modals'], function(modals) {
         location: location,
         newName: newName
       }
-    });
+    }).error(showError("Can not rename "+location+"."));
   }
 
-  function create(location, isDirectory) {
+  function create(location, isDirectory, content) {
     return $.ajax({
       url: '/api/local/create',
       type: 'PUT',
@@ -56,48 +67,47 @@ define(['widgets/modals/modals'], function(modals) {
       data: {
         location: location,
         isDirectory: isDirectory,
-        content: ''
+        content: content || ""
       }
-    });
+    }).error(showError("Can not create "+location+"."));
   }
 
-  function createContent(location, content) {
+  function _delete(location, isDirectory) {
     return $.ajax({
-      url: '/api/local/create',
+      url: '/api/local/delete',
       type: 'PUT',
       dataType: 'text',
       data: {
-        location: location,
-        isDirectory: false,
-        content: content
+        location: location
       }
+    }).error(showError("Can not delete "+location+"."));
+  }
+
+  function showError(err){
+    return function() {
+      modals.show({
+        title: "Oops. Something went wrong",
+        text: err,
+        cancel: "hide"
+      })
+    }
+  }
+
+  function buildItems(item) {
+    item.callback = function() {
+      window.location.hash = item.url;
+    }
+    return item;
+  }
+
+  function search(keywords) {
+    var url = '/app/' + window.serverAppModel.id + '/search/' + keywords;
+    return $.ajax({
+      url: url,
+      dataType: 'json'
+    }).error(showError("We could not search for:" + keywords)).pipe(function (data) {
+      return data.map(buildItems) || [];
     });
-
-    function buildItems(item) {
-      item.callback = function() {
-        window.location.hash = item.url;
-      }
-      return item;
-    }
-
-    function showError(err){
-      return function() {
-        modals.show({
-          title: "Oops. Something went wrong",
-          text: err,
-          cancel: "hide"
-        })
-      }
-    }
-    function search(keywords) {
-      var url = '/app/' + window.serverAppModel.id + '/search/' + keywords;
-      return $.ajax({
-        url: url,
-        dataType: 'json'
-      }).error(showError("We could not search for:" + keywords)).pipe(function (data) {
-        return data.map(buildItems) || [];
-      });
-    }
   }
 
   // Path utilities
@@ -109,12 +119,14 @@ define(['widgets/modals/modals'], function(modals) {
   }
 
   return {
+    search: search,
     browse: browse,
+    open: open,
     show: show,
     save: save,
     rename: rename,
     create: create,
-    createContent: createContent,
+    delete: _delete,
     relative: relative,
     absolute: absolute
   };

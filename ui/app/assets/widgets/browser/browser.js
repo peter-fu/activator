@@ -29,7 +29,7 @@ define([
     event.stopPropagation();
   }
   FileNode.prototype.show = function() {
-    fs.show(this.location);
+    fs.open(this.location);
   }
   FileNode.prototype.delete = function() {
     if(confirm("You are about to delete "+this.name)) fs.delete(this.location).success(this.parent.load.bind(this.parent));
@@ -125,7 +125,7 @@ define([
     fs.create(this.location+window.separator+name,false).success(this.load.bind(this));
   }
   TreeNode.prototype.show = function() {
-    fs.show(this.location);
+    fs.open(this.location);
   }
   TreeNode.prototype.delete = function() {
     if(confirm("You are about to delete "+this.name)) fs.delete(this.location).success(this.parent.load.bind(this.parent));
@@ -152,7 +152,7 @@ define([
     function refreshNode(node) {
       node.load().complete(function() {
         node.children().forEach(function(child) {
-          if (child.children().length != 0){
+          if (child.children && child.children().length != 0){
             refreshNode(child);
           }
         });
