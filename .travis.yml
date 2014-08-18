@@ -10,11 +10,9 @@ script:
   - sbt $TASKS
 
 env:
-  - TASKS=test
-  - TASKS=integrationTests
-  - TASKS=offlineTests
-  - SBT_OPTS="-XX:PermSize=256M -XX:MaxPermSize=512M -XX:+CMSClassUnloadingEnabled -XX:+UseCodeCacheFlushing -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalPacing -XX:+DoEscapeAnalysis"
-
+  - TASKS=test SBT_OPTS="-XX:PermSize=256M -XX:MaxPermSize=512M -XX:+CMSClassUnloadingEnabled -XX:+UseCodeCacheFlushing -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalPacing -XX:+DoEscapeAnalysis"
+  - TASKS=integrationTests SBT_OPTS="-XX:PermSize=256M -XX:MaxPermSize=512M -XX:+CMSClassUnloadingEnabled -XX:+UseCodeCacheFlushing -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalPacing -XX:+DoEscapeAnalysis"
+  - TASKS=offlineTests SBT_OPTS="-XX:PermSize=256M -XX:MaxPermSize=512M -XX:+CMSClassUnloadingEnabled -XX:+UseCodeCacheFlushing -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalPacing -XX:+DoEscapeAnalysis"
 
 notifications:
   email:
