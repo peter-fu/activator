@@ -7,12 +7,12 @@ jdk:
   - openjdk6
 
 script:
-  - sbt $TASKS
+  - sbt -J-XX:PermSize=256M -J-XX:MaxPermSize=512M -J-XX:+CMSClassUnloadingEnabled -J-XX:+UseCodeCacheFlushing -J-XX:+UseConcMarkSweepGC -J-XX:+CMSIncrementalPacing -J-XX:+DoEscapeAnalysis $TASKS
 
 env:
-  - TASKS=test SBT_OPTS="-XX:PermSize=256M -XX:MaxPermSize=512M -XX:+CMSClassUnloadingEnabled -XX:+UseCodeCacheFlushing -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalPacing -XX:+DoEscapeAnalysis"
-  - TASKS=integrationTests SBT_OPTS="-XX:PermSize=256M -XX:MaxPermSize=512M -XX:+CMSClassUnloadingEnabled -XX:+UseCodeCacheFlushing -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalPacing -XX:+DoEscapeAnalysis"
-  - TASKS=offlineTests SBT_OPTS="-XX:PermSize=256M -XX:MaxPermSize=512M -XX:+CMSClassUnloadingEnabled -XX:+UseCodeCacheFlushing -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalPacing -XX:+DoEscapeAnalysis"
+  - TASKS=test
+  - TASKS=integrationTests
+  - TASKS=offlineTests
 
 notifications:
   email:
