@@ -64,6 +64,7 @@ define([
     show: function(bodies) {
       // Default values
       bodies.text = bodies.text || false;
+      bodies.body = bodies.body || false;
       bodies.ok =  bodies.callback ? bodies.ok || "OK": bodies.ok || false;
       bodies.cancel = bodies.onCancel ? bodies.cancel || "Cancel" : bodies.cancel || false;
       bodies.okEnabled = bodies.okEnabled || true;
