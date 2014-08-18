@@ -5,7 +5,9 @@ define([
   "ace/ace",
   "text!./editor.html",
   "commons/settings",
-  "css!./editor"
+  "css!./editor",
+  "css!./themes/activator-dark",
+  "css!./themes/activator-light"
 ], function(
   ace,
   tpl,
@@ -18,8 +20,8 @@ define([
 
   // Theme and font
   var themes = {
-    "Activator Light": 'widgets/editor/themes/activator-light',
-    "Activator Dark": 'widgets/editor/themes/activator-dark',
+    "Activator Light": 'ace/theme/activator-light',
+    "Activator Dark": 'ace/theme/activator-dark',
     "Ambiance": "ace/theme/ambiance",
     "Chaos": "ace/theme/chaos",
     "Chrome": "ace/theme/chrome",
