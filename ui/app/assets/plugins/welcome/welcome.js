@@ -1,7 +1,16 @@
 /*
  Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
  */
-define(['text!./welcome.html', 'css!./welcome.css'], function(template, css){
+define([
+  'text!./welcome.html',
+  'widgets/layout/layout',
+  'widgets/layout/layoutManager',
+  'css!./welcome.css'
+], function(
+  tpl,
+  layout,
+  layoutManager
+){
 
 
   var WelcomeState = (function(){
@@ -31,19 +40,22 @@ define(['text!./welcome.html', 'css!./welcome.css'], function(template, css){
       }
     }
 
+    self.presentationMode = function(a,e) {
+      var on = e.target.checked;
+      document.body.style.zoom = on?"75%":"1";
+      document.body.classList.toggle("presentation-mode");
+      layoutManager.panelOpened(false);
+      layoutManager.navigationOpened(!on);
+    }
+
     self.loadNews();
     return self;
   }());
 
-  window.setNewsJson = WelcomeState.setNewsJson.bind(WelcomeState);
-
   return {
     render: function() {
-      var $welcome = $(template)[0];
-      ko.applyBindings(WelcomeState, $welcome);
-      return $welcome;
-    },
-    route: function(){}
+      layout.renderPlugin(bindhtml(tpl, WelcomeState));
+    }
   }
 
 });

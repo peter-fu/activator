@@ -15,19 +15,22 @@
     height: 18px;
     .expand();
   }
-  .infos {
+  .home {
     display: block;
-    width: 18px;
-    height: 18px;
-    line-height: 18px;
-    text-align: center;
-    border-radius: 9px;
-    background: @grey;
-    color: @slate-dkr;
-    font: 900 italic 16px Georgia, serif;
-    text-decoration: none;
+    width: 20px;
+    height: 20px;
+    padding: 1px;
+    border-radius: 10px;
+    border: 1px solid @grey;
+    g {
+      fill: @grey;
+    }
     &:hover {
       background: #fff;
+      background: @grey;
+      g {
+        fill: @slate-ltr;
+      }
     }
   }
 }
