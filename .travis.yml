@@ -17,4 +17,5 @@ env:
 notifications:
   email:
     - activator@typesafe.com
-  flowdock: 394be381de623fe7bee543e905ac3320
+  flowdock: 2eb8fdbb08ad2e595a21edea64252a22
+            
