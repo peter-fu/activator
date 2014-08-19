@@ -11,7 +11,7 @@ script:
 
 env:
   - TASKS=test
-  - TASKS=integrationTests
+  - TASKS=integrationTestsWithoutOffline
   - TASKS=offlineTests
 
 notifications:

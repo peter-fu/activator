@@ -56,9 +56,9 @@ To run a specific test, simply:
 
 To run all the integration tests, simply:
 
-    sbt> integration-tests
+    sbt> integrationTests
 
-
+This also runs offlineTests.
 
 ## Staging a distribution
 
