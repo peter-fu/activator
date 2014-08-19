@@ -7,7 +7,7 @@ jdk:
   - openjdk6
 
 script:
-  - sbt -J-XX:PermSize=256M -J-XX:MaxPermSize=512M -J-Xss1024K -J-Xmx1024M -J-XX:+CMSClassUnloadingEnabled -J-XX:+UseCodeCacheFlushing -J-XX:+UseConcMarkSweepGC -J-XX:+CMSIncrementalPacing -J-XX:+DoEscapeAnalysis $TASKS
+  - sbt -J-XX:PermSize=256M -J-XX:MaxPermSize=512M -J-Xss1024K -J-Xms512M -J-Xmx1024M -J-XX:+CMSClassUnloadingEnabled -J-XX:+UseCodeCacheFlushing -J-XX:+UseConcMarkSweepGC -J-XX:+CMSIncrementalPacing -J-XX:+DoEscapeAnalysis $TASKS
 
 env:
   - TASKS=test
