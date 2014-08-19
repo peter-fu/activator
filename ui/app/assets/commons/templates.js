@@ -243,13 +243,6 @@ define(function() {
     return ob.subscribe(fn);
   }
 
-  ko.doOnChangeAndWatchDom = function(target, ob, fn) {
-    var subscription = ko.doOnChange(ob, fn);
-    ko.domRemoved(target, function() {
-      subscription.dispose();
-    })
-  }
-
   ko.bindhtml = function(html, model) {
     var dom = $(html)[0];
     ko.applyBindings(model, dom);
