@@ -3,10 +3,12 @@
  */
 define([
   'commons/websocket',
+  'services/ajax',
   'widgets/fileselection/fileselection',
   'text!./open.html'
 ], function(
   websocket,
+  fs,
   FileSelection,
   tpl
 ) {
@@ -36,6 +38,22 @@ define([
     self.clickOpenButton = function() {
       $('#openButton').toggleClass("opened");
       self.toggleAppBrowser();
+    }
+
+    self.deleteApp = function(app,e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (confirm("Remove project from list?")){
+        fs.deleteApp(app).success(function() {
+          if (confirm("Do you also want to erase the data from the disk? (irreversible)")){
+            fs.delete(app.location, true).success(function() {
+              $(e.target).parent("li.recentApp").remove();
+            });
+          } else {
+            $(e.target).parent("li.recentApp").remove();
+          }
+        });
+      }
     }
 
   }
