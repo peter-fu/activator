@@ -30,23 +30,9 @@ define(function() {
     });
 
   // TODO = provide JSON route, for meta-datas
-  $.get("tutorial/index.html", function(data){
-    metaData({
-      "metaData": {
-        "name": "Tutorial Name",
-        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vitae lorem at neque mollis viverra eu eu tortor. Vivamus at viverra risus. Quisque scelerisque felis purus, a tempor elit vulputate tempor. Sed pharetra condimentum elementum. Aliquam lobortis, metus ut luctus commodo, neque justo cursus diam, eu semper augue dui a erat. Praesent eget augue dignissim, aliquet erat lobortis, feugiat dui.",
-        "source": "http://github.com/johndoe/activator-akka-spray",
-        "author": {
-          "name": "John Does",
-          "twitter": "johndoe"
-        },
-        "partner": {
-          "url": "http://partner.com",
-          "logo": "http://dommkopfq6m1m.cloudfront.net/assets/1387589794721/images/partners/svcs/chariot.png",
-          "summary": "Maecenas lorem arcu, tristique ut accumsan ac, ultricies non nulla. Pellentesque adipiscing venenatis risus at faucibus. In vehicula fermentum enim et placerat."
-        }
-      }
-    });
+  $.getJSON("/api/templates/"+serverAppModel.name+"/meta", function(data){
+    console.log(data)
+    metaData(data);
   });
 
   $.get("tutorial/index.html", function(data){
