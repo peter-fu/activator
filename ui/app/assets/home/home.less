@@ -871,15 +871,25 @@ article {
 }
 
 
-#open .delete {
-  display: block;
-  position: absolute;
-  z-index: 99;
-  top: 13px;
-  right: 12px;
-  border-radius: 10px;
-  width: 15px;
-  height: 15px;
-  line-height: 15px;
-  text-align: center;
+#open .recentApp {
+  .delete {
+    display: block;
+    position: absolute;
+    z-index: 99;
+    top: 13px;
+    right: 12px;
+    border-radius: 10px;
+    width: 15px;
+    height: 15px;
+    line-height: 13px;
+    font-size: 15px;
+    text-align: center;
+    background: #fff;
+    color: @red;
+    opacity: 0;
+    .transition();
+  }
+  &:hover .delete {
+    opacity: 1;
+  }
 }
