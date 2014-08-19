@@ -10,6 +10,8 @@ import play.PlayImport.PlayKeys
 import com.typesafe.sbt.less.Import.LessKeys
 import com.typesafe.sbt.web.SbtWeb.autoImport._
 import com.typesafe.sbt.jse.JsEngineImport.JsEngineKeys
+import com.typesafe.sbt.webdriver.SbtWebDriver.autoImport._
+
 // NOTE - This file is only used for SBT 0.12.x, in 0.13.x we'll use build.sbt and scala libraries.
 // As such try to avoid putting stuff in here so we can see how good build.sbt is without build.scala.
 
@@ -141,6 +143,25 @@ object TheActivatorBuild extends Build {
         oldCompile
       }
     )
+    settings(WebDriverKeys.browserType := WebDriverKeys.BrowserType.PhantomJs,
+            TaskKey[Unit]("testWebDriver") := {
+              import com.typesafe.webdriver._
+              import spray.json._
+              import akka.pattern._
+              import akka.actor._
+              import scala.concurrent.Await
+              import scala.concurrent.ExecutionContext.Implicits.global
+              implicit val timeout = akka.util.Timeout(60, java.util.concurrent.TimeUnit.SECONDS)
+              val browser = WebDriverKeys.webBrowser.value
+              browser ! LocalBrowser.Startup
+              Await.result({
+                for (
+                  session <- (browser ? LocalBrowser.CreateSession).mapTo[ActorRef];
+                  result <- (session ? Session.ExecuteJs("return arguments[0]", JsArray(JsNumber(999)))).mapTo[JsNumber]) yield {
+                    Keys.streams.value.log(result.toString)
+                  }
+              }, timeout.duration)
+            })
   )
 
   lazy val launcher = (
