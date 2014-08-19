@@ -31,7 +31,6 @@ define(function() {
 
   // TODO = provide JSON route, for meta-datas
   $.getJSON("/api/templates/"+serverAppModel.name+"/meta", function(data){
-    console.log(data)
     metaData(data);
   });
 
