@@ -13,7 +13,7 @@ define([
 
   return {
     render: function(){
-      return bindhtml(tpl, {})
+      return ko.bindhtml(tpl, {})
     }
   }
 

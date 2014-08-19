@@ -79,17 +79,17 @@ define([
         if (bodies.onCancel) bodies.onCancel(false);
       }
 
-      modal.html("").append(bindhtml(tpl, bodies));
+      modal.html("").append(ko.bindhtml(tpl, bodies));
       show();
     },
 
     alert: function(bodies) {
-      modal.html("").append(bindhtml(tpl, bodies));
+      modal.html("").append(ko.bindhtml(tpl, bodies));
       show();
     },
 
     confirm: function(bodies) {
-      modal.html("").append(bindhtml(tpl, bodies));
+      modal.html("").append(ko.bindhtml(tpl, bodies));
       show();
     }
 

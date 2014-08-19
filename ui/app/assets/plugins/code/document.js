@@ -78,13 +78,13 @@ define([
 
     // Formatting:
     self.chosenSoftTabs = ko.observable(true);
-    doOnChange(self.chosenSoftTabs, function(t) {
+    ko.doOnChange(self.chosenSoftTabs, function(t) {
       self.session.setUseSoftTabs(t);
     });
 
     self.tabSizes = [1,2,3,4,8];
     self.chosenTabSize = ko.observable(2);
-    doOnChange(self.chosenTabSize, function(t) {
+    ko.doOnChange(self.chosenTabSize, function(t) {
       self.session.setTabSize(t);
     });
 

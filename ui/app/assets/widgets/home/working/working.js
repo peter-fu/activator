@@ -11,7 +11,7 @@ define([
 
   return {
     render: function() {
-      var dom = bindhtml(tpl, {});
+      var dom = ko.bindhtml(tpl, {});
       var logs = $("#loading-logs", dom);
       var wrapper = $("article", dom)[0];
 

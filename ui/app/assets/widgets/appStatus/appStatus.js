@@ -111,6 +111,6 @@ define([
     testing: testing
   }
 
-  return bindhtml(tpl, State);
+  return ko.bindhtml(tpl, State);
 
 });

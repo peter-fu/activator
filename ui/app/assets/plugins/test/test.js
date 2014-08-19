@@ -36,7 +36,7 @@ define([
 
   return {
     render: function(url){
-      layout.renderPlugin(bindhtml(tpl, {}))
+      layout.renderPlugin(ko.bindhtml(tpl, {}))
     },
 
     route: function(url, breadcrumb){

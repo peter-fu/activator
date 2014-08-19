@@ -57,7 +57,7 @@ define([
   }
 
   var chosenTheme = settings.observable("code.theme", Object.keys(themes)[0]);
-  doOnChange(chosenTheme, function(t) {
+  ko.doOnChange(chosenTheme, function(t) {
     editor.setTheme(themes[t]);
   });
 
@@ -68,7 +68,7 @@ define([
     "XLarge": "22px"
   }
   var chosenFontSize = settings.observable("code.fontSize", Object.keys(fontSizes)[0]);
-  doOnChange(chosenFontSize, function(t) {
+  ko.doOnChange(chosenFontSize, function(t) {
     editor.container.style.fontSize = fontSizes[t];
   });
 
@@ -89,7 +89,7 @@ define([
     setDocument: function(selectedDocument) {
       State.selectedDocument = selectedDocument;
       // bind the document
-      doOnChange(selectedDocument, function(doc) {
+      ko.doOnChange(selectedDocument, function(doc) {
         if (doc && doc.isText && doc.session != editor.getSession()) {
           editor.setSession(doc.session);
           editor.focus();
@@ -98,7 +98,7 @@ define([
     },
 
     render: function() {
-      return bindhtml(tpl, State);
+      return ko.bindhtml(tpl, State);
     }
   }
 

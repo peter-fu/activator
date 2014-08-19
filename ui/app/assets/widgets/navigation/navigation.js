@@ -60,7 +60,7 @@ define([
 
   return {
     render: function(){
-      var dom = bindhtml(tpl, State);
+      var dom = ko.bindhtml(tpl, State);
       activate(dom);
       return dom;
     }

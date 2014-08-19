@@ -51,7 +51,7 @@ define([
 
   return {
     render: function(url) {
-      layout.renderPlugin(bindhtml(tpl, State))
+      layout.renderPlugin(ko.bindhtml(tpl, State))
     },
     route: plugins.route('run', function(url, breadcrumb, plugin) {
       subplugin(plugin.render());

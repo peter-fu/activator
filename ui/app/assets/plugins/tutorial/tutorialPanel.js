@@ -12,7 +12,7 @@ define([
 
   return {
     render: function(){
-      return bindhtml(tpl, TutorialState);
+      return ko.bindhtml(tpl, TutorialState);
     }
   }
 
