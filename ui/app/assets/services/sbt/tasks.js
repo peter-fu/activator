@@ -222,7 +222,20 @@ define([
 
   // subTypeEventStream("TestEvent");
 
-  // subTypeEventStream("BuildStructureChanged")
+  subTypeEventStream("BuildStructureChanged").each(function(message) {
+    var projects = message.event.structure.projects;
+    if (projects !== undefined && projects.length > 0) {
+      app.removeExistingProjects();
+
+      $.each(projects, function(i, v) {
+        app.projects.push(v.id.name);
+      });
+
+      // FIXME : is there any way to get the current project from the build structure?
+      // Right now we just say that the first project in the list also is the current one.
+      app.currentProject(app.projects[0]);
+    }
+  });
 
   subTypeEventStream("ClientOpened").each(function(message) {
     debug && console.log("Client opened");

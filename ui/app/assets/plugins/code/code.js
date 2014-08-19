@@ -166,7 +166,6 @@ define([
       var focus = $("#wrapper .browser span.focus");
       if (meta){
         if (key == "S"){
-          console.log("SAVE")
           selectedDocument().save();
           e.preventDefault();
           e.stopPropagation();
