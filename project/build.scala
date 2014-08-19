@@ -225,7 +225,7 @@ object TheActivatorBuild extends Build {
         "org.fusesource.jansi" % "jansi" % "1.11",
         "org.scalatest" % "scalatest_2.11" % "2.1.6",
 
-        Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-jshint" % "1.0.0", "0.13", "2.10"),
+        Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-jshint" % "1.0.1", "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-rjs" % "1.0.1", "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-digest" % "1.0.0", "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-mocha" % "1.0.0", "0.13", "2.10"),
