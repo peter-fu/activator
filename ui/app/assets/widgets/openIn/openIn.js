@@ -15,7 +15,7 @@ define([
   var OpenInEclipse = function(callback, state) {
     modals.show({
       title: "Generating Eclipse Files",
-      body: bindhtml(openInEclipse, state),
+      body: ko.bindhtml(openInEclipse, state),
       callback: callback,
       ok: "OK"
     });
@@ -24,7 +24,7 @@ define([
   var OpenInIdea = function(callback, state) {
     modals.show({
       title: "Generating IntelliJ IDEA Files",
-      body: bindhtml(openInIdea, state),
+      body: ko.bindhtml(openInIdea, state),
       callback: callback,
       ok: "OK"
     });

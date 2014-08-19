@@ -21,7 +21,7 @@ define([
   return {
 
     render: function(url) {
-      layout.renderPlugin(bindhtml(tpl, TutorialState))
+      layout.renderPlugin(ko.bindhtml(tpl, TutorialState))
     },
 
     route: function(url, breadcrumb) {

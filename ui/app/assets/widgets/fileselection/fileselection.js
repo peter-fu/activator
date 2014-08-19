@@ -88,7 +88,7 @@ define([
     },
     render: function(element) {
       var self = this;
-      return bindhtml(tpl, self);
+      return ko.bindhtml(tpl, self);
     },
     clickDir: function(context,event){
       event.preventDefault();

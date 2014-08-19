@@ -54,7 +54,7 @@ define([
 
   return {
     render: function() {
-      layout.renderPlugin(bindhtml(tpl, WelcomeState));
+      layout.renderPlugin(ko.bindhtml(tpl, WelcomeState));
     }
   }
 

@@ -149,7 +149,7 @@ define([
 
   return {
     render: function() {
-      return bindhtml(tpl, new State());
+      return ko.bindhtml(tpl, new State());
     }
   }
 

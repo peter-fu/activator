@@ -8,6 +8,6 @@ define([
   tpl
 ){
 
-  return bindhtml(tpl,{});
+  return ko.bindhtml(tpl,{});
 
 });

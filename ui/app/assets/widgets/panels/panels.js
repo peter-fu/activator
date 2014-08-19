@@ -61,7 +61,7 @@ define([
 
   return {
     render: function() {
-      return bindhtml(template, PanelState)
+      return ko.bindhtml(template, PanelState)
     },
     state: PanelState
   }

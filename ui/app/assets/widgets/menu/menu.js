@@ -10,7 +10,7 @@ define([
 
   return function(elements,state) {
     state.__elements = elements;
-    return bindhtml(tpl, state);
+    return ko.bindhtml(tpl, state);
   }
 
 });

@@ -201,7 +201,7 @@ define([
     tree: tree,
     reveal: revealInSideBar,
     render: function(){
-      return bindhtml(tpl, State);
+      return ko.bindhtml(tpl, State);
     }
   }
 

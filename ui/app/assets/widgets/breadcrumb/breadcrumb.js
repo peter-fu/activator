@@ -10,6 +10,6 @@ define([
   tpl
 ){
 
-  return bindhtml(tpl, router)
+  return ko.bindhtml(tpl, router)
 
  });

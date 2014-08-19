@@ -14,7 +14,7 @@ define([
 
   return {
     render: function(){
-      return bindhtml(tpl, State)
+      return ko.bindhtml(tpl, State)
     }
   }
 
