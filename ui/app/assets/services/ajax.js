@@ -118,6 +118,13 @@ define(['widgets/modals/modals'], function(modals) {
     return window.serverAppModel.location + path;
   }
 
+  function deleteApp(app) {
+    return $.ajax({
+      url: '/api/app/history/'+app.id,
+      type: 'DELETE'
+    }).error(showError("Can not delete "+app+"."));
+  }
+
   return {
     search: search,
     browse: browse,
@@ -128,7 +135,8 @@ define(['widgets/modals/modals'], function(modals) {
     create: create,
     delete: _delete,
     relative: relative,
-    absolute: absolute
+    absolute: absolute,
+    deleteApp: deleteApp
   };
 
 });
