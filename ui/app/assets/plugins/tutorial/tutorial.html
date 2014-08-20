@@ -20,20 +20,28 @@
   </nav>
   <!-- ko ifnot: page() -->
   <article class="intro typo">
+    <!-- ko if: metaData() -->
     <div class="description">
-      <h1>Tutorial Name</h1>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vitae lorem at neque mollis viverra eu eu tortor. Vivamus at viverra risus. Quisque scelerisque felis purus, a tempor elit vulputate tempor. Sed pharetra condimentum elementum. Aliquam lobortis, metus ut luctus commodo, neque justo cursus diam, eu semper augue dui a erat. Praesent eget augue dignissim, aliquet erat lobortis, feugiat dui.</p>
+      <h1 data-bind="text: metaData().title"></h1>
+      <p data-bind="text: metaData().description"></p>
       <p class="author">
-        <cite>by John Does (<a href="//twitter.com/johndoe">@johndoe</a>) -</cite><a class="source" href="http://github.com/johndoe/activator-akka-spray">http://github.com/johndoe/activator-akka-spray</a>
+        <cite>by <span data-bind="text: metaData().authorName"></span> (<a target="_blank" data-bind="text: '@'+metaData().authorTwitter, href: 'http://twitter.com/'+metaData().authorTwitter"></a>) -</cite><a target="_blank" class="source" data-bind="text: metaData().sourceLink, href: metaData().sourceLink"></a>
       </p>
     </div>
     <div class="training">
-      <a href="http://partner.com">
-        <img src="http://dommkopfq6m1m.cloudfront.net/assets/1387589794721/images/partners/svcs/chariot.png">
+      <a target="_blank" data-bind="href: metaData().authorLink">
+        <img data-bind="attr: {src: metaData().authorLogo}">
       </a>
-      <h3>Typesafe Training Partner</h3>
-      <p>Maecenas lorem arcu, tristique ut accumsan ac, ultricies non nulla. Pellentesque adipiscing venenatis risus at faucibus. In vehicula fermentum enim et placerat.</p>
+      <h3 data-bind="text: metaData().authorName"></h3>
+      <p data-bind="text: metaData().authorBio"></p>
     </div>
+    <!-- /ko -->
+    <!-- ko ifnot: metaData() -->
+      <div class="description">
+        <h1>Tutorial</h1>
+        <p>No descrption for this tutorial.</p>
+      </div>
+    <!-- /ko -->
   </article>
   <!-- /ko -->
   <!-- ko if: page() -->

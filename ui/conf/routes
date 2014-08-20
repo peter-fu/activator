@@ -6,6 +6,7 @@
 # Templates
 GET         /api/templates/list                          controllers.api.Templates.list
 POST        /api/templates/clone                         controllers.api.Templates.cloneTemplate
+GET         /api/templates/:name/meta                    controllers.api.Templates.meta(name)
 GET         /api/templates/:id/tutorial/*location        controllers.api.Templates.tutorial(id, location)
 
 # Operations on an app

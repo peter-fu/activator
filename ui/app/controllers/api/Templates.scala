@@ -49,6 +49,11 @@ object Templates extends Controller {
     templateCache.metadata map { m => Ok(Json toJson m) }
   }
 
+  def meta(name: String) = Action.async { request =>
+    import concurrent.ExecutionContext.Implicits._
+    templateCache.metadata.map { m => Ok(Json.toJson(m.filter(t => t.name == name).head)) }
+  }
+
   def tutorial(id: String, location: String) = Action.async { request =>
     import concurrent.ExecutionContext.Implicits._
     templateCache tutorial id map { tutorialOpt =>
