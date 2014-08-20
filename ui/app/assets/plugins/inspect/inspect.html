@@ -7,16 +7,34 @@
     <header>
       <h1>Inspect</h1>
     </header>
+    <!-- ko if: (instrumentation() == "newRelic") -->
     <section  class="module viewer">
       <article>
         <header>
-          <h1>Disabled</h1>
+          <h1>Disabled: New Relic enabled</h1>
         </header>
-        <div id="splash">
-          <p>Inspect disabled while Third-party monitoring in use.</p>
+        <div class="instruction">
+          <p>To re-enable Inspect monitoring click the <span class="buttonRef">Inspect</span> radio button on the <a href="#run">run</a> tab.</p>
+          <br/>
+          <p>Click <a href="https://rpm.newrelic.com/" target="_blank">here</a> to go to your <a href="https://rpm.newrelic.com/" target="_blank">New Relic dashboard</a></p>
         </div>
       </article>
     </section>
+    <!-- /ko -->
+    <!-- ko if: (instrumentation() == "appDynamics") -->
+    <section  class="module viewer">
+      <article>
+        <header>
+          <h1>Disabled: AppDynamics enabled</h1>
+        </header>
+        <div class="instruction">
+          <p>To re-enable Inspect monitoring click the <span class="buttonRef">Inspect</span> radio button on the <a href="#run">run</a> tab.</p>
+          <br/>
+          <p>Click <a data-bind="attr: { href: appDynamicsHostName }" target="_blank">here</a> to go to your <a data-bind="attr: { href: appDynamicsHostName }" target="_blank">AppDynamics dashboard</a></p>
+        </div>
+      </article>
+    </section>
+    <!-- /ko -->
   </article>
   <!-- /ko -->
 </div>
