@@ -1,12 +1,16 @@
 /*
  Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
  */
-define(['commons/streams', 'services/build', './console/console', 'services/connection', 'text!./inspect.html', 'css!./inspect.css'],
-  function(streams, build, Console, Connection, template){
+define(['commons/streams', 'services/build', './console/console', 'services/connection', 'services/appdynamics', 'text!./inspect.html', 'css!./inspect.css'],
+  function(streams, build, Console, Connection, appDynamics, template){
 
     var InspectState = {
       inspectEnabled: ko.computed(function() {
         return build.run.instrumentation() == "inspect";
+      }),
+      instrumentation: build.run.instrumentation,
+      appDynamicsHostName: ko.computed(function() {
+        return ("https://"+appDynamics.hostName()+"/");
       }),
       consoleWidget: new Console()
     };
