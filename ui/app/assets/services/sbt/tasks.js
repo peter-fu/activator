@@ -218,9 +218,16 @@ define([
     removeExecution(message.event.id, true /* succeeded */);
   });
 
-  // subTypeEventStream("CompilationFailure");
-
-  // subTypeEventStream("TestEvent");
+  subTypeEventStream("TaskEvent").each(function(message) {
+    var event = message.event;
+    if (event.name === "CompilationFailure") {
+      // TODO : add logic to handle compilation errors
+      debug && console.log("CompilationFailure: ", event);
+    } else if (event.name === "TestEvent") {
+      // TODO : add logic to handle test results
+      debug && console.log("TestEvent: ", event);
+    }
+  });
 
   subTypeEventStream("BuildStructureChanged").each(function(message) {
     var projects = message.event.structure.projects;
