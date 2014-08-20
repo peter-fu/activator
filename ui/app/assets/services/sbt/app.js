@@ -7,13 +7,12 @@ define([
   settings
 ) {
 
-  var projects = ko.observableArray([
-    "ProjectA",
-    "ProjectB",
-    "ProjectC",
-    "ProjectD"
-  ]);
-  var currentProject =  ko.observable("ProjectA");
+  var projects = ko.observableArray([]);
+  var currentProject =  ko.observable("");
+  var removeExistingProjects = function() {
+    this.currentProject()
+    this.projects([]);
+  };
 
   var mainClasses = ko.observable([]);
   var currentMainClass = ko.observable();
@@ -24,6 +23,7 @@ define([
     location:           "",
     projects:           projects,
     currentProject:     currentProject,
+    removeExistingProjects: removeExistingProjects,
     mainClasses:        mainClasses,
     currentMainClass:   currentMainClass,
     inspectorActivated: ko.observable(true),
