@@ -233,7 +233,7 @@ define([
 
       // FIXME : is there any way to get the current project from the build structure?
       // Right now we just say that the first project in the list also is the current one.
-      app.currentProject(app.projects[0]);
+      app.currentProject(app.projects()[0]);
     }
   });
 
