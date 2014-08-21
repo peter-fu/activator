@@ -8,10 +8,10 @@
             <svg data-bind="svg: '/assets/icons/more.svg'"/>
           </dt>
           <dd>
-            <a>Noop</a>
+            <a data-bind="click: function(){ sbtExecCommand('test') }">Test</a>
           </dd>
         </dl>
-        <button>
+        <button data-bind="click: function(){ sbtExecCommand('test') }">
           <svg data-bind="svg: '/assets/icons/test.svg'"/>
           Test
         </button>
@@ -27,44 +27,18 @@
       </ul>
     </div>
     <ul class="list links">
-      <li><a href="#test/results">Test results</a>
-      </li>
-      <li><a href="#test/editor">Test editor</a>
-      </li>
-      <li><a href="#test/history">History</a>
-      </li>
+      <li><a href="#test/results">Test results</a></li>
     </ul>
   </nav>
   <article class="plugin">
     <header>
-      <h1>Test suite</h1>
+      <h1>Test results</h1>
     </header>
     <section>
-      <ul class="suite">
-        <li data-status="waiting">
-          <label>
-            <input type="checkbox" id="a2280419556" class="889683" checked="true">First test first
-          </label>
-        </li>
-        <li data-status="pending">
-          <label>
-            <input type="checkbox" id="a1286942312" class="9595816" checked="true">Second test second
-          </label>
-        </li>
-        <li data-status="failed">
-          <label>
-            <input type="checkbox" id="a8360849085" class="9623995" checked="true">Third test third
-          </label>
-        </li>
-        <li data-status="passed">
-          <label>
-            <input type="checkbox" id="a1033511243" class="9934164" checked="true">Fourth test fourth
-          </label>
-        </li>
-        <li data-status="" class="disabled">
-          <label>
-            <input type="checkbox" id="a3676637357" class="5665054">Fifth test fifth
-          </label>
+      <ul class="suite" data-bind="foreach: results">
+        <li data-bind="attr: {'data-status': outcome}">
+          <label data-bind="text: name"></label>
+          <p class="error" data-bind="visible: error, text: error"></p>
         </li>
       </ul>
     </section>
