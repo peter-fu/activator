@@ -192,6 +192,7 @@ define([
         workingTasks.run(true);
         break;
       case "test":
+        testResults([]); // Reset test results
         workingTasks.test(true);
         break;
     }
@@ -218,14 +219,14 @@ define([
     removeExecution(message.event.id, true /* succeeded */);
   });
 
+  var testResults = ko.observableArray([]);
   subTypeEventStream("TaskEvent").each(function(message) {
     var event = message.event;
     if (event.name === "CompilationFailure") {
-      // TODO : add logic to handle compilation errors
       debug && console.log("CompilationFailure: ", event);
     } else if (event.name === "TestEvent") {
-      // TODO : add logic to handle test results
       debug && console.log("TestEvent: ", event);
+      testResults.push(event.serialized);
     }
   });
 
@@ -270,6 +271,7 @@ define([
     cancelExecution: cancelExecution,
     executions: executions,
     workingTasks: workingTasks,
+    testResults: testResults,
     active: {
       turnedOn:     "",
       compiling:    "",

@@ -19,14 +19,6 @@ define([
   layout
 ){
 
-  var suite = [
-    { title: "First test first", status: ko.observable("waiting"), disabled: ko.observable(false) },
-    { title: "Second test second", status: ko.observable("pending"), disabled: ko.observable(false) },
-    { title: "Third test third", status: ko.observable("failed"), disabled: ko.observable(false) },
-    { title: "Fourth test fourth", status: ko.observable("passed"), disabled: ko.observable(false) },
-    { title: "Fifth test fifth", status: ko.observable(""), disabled: ko.observable(true) }
-  ]
-
   var enabled = function(e){
     var o = ko.observable(!e());
     e.on("change", function(v){ return o(!v) });
@@ -34,9 +26,18 @@ define([
     return o;
   }
 
+  var sbtExecCommand = function(cmd){
+    sbt.tasks.requestExecution(cmd);
+  }
+
+  var State = {
+    results: sbt.tasks.testResults,
+    sbtExecCommand: sbtExecCommand
+  }
+
   return {
     render: function(url){
-      layout.renderPlugin(ko.bindhtml(tpl, {}))
+      layout.renderPlugin(ko.bindhtml(tpl, State))
     },
 
     route: function(url, breadcrumb){
