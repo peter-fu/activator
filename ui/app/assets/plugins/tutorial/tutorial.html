@@ -21,20 +21,32 @@
   <!-- ko ifnot: page() -->
   <article class="intro typo">
     <!-- ko if: metaData() -->
-    <div class="description">
-      <h1 data-bind="text: metaData().title"></h1>
-      <p data-bind="text: metaData().description"></p>
-      <p class="author">
-        <cite>by <span data-bind="text: metaData().authorName"></span> (<a target="_blank" data-bind="text: '@'+metaData().authorTwitter, href: 'http://twitter.com/'+metaData().authorTwitter"></a>) -</cite><a target="_blank" class="source" data-bind="text: metaData().sourceLink, href: metaData().sourceLink"></a>
-      </p>
-    </div>
-    <div class="training">
-      <a target="_blank" data-bind="href: metaData().authorLink">
-        <img data-bind="attr: {src: metaData().authorLogo}">
-      </a>
-      <h3 data-bind="text: metaData().authorName"></h3>
-      <p data-bind="text: metaData().authorBio"></p>
-    </div>
+      <div class="description">
+        <h1 data-bind="text: metaData().title"></h1>
+        <p data-bind="text: metaData().description"></p>
+        <p class="author">
+          <cite>
+            by <span data-bind="text: metaData().authorName"></span>
+            <!-- ko if: metaData().authorTwitter -->
+            (<a target="_blank" data-bind="text: '@'+metaData().authorTwitter, href: 'http://twitter.com/'+metaData().authorTwitter"></a>)
+            <!-- /ko -->
+          </cite>
+          <!-- ko if: metaData().sourceLink -->
+          - <a target="_blank" class="source" data-bind="text: metaData().sourceLink, href: metaData().sourceLink"></a>
+          <!-- /ko -->
+        </p>
+      </div>
+      <!-- ko if: (metaData().authorLink && metaData().authorBio && metaData().authorName) -->
+      <div class="training">
+        <a target="_blank" data-bind="href: metaData().authorLink">
+          <!-- ko if: metaData().authorLogo -->
+          <img data-bind="attr: {src: metaData().authorLogo}">
+          <!-- /ko -->
+          <h3 data-bind="text: metaData().authorName"></h3>
+        </a>
+        <p data-bind="text: metaData().authorBio"></p>
+      </div>
+      <!-- /ko -->
     <!-- /ko -->
     <!-- ko ifnot: metaData() -->
       <div class="description">
