@@ -114,7 +114,7 @@ define([
     var execution = executionsById[id];
     if (execution) {
       // we want succeeded flag up-to-date when finished notifies
-      execution.succeeded(true);
+      execution.succeeded(succeeded);
       execution.finished(new Date());
 
       var event = new CustomEvent('TaskSuccess', { detail: { command: execution.command } });
@@ -122,6 +122,7 @@ define([
 
       switch(execution.command){
         case "compile":
+          compilationErrors(compilationErrorsAccumulator);
           workingTasks.compile(false);
           break;
         case "run":
@@ -210,6 +211,7 @@ define([
 
     switch(execution.command){
       case "compile":
+        compilationErrorsAccumulator = [];
         workingTasks.compile(true);
         break;
       case "run":
@@ -244,10 +246,13 @@ define([
   });
 
   var testResults = ko.observableArray([]);
+  var compilationErrors = ko.observableArray([]);
+  var compilationErrorsAccumulator = [];
   subTypeEventStream("TaskEvent").each(function(message) {
     var event = message.event;
     if (event.name === "CompilationFailure") {
       debug && console.log("CompilationFailure: ", event);
+      compilationErrorsAccumulator.push(event.serialized);
     } else if (event.name === "TestEvent") {
       debug && console.log("TestEvent: ", event);
       testResults.push(event.serialized);
@@ -340,6 +345,7 @@ define([
     executions: executions,
     workingTasks: workingTasks,
     testResults: testResults,
+    compilationErrors: compilationErrors,
     active: {
       turnedOn:     "",
       compiling:    "",

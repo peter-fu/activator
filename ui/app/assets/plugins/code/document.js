@@ -3,9 +3,11 @@
  */
 define([
   "services/ajax",
+  "services/sbt",
   'ace/ace'
 ],function(
   fs,
+  sbt,
   ace
 ){
 
@@ -37,16 +39,16 @@ define([
       self.edited(self.session.getValue() != self.body());
     });
 
-
     // Annotation (error, warning...)
-    self.annotations = ko.observable([]);
-    self.annotations.subscribe(function(_) {
-      self.session.setAnnotations(_.map(function(m) {
+    sbt.tasks.compilationErrors.subscribe(function(_) {
+      self.session.setAnnotations(_.filter(function(m) {
+        return m.position.sourcePath == self.location;
+      }).map(function(m) {
         // Translate sbt error kinds, to ace annotations types
-        var aceLevel = m.kind == 'error' ? 'error': m.kind == 'warn' ? 'warning': 'info';
+        var aceLevel = m.severity == 'Error' ? 'error': m.kind == 'Warning' ? 'warning': 'info';
         return {
-          row: m.line - 1, // Ace count from zero
-          column: 0,
+          row: m.position.line - 1, // Ace count from zero
+          column: m.position.offset,
           text: m.message,
           type: aceLevel
         }
