@@ -4,6 +4,7 @@
 
 define([
   "services/ajax",
+  "services/sbt",
   "main/plugins",
   "text!./code.html",
   "widgets/layout/layout",
@@ -17,6 +18,7 @@ define([
   "css!widgets/buttons/button"
 ], function(
   fs,
+  sbt,
   plugins,
   tpl,
   layout,
@@ -126,6 +128,13 @@ define([
     if (autoSave() && document.hidden){
       saveAll();
     }
+  });
+
+  // Annotations
+  sbt.tasks.compilationErrors.subscribe(function(_) {
+    openedDocuments().forEach(function(doc) {
+      doc.showAnnotations(_);
+    });
   });
 
   var State = {

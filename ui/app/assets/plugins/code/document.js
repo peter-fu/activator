@@ -40,8 +40,8 @@ define([
     });
 
     // Annotation (error, warning...)
-    sbt.tasks.compilationErrors.subscribe(function(_) {
-      self.session.setAnnotations(_.filter(function(m) {
+    self.showAnnotations = function(_) {
+      var annotations = _.filter(function(m) {
         return m.position.sourcePath == self.location;
       }).map(function(m) {
         // Translate sbt error kinds, to ace annotations types
@@ -52,8 +52,11 @@ define([
           text: m.message,
           type: aceLevel
         }
-      }));
-    });
+      });
+      self.session.clearAnnotations();
+      self.session.setAnnotations(annotations);
+    }
+    self.showAnnotations(sbt.tasks.compilationErrors());
 
     // Save document
     self.save = function(callback){

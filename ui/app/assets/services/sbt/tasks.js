@@ -120,9 +120,13 @@ define([
       var event = new CustomEvent('TaskSuccess', { detail: { command: execution.command } });
       document.body.dispatchEvent(event);
 
+      // TODO when tasks are serialized correctly, use the exact names (compile and compile:)
+      if (execution.command.indexOf("compile") >= 0 ){
+        compilationErrors(compilationErrorsAccumulator);
+      }
+
       switch(execution.command){
         case "compile":
-          compilationErrors(compilationErrorsAccumulator);
           workingTasks.compile(false);
           break;
         case "run":
