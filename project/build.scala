@@ -157,7 +157,7 @@ object TheActivatorBuild extends Build {
               Await.result({
                 for (
                   session <- (browser ? LocalBrowser.CreateSession).mapTo[ActorRef];
-                  result <- (session ? Session.ExecuteJs("return arguments[0]", JsArray(JsNumber(999)))).mapTo[JsNumber]) yield {
+                  result <- (session ? Session.ExecuteJs("return arguments[0];", JsArray(JsNumber(999)))).mapTo[JsNumber]) yield {
                     Keys.streams.value.log(result.toString)
                   }
               }, timeout.duration)
