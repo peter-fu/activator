@@ -53,7 +53,6 @@ define([
             makeActive(doc);
             break;
           case 'directory':
-            console.log("REVEAL", data)
             browser.reveal(data.location);
             break;
           default:

@@ -128,7 +128,7 @@ define([
     },
 
     exec: function(option) {
-      console.log(option)
+      debug && console.log(option)
       option.callback(option);
       options([]);
       selected(0);

@@ -69,7 +69,7 @@ define(['commons/utils', 'commons/streams', 'services/sbt', 'services/ajax'], fu
   };
 
   var runSbtCommand = function() {
-    return sbt.requestExecution(generator.sbtCommand);
+    return sbt.requestDeferredExecution(generator.sbtCommand);
   };
 
   var checkCommand = function() {
