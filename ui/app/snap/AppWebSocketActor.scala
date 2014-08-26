@@ -51,10 +51,10 @@ class AppWebSocketActor extends WebSocketActor[JsValue] with ActorLogging {
         payload.requestType match {
           case AppWebSocketActor.requestExecution =>
             context.parent ? RequestExecution(payload.serialId, Some(payload.command)) map {
-              case (serialId: Long, executionId: Long) =>
+              case (serialId: Long, command: String, executionId: Long) =>
                 sendResult(AppWebSocketActor.requestExecution, serialId, JsNumber(executionId))
               case other =>
-                log.warning("sbt could not execute command")
+                log.warning(s"sbt could not execute command: $other")
             }
           case AppWebSocketActor.cancelExecution =>
             if (payload.executionId.isDefined) {
