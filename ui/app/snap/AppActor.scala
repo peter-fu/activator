@@ -23,13 +23,13 @@ case object CloseClient extends AppRequest
 
 // requests that need an sbt client
 sealed trait ClientAppRequest extends AppRequest {
-  def serialId: String
+  def serialId: Long
   def command: Option[String] = None
 }
-case class RequestExecution(serialId: String, override val command: Option[String]) extends ClientAppRequest
-case class CancelExecution(serialId: String, executionId: Long) extends ClientAppRequest
-case class PossibleAutoCompletions(serialId: String, override val command: Option[String], detailLevel: Option[Int] = None) extends ClientAppRequest
-case class RequestSelfDestruct(serialId: String) extends ClientAppRequest
+case class RequestExecution(serialId: Long, override val command: Option[String]) extends ClientAppRequest
+case class CancelExecution(serialId: Long, executionId: Long) extends ClientAppRequest
+case class PossibleAutoCompletions(serialId: Long, override val command: Option[String], detailLevel: Option[Int] = None) extends ClientAppRequest
+case class RequestSelfDestruct(serialId: Long) extends ClientAppRequest
 
 sealed trait AppReply
 case object WebSocketAlreadyUsed extends AppReply
@@ -47,7 +47,7 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
 
   // TODO configName/humanReadableName are cut-and-pasted into AppManager, fix
   val connector = SbtConnector(configName = "activator", humanReadableName = "Activator", location)
-  val socket = context.actorOf(Props(new AppWebSocketActor(pending)), name = "socket")
+  val socket = context.actorOf(Props[AppWebSocketActor], name = "socket")
   val projectWatcher = context.actorOf(Props(new ProjectWatcher(location, newSourcesSocket = socket, appActor = self)),
     name = "projectWatcher")
   var clientActor: Option[ActorRef] = None
@@ -97,6 +97,8 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
       } else if (Some(ref) == clientActor) {
         log.debug(s"clientActor terminated, dropping it")
         clientActor = None
+      } else if (ref == socket) {
+        for (p <- pending) p._1 ! Status.Failure(new RuntimeException("app shut down"))
       }
 
     case req: AppRequest => req match {

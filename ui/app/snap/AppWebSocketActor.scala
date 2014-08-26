@@ -8,7 +8,7 @@ import play.api.libs.json._
 import snap.JsonHelper._
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class AppWebSocketActor(pending: Vector[(ActorRef, ClientAppRequest)]) extends WebSocketActor[JsValue] with ActorLogging {
+class AppWebSocketActor extends WebSocketActor[JsValue] with ActorLogging {
   implicit val timeout = WebSocketActor.timeout
 
   override def onMessage(json: JsValue): Unit = {
@@ -30,11 +30,11 @@ class AppWebSocketActor(pending: Vector[(ActorRef, ClientAppRequest)]) extends W
    * Please note that the 'serialId' is not any id used in sbt-server.
    */
   def handleSbtPayload(json: JsValue) = {
-    def sendResult(subType: String, serialId: String, result: JsValue, partialCommand: Option[String] = None) = {
+    def sendResult(subType: String, serialId: Long, result: JsValue, partialCommand: Option[String] = None) = {
       var payload = Seq(
         "type" -> JsString("sbt"),
         "subType" -> JsString(subType),
-        "serialId" -> JsString(serialId),
+        "serialId" -> JsNumber(serialId),
         "result" -> result)
 
       val pc = for {
@@ -47,12 +47,11 @@ class AppWebSocketActor(pending: Vector[(ActorRef, ClientAppRequest)]) extends W
     }
 
     json.validate[SbtPayload](SbtPayload.sbtPayloadReads) match {
-      case p: JsSuccess[SbtPayload] =>
-        val payload = p.get
+      case JsSuccess(payload, path) =>
         payload.requestType match {
           case AppWebSocketActor.requestExecution =>
             context.parent ? RequestExecution(payload.serialId, Some(payload.command)) map {
-              case (serialId: String, executionId: Long) =>
+              case (serialId: Long, executionId: Long) =>
                 sendResult(AppWebSocketActor.requestExecution, serialId, JsNumber(executionId))
               case other =>
                 log.warning("sbt could not execute command")
@@ -60,7 +59,7 @@ class AppWebSocketActor(pending: Vector[(ActorRef, ClientAppRequest)]) extends W
           case AppWebSocketActor.cancelExecution =>
             if (payload.executionId.isDefined) {
               context.parent ? CancelExecution(payload.serialId, payload.executionId.get) map {
-                case (serialId: String, result: Boolean) =>
+                case (serialId: Long, result: Boolean) =>
                   sendResult(AppWebSocketActor.cancelExecution, serialId, JsBoolean(result))
                 case other =>
                   log.warning("sbt could not cancel command")
@@ -71,7 +70,7 @@ class AppWebSocketActor(pending: Vector[(ActorRef, ClientAppRequest)]) extends W
             }
           case AppWebSocketActor.possibleAutoCompletions =>
             context.parent ? PossibleAutoCompletions(payload.serialId, Some(payload.command)) map {
-              case (serialId: String, command: String, choicesAny: Set[_]) =>
+              case (serialId: Long, command: String, choicesAny: Set[_]) =>
                 val choices = choicesAny.map(_.asInstanceOf[sbt.protocol.Completion])
                 sendResult(AppWebSocketActor.possibleAutoCompletions, serialId, JsArray(choices.toList map { Json.toJson(_) }), Some(command))
               case other => log.warning(s"sbt could not execute possible auto completions")
@@ -91,11 +90,6 @@ class AppWebSocketActor(pending: Vector[(ActorRef, ClientAppRequest)]) extends W
       log.debug("sending message on web socket: {}", json)
       produce(json)
   }
-
-  override def postStop(): Unit = {
-    log.debug("postStop")
-    for (p <- pending) p._1 ! Status.Failure(new RuntimeException("app shut down"))
-  }
 }
 
 object AppWebSocketActor {
@@ -108,7 +102,7 @@ case class InspectRequest(json: JsValue)
 
 case class SbtRequest(json: JsValue)
 
-case class SbtPayload(serialId: String, requestType: String, command: String, executionId: Option[Long])
+case class SbtPayload(serialId: Long, requestType: String, command: String, executionId: Option[Long])
 
 object InspectRequest {
   val tag = "InspectRequest"
@@ -139,7 +133,7 @@ object SbtPayload {
   import play.api.libs.functional.syntax._
 
   implicit val sbtPayloadReads = (
-    (__ \ "serialId").read[String] and
+    (__ \ "serialId").read[Long] and
     (__ \ "type").read[String] and
     (__ \ "command").read[String] and
     (__ \ "executionId").readNullable[Long])(SbtPayload.apply _)

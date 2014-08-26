@@ -18,17 +18,8 @@ define([
   var deferredRequests = {};
   var clientSerialId = 1;
 
-  /*
-   Simple function to create a serial id that is unique per client.
-   No need to bother about atomic-ness or number overflow or similar.
-   It is intentionally kept this simple until we integrate the concept of serial ids with sbt server.
-   */
-  function getClientSerialId() {
-    return "activator" + clientSerialId++;
-  }
-
   function sbtRequest(what, command, executionId) {
-    var id = getClientSerialId();
+    var id = clientSerialId++
     var request = {
       "request" : "sbt",
       "payload" : {
@@ -100,7 +91,7 @@ define([
    * In other words the caller of this method can expect a result back.
    * See method 'subTypeEventStream("PossibleAutoCompletions")' below for more information about the result layout.
    */
-  function possibleAutoCompletions(partialCommand) {
+  function deferredPossibleAutoCompletions(partialCommand) {
     var serialId = sbtRequest('PossibleAutoCompletions', partialCommand);
     var result = $.Deferred();
     deferredRequests[serialId] = result;
@@ -341,7 +332,7 @@ define([
 
   return {
     sbtRequest: sbtRequest,
-    possibleAutoCompletions: possibleAutoCompletions,
+    deferredPossibleAutoCompletions: deferredPossibleAutoCompletions,
     requestExecution: requestExecution,
     requestDeferredExecution: requestDeferredExecution,
     cancelExecution: cancelExecution,
