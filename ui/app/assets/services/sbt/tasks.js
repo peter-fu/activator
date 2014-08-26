@@ -4,64 +4,44 @@
 define([
   'commons/websocket',
   'commons/types',
-  './app',
-  'widgets/notifications/notifications'
+  './app'
 ], function(
   websocket,
   types,
-  app,
-  notifications
+  app
 ) {
 
-  // -------------
-  // Ajax Handlers
-  function sbtRequest(what, o) {
-    o.socketId = serverAppModel.socketId;
-    var areq = {
-      url: '/api/sbt/' + what,
-      type: 'POST',
-      dataType: 'json', // return type
-      contentType: 'application/json; charset=utf-8',
-      data: JSON.stringify(o)
+  /**
+  Temp holder for deferred possible outcomes.
+  Uses the serialId as key to the deferred object.
+  */
+  var deferredRequests = {};
+  var clientSerialId = 1;
+
+  function sbtRequest(what, command, executionId) {
+    var id = clientSerialId++
+    var request = {
+      "request" : "sbt",
+      "payload" : {
+        "serialId": id,
+        "type" : what,
+        "command": command,
+        "executionId": executionId
+      }
     };
-    return $.ajax(areq);
+    websocket.send(request);
+    return id;
   }
 
-  function possibleAutocompletions(partialCommand) {
-    // TODO return something better (with the return value already parsed)
-    return sbtRequest('possibleAutocompletions', {
-      partialCommand: partialCommand
-    }).pipe(function(completions) {
-      return $.map(completions.choices, function(completion){
-        return {
-          title: completion.display,
-          subtitle: "run sbt task " + completion.display,
-          type: "Sbt",
-          url: false,
-          execute: partialCommand + completion.append,
-          callback: function() {
-            requestExecution(partialCommand + completion.append);
-          }
-        }
-      });
-    });
-  }
-
-  function cancelExecution(id) {
-    // TODO return something better (with the return value already parsed)
-    return sbtRequest('cancelExecution', {
-      executionId: id
-    });
-  }
-
+  /**
+   * Returns the client serial id used for this action.
+   */
   function requestExecution(command) {
     if (command == "run") {
       command = runCommand(); // typing 'run' execute runMain
     }
-    // TODO return something better (with the return value already parsed)
-    return sbtRequest('requestExecution', {
-      command: command
-    });
+
+    return sbtRequest('RequestExecution', command);
   }
 
   // -----------
@@ -74,6 +54,49 @@ define([
       return "run";
     }
   });
+
+  /**
+   * Returns the result of the execution directly (deferred).
+   * Use only when the caller must get the result back in "this" call.
+   * Default should be to use "requestExection" as this has better overall performance.
+   */
+  function requestDeferredExecution(command) {
+    var serialId = requestExecution(command);
+    var result = $.Deferred();
+    deferredRequests[serialId] = result;
+    return result;
+  }
+
+  /**
+   * Returns the client serial id used for this action.
+   */
+  function cancelExecution(id) {
+    return sbtRequest('CancelExecution', "", id);
+  }
+
+  /**
+   * Returns the result of the cancel execution directly (deferred).
+   * Use only when the caller must get the result back in "this" call.
+   * Default should be to use "cancelExection" as this has better overall performance.
+   */
+  function cancelDeferredExecution(id) {
+    var serialId = cancelExecution(id);
+    var result = $.Deferred();
+    deferredRequests[serialId] = result;
+    return result;
+  }
+
+  /**
+   * Uses a deferred object to "wait" for the result to come back from the server.
+   * In other words the caller of this method can expect a result back.
+   * See method 'subTypeEventStream("PossibleAutoCompletions")' below for more information about the result layout.
+   */
+  function deferredPossibleAutoCompletions(partialCommand) {
+    var serialId = sbtRequest('PossibleAutoCompletions', partialCommand);
+    var result = $.Deferred();
+    deferredRequests[serialId] = result;
+    return result;
+  }
 
   // ------------------
   // Websocket Handlers
@@ -114,6 +137,7 @@ define([
   }
 
   var sbtEventStream = websocket.subscribe().matchOnAttribute('type','sbt');
+
   var subTypeEventStream = function(subType) {
     return sbtEventStream.fork().matchOnAttribute('subType',subType);
   }
@@ -249,6 +273,48 @@ define([
     debug && console.log("Client opened");
   });
 
+  subTypeEventStream("RequestExecution").each(function(message) {
+    debug && console.log("Received request execution result", message);
+
+    var req = deferredRequests[message.serialId];
+    if (req !== undefined) {
+      delete deferredRequests[message.serialId];
+      req.resolve({"result": message.result});
+    }
+  });
+
+  subTypeEventStream("CancelExecution").each(function(message) {
+    debug && console.log("Received cancel execution result", message);
+
+    var req = deferredRequests[message.serialId];
+    if (req !== undefined) {
+      delete deferredRequests[message.serialId];
+      req.resolve({"result": message.result});
+    }
+  });
+
+  subTypeEventStream("PossibleAutoCompletions").each(function(message) {
+    debug && console.log("Received possible auto completions", message);
+
+    var pac = deferredRequests[message.serialId]
+    if (pac !== undefined) {
+      delete deferredRequests[message.serialId];
+      pac.resolve(
+        $.map(message.result, function(completion) {
+        return {
+          title: completion.display,
+          subtitle: "run sbt task " + completion.display,
+          type: "Sbt",
+          url: false,
+          execute: message.partialCommand + completion.append,
+          callback: function () {
+            requestExecution(message.partialCommand + completion.append);
+          }
+        }
+      }));
+    }
+  });
+
   var valueChanged = subTypeEventStream("ValueChanged").map(function(message) {
     return {
       key: message.event.key.key.name,
@@ -266,9 +332,11 @@ define([
 
   return {
     sbtRequest: sbtRequest,
-    possibleAutocompletions: possibleAutocompletions,
+    deferredPossibleAutoCompletions: deferredPossibleAutoCompletions,
     requestExecution: requestExecution,
+    requestDeferredExecution: requestDeferredExecution,
     cancelExecution: cancelExecution,
+    cancelDeferredExecution: cancelDeferredExecution,
     executions: executions,
     workingTasks: workingTasks,
     testResults: testResults,
