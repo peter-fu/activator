@@ -17,13 +17,15 @@ define([
 
   var SocketStream = Stream().map(function(evt) {
     return JSON.parse(evt.data);
-  }).log(debug && "Received");
+  });
 
   // Pattern checking (optional), eg:
   // subscribe({ type: 'Log', subtype: String })
   // See commons/type.js -> is()
-  function subscribe(pattern) {
-    if (pattern)
+  function subscribe(pattern, value) {
+    if (value && pattern)
+      return SocketStream.matchOnAttribute(pattern, value);
+    else if (pattern)
       return SocketStream.match(pattern);
     else
       return SocketStream.fork();

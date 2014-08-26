@@ -3,6 +3,7 @@
  */
 define([
   'main/router',
+  'services/sbt',
   'widgets/typesafe/typesafe',
   'widgets/appManager/appManager',
   'widgets/appStatus/appStatus',
@@ -11,6 +12,7 @@ define([
   'css!./navigation'
 ], function(
   router,
+  sbt,
   typesafe,
   appManager,
   appStatus,
@@ -21,6 +23,7 @@ define([
     appManager: appManager,
     appStatus: appStatus,
     typesafe: typesafe,
+    counters: sbt.tasks.errorCounters,
 
     links: {
       'Learn': {

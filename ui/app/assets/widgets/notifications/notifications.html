@@ -1,8 +1,10 @@
 <dl id="notifications" class="dropdown">
-  <dt>
-    <span class="counter">0</span>
+  <dt data-bind="click: markAsRead">
+    <span class="counter" data-bind="text: notificationsReadCount"></span>
     <div class="sticker success"><span class="shape"><svg class="mark" data-bind="svg: '/assets/icons/success-mini.svg'"/></span></div>
+    <div class="sticker error"><span class="shape"><svg class="mark" data-bind="svg: '/assets/icons/error-mini.svg'"/></span></div>
   </dt>
-  <dd><a href="/">Notification</a><a href="/">Notification</a><a href="/">Notification</a>
+  <dd data-bind="foreach: notifications">
+    <a data-bind="text: text, href: link, attr: {type: type}, css: {read: read}"></a>
   </dd>
 </dl>

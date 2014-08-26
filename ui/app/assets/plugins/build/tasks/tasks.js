@@ -28,6 +28,7 @@ define([
 
   return {
     render: function(){
+      sbt.tasks.errorCounters.build(0);
       return ko.bindhtml(tpl, State)
     }
   }

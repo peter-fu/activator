@@ -4,19 +4,37 @@
   <dl id="rockets">
     <dt>Learn</dt>
     <dd>
-      <a data-bind="memorizeLinks: '#tutorial',      isActiveUrl: '#tutorial'      ">Tutorial</a>
-      <a data-bind="memorizeLinks: '#documentation', isActiveUrl: '#documentation' ">Documentation</a>
+      <a data-bind="memorizeLinks: '#tutorial', isActiveUrl: '#tutorial'">
+        Tutorial
+      </a>
+      <a data-bind="memorizeLinks: '#documentation', isActiveUrl: '#documentation'">
+        Documentation
+      </a>
     </dd>
     <dt>Develop</dt>
     <dd>
-      <a data-bind="memorizeLinks: '#build',         isActiveUrl: '#build'         ">Build</a>
-      <a data-bind="memorizeLinks: '#code',          isActiveUrl: '#code'          ">Code</a>
-      <a data-bind="memorizeLinks: '#run',           isActiveUrl: '#run'           ">Run</a>
-      <a data-bind="memorizeLinks: '#test',          isActiveUrl: '#test'          ">Test</a>
+      <a data-bind="memorizeLinks: '#build', isActiveUrl: '#build'">
+        Build
+        <span class="counter" data-bind="text: counters.build, visible: counters.build()"></span>
+      </a>
+      <a data-bind="memorizeLinks: '#code', isActiveUrl: '#code'">
+        Code
+        <span class="counter" data-bind="text: counters.code, visible: counters.code()"></span>
+      </a>
+      <a data-bind="memorizeLinks: '#run', isActiveUrl: '#run'">
+        Run
+        <span class="counter" data-bind="text: counters.run, visible: counters.run()"></span>
+      </a>
+      <a data-bind="memorizeLinks: '#test', isActiveUrl: '#test'">
+        Test
+        <span class="counter" data-bind="text: counters.test, visible: counters.test()"></span>
+      </a>
     </dd>
     <dt>Deliver</dt>
     <dd>
-      <a data-bind="memorizeLinks: '#monitor',       isActiveUrl: '#monitor'       ">Monitor</a>
+      <a data-bind="memorizeLinks: '#monitor', isActiveUrl: '#monitor'">
+        Monitor
+      </a>
     </dd>
   </dl>
   <!-- ko include: typesafe --><!-- /ko -->
