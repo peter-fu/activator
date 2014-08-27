@@ -41,7 +41,6 @@ define([
     },
 
     route: function(url, breadcrumb){
-      sbt.tasks.errorCounters.test(0);
       var all = [
         ['test/', "Test"]
       ];

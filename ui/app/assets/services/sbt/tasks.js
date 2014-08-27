@@ -62,9 +62,6 @@ define([
   */
   var testResults = ko.observableArray([]);
   var compilationErrors = ko.observableArray([]);
-  // We use a temporary local values to avoid reseting the numbers in the UI if the errors are still here
-  var testResultsAccumulator = [];
-  var compilationErrorsAccumulator = [];
 
   /**
   Temp holder for deferred possible outcomes.
@@ -159,16 +156,43 @@ define([
     return sbtEventStream.matchOnAttribute('subType',subType);
   }
 
-  // Tasks complete
+  // Tasks
+  subTypeEventStream("TaskStarted").each(function(message) {
+    var execution = executionsById[message.event.executionId]
+    if (execution) {
+      var task = new Task(message);
+      debug && console.log("Starting task ", task);
+      // we want to be in the by-id hash before we notify
+      // on the tasks array
+      tasksById[task.taskId] = task;
+      executionsById[task.executionId].tasks[task.taskId] = task;
+    } else {
+      debug && console.log("Ignoring task for unknown execution " + message.event.executionId)
+    }
+  });
+
+  subTypeEventStream("TaskFinished").each(function(message) {
+    var task = tasksById[message.event.taskId];
+    if (task) {
+      // we want succeeded flag up-to-date when finished notifies
+      // task.succeeded(message.event.success);
+      task.finished(true);
+      delete tasksById[task.taskId];
+      delete executionsById[task.executionId].tasks[task.taskId];
+    }
+  });
+
   subTypeEventStream("TaskEvent").each(function(message) {
     var event = message.event;
+    var execution = executionsById[tasksById[event.taskId].executionId];
+    if (!execution) throw "Orphan task detected";
 
     if (event.name === "CompilationFailure") {
       debug && console.log("CompilationFailure: ", event);
-      compilationErrorsAccumulator.push(event.serialized);
+      execution.compilationErrors.push(event.serialized);
     } else if (event.name === "TestEvent") {
       debug && console.log("TestEvent: ", event);
-      testResults.push(event.serialized);
+      execution.testResults.push(event.serialized);
     }
   });
 
@@ -185,21 +209,19 @@ define([
     switch(execution.command){
       case "compile":
         // Reset the compilation errors
-        compilationErrorsAccumulator = [];
         workingTasks.compile(workingTasks.compile()+1);
         break;
       case "run":
         workingTasks.run(workingTasks.run()+1);
         break;
       case "test":
-        testResults([]); // Reset test results
         workingTasks.test(workingTasks.test()+1);
         break;
     }
   });
 
   subTypeEventStream("ExecutionStarting").each(function(message) {
-    var execution = executionsById[message.event.executionId];
+    var execution = executionsById[message.event.id];
     if (execution) {
       execution.started(new Date());
     }
@@ -232,19 +254,26 @@ define([
         break;
     }
 
-    // Update counters
-    if (execution.command == "compile"){
-      compilationErrors(compilationErrorsAccumulator);
-      errorCounters.code(compilationErrorsAccumulator.length);
+    compilationErrors(execution.compilationErrors);
+    if (execution.testResults.length) {
+      testResults(execution.testResults);
+      errorCounters.test(execution.testResults.filter(function(t) {
+        return t.outcome == "failed";
+      }).length);
     }
+
+    // Update counters
+    errorCounters.code(execution.compilationErrors.length);
     // Failed tasks
     if (!succeeded){
       if (execution.command == "run" && router.current().id != "run"){
         errorCounters.run(errorCounters.run()+1);
         new Notification("Runtime error", "#run/", "run");
-      } else if (execution.command == "test"  && router.current().id != "test"){
-        errorCounters.test(errorCounters.test()+1);
-        new Notification("Test failed", "#test/results", "test");
+      } else if (execution.command == "test"){
+        // Only show notification if we don't see the result
+        if (router.current().id != "test") {
+          new Notification("Test failed", "#test/results", "test");
+        }
       } else if (router.current().id != "build"){
         errorCounters.build(errorCounters.build()+1);
         new Notification("Build error", "#build/tasks", "build");
@@ -343,11 +372,18 @@ define([
 
     self.executionId = message.event.id;
     self.command     = message.event.command;
-    self.started     = ko.observable(new Date());
+    self.started     = ko.observable(0);
     self.finished    = ko.observable(0); // 0 here stands for no Date() object, yet
     self.finished.extend({ notify: 'always' });
     self.succeeded   = ko.observable();
 
+    // Data produced:
+    self.tasks          = {};
+    self.compilationErrors  = [];
+    self.testResults    = [];
+    self.notifications  = [];
+
+    // Statuses
     self.running = ko.computed(function() {
       return !self.finished();
     });
@@ -356,7 +392,7 @@ define([
     });
     self.time = ko.computed(function() {
       if (self.finished() && self.started()){
-        return "Completed in " + Math.round((self.finished() - self.started()) /1000) +" s";
+        return (self.succeeded()?"Completed in ":"Failed after ")+Math.round((self.finished() - self.started()) /1000) +" s";
       } else if (self.started()) {
         return "Running for " + Math.round((new Date() - self.started()) /1000) +" s";
       } else {
@@ -371,6 +407,15 @@ define([
         setTimeout(timer, 100)
       }
     }());
+  }
+
+  function Task(message) {
+    var self = this;
+    self.executionId = message.event.executionId;
+    self.taskId = message.event.taskId;
+    self.key = message.event.key ? message.event.key.key.name : null;
+    self.finished = ko.observable(0); // 0 here stands for no Date() object
+    self.succeeded = ko.observable(0); // 0 here stands for no Date() object
   }
 
   /**
