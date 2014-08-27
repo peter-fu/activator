@@ -18,6 +18,7 @@ define([
     self.location = doc.location;
     self.active = ko.observable(false); // == displayed document
     self.body = ko.observable("");
+    self.lineNumber = doc.lineNumber;
 
     // Indicates a network activity on the file
     self.working = ko.observable(0);

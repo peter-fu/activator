@@ -19,7 +19,7 @@
       </a>
       <a data-bind="memorizeLinks: '#code', isActiveUrl: '#code'">
         Code
-        <span class="counter" data-bind="text: counters.code, visible: counters.code()"></span>
+        <span class="counter" data-bind="text: counters.code, visible: counters.code(), click: showFirstCompileError"></span>
       </a>
       <a data-bind="memorizeLinks: '#run', isActiveUrl: '#run'">
         Run

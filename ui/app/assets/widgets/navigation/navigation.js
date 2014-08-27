@@ -4,6 +4,7 @@
 define([
   'main/router',
   'services/sbt',
+  'services/ajax',
   'widgets/typesafe/typesafe',
   'widgets/appManager/appManager',
   'widgets/appStatus/appStatus',
@@ -13,6 +14,7 @@ define([
 ], function(
   router,
   sbt,
+  fs,
   typesafe,
   appManager,
   appStatus,
@@ -24,6 +26,13 @@ define([
     appStatus: appStatus,
     typesafe: typesafe,
     counters: sbt.tasks.errorCounters,
+    showFirstCompileError: function(c, e) {
+      e.preventDefault();
+      var ers = sbt.tasks.compilationErrors();
+      if(ers.length){
+        window.location.hash = "#code"+ fs.relative(ers[0].position.sourcePath)+":"+ers[0].position.line;
+      }
+    },
 
     links: {
       'Learn': {
