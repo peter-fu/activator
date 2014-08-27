@@ -33,6 +33,7 @@
     padding: 0 0 10px;
   }
   a {
+    position: relative;
     display: block;
     padding: 3px 10px;
     color: @grey;
@@ -46,6 +47,20 @@
     &:hover, &.active {
       color: white;
     }
+  }
+  .counter {
+    position: absolute;
+    top: 7px;
+    right: 8px;
+    min-width: 16px;
+    height: 16px;
+    line-height: 16px;
+    border-radius: 10px;
+    text-align: center;
+    padding: 0 6px;
+    background: @red;
+    color: #fff;
+    font-size: 11px;
   }
 }
 

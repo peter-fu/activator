@@ -4,6 +4,7 @@
 
 define([
   "services/ajax",
+  "services/sbt",
   "main/plugins",
   "text!./code.html",
   "widgets/layout/layout",
@@ -17,6 +18,7 @@ define([
   "css!widgets/buttons/button"
 ], function(
   fs,
+  sbt,
   plugins,
   tpl,
   layout,
@@ -29,6 +31,7 @@ define([
 
   var openedDocuments = ko.observableArray([]);
   var selectedDocument = ko.observable();
+  selectedDocument.extend({ notify: 'always' });
   var visible = ko.computed(function(){
     return !!openedDocuments().length;
   });
@@ -41,6 +44,7 @@ define([
       doc = openedDocuments()[index];
       if (doc.location == e.data.scope.location){
         foundDocIndex = parseInt(index);
+        if(e.data.scope.lineNumber) doc.lineNumber = e.data.scope.lineNumber;
         break;
       }
     }
@@ -128,6 +132,13 @@ define([
     }
   });
 
+  // Annotations
+  sbt.tasks.compilationErrors.subscribe(function(_) {
+    openedDocuments().forEach(function(doc) {
+      doc.showAnnotations(_);
+    });
+  });
+
   var State = {
     browser: browser,
     editor: editor,
@@ -149,11 +160,18 @@ define([
 
     route: function(url, breadcrumb) {
       var all = [['code/', "Code"]];
+      // Search for line number
+      var lastParameter = url.parameters[url.parameters.length-1];
+      var filenameAndLine = lastParameter.split(":");
+      url.parameters[url.parameters.length-1] = filenameAndLine[0];
+      lastParameter = url.parameters[url.parameters.length-1];
+
       breadcrumb(all.concat([["code/"+url.parameters.join("/"),url.parameters.join("/")]]));
       if (url.parameters[0]){
         openFile({data:{scope:{
-          title: url.parameters[url.parameters.length-1],
-          location: fs.absolute("/"+url.parameters.join("/"))
+          title: lastParameter,
+          location: fs.absolute("/"+url.parameters.join("/")),
+          lineNumber: filenameAndLine[1]
         }}});
       } else if (!selectedDocument()){
         breadcrumb(all);

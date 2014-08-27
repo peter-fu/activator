@@ -76,9 +76,9 @@ define([
     }
   });
 
-  document.body.addEventListener("TaskSuccess", function(e){
+  sbt.tasks.taskCompleteEvent.subscribe(function(e) {
     var command;
-    switch(e.detail.command){
+    switch(e.command){
       case "compile":
       case "clean":
       case "reload":
@@ -97,11 +97,11 @@ define([
         command = "running";
         break;
     }
-    var el = $("#appStatus ."+command+" .success").removeClass('animate');
+    $("#appStatus ."+command+" .animate").removeClass('animate');
+    var el = $("#appStatus ."+command+" ."+(e.succeded?"success":"error"));
     setTimeout(function(){
       el.addClass('animate');
     },50);
-
   });
 
   var State = {

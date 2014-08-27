@@ -90,8 +90,15 @@ define([
       State.selectedDocument = selectedDocument;
       // bind the document
       ko.doOnChange(selectedDocument, function(doc) {
-        if (doc && doc.isText && doc.session != editor.getSession()) {
-          editor.setSession(doc.session);
+        if (doc && doc.isText) {
+          if (doc.session != editor.getSession()){
+            editor.setSession(doc.session);
+          }
+          if (doc.lineNumber) {
+            setTimeout(function() {
+              editor.gotoLine(doc.lineNumber);
+            },1);
+          }
           editor.focus();
         }
       });
