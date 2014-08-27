@@ -24,9 +24,9 @@ define([
   // See commons/type.js -> is()
   function subscribe(pattern, value) {
     if (value && pattern)
-      return SocketStream.matchOnAttribute(pattern, value);
+      return SocketStream.fork().matchOnAttribute(pattern, value);
     else if (pattern)
-      return SocketStream.match(pattern);
+      return SocketStream.fork().match(pattern);
     else
       return SocketStream.fork();
   }
