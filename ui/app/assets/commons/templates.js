@@ -213,7 +213,11 @@ define(function() {
   // This allows to style SVG in css (including css transition and animations)
   ko.bindingHandlers.svg = {
     init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-      $(element).css({ width: "16px", height: "16px" });
+      $(element)
+        .attr({
+          width: "18px", // putting default small value,
+          height: "18px" // to avoid cranky blinking
+        });
       $.get(valueAccessor(), function(data) {
         var img = $(document.adoptNode(data.querySelector('svg')));
         $(element).replaceWith(img);
