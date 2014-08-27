@@ -215,12 +215,7 @@ define(function() {
     init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
       $.get(valueAccessor(), function(data) {
         var img = $(document.adoptNode(data.querySelector('svg')));
-        $(element)
-          .html(img.html())
-          .attr({
-            width: img.attr('width'),
-            height: img.attr('height')
-          });
+        $(element).replaceWith(img);
       }, 'xml');
     }
   }
