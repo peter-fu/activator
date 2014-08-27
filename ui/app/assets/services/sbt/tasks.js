@@ -263,7 +263,9 @@ define([
     }
 
     // Update counters
-    errorCounters.code(execution.compilationErrors.length);
+    errorCounters.code(execution.compilationErrors.filter(function(m) {
+      return m.severity == "Error";
+    }).length);
     // Failed tasks
     if (!succeeded){
       if (execution.command == "run" && router.current().id != "run"){

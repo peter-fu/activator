@@ -46,7 +46,7 @@ define([
         return m.position.sourcePath == self.location;
       }).map(function(m) {
         // Translate sbt error kinds, to ace annotations types
-        var aceLevel = m.severity == 'Error' ? 'error': m.kind == 'Warning' ? 'warning': 'info';
+        var aceLevel = m.severity == 'Error' ? 'error': m.kind == 'Warn' ? 'warning': 'info';
         return {
           row: m.position.line - 1, // Ace count from zero
           column: m.position.offset,
