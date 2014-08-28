@@ -163,13 +163,13 @@ define([
     route: function(url, breadcrumb) {
       var all = [['code/', "Code"]];
       // Search for line number
-      var lastParameter = url.parameters[url.parameters.length-1];
-      var filenameAndLine = lastParameter.split(":");
-      url.parameters[url.parameters.length-1] = filenameAndLine[0];
-      lastParameter = url.parameters[url.parameters.length-1];
 
       breadcrumb(all.concat([["code/"+url.parameters.join("/"),url.parameters.join("/")]]));
       if (url.parameters[0]){
+        var lastParameter = url.parameters[url.parameters.length-1];
+        var filenameAndLine = lastParameter.split(":");
+        url.parameters[url.parameters.length-1] = filenameAndLine[0];
+        lastParameter = url.parameters[url.parameters.length-1];
         openFile({data:{scope:{
           title: lastParameter,
           location: fs.absolute("/"+url.parameters.join("/")),
