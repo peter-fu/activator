@@ -188,6 +188,7 @@ define([
     if (!execution) throw "Orphan task detected";
 
     if (event.name === "CompilationFailure") {
+      var debug = 1
       debug && console.log("CompilationFailure: ", event);
       execution.compilationErrors.push(event.serialized);
     } else if (event.name === "TestEvent") {
@@ -206,7 +207,7 @@ define([
     executions.push(execution);
 
     // Increment active tasks (to make icons glowing)
-    switch(execution.command){
+    switch(execution.commandId){
       case "compile":
         // Reset the compilation errors
         workingTasks.compile(workingTasks.compile()+1);
@@ -239,10 +240,10 @@ define([
     execution.succeeded(succeeded);
     execution.finished(new Date());
 
-    taskComplete(execution.command, succeeded); // Throw an event
+    taskComplete(execution.commandId, succeeded); // Throw an event
 
     // Decrement active tasks (to stop icons glowing if no pending task ;; if counter is 0)
-    switch(execution.command){
+    switch(execution.commandId){
       case "compile":
         workingTasks.compile(workingTasks.compile()-1);
         break;
@@ -268,10 +269,10 @@ define([
     }).length);
     // Failed tasks
     if (!succeeded){
-      if (execution.command == "run" && router.current().id != "run"){
+      if ((execution.commandId == "run") && router.current().id != "run"){
         errorCounters.run(errorCounters.run()+1);
         new Notification("Runtime error", "#run/", "run");
-      } else if (execution.command == "test"){
+      } else if (execution.commandId == "test"){
         // Only show notification if we don't see the result
         if (router.current().id != "test") {
           new Notification("Test failed", "#test/results", "test");
@@ -374,10 +375,13 @@ define([
 
     self.executionId = message.event.id;
     self.command     = message.event.command;
+    self.commandId   = message.event.command.split(/[:\ ]/)[0];
     self.started     = ko.observable(0);
     self.finished    = ko.observable(0); // 0 here stands for no Date() object, yet
     self.finished.extend({ notify: 'always' });
     self.succeeded   = ko.observable();
+
+    if (self.commandId == "runMain") self.commandId = "run";
 
     // Data produced:
     self.tasks          = {};
