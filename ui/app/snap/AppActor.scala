@@ -3,8 +3,6 @@
  */
 package snap
 
-import java.util.concurrent.atomic.AtomicLong
-
 import akka.actor._
 import java.io.File
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
