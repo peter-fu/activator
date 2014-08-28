@@ -4,11 +4,13 @@
 define([
   'main/router',
   'commons/websocket',
+  'commons/stream',
   'commons/types',
   './app'
 ], function(
   router,
   websocket,
+  Stream,
   types,
   app
 ) {
@@ -37,6 +39,13 @@ define([
     code:  ko.observable(0),
     run:   ko.observable(0),
     test:  ko.observable(0)
+  }
+
+  /**
+  Stream Events
+  */
+  var SbtEvents = {
+    successfulBuild:  Stream()
   }
 
   /**
@@ -178,7 +187,9 @@ define([
       // task.succeeded(message.event.success);
       task.finished(true);
       delete tasksById[task.taskId];
-      delete executionsById[task.executionId].tasks[task.taskId];
+      if(executionsById[task.executionId]) {
+        delete executionsById[task.executionId].tasks[task.taskId];
+      }
     }
   });
 
@@ -245,6 +256,7 @@ define([
     switch(execution.command){
       case "compile":
         workingTasks.compile(workingTasks.compile()-1);
+        if (succeeded) SbtEvents.successfulBuild.push(succeeded);
         break;
       case "run":
         workingTasks.run(workingTasks.run()-1);
@@ -445,6 +457,7 @@ define([
     errorCounters:           errorCounters,
     taskCompleteEvent:       taskCompleteEvent,
     notifications:           notifications,
+    SbtEvents:               SbtEvents,
     active: {
       turnedOn:     "",
       compiling:    "",

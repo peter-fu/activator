@@ -139,8 +139,7 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
         clientActor.foreach(_ ! RequestSelfDestruct)
 
       case ProjectFilesChanged =>
-        // TODO : use recompilation flag sent from client to determine whether or not the file change(s) should trigger a compilation
-        pending = pending :+ (self -> RequestExecution(serialId.getAndIncrement(), Some(SbtClientActor.compileCommand)))
+        self ! NotifyWebSocket(AppActor.projectFileChanged)
         flushPending()
       case OpenClient(client) =>
         log.debug(s"Old client actor was ${clientActor}")
@@ -203,4 +202,5 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
 
 object AppActor {
   val clientOpenedJsonResponse = JsObject(Seq("type" -> JsString("sbt"), "subType" -> JsString("ClientOpened"), "event" -> JsObject(Nil)))
+  val projectFileChanged = JsObject(Seq("type" -> JsString("sbt"), "subType" -> JsString("ProjectFilesChanged"), "event" -> JsObject(Nil)))
 }

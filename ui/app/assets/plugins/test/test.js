@@ -32,6 +32,7 @@ define([
 
   var State = {
     results: sbt.tasks.testResults,
+    retestOnSuccessfulBuild: sbt.app.settings.retestOnSuccessfulBuild,
     sbtExecCommand: sbtExecCommand
   }
 
