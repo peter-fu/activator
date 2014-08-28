@@ -52,8 +52,9 @@ object Templates extends Controller {
   def meta(name: String) = Action.async { request =>
     import concurrent.ExecutionContext.Implicits._
     templateCache.metadata.map { m =>
-      Ok(Json.toJson(m.filter(t => t.name == name).headOption.getOrElse(
-        throw new RuntimeException(s"Could not load information about project: $name"))))
+      val metadata = m.filter(t => t.name == name).headOption
+      if (metadata.isDefined) Ok(Json.toJson(metadata.get))
+      else NotFound
     }
   }
 

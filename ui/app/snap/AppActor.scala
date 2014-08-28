@@ -57,11 +57,6 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
     name = "projectWatcher")
   var clientActor: Option[ActorRef] = None
   var clientCount = 0
-
-  // Serial id of this client, i.e. the server.
-  // Starts on a higher number to reduce any number clash confusion (but it is not super important to avoid hence the sort of slack attempt).
-  var serialId = new AtomicLong(100000)
-
   var webSocketCreated = false
 
   context.watch(socket)
@@ -137,10 +132,8 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
         projectWatcher ! SetSourceFilesRequest(files)
       case ReloadSbtBuild =>
         clientActor.foreach(_ ! RequestSelfDestruct)
-
       case ProjectFilesChanged =>
         self ! NotifyWebSocket(AppActor.projectFileChanged)
-        flushPending()
       case OpenClient(client) =>
         log.debug(s"Old client actor was ${clientActor}")
         clientActor.foreach(_ ! PoisonPill) // shouldn't happen - paranoia
@@ -162,8 +155,6 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
           produceLog(LogMessage.DEBUG, s"request pending until connection to sbt opens: ${r}")
         }
     }
-
-    case sbt: SbtClientResponse => //ignore but keep this to not spam dead letters (side effect of calling sbt client with self from this actor here above)
   }
 
   private def flushPending(): Unit = {

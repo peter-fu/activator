@@ -113,7 +113,3 @@ class SbtClientActor(val client: SbtClient) extends Actor with ActorLogging {
     } pipeTo sender
   }
 }
-
-object SbtClientActor {
-  val compileCommand = "compile"
-}
