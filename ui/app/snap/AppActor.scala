@@ -3,6 +3,8 @@
  */
 package snap
 
+import java.util.concurrent.atomic.AtomicLong
+
 import akka.actor._
 import java.io.File
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -20,11 +22,13 @@ case class UpdateSourceFiles(files: Set[File]) extends AppRequest
 case object ReloadSbtBuild extends AppRequest
 case class OpenClient(client: SbtClient) extends AppRequest
 case object CloseClient extends AppRequest
+case object ProjectFilesChanged extends AppRequest
 
 // requests that need an sbt client
 sealed trait ClientAppRequest extends AppRequest {
   def serialId: Long
   def command: Option[String] = None
+
 }
 case class RequestExecution(serialId: Long, override val command: Option[String]) extends ClientAppRequest
 case class CancelExecution(serialId: Long, executionId: Long) extends ClientAppRequest
@@ -32,6 +36,7 @@ case class PossibleAutoCompletions(serialId: Long, override val command: Option[
 case class RequestSelfDestruct(serialId: Long) extends ClientAppRequest
 
 sealed trait AppReply
+case class SbtClientResponse(serialId: Long, result: Any, command: Option[String] = None) extends AppReply
 case object WebSocketAlreadyUsed extends AppReply
 case class WebSocketCreatedReply(created: Boolean) extends AppReply
 
@@ -52,6 +57,10 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
     name = "projectWatcher")
   var clientActor: Option[ActorRef] = None
   var clientCount = 0
+
+  // Serial id of this client, i.e. the server.
+  // Starts on a higher number to reduce any number clash confusion (but it is not super important to avoid hence the sort of slack attempt).
+  var serialId = new AtomicLong(100000)
 
   var webSocketCreated = false
 
@@ -128,6 +137,11 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
         projectWatcher ! SetSourceFilesRequest(files)
       case ReloadSbtBuild =>
         clientActor.foreach(_ ! RequestSelfDestruct)
+
+      case ProjectFilesChanged =>
+        // TODO : use recompilation flag sent from client to determine whether or not the file change(s) should trigger a compilation
+        pending = pending :+ (self -> RequestExecution(serialId.getAndIncrement(), Some(SbtClientActor.compileCommand)))
+        flushPending()
       case OpenClient(client) =>
         log.debug(s"Old client actor was ${clientActor}")
         clientActor.foreach(_ ! PoisonPill) // shouldn't happen - paranoia
@@ -149,6 +163,8 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
           produceLog(LogMessage.DEBUG, s"request pending until connection to sbt opens: ${r}")
         }
     }
+
+    case sbt: SbtClientResponse => //ignore but keep this to not spam dead letters (side effect of calling sbt client with self from this actor here above)
   }
 
   private def flushPending(): Unit = {

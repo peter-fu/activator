@@ -109,10 +109,11 @@ class SbtClientActor(val client: SbtClient) extends Actor with ActorLogging {
     } map { result =>
       log.debug(s"${req} result: ${result}")
       produceLog(LogMessage.DEBUG, s"request $req result: ${result}")
-
-      // Not all request contain a command, check to see what should be returned
-      if (req.command.isDefined) (req.serialId, req.command.get, result)
-      else (req.serialId, result)
+      SbtClientResponse(req.serialId, result, req.command)
     } pipeTo sender
   }
+}
+
+object SbtClientActor {
+  val compileCommand = "compile"
 }
