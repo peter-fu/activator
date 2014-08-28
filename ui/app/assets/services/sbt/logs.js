@@ -11,6 +11,8 @@ define([
 
   var logs = ko.observableArray([]);
   var stdout = ko.observableArray([]);
+  var logsBuffer = ko.buffer();
+  var stdoutBuffer = ko.buffer();
 
   // Websocket Handlers
   var logEvent = websocket.subscribe({ type:'sbt', subType:'LogEvent' })
@@ -21,10 +23,11 @@ define([
       return !((m.event.entry.level == "debug" || m.event.entry.type == "stdout") && !(app.settings.showLogDebug() || debug))
     })
     .each(function(message){
-      logs.push(message);
-      // TODO: Put a higher scrollback
-      if(logs().length > (app.settings.showLogDebug()?1000:250)) {
-        logs.splice(0,100);
+      logsBuffer(message, function(messages) {
+        logs.push.apply(logs, messages);
+      });
+      if(logs().length > 1000) {
+        logs.splice(0,100); // Remove the first 100 items
       }
     });
 
@@ -34,10 +37,11 @@ define([
       return m.event.entry && m.event.entry.type == "stdout";
     })
     .each(function(message){
-      stdout.push(message);
-      // TODO: Put a higher scrollback
-      if(stdout().length > 500) {
-        stdout.splice(0,100);
+      stdoutBuffer(message, function(messages) {
+        stdout.push.apply(stdout, messages);
+      });
+      if(stdout().length > 1000) {
+        stdout.splice(0,100); // Remove the first 100 items
       }
     });
 

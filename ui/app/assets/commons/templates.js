@@ -220,6 +220,24 @@ define(function() {
     }
   }
 
+  // Try to avoid the dom to be solicited on every messages, by looking for sequences:
+  // when the server pushes 50 lines at once in the webscoket, it comes as 50 events
+  // we buffer those sequences by listening all events that occur in less than 20ms.
+  ko.buffer = function() {
+    var timer, bufferArray = [];
+    return function(item, callback) {
+      bufferArray.push(item);
+      if (timer) {
+        window.clearTimeout(timer);
+      }
+      timer = setTimeout(function() {
+        callback(bufferArray);
+        bufferArray = [];
+        timer = null;
+      }, 20);
+    }
+  }
+
   // Utility functions
   ko.domRemoved = function(target, callback) {
     return setTimeout(function() {
