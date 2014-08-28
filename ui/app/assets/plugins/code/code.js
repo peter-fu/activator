@@ -72,8 +72,10 @@ define([
   }
 
   var closeFile = function(doc, event) {
-    event.preventDefault();
-    event.stopPropagation();
+    if (event){
+      event.preventDefault();
+      event.stopPropagation();
+    }
     if (doc.edited() && !confirm("This file has unsaved changes, do you confirm closing without saving?")) return;
     var docIndex = openedDocuments.indexOf(doc);
     if (docIndex >= 0){
@@ -188,6 +190,11 @@ define([
           e.stopPropagation();
           return false;
         }
+      } else if (key == "W"){
+        closeFile(selectedDocument());
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
       } else if (key == "BOTTOM"){
         var all = $("#wrapper .browser span:visible");
         var index = all.index(focus);
