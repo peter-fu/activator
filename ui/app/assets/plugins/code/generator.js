@@ -1,7 +1,16 @@
 /*
  Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
  */
-define(['commons/utils', 'commons/streams', 'services/sbt', 'services/ajax'], function (utils, stream, sbt, ajax) {
+define([
+  'commons/utils',
+  'commons/websocket',
+  'services/sbt',
+  'services/ajax'],
+  function (
+    utils,
+    websocket,
+    sbt,
+    ajax) {
 
   // available states
   var idle = 1;
@@ -26,9 +35,16 @@ define(['commons/utils', 'commons/streams', 'services/sbt', 'services/ajax'], fu
       this.processTimeoutId = -1;
       this.currentState = idle;
       this.currentExecutionId = 0;
-      this.subscription = null;
+      this.subscription = websocket.subscribe('type', 'sbt');
+      initializeSubscriptions(this.subscription);
     }
   });
+
+  var initializeSubscriptions = function(s) {
+    s.matchOnAttribute('subType','ExecutionSuccess').each(function(msg) { successExecutionHandler(msg); });
+    s.matchOnAttribute('subType','ExecutionFailure').each(function(msg) { failureExecutionHandler(msg); });
+    s.matchOnAttribute('subType','ClientOpened').each(function(msg) { clientOpenedHandler(msg); });
+  }
 
   var setNewTimeout = function() {
     // Delete existing timeout
@@ -40,7 +56,6 @@ define(['commons/utils', 'commons/streams', 'services/sbt', 'services/ajax'], fu
   var start = function() {
     // Reset any previous messages
     logs([]);
-    subscribe();
     logs.push({message: "Generating files may take a while. Sit back and relax."});
     setNewTimeout();
     checkProjectFile();
@@ -69,7 +84,7 @@ define(['commons/utils', 'commons/streams', 'services/sbt', 'services/ajax'], fu
   };
 
   var runSbtCommand = function() {
-    return sbt.requestDeferredExecution(generator.sbtCommand);
+    return sbt.tasks.requestDeferredExecution(generator.sbtCommand);
   };
 
   var checkCommand = function() {
@@ -77,8 +92,8 @@ define(['commons/utils', 'commons/streams', 'services/sbt', 'services/ajax'], fu
     logs.push({message: "Trying to run \'" + generator.sbtCommand + "\'..."});
     var result = runSbtCommand();
     result.done(function(data) {
-      // Note: the result from sbt is asynchronous and the stream subscription below will continue to drive the process
-      generator.currentExecutionId = data.id;
+      // Note: the result from sbt is asynchronous and the websocket subscription drives the process forward
+      generator.currentExecutionId = data.result;
     }).fail(function() {
       resetState("Did not receive any response from server. Please try again.");
     });
@@ -89,8 +104,8 @@ define(['commons/utils', 'commons/streams', 'services/sbt', 'services/ajax'], fu
     logs.push({message: "Running the " + generator.sbtCommand + " command."});
     var result = runSbtCommand();
     result.done(function(data) {
-      // Note: the result from sbt is asynchronous and the stream subscription below will continue to drive the process
-      generator.currentExecutionId = data.id;
+      // Note: the result from sbt is asynchronous and the websocket subscription drives the process forward
+      generator.currentExecutionId = data.result;
     }).fail(function() {
       resetState("Did not receive any response from server. Please try again.");
     });
@@ -115,52 +130,41 @@ define(['commons/utils', 'commons/streams', 'services/sbt', 'services/ajax'], fu
     clearInterval(generator.processTimeoutId);
     debug && console.log(msg);
     logs.push({message: msg});
-    stream.unsubscribe(generator.subscription);
     generator = null;
   };
 
-  /**
-   * Subscribes to the stream to drive the process after asynchronous calls have been made to the server-side.
-   */
-  var subscribe = function () {
-    generator.subscription = stream.subscribe({
-      handler: function (msg) {
-        if (msg.type === 'sbt') {
-          // This is the id of the task that has been handled by sbt
-          var executionId = msg.event.id;
-          var subType = msg.subType;
-
-          // State : After checking if the command is available in sbt
-          if (generator.currentState === checkingCommand && generator.currentExecutionId == executionId) {
-            if (subType === 'ExecutionFailure') {
-              logs.push({message: "\'" + generator.sbtCommand + "\' not available, trying to add a plugin to provide it."});
-              generateFile();
-            } else if (subType === 'ExecutionSuccess') {
-              setNewTimeout();
-              logs.push({message: "\'" + generator.sbtCommand + "\' command was available and has been run."});
-              resetState("Required files generated. Open your IDE and import project.");
-            }
-          }
-
-          // State: After sbt restart
-          else if (generator.currentState === restartingSbt && subType === "ClientOpened") {
-            setNewTimeout();
-            runCommand();
-          }
-
-          // State: After running the command
-          else if (generator.currentState === runningCommand && generator.currentExecutionId == executionId) {
-            if (subType === 'ExecutionFailure') {
-              resetState("Could not run the \'" + generator.sbtCommand + "\' command. Please try again.");
-            } else if (subType === 'ExecutionSuccess') {
-              logs.push({message: "\'" + generator.sbtCommand + "\' command has been executed."});
-              resetState("Required files generated. Open your IDE and import project.");
-            }
-          }
-        }
+  var failureExecutionHandler = function(msg) {
+    var executionId = msg.event.id;
+    if (generator !== null && generator.currentExecutionId === executionId) {
+      if (generator.currentState === checkingCommand) {
+        logs.push({message: "\'" + generator.sbtCommand + "\' not available, trying to add a plugin to provide it."});
+        generateFile();
+      } else if (generator.currentState === runningCommand) {
+        resetState("Could not run the \'" + generator.sbtCommand + "\' command. Please try again.");
       }
-    });
-  }
+    }
+  };
+
+  var successExecutionHandler = function(msg) {
+    var executionId = msg.event.id;
+    if (generator !== null && generator.currentExecutionId === executionId) {
+      if (generator.currentState === checkingCommand) {
+        setNewTimeout();
+        logs.push({message: "\'" + generator.sbtCommand + "\' command was available and has been run."});
+        resetState("Required files generated. Open your IDE and import project.");
+      } else if (generator.currentState === runningCommand) {
+        logs.push({message: "\'" + generator.sbtCommand + "\' command has been executed."});
+        resetState("Required files generated. Open your IDE and import project.");
+      }
+    }
+  };
+
+  var clientOpenedHandler = function(msg) {
+    if (generator !== null && generator.currentState === restartingSbt) {
+      setNewTimeout();
+      runCommand();
+    }
+  };
 
   var generator = null;
   var startProcess = function (overrideExisting, projectFile, projectFileLocation, pluginFileContent, sbtCommand) {

@@ -50,7 +50,7 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
   val socket = context.actorOf(Props[AppWebSocketActor], name = "socket")
   val projectWatcher = context.actorOf(Props(new ProjectWatcher(location, newSourcesSocket = socket, appActor = self)),
     name = "projectWatcher")
-  var clientActor: Option[ActorRef] = None
+  var sbtClientActor: Option[ActorRef] = None
   var clientCount = 0
 
   var webSocketCreated = false
@@ -94,9 +94,9 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
       } else if (ref == projectWatcher) {
         log.info(s"projectWatcher terminated, killing AppActor ${self.path.name}")
         self ! PoisonPill
-      } else if (Some(ref) == clientActor) {
+      } else if (Some(ref) == sbtClientActor) {
         log.debug(s"clientActor terminated, dropping it")
-        clientActor = None
+        sbtClientActor = None
       } else if (ref == socket) {
         for (p <- pending) p._1 ! Status.Failure(new RuntimeException("app shut down"))
       }
@@ -127,21 +127,22 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
       case UpdateSourceFiles(files) =>
         projectWatcher ! SetSourceFilesRequest(files)
       case ReloadSbtBuild =>
-        clientActor.foreach(_ ! RequestSelfDestruct)
+        sbtClientActor.foreach(_ ! RequestSelfDestruct(AppActor.playInternalSerialId))
       case OpenClient(client) =>
-        log.debug(s"Old client actor was ${clientActor}")
-        clientActor.foreach(_ ! PoisonPill) // shouldn't happen - paranoia
+        log.debug(s"Old client actor was ${sbtClientActor}")
+        sbtClientActor.foreach(_ ! PoisonPill) // shouldn't happen - paranoia
 
         log.debug(s"Opening new client actor for sbt client ${client}")
         clientCount += 1
+
         self ! NotifyWebSocket(AppActor.clientOpenedJsonResponse)
-        clientActor = Some(context.actorOf(Props(new SbtClientActor(client)), name = s"client-$clientCount"))
-        clientActor.foreach(context.watch(_))
+        sbtClientActor = Some(context.actorOf(Props(new SbtClientActor(client)), name = s"client-$clientCount"))
+        sbtClientActor.foreach(context.watch(_))
         flushPending()
       case CloseClient =>
-        log.debug(s"Closing client actor ${clientActor}")
-        clientActor.foreach(_ ! PoisonPill) // shouldn't be needed - paranoia
-        clientActor = None
+        log.debug(s"Closing client actor ${sbtClientActor}")
+        sbtClientActor.foreach(_ ! PoisonPill) // shouldn't be needed - paranoia
+        sbtClientActor = None
       case r: ClientAppRequest =>
         pending = pending :+ (sender -> r)
         flushPending()
@@ -152,10 +153,10 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
   }
 
   private def flushPending(): Unit = {
-    while (clientActor.isDefined && pending.nonEmpty) {
+    while (sbtClientActor.isDefined && pending.nonEmpty) {
       val req = pending.head
       pending = pending.tail
-      clientActor.foreach { actor =>
+      sbtClientActor.foreach { actor =>
         produceLog(LogMessage.DEBUG, s"sending request to sbt ${req._2}")
         actor.tell(req._2, req._1)
       }
@@ -187,4 +188,6 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
 
 object AppActor {
   val clientOpenedJsonResponse = JsObject(Seq("type" -> JsString("sbt"), "subType" -> JsString("ClientOpened"), "event" -> JsObject(Nil)))
+
+  val playInternalSerialId = -1L
 }

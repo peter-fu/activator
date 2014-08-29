@@ -6,6 +6,8 @@ define([
   "services/ajax",
   "services/sbt",
   "main/plugins",
+  "./eclipseGenerator",
+  "./ideaGenerator",
   "text!./code.html",
   "widgets/layout/layout",
   "widgets/browser/browser",
@@ -20,6 +22,8 @@ define([
   fs,
   sbt,
   plugins,
+  eclipse,
+  idea,
   tpl,
   layout,
   browser,
@@ -125,6 +129,14 @@ define([
     openedDocuments([]);
   }
 
+  function generateEclipseFiles() {
+    eclipse.generate(true); // boolean flag decides whether or not to override any existing project files
+  }
+
+  function generateIdeaFiles() {
+    idea.generate(true); // boolean flag decides whether or not to override any existing project files
+  }
+
   var autoSave = settings.observable("code.autoSave", false);
   document.addEventListener("visibilitychange", function() {
     if (autoSave() && document.hidden){
@@ -150,7 +162,9 @@ define([
     visible: visible,
     closeAll: closeAll,
     saveAll: saveAll,
-    autoSave: autoSave
+    autoSave: autoSave,
+    generateEclipseFiles: generateEclipseFiles,
+    generateIdeaFiles: generateIdeaFiles
   }
 
   return {
