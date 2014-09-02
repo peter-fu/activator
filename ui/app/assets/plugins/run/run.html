@@ -13,7 +13,7 @@
             <!-- <a>Options</a> -->
           </dd>
         </dl>
-        <button>
+        <button data-bind="click: function(){ sbtExecCommand('run') }">
           <svg data-bind="svg: '/assets/icons/run.svg'"/>
           Run
         </button>
@@ -39,7 +39,7 @@
           </div>
           Reset data on run
         </li>
-        <!--if-->
+        <!-- ko if: sbt.app.currentMainClass() -->
         <li>
           <h4>Main file</h4>
           <dl class="select dropdown">
@@ -54,7 +54,7 @@
             </dd>
           </dl>
         </li>
-        <!--/if-->
+        <!-- /ko -->
       </ul>
     </div>
     <footer>

@@ -49,9 +49,7 @@ define([
   var run = {
     active: ko.observable(false),
     working: sbt.tasks.workingTasks.run,
-    disabled: ko.computed(function() {
-      return !sbt.app.currentMainClass() || off();
-    }),
+    disabled: off,
     click: sbt.tasks.actions.run
   };
   run.text = ko.computed(function() {

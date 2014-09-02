@@ -72,7 +72,7 @@ class ProjectWatcher(val location: File, val newSourcesSocket: ActorRef, val app
     case event: FileWatcherEvent => event match {
       case FilesChanged(source) =>
         if (source == sourcesWatcher) {
-          newSourcesSocket ! NotifyWebSocket(JsObject(Seq("type" -> JsString("FilesChanged"))))
+          appActor ! ProjectFilesChanged
         } else if (source == sbtBuildWatcher) {
           appActor ! ReloadSbtBuild
         } else {
@@ -92,7 +92,7 @@ class ProjectWatcher(val location: File, val newSourcesSocket: ActorRef, val app
   }
 
   private def scanBuildDir(dir: File): Set[File] = {
-    (dir.listFiles().toList.map { f =>
+    dir.listFiles().toList.map { f =>
       if (isSource(f) || isSbt(f)) {
         Set(f)
       } else if (f.isDirectory()) {
@@ -100,13 +100,12 @@ class ProjectWatcher(val location: File, val newSourcesSocket: ActorRef, val app
       } else {
         Set.empty[File]
       }
-    })
-      .fold(Set.empty[File]) { (sofar: Set[File], next: Set[File]) => sofar ++ next }
+    }.fold(Set.empty[File]) { (sofar: Set[File], next: Set[File]) => sofar ++ next }
   }
 
   // this is inefficient, sue me. if it breaks in practice we can fix it.
   private def scanAnyDir(dir: File): Contents = {
-    (dir.listFiles().toList.map { f =>
+    dir.listFiles().toList.map { f =>
       if (isSource(f)) {
         Contents(projectSources = Set(f), buildSources = Set.empty)
       } else if (isSbt(f)) {
@@ -121,8 +120,7 @@ class ProjectWatcher(val location: File, val newSourcesSocket: ActorRef, val app
       } else {
         Contents.empty
       }
-    })
-      .fold(Contents.empty) { (sofar: Contents, c: Contents) => sofar ++ c }
+    }.fold(Contents.empty) { (sofar: Contents, c: Contents) => sofar ++ c }
   }
 
   private def rescan(): Unit = {
@@ -134,8 +132,8 @@ class ProjectWatcher(val location: File, val newSourcesSocket: ActorRef, val app
           sbtBuildWatcher ! SetFilesToWatch(newContents.buildSources)
         }
         if (newContents.projectSources != files.projectSources) {
-          // notify client to reload sources to watch and pick up new files
-          newSourcesSocket ! NotifyWebSocket(JsObject(Seq("type" -> JsString("SourcesMayHaveChanged"))))
+          log.debug("Setting {} project source files to watch", newContents.projectSources.size)
+          sourcesWatcher ! SetFilesToWatch(newContents.projectSources)
         }
         files = newContents
       }

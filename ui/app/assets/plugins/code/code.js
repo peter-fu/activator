@@ -76,8 +76,10 @@ define([
   }
 
   var closeFile = function(doc, event) {
-    event.preventDefault();
-    event.stopPropagation();
+    if (event){
+      event.preventDefault();
+      event.stopPropagation();
+    }
     if (doc.edited() && !confirm("This file has unsaved changes, do you confirm closing without saving?")) return;
     var docIndex = openedDocuments.indexOf(doc);
     if (docIndex >= 0){
@@ -175,13 +177,13 @@ define([
     route: function(url, breadcrumb) {
       var all = [['code/', "Code"]];
       // Search for line number
-      var lastParameter = url.parameters[url.parameters.length-1];
-      var filenameAndLine = lastParameter.split(":");
-      url.parameters[url.parameters.length-1] = filenameAndLine[0];
-      lastParameter = url.parameters[url.parameters.length-1];
 
       breadcrumb(all.concat([["code/"+url.parameters.join("/"),url.parameters.join("/")]]));
       if (url.parameters[0]){
+        var lastParameter = url.parameters[url.parameters.length-1];
+        var filenameAndLine = lastParameter.split(":");
+        url.parameters[url.parameters.length-1] = filenameAndLine[0];
+        lastParameter = url.parameters[url.parameters.length-1];
         openFile({data:{scope:{
           title: lastParameter,
           location: fs.absolute("/"+url.parameters.join("/")),
@@ -202,6 +204,11 @@ define([
           e.stopPropagation();
           return false;
         }
+      } else if (key == "W"){
+        closeFile(selectedDocument());
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
       } else if (key == "BOTTOM"){
         var all = $("#wrapper .browser span:visible");
         var index = all.index(focus);
