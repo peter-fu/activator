@@ -213,10 +213,29 @@ define(function() {
   // This allows to style SVG in css (including css transition and animations)
   ko.bindingHandlers.svg = {
     init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+      $(element).css({ width: "16px", height: "16px" });
       $.get(valueAccessor(), function(data) {
         var img = $(document.adoptNode(data.querySelector('svg')));
         $(element).replaceWith(img);
       }, 'xml');
+    }
+  }
+
+  // Try to avoid the dom to be solicited on every messages, by looking for sequences:
+  // when the server pushes 50 lines at once in the webscoket, it comes as 50 events
+  // we buffer those sequences by listening all events that occur in less than 20ms.
+  ko.buffer = function() {
+    var timer, bufferArray = [];
+    return function(item, callback) {
+      bufferArray.push(item);
+      if (timer) {
+        window.clearTimeout(timer);
+      }
+      timer = setTimeout(function() {
+        callback(bufferArray);
+        bufferArray = [];
+        timer = null;
+      }, 20);
     }
   }
 
