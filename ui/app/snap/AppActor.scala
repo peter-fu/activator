@@ -20,11 +20,13 @@ case class UpdateSourceFiles(files: Set[File]) extends AppRequest
 case object ReloadSbtBuild extends AppRequest
 case class OpenClient(client: SbtClient) extends AppRequest
 case object CloseClient extends AppRequest
+case object ProjectFilesChanged extends AppRequest
 
 // requests that need an sbt client
 sealed trait ClientAppRequest extends AppRequest {
   def serialId: Long
   def command: Option[String] = None
+
 }
 case class RequestExecution(serialId: Long, override val command: Option[String]) extends ClientAppRequest
 case class CancelExecution(serialId: Long, executionId: Long) extends ClientAppRequest
@@ -32,6 +34,7 @@ case class PossibleAutoCompletions(serialId: Long, override val command: Option[
 case class RequestSelfDestruct(serialId: Long) extends ClientAppRequest
 
 sealed trait AppReply
+case class SbtClientResponse(serialId: Long, result: Any, command: Option[String] = None) extends AppReply
 case object WebSocketAlreadyUsed extends AppReply
 case class WebSocketCreatedReply(created: Boolean) extends AppReply
 
@@ -52,7 +55,6 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
     name = "projectWatcher")
   var clientActor: Option[ActorRef] = None
   var clientCount = 0
-
   var webSocketCreated = false
 
   context.watch(socket)
@@ -128,6 +130,8 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
         projectWatcher ! SetSourceFilesRequest(files)
       case ReloadSbtBuild =>
         clientActor.foreach(_ ! RequestSelfDestruct)
+      case ProjectFilesChanged =>
+        self ! NotifyWebSocket(AppActor.projectFileChanged)
       case OpenClient(client) =>
         log.debug(s"Old client actor was ${clientActor}")
         clientActor.foreach(_ ! PoisonPill) // shouldn't happen - paranoia
@@ -187,4 +191,5 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
 
 object AppActor {
   val clientOpenedJsonResponse = JsObject(Seq("type" -> JsString("sbt"), "subType" -> JsString("ClientOpened"), "event" -> JsObject(Nil)))
+  val projectFileChanged = JsObject(Seq("type" -> JsString("sbt"), "subType" -> JsString("ProjectFilesChanged"), "event" -> JsObject(Nil)))
 }

@@ -51,7 +51,7 @@ class AppWebSocketActor extends WebSocketActor[JsValue] with ActorLogging {
         payload.requestType match {
           case AppWebSocketActor.requestExecution =>
             context.parent ? RequestExecution(payload.serialId, Some(payload.command)) map {
-              case (serialId: Long, command: String, executionId: Long) =>
+              case SbtClientResponse(serialId, executionId: Long, command) =>
                 sendResult(AppWebSocketActor.requestExecution, serialId, JsNumber(executionId))
               case other =>
                 log.warning(s"sbt could not execute command: $other")
@@ -59,7 +59,7 @@ class AppWebSocketActor extends WebSocketActor[JsValue] with ActorLogging {
           case AppWebSocketActor.cancelExecution =>
             if (payload.executionId.isDefined) {
               context.parent ? CancelExecution(payload.serialId, payload.executionId.get) map {
-                case (serialId: Long, result: Boolean) =>
+                case SbtClientResponse(serialId, result: Boolean, _) =>
                   sendResult(AppWebSocketActor.cancelExecution, serialId, JsBoolean(result))
                 case other =>
                   log.warning("sbt could not cancel command")
@@ -70,9 +70,9 @@ class AppWebSocketActor extends WebSocketActor[JsValue] with ActorLogging {
             }
           case AppWebSocketActor.possibleAutoCompletions =>
             context.parent ? PossibleAutoCompletions(payload.serialId, Some(payload.command)) map {
-              case (serialId: Long, command: String, choicesAny: Set[_]) =>
+              case SbtClientResponse(serialId, choicesAny: Set[_], command) =>
                 val choices = choicesAny.map(_.asInstanceOf[sbt.protocol.Completion])
-                sendResult(AppWebSocketActor.possibleAutoCompletions, serialId, JsArray(choices.toList map { Json.toJson(_) }), Some(command))
+                sendResult(AppWebSocketActor.possibleAutoCompletions, serialId, JsArray(choices.toList map { Json.toJson(_) }), command)
               case other => log.warning(s"sbt could not execute possible auto completions")
             }
           case other =>

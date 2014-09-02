@@ -35,7 +35,7 @@ define([
       slick:            ko.observable(false)
     },
     settings: {
-      rerunOnBuild:             settings.observable("build.rerunOnBuild", true),
+      rerunOnBuild:             settings.observable("build.rerunOnBuild", false),
       retestOnSuccessfulBuild:  settings.observable("build.retestOnSuccessfulBuild", false),
       automaticResetInspect:    settings.observable("build.automaticResetInspect", false),
       recompileOnChange:        settings.observable("build.recompileOnChange", true),
