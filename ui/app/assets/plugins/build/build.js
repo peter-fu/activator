@@ -61,7 +61,9 @@ define([
     },
     route: plugins.route('build', function(url, breadcrumb, plugin) {
       subplugin(plugin.render());
-      breadcrumb([['build/', "Build"],['build/'+url.parameters[0], subPlugins[url.parameters[0]]]]);
+      if (url.parameters){
+        breadcrumb([['build/', "Build"],['build/'+url.parameters[0], subPlugins[url.parameters[0]]]]);
+      }
     }, "build/tasks")
   }
 

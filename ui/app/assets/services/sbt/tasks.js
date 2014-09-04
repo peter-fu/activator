@@ -112,10 +112,10 @@ define([
   */
   var runCommand = ko.computed(function() {
     if (app.currentMainClass()){
-      return "backgroundRunMain "+ app.currentMainClass();
+      return "echo:backgroundRunMain "+ app.currentMainClass();
     }
     else {
-      return "backgroundRun";
+      return "echo:backgroundRun";
     }
   });
 
@@ -444,7 +444,7 @@ define([
     self.stopping    = ko.observable(false);
     self.jobIds      = ko.observableArray([]);
 
-    if (self.commandId == "runMain" || self.commandId == "backgroundRunMain" || self.commandId == "backgroundRun") self.commandId = "run";
+    if (self.commandId == "runMain" || self.commandId == "echo" || self.commandId == "backgroundRunMain" || self.commandId == "backgroundRun") self.commandId = "run";
 
     // Data produced:
     self.tasks          = {};

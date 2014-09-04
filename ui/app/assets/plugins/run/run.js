@@ -4,6 +4,7 @@
 define([
   "main/plugins",
   "services/sbt",
+  "services/inspect/connection",
   "widgets/layout/layout",
   "text!./run.html",
   "css!./run",
@@ -14,11 +15,13 @@ define([
 ], function(
   plugins,
   sbt,
+  connection,
   layout,
   tpl
 ) {
 
   var subplugin = ko.observable();
+  var currentPlugin;
   var inspects = ko.observable();
   var sbtExecCommand = function(cmd){
     sbt.tasks.requestExecution(cmd);
@@ -67,9 +70,14 @@ define([
     },
     route: plugins.route('run', function(url, breadcrumb, plugin) {
       subplugin(plugin.render());
+      currentPlugin = plugin;
       breadcrumb([['run/', "Run"],['run/'+url.parameters[0], subPlugins[url.parameters[0]]]]);
-    }, "run/system")
+    }, "run/system"),
+
+    keyboard: function(key, meta, e) {
+      if (currentPlugin.keyboard) {
+        currentPlugin.keyboard(key, meta, e);
+      };
+    }
   }
-
-
 });
