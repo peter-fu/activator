@@ -34,8 +34,9 @@ define(function() {
 
   $(document.body).on("click", ".dropdown:not(.dropdownNoEvent)",function(e){
     $(this).toggleClass("opened");
+  }).on("click", ".dropdown:not(.dropdownNoEvent) dd",function(e){
+    e.stopPropagation();
   });
-
 
   // Custom ko bindings
 
@@ -240,6 +241,20 @@ define(function() {
         bufferArray = [];
         timer = null;
       }, 20);
+    }
+  }
+
+  // Format micro-seconds in ms and s
+  function roundDecimal(n) {
+    console.log(n)
+    return Math.round(n*10)/10;
+  }
+  ko.bindingHandlers.formatTime = {
+    update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+      var value = valueAccessor();
+      if (value > 10e5) element.innerText = roundDecimal(value/10e5)+" s"
+      if (value > 10e2) element.innerText = roundDecimal(value/10e2)+" ms"
+      else              element.innerText = roundDecimal(value)     +" µs"
     }
   }
 
