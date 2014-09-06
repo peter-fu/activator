@@ -3,7 +3,7 @@ package snap
 import akka.actor._
 import akka.pattern._
 
-import play.api.libs.json.Format
+import play.api.libs.json.Writes
 
 import sbt.client.{ TaskKey, Subscription, SbtClient }
 import sbt.protocol._
@@ -58,7 +58,7 @@ class SbtClientActor(val client: SbtClient) extends Actor with ActorLogging {
     client.close()
   }
 
-  private def forwardOverSocket[T <: Event: Format: ClassTag](event: T): Unit = {
+  private def forwardOverSocket[T <: Event: Writes: ClassTag](event: T): Unit = {
     context.parent ! NotifyWebSocket(Sbt.wrapEvent(event))
   }
 
@@ -73,7 +73,11 @@ class SbtClientActor(val client: SbtClient) extends Actor with ActorLogging {
       case _: BuildStructureChanged =>
         log.error(s"Received event which should have been filtered out by SbtClient ${event}")
       case changed: ValueChanged[_] => forwardOverSocket(changed)
-      case entry: LogEvent => forwardOverSocket(entry)
+      case entry: LogEvent => entry match {
+        case e: CoreLogEvent => forwardOverSocket(e)
+        case e: TaskLogEvent => forwardOverSocket(e)
+        case e: BackgroundJobLogEvent => forwardOverSocket(e)
+      }
       case fail: ExecutionFailure => forwardOverSocket(fail)
       case yay: ExecutionSuccess => forwardOverSocket(yay)
       case starting: ExecutionStarting => forwardOverSocket(starting)
