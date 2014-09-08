@@ -447,6 +447,14 @@ define([
     notifications.unshift(this);
   }
 
+  function killTask(task) {
+    executions().filter(function(execution) {
+      return !task || execution.command == task;
+    }).forEach(function(execution) {
+      cancelExecution(execution.executionId);
+    });
+  }
+
   return {
     sbtRequest:              sbtRequest,
     deferredPossibleAutoCompletions: deferredPossibleAutoCompletions,
@@ -469,6 +477,7 @@ define([
       testing:      ""
     },
     actions: {
+      kill:         killTask,
       turnOnOff:    function() {},
       compile:      function() {
         requestExecution("compile");
