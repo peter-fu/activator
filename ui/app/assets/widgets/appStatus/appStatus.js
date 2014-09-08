@@ -19,6 +19,10 @@ define([
   onoff.click = function(e) {
     onoff.active(!onoff.active());
     // TODO: KILL ALL THE THINGS (on off)!
+    if (onoff.active()){
+      console.log("KILL ALL");
+    }
+    sbt.tasks.actions.kill();
   };
   onoff.text = ko.computed(function() {
     if (onoff.active()) {
@@ -35,9 +39,16 @@ define([
   var compile = {
     active: ko.observable(false),
     working: sbt.tasks.workingTasks.compile,
-    disabled: off,
-    click: sbt.tasks.actions.compile
+    disabled: off
   };
+  compile.click = function() {
+    if (!compile.working()){
+      sbt.tasks.actions.compile();
+    } else {
+      console.log("KILL COMPILE");
+      sbt.tasks.actions.kill("compile");
+    }
+  }
   compile.text = ko.computed(function() {
     if (!compile.working()) {
       return "Compile";
@@ -49,9 +60,16 @@ define([
   var run = {
     active: ko.observable(false),
     working: sbt.tasks.workingTasks.run,
-    disabled: off,
-    click: sbt.tasks.actions.run
+    disabled: off
   };
+  run.click = function() {
+    if (!run.working()){
+      sbt.tasks.actions.run();
+    } else {
+      console.log("KILL RUN");
+      sbt.tasks.actions.kill("run");
+    }
+  }
   run.text = ko.computed(function() {
     if (!run.working()) {
       return "Run";
@@ -63,9 +81,16 @@ define([
   var testing = {
     active: ko.observable(false),
     working: sbt.tasks.workingTasks.test,
-    disabled: off,
-    click: sbt.tasks.actions.test
+    disabled: off
   };
+  testing.click = function() {
+    if (!testing.working()){
+      sbt.tasks.actions.test();
+    } else {
+      console.log("KILL TEST");
+      sbt.tasks.actions.kill("test");
+    }
+  }
   testing.text = ko.computed(function() {
     if (!testing.working()) {
       return "Test";
