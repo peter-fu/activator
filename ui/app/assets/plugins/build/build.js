@@ -27,6 +27,16 @@ define([
   var setProject = function(project){
     sbt.app.currentProject(project);
   }
+  var mainBuildAction = function() {
+    if (sbt.tasks.pendingTasks.compile()){
+      sbt.tasks.actions.kill("compile");
+    } else {
+      sbt.tasks.actions.compile();
+    }
+  }
+  var mainBuildName = ko.computed(function() {
+    return sbt.tasks.pendingTasks.compile()?"Stop":"Compile";
+  });
 
   var subPlugins = {
     dependencies:   "Dependencies",
@@ -40,7 +50,9 @@ define([
     sbtExecCommand: sbtExecCommand,
     setProject: setProject,
     recompileOnChange: sbt.app.settings.recompileOnChange,
-    sbt: sbt
+    sbt: sbt,
+    mainBuildAction: mainBuildAction,
+    mainBuildName:   mainBuildName
   }
 
   return {

@@ -11,9 +11,9 @@
             <a data-bind="click: function(){ sbtExecCommand('test') }">Test</a>
           </dd>
         </dl>
-        <button data-bind="click: function(){ sbtExecCommand('test') }">
+        <button data-bind="click: mainTestAction">
           <svg data-bind="svg: '/assets/icons/test.svg'"/>
-          Test
+          <span class="mainAction" data-bind="text: mainTestName"></span>
         </button>
       </div>
     </header>

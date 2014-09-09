@@ -30,7 +30,7 @@ define([
     var buffer = ko.buffer();
     return function(message) {
       buffer(message, function(messages) {
-        bucket.push.apply(logs, messages);
+        bucket.push.apply(bucket, messages);
       });
       if(bucket().length > 1000) {
         bucket.splice(0,100); // Remove the first 100 items

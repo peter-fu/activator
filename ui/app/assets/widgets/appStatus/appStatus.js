@@ -11,93 +11,98 @@ define([
   tpl
 ) {
 
-  var onoff = {
-    active: ko.observable(true),
-    working: ko.observable(false),
-    disabled: ko.observable(false)
-  };
-  onoff.click = function(e) {
-    onoff.active(!onoff.active());
-    // TODO: KILL ALL THE THINGS (on off)!
-    if (onoff.active()){
-      console.log("KILL ALL");
-    }
-    sbt.tasks.actions.kill();
-  };
-  onoff.text = ko.computed(function() {
-    if (onoff.active()) {
-      return "Turn off";
-    } else {
-      return "Turn on";
+  var off = ko.observable(false);
+
+  var onoff = new StatusButton({
+    labels: {
+      working: "Kill all tasks",
+      pending: "Kill all tasks",
+      inactive: "Kill all tasks"
+    },
+    click: function() {
+      sbt.tasks.actions.kill();
     }
   });
 
-  var off = ko.computed(function() {
-    return !onoff.active();
-  })
-
-  var compile = {
-    active: ko.observable(false),
+  var compile = new StatusButton({
+    labels: {
+      working: "Compiling",
+      pending: "Pending...",
+      inactive: "Compile"
+    },
+    click: function() {
+      if (!this.working()){
+        sbt.tasks.actions.compile();
+      } else {
+        sbt.tasks.actions.kill("compile");
+      }
+    },
     working: sbt.tasks.workingTasks.compile,
+    pending: sbt.tasks.pendingTasks.compile,
     disabled: off
-  };
-  compile.click = function() {
-    if (!compile.working()){
-      sbt.tasks.actions.compile();
-    } else {
-      console.log("KILL COMPILE");
-      sbt.tasks.actions.kill("compile");
-    }
-  }
-  compile.text = ko.computed(function() {
-    if (!compile.working()) {
-      return "Compile";
-    } else {
-      return "Compiling";
-    }
   });
 
-  var run = {
-    active: ko.observable(false),
+  var run = new StatusButton({
+    labels: {
+      working: "Running",
+      pending: "Pending...",
+      inactive: "Run"
+    },
+    click: function() {
+      if (!this.working()){
+        sbt.tasks.actions.run();
+      } else {
+        sbt.tasks.actions.kill("run");
+      }
+    },
     working: sbt.tasks.workingTasks.run,
+    pending: sbt.tasks.pendingTasks.run,
     disabled: off
-  };
-  run.click = function() {
-    if (!run.working()){
-      sbt.tasks.actions.run();
-    } else {
-      console.log("KILL RUN");
-      sbt.tasks.actions.kill("run");
-    }
-  }
-  run.text = ko.computed(function() {
-    if (!run.working()) {
-      return "Run";
-    } else {
-      return "Runing";
-    }
   });
 
-  var testing = {
-    active: ko.observable(false),
+  var testing = new StatusButton({
+    labels: {
+      working: "Testing",
+      pending: "Pending...",
+      inactive: "Test"
+    },
+    click: function() {
+      if (!this.working()){
+        sbt.tasks.actions.test();
+      } else {
+        sbt.tasks.actions.kill("test");
+      }
+    },
     working: sbt.tasks.workingTasks.test,
+    pending: sbt.tasks.pendingTasks.test,
     disabled: off
-  };
-  testing.click = function() {
-    if (!testing.working()){
-      sbt.tasks.actions.test();
-    } else {
-      console.log("KILL TEST");
-      sbt.tasks.actions.kill("test");
-    }
-  }
-  testing.text = ko.computed(function() {
-    if (!testing.working()) {
-      return "Test";
-    } else {
-      return "Testing";
-    }
   });
+
+  function StatusButton(opts){
+    var self = this;
+    self.pending = opts.pending || ko.observable(false);
+    self.working = opts.working || ko.observable(false);
+    self.disabled = opts.disabled || ko.observable(false);
+    self.click = function(e) {
+      opts.click.call(self);
+    }
+    self.text = ko.computed(function() {
+      if (self.pending()) {
+        return opts.labels.working;
+      } else if (self.working()) {
+        return opts.labels.pending;
+      } else {
+        return opts.labels.inactive;
+      }
+    });
+  }
+
+  ko.bindingHandlers.appStatusButton = {
+    init: function(element, valueAccessor) {
+      var model = valueAccessor();
+      ko.applyBindingsToNode(element, { css: {pending: model.pending, working: model.working, disabled: model.disabled},  click: model.click });
+    },
+  }
 
   sbt.tasks.taskCompleteEvent.subscribe(function(e) {
     var command;
@@ -106,18 +111,18 @@ define([
       case "clean":
       case "reload":
       case "compile":
-        command = "refresh";
+        command = "compile";
         break;
       case "start":
       case "run":
-        command = "console";
+        command = "run";
         break;
       case "test":
       case "testOnly":
-        command = "testing";
+        command = "test";
         break;
       default:
-        command = "running";
+        command = "onoff";
         break;
     }
     $("#appStatus ."+command+" .animate").removeClass('animate');
