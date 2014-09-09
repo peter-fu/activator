@@ -21,7 +21,11 @@ define([
       sbt.logs.logs([]);
     },
     rerunTask: function(task) {
-      sbt.tasks.requestExecution(task.command);
+      if (!task.finished()){
+        sbt.tasks.kill(task);
+      } else {
+        sbt.tasks.requestExecution(task.command);
+      }
     },
   };
 

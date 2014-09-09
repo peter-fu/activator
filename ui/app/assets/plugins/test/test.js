@@ -25,6 +25,17 @@ define([
     o.on("change", function(v){ return e(!v) });
     return o;
   }
+  var mainTestAction = function() {
+    if (sbt.tasks.pendingTasks.test()){
+      sbt.tasks.actions.kill("test");
+    } else {
+      sbt.tasks.actions.test();
+    }
+  }
+  var mainTestName = ko.computed(function() {
+    return sbt.tasks.pendingTasks.test()?"Stop":"Test";
+  });
+
 
   var sbtExecCommand = function(cmd){
     sbt.tasks.requestExecution(cmd);
@@ -33,7 +44,9 @@ define([
   var State = {
     results: sbt.tasks.testResults,
     retestOnSuccessfulBuild: sbt.app.settings.retestOnSuccessfulBuild,
-    sbtExecCommand: sbtExecCommand
+    sbtExecCommand: sbtExecCommand,
+    mainTestAction: mainTestAction,
+    mainTestName: mainTestName
   }
 
   return {

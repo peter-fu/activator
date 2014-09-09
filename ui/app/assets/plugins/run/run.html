@@ -8,14 +8,14 @@
             <svg data-bind="svg: '/assets/icons/more.svg'"/>
           </dt>
           <dd>
-            <a data-bind="click: function(){ sbtExecCommand('run') }">Run</a>
+            <a data-bind="click: sbt.tasks.actions.run">Run</a>
             <a data-bind="click: function(){ sbtExecCommand('start') }">Start</a>
             <!-- <a>Options</a> -->
           </dd>
         </dl>
-        <button data-bind="click: function(){ sbtExecCommand('run') }">
+        <button data-bind="click: mainRunAction">
           <svg data-bind="svg: '/assets/icons/run.svg'"/>
-          Run
+          <span class="mainAction" data-bind="text: mainRunName"></span>
         </button>
       </div>
     </header>
@@ -50,7 +50,7 @@
               </span>
             </dt>
             <dd data-bind="foreach: sbt.app.mainClasses">
-              <a data-bind="text: $data, click: function(){ sbt.app.currentMainClass($data) }"></a>
+              <a data-bind="text: $data, click: function(){ $root.sbt.app.currentMainClass($data) }"></a>
             </dd>
           </dl>
         </li>
