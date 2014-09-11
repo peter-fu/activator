@@ -5,6 +5,7 @@ define([
   "main/plugins",
   "services/sbt",
   "services/inspect/connection",
+  "./runPluginHandler",
   "widgets/layout/layout",
   "text!./run.html",
   "css!./run",
@@ -16,6 +17,7 @@ define([
   plugins,
   sbt,
   connection,
+  runPluginHandler,
   layout,
   tpl
 ) {
@@ -30,6 +32,7 @@ define([
     if (sbt.tasks.pendingTasks.run()){
       sbt.tasks.actions.kill("run");
     } else {
+      runPluginHandler.running();
       sbt.tasks.actions.run();
     }
   }

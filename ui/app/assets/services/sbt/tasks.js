@@ -561,7 +561,7 @@ define([
         requestExecution("compile");
       },
       run:          function() {
-        requestExecution(runCommand());
+        return requestExecution(runCommand());
       },
       test:         function() {
         requestExecution("test");
