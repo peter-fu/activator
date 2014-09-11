@@ -72,6 +72,18 @@ define(['widgets/modals/modals'], function(modals) {
     }).error(showError("Can not create "+location+"."));
   }
 
+  function append(location, content) {
+    return $.ajax({
+      url: '/api/local/append',
+      type: 'PUT',
+      dataType: 'text',
+        data: {
+          location: location,
+          content: content || ""
+        }
+    }).error(showError("Can not append content to file " + location + "."));
+  }
+
   function _delete(location, isDirectory) {
     return $.ajax({
       url: '/api/local/delete',
@@ -136,7 +148,8 @@ define(['widgets/modals/modals'], function(modals) {
     delete: _delete,
     relative: relative,
     absolute: absolute,
-    deleteApp: deleteApp
+    deleteApp: deleteApp,
+    append: append
   };
 
 });
