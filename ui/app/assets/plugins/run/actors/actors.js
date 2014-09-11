@@ -81,7 +81,6 @@ define([
 
   return {
     route: function(url, breadcrumb) {
-      console.log(">>>>>>", url)
       if (url.parameters){
         breadcrumb(breadcrumb().concat([['run/actors/'+url.parameters.join("/"), url.parameters.slice(-1)[0]]]));
         actors.setCurrentActorId(url.parameters.join("/"));

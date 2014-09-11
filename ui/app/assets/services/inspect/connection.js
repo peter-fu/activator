@@ -32,7 +32,7 @@ define([
    Send an InspectRequest
    */
   function send(message){
-    console.log(JSON.stringify({
+    debug && console.log(JSON.stringify({
       request: 'InspectRequest',
       location: message
     }));

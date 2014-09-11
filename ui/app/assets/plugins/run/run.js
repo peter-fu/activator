@@ -32,6 +32,7 @@ define([
     if (sbt.tasks.pendingTasks.run()){
       sbt.tasks.actions.kill("run");
     } else {
+      runPluginHandler.running();
       sbt.tasks.actions.run();
     }
   }
