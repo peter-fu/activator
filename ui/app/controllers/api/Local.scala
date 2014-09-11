@@ -11,6 +11,7 @@ import play.api.data._
 import play.api.data.Forms._
 import play.api.Logger
 import scala.util.control.NonFatal
+import sbt.IO
 
 object Local extends Controller {
 
@@ -198,7 +199,6 @@ object Local extends Controller {
     val (location, isDirectory, content) = createFileForm.bindFromRequest.get
     val loc = Platform.fromClientFriendlyFilename(location)
     try {
-      import sbt.IO
       if (isDirectory)
         IO.createDirectory(loc)
       else
@@ -210,6 +210,20 @@ object Local extends Controller {
         Logger.debug(s"failed to create $loc: ${e.getClass.getName}: ${e.getMessage}")
         NotAcceptable(s"failed to create: $loc: ${e.getMessage}")
     }
+  }
+
+  val appendFileContentForm = Form(tuple("location" -> text, "content" -> text))
+  def appendFile = Action { implicit request =>
+    val (location, content) = appendFileContentForm.bindFromRequest.get
+    val loc = Platform.fromClientFriendlyFilename(location)
+    if (!loc.exists || loc.isDirectory) NotAcceptable(s"${location} is not a file.")
+    else try {
+      IO.append(loc, content)
+    } catch {
+      case ex: Exception =>
+        NotAcceptable(s"Failed to append '${content}' to file: ${location}.")
+    }
+    Ok(content)
   }
 
   val renameForm = Form(tuple("location" -> text, "newName" -> text))

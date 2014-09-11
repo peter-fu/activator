@@ -24,6 +24,7 @@ GET         /api/local/open                              controllers.api.Local.o
 PUT         /api/local/create                            controllers.api.Local.createFile
 PUT         /api/local/rename                            controllers.api.Local.renameFile
 PUT         /api/local/delete                            controllers.api.Local.deleteFile
+PUT         /api/local/append                            controllers.api.Local.appendFile
 
 # Base flow ->  Select Template -> Running Application.
 GET         /                                            controllers.Application.index
