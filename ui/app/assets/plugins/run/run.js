@@ -5,6 +5,7 @@ define([
   "main/plugins",
   "services/sbt",
   "services/inspect/connection",
+  'services/inspect/runPluginHandler',
   "widgets/layout/layout",
   "text!./run.html",
   "css!./run",
@@ -16,6 +17,7 @@ define([
   plugins,
   sbt,
   connection,
+  runPluginHandler,
   layout,
   tpl
 ) {
@@ -40,6 +42,8 @@ define([
   sbt.app.inspectorActivated.subscribe(function(active) {
     if (!active && window.location.hash.indexOf("#run/system") != 0) {
       window.location.hash = "run/system";
+    } else {
+      runPluginHandler.running();
     }
   })
 

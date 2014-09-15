@@ -26,7 +26,7 @@ define([
     removeExistingProjects: removeExistingProjects,
     mainClasses:        mainClasses,
     currentMainClass:   currentMainClass,
-    inspectorActivated: ko.observable(true),
+    inspectorActivated: ko.observable(false),
     versions: {
       scala:            ko.observable(false),
       akka:             ko.observable(false),

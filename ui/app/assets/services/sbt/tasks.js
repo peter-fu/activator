@@ -6,15 +6,13 @@ define([
   'commons/websocket',
   'commons/stream',
   'commons/types',
-  './app',
-  'services/inspect/runPluginHandler'
+  './app'
 ], function(
   router,
   websocket,
   Stream,
   types,
-  app,
-  runPluginHandler
+  app
 ) {
 
   /**
@@ -563,7 +561,6 @@ define([
         requestExecution("compile");
       },
       run:          function() {
-        runPluginHandler.running();
         return requestExecution(runCommand());
       },
       test:         function() {
