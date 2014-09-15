@@ -3,7 +3,7 @@ package snap
 import akka.actor._
 import akka.pattern._
 
-import play.api.libs.json.Format
+import play.api.libs.json.Writes
 
 import sbt.client.{ TaskKey, Subscription, SbtClient }
 import sbt.protocol._
@@ -58,7 +58,7 @@ class SbtClientActor(val client: SbtClient) extends Actor with ActorLogging {
     client.close()
   }
 
-  private def forwardOverSocket[T <: Event: Format: ClassTag](event: T): Unit = {
+  private def forwardOverSocket[T <: Event: Writes: ClassTag](event: T): Unit = {
     context.parent ! NotifyWebSocket(Sbt.wrapEvent(event))
   }
 
@@ -72,8 +72,12 @@ class SbtClientActor(val client: SbtClient) extends Actor with ActorLogging {
         self ! PoisonPill
       case _: BuildStructureChanged =>
         log.error(s"Received event which should have been filtered out by SbtClient ${event}")
-      case changed: ValueChanged[_] => forwardOverSocket(changed)
-      case entry: LogEvent => forwardOverSocket(entry)
+      case changed: ValueChanged[_, _] => forwardOverSocket(changed)
+      case entry: LogEvent => entry match {
+        case e: CoreLogEvent => forwardOverSocket(e)
+        case e: TaskLogEvent => forwardOverSocket(e)
+        case e: BackgroundJobLogEvent => forwardOverSocket(e)
+      }
       case fail: ExecutionFailure => forwardOverSocket(fail)
       case yay: ExecutionSuccess => forwardOverSocket(yay)
       case starting: ExecutionStarting => forwardOverSocket(starting)
@@ -83,6 +87,9 @@ class SbtClientActor(val client: SbtClient) extends Actor with ActorLogging {
       case taskEvent: TaskEvent => forwardOverSocket(taskEvent)
       case loaded: BuildLoaded => forwardOverSocket(loaded)
       case failed: BuildFailedToLoad => forwardOverSocket(failed)
+      case background: BackgroundJobEvent => forwardOverSocket(background)
+      case background: BackgroundJobStarted => forwardOverSocket(background)
+      case background: BackgroundJobFinished => forwardOverSocket(background)
     }
     case structure: MinimalBuildStructure =>
       forwardOverSocket(BuildStructureChanged(structure))
@@ -98,7 +105,6 @@ class SbtClientActor(val client: SbtClient) extends Actor with ActorLogging {
           log.debug("possible autocompletions for " + pac.command.get)
           client.possibleAutocompletions(pac.command.get, detailLevel = pac.detailLevel.getOrElse(0))
         case rsd: RequestSelfDestruct =>
-          log.info("Asking sbt to exit")
           client.requestSelfDestruct()
           Future.successful(None)
       }
