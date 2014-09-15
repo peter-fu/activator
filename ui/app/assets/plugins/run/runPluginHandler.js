@@ -18,10 +18,10 @@ define([
 
     // plugin information
     var backgroundRunPluginFileLocation = "/project/background.sbt";
-    var backgroundRunPluginFileContent = "addSbtPlugin(\"com.typesafe.sbtrc\" % \"ui-interface-0-13\" % \"1.0-c1097d4e036b7cf7d5dbe10fa06ca77aa20eb4ab\")";
+    var backgroundRunPluginFileContent = "addSbtPlugin(\"com.typesafe.sbtrc\" % \"ui-interface-0-13\" % \"1.0-d5ba9ed9c1d31e3431aeca5e429d290b56cb0b14\")";
 
     var echoPluginFileLocation = "/project/echo.sbt";
-    var echoPluginFileContent = "addSbtPlugin(\"com.typesafe.sbt\" % \"sbt-echo\" % \"0.1.6-SNAPSHOT\")";
+    var echoPluginFileContent = "addSbtPlugin(\"com.typesafe.sbt\" % \"sbt-echo\" % \"0.1.6\")";
 
     // Is this safe to do, i.e. is the location and name always the same for an Activator project?
     var buildFileLocation = "/build.sbt";

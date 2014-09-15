@@ -320,7 +320,7 @@ object AppManager {
                 result match {
                   case TaskSuccess(value) if value.value.isDefined => namePromise.trySuccess(value.stringValue)
                   case TaskSuccess(_) => namePromise.tryFailure(new RuntimeException("Project has no value for name setting"))
-                  case f: TaskFailure[_] => namePromise.tryFailure(new RuntimeException(s"Failed to get name setting from project ${f.message}"))
+                  case f: TaskFailure[_, _] => namePromise.tryFailure(new RuntimeException(s"Failed to get name setting from project ${f.message}"))
                 }
               }
 

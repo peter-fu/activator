@@ -72,7 +72,7 @@ class SbtClientActor(val client: SbtClient) extends Actor with ActorLogging {
         self ! PoisonPill
       case _: BuildStructureChanged =>
         log.error(s"Received event which should have been filtered out by SbtClient ${event}")
-      case changed: ValueChanged[_] => forwardOverSocket(changed)
+      case changed: ValueChanged[_, _] => forwardOverSocket(changed)
       case entry: LogEvent => entry match {
         case e: CoreLogEvent => forwardOverSocket(e)
         case e: TaskLogEvent => forwardOverSocket(e)
