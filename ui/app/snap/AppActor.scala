@@ -138,14 +138,14 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
       case ReloadSbtBuild =>
         sbtClientActor.foreach(_ ! RequestSelfDestruct(AppActor.playInternalSerialId))
       case ProjectFilesChanged =>
-        self ! NotifyWebSocket(AppActor.projectFileChanged)
+        self ! NotifyWebSocket(AppActor.projectFilesChanged)
       case OpenClient(client) =>
         log.debug(s"Old client actor was ${sbtClientActor}")
         sbtClientActor.foreach(_ ! PoisonPill) // shouldn't happen - paranoia
 
         log.debug(s"Opening new client actor for sbt client ${client}")
         clientCount += 1
-        self ! NotifyWebSocket(AppActor.clientOpenedJsonResponse)
+        self ! NotifyWebSocket(AppActor.clientOpenedJsonEvent)
         sbtClientActor = Some(context.actorOf(Props(new SbtClientActor(client)), name = s"client-$clientCount"))
         sbtClientActor.foreach(context.watch(_))
         flushPending()
@@ -153,6 +153,7 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
         log.debug(s"Closing client actor ${sbtClientActor}")
         sbtClientActor.foreach(_ ! PoisonPill) // shouldn't be needed - paranoia
         sbtClientActor = None
+        self ! NotifyWebSocket(AppActor.clientClosedJsonEvent)
       case r: ClientAppRequest =>
         pending = pending :+ (sender -> r)
         flushPending()
@@ -197,7 +198,8 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
 }
 
 object AppActor {
-  val clientOpenedJsonResponse = JsObject(Seq("type" -> JsString("sbt"), "subType" -> JsString("ClientOpened"), "event" -> JsObject(Nil)))
+  val clientOpenedJsonEvent = SbtProtocol.wrapEvent(JsObject(Nil), "ClientOpened")
+  val clientClosedJsonEvent = SbtProtocol.wrapEvent(JsObject(Nil), "ClientClosed")
   val playInternalSerialId = -1L
-  val projectFileChanged = JsObject(Seq("type" -> JsString("sbt"), "subType" -> JsString("ProjectFilesChanged"), "event" -> JsObject(Nil)))
+  val projectFilesChanged = SbtProtocol.wrapEvent(JsObject(Nil), "ProjectFilesChanged")
 }
