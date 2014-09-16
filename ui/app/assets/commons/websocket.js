@@ -46,11 +46,11 @@ define([
     debug && console.error("WS error: ", event);
     isOpened(false);
     modals.show({
-      title: "WebSocket is closed",
-      text: "Click OK to try to re-connect. You may have to refresh your this page in your browser.",
+      title: "Lost connection to Activator",
+      text: "Click OK to try to reconnect. You may have to refresh this page in your browser.",
       ok: "Try again",
       callback: reconnect,
-      cancel: "hide"
+      cancel: "Hide"
     });
   }
 
