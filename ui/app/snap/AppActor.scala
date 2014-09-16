@@ -66,13 +66,20 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
 
   override val supervisorStrategy = SupervisorStrategy.stoppingStrategy
 
+  @volatile
+  var startedConnecting = System.currentTimeMillis()
+
   log.debug("Opening SbtConnector")
   connector.open({ client =>
-    log.debug(s"Opened connection to sbt for ${location} AppActor=${self.path.name}")
+    val now = System.currentTimeMillis()
+    val delta = now - startedConnecting
+
+    log.info(s"Opened connection to sbt for ${location} AppActor=${self.path.name} after ${delta}ms (${delta.toDouble / 1000.0}s)")
     produceLog(LogMessage.DEBUG, s"Opened sbt at '${location}'")
     self ! OpenClient(client)
   }, { (reconnecting, message) =>
-    log.debug(s"sbt client closed reconnecting=${reconnecting}: ${message}")
+    startedConnecting = System.currentTimeMillis()
+    log.info(s"Connection to sbt closed (reconnecting=${reconnecting}: ${message})")
     produceLog(LogMessage.INFO, s"Lost or failed sbt connection: ${message}")
     self ! CloseClient
     if (!reconnecting) {

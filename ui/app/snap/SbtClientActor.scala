@@ -98,6 +98,7 @@ class SbtClientActor(val client: SbtClient) extends Actor with ActorLogging {
           log.debug("possible autocompletions for " + pac.command.get)
           client.possibleAutocompletions(pac.command.get, detailLevel = pac.detailLevel.getOrElse(0))
         case rsd: RequestSelfDestruct =>
+          log.info("Asking sbt to exit")
           client.requestSelfDestruct()
           Future.successful(None)
       }
