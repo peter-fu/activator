@@ -30,6 +30,20 @@ define([
     });
   }
 
+  var OpenInInspect = function (callback, state) {
+    modals.show({
+      title: "Configuring project...",
+      text: "Activator is adding the Inspector to you project.",
+      body: ko.bindhtml(openInInspect, state),
+      callback: callback,
+      ok: "OK"
+    });
+  };
+
+  var CloseModalWindow = function () {
+    modals.hideModal();
+  };
+
   return {
     Eclipse : OpenInEclipse,
     Idea : OpenInIdea

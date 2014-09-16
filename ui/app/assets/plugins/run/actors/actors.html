@@ -1,11 +1,8 @@
 <article class="plugin actors">
   <header>
     <h1>Actors</h1>
-    <div class="buttons">
-      <button>List</button>
-      <button>Table</button>
-    </div>
   </header>
+  <!-- ko if: actors().length -->
   <section>
     <div class="pluginBlock list-col">
 
@@ -50,8 +47,11 @@
           <h2>
             <a data-bind="text: name, attr: { href: actorLink }"></a>
           </h2>
-          <p class="path" data-bind="text: parent"></p>
           <span class="deviation-counter right" data-bind="text: deviations, visible: deviations"></span>
+          <p class="path" data-bind="text: parent"></p>
+          <p class="throughput" data-bind="text: throughput"></p>
+          <p class="maxMailboxSize" data-bind="text: maxMailboxSize"></p>
+          <p class="maxTimeInMailbox" data-bind="text: maxTimeInMailbox"></p>
 <!-- 
           <p class="props">
             <span class="throughput right" data-bind="text: throughput"></span>
@@ -66,7 +66,7 @@
     <!-- ko with: currentActor() -->
     <div class="pluginBlock dark stats actor">
       <div class="subheader">
-        <h2 data-bind="text: $root.actorPath">akka://application/user/distributedPubSubMediator/region-5-7-21</h2>
+        <h2 data-bind="text: scope.actorPath">akka://application/user/distributedPubSubMediator/region-5-7-21</h2>
       </div>
       <div class="table-wrapper">
         <table>
@@ -128,18 +128,22 @@
     <!-- /ko -->
     <!-- ko ifnot: currentActor() -->
     <div class="pluginBlock dark">
-      <!-- ko ifnot: actors().length -->
-        <p class="emptyList">
-          There is no Actor activity. You need to run your app in order to get datas, starting mights take a minute.
-        </p>
-      <!-- /ko -->
-      <!-- ko if: actors().length -->
         <!-- TODO: Show some stats here? -->
         <p class="emptyList">
           Select an actor in the list to get some more datas.
         </p>
-      <!-- /ko -->
     </div>
     <!-- /ko -->
   </section>
+  <!-- /ko -->
+  <!-- ko ifnot: actors().length -->
+  <section>
+    <div class="pluginBlock dark">
+      <p class="emptyList">
+          You can see actor information here but so far there has been no activity in your application or you're running an unsupported version of Akka (&gt;2.3.4).
+      </p>
+    </div>
+  </section>
+  <!-- /ko -->
+
 </article>
