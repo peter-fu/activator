@@ -6,13 +6,15 @@ define([
   'commons/websocket',
   'commons/stream',
   'commons/types',
-  './app'
+  './app',
+  'services/inspect/runPluginHandler'
 ], function(
   router,
   websocket,
   Stream,
   types,
-  app
+  app,
+  runPluginHandler
 ) {
 
   /**
@@ -112,10 +114,10 @@ define([
   */
   var runCommand = ko.computed(function() {
     if (app.currentMainClass()){
-      return "echo:backgroundRunMain "+ app.currentMainClass();
+      return (app.inspectorActivated()?"echo:":"")+"backgroundRunMain "+ app.currentMainClass();
     }
     else {
-      return "echo:backgroundRun";
+      return (app.inspectorActivated()?"echo:":"")+"echo:backgroundRun";
     }
   });
 
@@ -561,6 +563,7 @@ define([
         requestExecution("compile");
       },
       run:          function() {
+        runPluginHandler.running();
         return requestExecution(runCommand());
       },
       test:         function() {
