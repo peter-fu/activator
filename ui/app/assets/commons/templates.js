@@ -246,7 +246,6 @@ define(function() {
 
   // Format micro-seconds in ms and s
   function roundDecimal(n) {
-    console.log(n)
     return Math.round(n*10)/10;
   }
   ko.bindingHandlers.formatTime = {
@@ -282,5 +281,11 @@ define(function() {
     return dom;
   }
 
+  ko.once = function(observable, callback) {
+    var subscription = observable.subscribe(function(newValue) {
+      callback(newValue);
+      subscription.dispose();
+    });
+  }
 
 });

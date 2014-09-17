@@ -5,13 +5,11 @@ define([
   'widgets/modals/modals',
   'text!./openInEclipse.html',
   'text!./openInIdea.html',
-  'text!./openInInspect.html',
   'css!./openIn'
 ],function(
   modals,
   openInEclipse,
-  openInIdea,
-  openInInspect
+  openInIdea
 ){
 
   var OpenInEclipse = function(callback, state) {
@@ -32,29 +30,6 @@ define([
     });
   };
 
-  var OpenInInspect = function (callback, state) {
-    modals.show({
-      title: "Enabling Inspect",
-      body: ko.bindhtml(openInInspect, state),
-      callback: callback,
-      ok: "OK"
-    });
-  };
-
-  var CloseModalWindow = function () {
-    modals.hideModal();
-  };
-
-  var OpenInInspect = function (callback, state) {
-    modals.show({
-      title: "Configuring project...",
-      text: "Activator is adding the Inspector to you project.",
-      body: ko.bindhtml(openInInspect, state),
-      callback: callback,
-      ok: "OK"
-    });
-  };
-
   var CloseModalWindow = function () {
     modals.hideModal();
   };
@@ -62,7 +37,6 @@ define([
   return {
     Eclipse : OpenInEclipse,
     Idea : OpenInIdea,
-    Inspect: OpenInInspect,
     CloseModalWindow: CloseModalWindow
   };
 });

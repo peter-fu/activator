@@ -413,6 +413,15 @@ define([
     }
   });
 
+  // Application ready
+  var applicationReady = ko.observable(false);
+  subTypeEventStream('ClientOpened').each(function (msg) {
+    applicationReady(true);
+  });
+  subTypeEventStream('ClientClosed').each(function (msg) {
+    applicationReady(false);
+  });
+
   // Killing an execution
   function stopJob(message) {
     if (message.event && message.event.command && message.event.command.slice(0, 7) == "jobStop") {
@@ -522,6 +531,10 @@ define([
     }
   }
 
+  function stopRunningTasks(){
+
+  }
+
   /**
   Check if a task is pending
   */
@@ -548,6 +561,7 @@ define([
     notifications:           notifications,
     SbtEvents:               SbtEvents,
     kill:                    killExecution,
+    applicationReady:        applicationReady,
     active: {
       turnedOn:     "",
       compiling:    "",

@@ -5,7 +5,7 @@ define([
   "main/plugins",
   "services/sbt",
   "services/inspect/connection",
-  'services/inspect/runPluginHandler',
+  'widgets/echoInstaller/echoInstaller',
   "widgets/layout/layout",
   "text!./run.html",
   "css!./run",
@@ -17,7 +17,7 @@ define([
   plugins,
   sbt,
   connection,
-  runPluginHandler,
+  echoInstaller,
   layout,
   tpl
 ) {
@@ -32,7 +32,6 @@ define([
     if (sbt.tasks.pendingTasks.run()){
       sbt.tasks.actions.kill("run");
     } else {
-      runPluginHandler.running();
       sbt.tasks.actions.run();
     }
   }
@@ -43,8 +42,11 @@ define([
   sbt.app.inspectorActivated.subscribe(function(active) {
     if (!active && window.location.hash.indexOf("#run/system") != 0) {
       window.location.hash = "run/system";
-    } else {
-      runPluginHandler.running();
+    } else if(active) {
+      sbt.tasks.actions.kill();
+      echoInstaller(function() {
+        sbt.tasks.actions.run();
+      });
     }
   })
 
