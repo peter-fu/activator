@@ -43,6 +43,7 @@ define([
         editingBuildFile(true);
       }, true);
 
+      echoReady() && callback();
       ko.once(echoReady, function(ready) {
         if (ready){
           callback();

@@ -352,10 +352,6 @@ define([
     }
   });
 
-  subTypeEventStream("ClientOpened").each(function(message) {
-    debug && console.log("Client opened");
-  });
-
   subTypeEventStream("RequestExecution").each(function(message) {
     debug && console.log("Received request execution result", message);
 
