@@ -2,35 +2,40 @@
  Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
  */
 define([
-  'services/sbt',
+  './tasks',
   'services/ajax'
 ], function (
-    sbt,
+    tasks,
     ajax) {
 
     // plugin information
     var backgroundRunPluginFileLocation = "/project/background.sbt";
     var backgroundRunPluginFileContent = "addSbtPlugin(\"com.typesafe.sbtrc\" % \"ui-interface-0-13\" % \"1.0-d5ba9ed9c1d31e3431aeca5e429d290b56cb0b14\")";
+    var uiFileEchoSettings = "\n\nfork in run := true";
 
     var echoPluginFileLocation = "/project/echo.sbt";
     var echoPluginFileContent = "addSbtPlugin(\"com.typesafe.sbt\" % \"sbt-echo\" % \"0.1.6\")";
 
     // Is this safe to do, i.e. is the location and name always the same for an Activator project?
     var buildFileLocation = "/build.sbt";
-    var buildFileEchoSettings = "\n\nechoSettings\n\nfork in run := true";
+    var buildFileEchoSettings = "\n\nechoSettings";
 
     var addingEchoFile = ko.observable(false);
     var addingBackgroundFile = ko.observable(false);
     var editingBuildFile = ko.observable(false);
 
+    checkFileContent(serverAppModel.location+backgroundRunPluginFileLocation, backgroundRunPluginFileContent, function() {
+      addingEchoFile(true);
+    });
+    checkFileContent(serverAppModel.location+buildFileLocation, uiFileEchoSettings, function() {
+      editingBuildFile(true);
+    }, true);
+
     var echoReady = ko.computed(function() {
-      return (sbt.tasks.applicationReady() && addingEchoFile() && addingBackgroundFile() && editingBuildFile());
+      return (tasks.applicationReady() && addingEchoFile() && addingBackgroundFile() && editingBuildFile());
     });
 
     function echoInstalledAndReady(callback){
-      checkFileContent(serverAppModel.location+backgroundRunPluginFileLocation, backgroundRunPluginFileContent, function() {
-        addingEchoFile(true);
-      });
       checkFileContent(serverAppModel.location+echoPluginFileLocation, echoPluginFileContent, function() {
         addingBackgroundFile(true);
       });
@@ -59,7 +64,7 @@ define([
         if (data.indexOf(content) >= 0){
           callback();
         } else {
-          if (confirm("Your project configuration is outdated, do you want to update it?")) {
+          if (confirm("Your project is not ready for this version of Activator, do you want to update it?")) {
             ajax.save(path, appendTofile?data+content:content).success(callback);
           }
         }

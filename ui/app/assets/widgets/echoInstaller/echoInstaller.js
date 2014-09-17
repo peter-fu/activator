@@ -2,12 +2,12 @@
  Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
  */
 define([
-  'services/inspect/echoInstaller',
+  'services/sbt/configuration',
   'widgets/modals/modals',
   'text!./echoInstaller.html',
   'css!./echoInstaller',
 ],function(
-  echoIntallerService,
+  configuration,
   modals,
   tpl
 ){
@@ -16,9 +16,9 @@ define([
     modals.show({
       title: "Configuring project...",
       text: "Activator is adding the Inspector to your project.",
-      body: ko.bindhtml(tpl, echoIntallerService)
+      body: ko.bindhtml(tpl, configuration)
     });
-    echoIntallerService.echoInstalledAndReady(function() {
+    configuration.echoInstalledAndReady(function() {
       modals.hideModal();
       callback();
     });
