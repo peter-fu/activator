@@ -17,7 +17,7 @@ define([
 
     // Is this safe to do, i.e. is the location and name always the same for an Activator project?
     var buildFileLocation = "/build.sbt";
-    var buildFileEchoSettings = "\n\nechoSettings";
+    var buildFileEchoSettings = "\n\nechoSettings\n\nfork in run := true";
 
     var addingEchoFile = ko.observable(false);
     var addingBackgroundFile = ko.observable(false);
