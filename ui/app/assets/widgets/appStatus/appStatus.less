@@ -5,26 +5,26 @@
 
 @-webkit-keyframes glowSvg {
   0% {
-    fill: @blue;
+    fill: @grey-ltr;
   }
   100% {
-    fill: @grey;
+    fill: @grey-dkr;
   }
 }
 @-moz-keyframes glowSvg {
   0% {
-    fill: @blue;
+    fill: @grey-ltr;
   }
   100% {
-    fill: @grey;
+    fill: @grey-dkr;
   }
 }
 @keyframes glowSvg {
   0% {
-    fill: @blue;
+    fill: @grey-ltr;
   }
   100% {
-    fill: @grey;
+    fill: @grey-dkr;
   }
 }
 
@@ -94,7 +94,7 @@
         display: block;
       }
     }
-    &:active, &.working {
+    &.pending, &.working {
       background: @slate-dkr;
     }
     .icon {
@@ -103,16 +103,14 @@
       top: 5px;
     }
 
-    &.working .icon g {
-      -webkit-animation: 300ms glowSvg infinite alternate linear;
-      -moz-animation: 300ms glowSvg infinite alternate linear;
-      animation: 300ms glowSvg infinite alternate linear;
+    &.working g {
+      fill: @blue;
     }
-    &:hover .icon g {
+    &:hover  g {
       fill: fadeout(@blue, 40%);
     }
-    &.active .icon g {
-      fill: @blue;
+    &.working:hover  g {
+      fill: @red;
     }
     &.disabled {
       pointer-events: none;
@@ -127,6 +125,14 @@
       .icon g {
         fill: @grey;
       }
+    }
+  }
+  .onoff {
+    &:hover  g {
+      fill: fadeout(@red, 60%);
+    }
+    &:active g {
+      fill: @red;
     }
   }
 }

@@ -2,8 +2,8 @@ import sbt._
 import Keys._
 
 object Dependencies {
-  val sbtVersion = "0.13.6-M2"
-  val sbtLibraryVersion = "0.13.6-M2" // for sbtIO on scala 2.11
+  val sbtVersion = "0.13.6"
+  val sbtLibraryVersion = "0.13.6" // for sbtIO on scala 2.11
 
   val sbtPluginVersion = "0.13"
   val sbtPluginScalaVersion = "2.11.1"
@@ -11,12 +11,12 @@ object Dependencies {
   val luceneVersion = "4.2.1"
 
   val templateCacheVersion = "1.0-6830c15252733edf977c869af798d113ad5ac80d"
-  val sbtRcVersion = "1.0-63452320c19ac7a46b31b6971d2e99097a6830fb"
+  val sbtRcVersion = "1.0-d5ba9ed9c1d31e3431aeca5e429d290b56cb0b14"
 
   val playVersion = "2.3.3"
   val akkaVersion = "2.3.4"
   val slickVersion = "2.1.0"
-  val echoPluginVersion = "0.1.5"
+  val echoPluginVersion = "0.1.6"
   val activatorAnalyticsVersion = "0.1.6"
   val aspectJVersion = "1.7.3"
 

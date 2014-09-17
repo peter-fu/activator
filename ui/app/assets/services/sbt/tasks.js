@@ -20,12 +20,18 @@ define([
   */
   var executionsById = {};
   var executions = ko.observableArray([]);
+  var executionsByJobId = {};
   var tasksById = {};
 
   /**
   Tasks status
   */
   var workingTasks = {
+    compile: ko.observable(false),
+    run: ko.observable(false),
+    test: ko.observable(false)
+  }
+  var pendingTasks = {
     compile: ko.observable(false),
     run: ko.observable(false),
     test: ko.observable(false)
@@ -98,10 +104,6 @@ define([
    * Returns the client serial id used for this action.
    */
   function requestExecution(command) {
-    if (command == "run") {
-      command = runCommand(); // typing 'run' execute runMain
-    }
-
     return sbtRequest('RequestExecution', command);
   }
 
@@ -110,10 +112,10 @@ define([
   */
   var runCommand = ko.computed(function() {
     if (app.currentMainClass()){
-      return "runMain "+ app.currentMainClass();
+      return "backgroundRunMain "+ app.currentMainClass();
     }
     else {
-      return "run";
+      return "backgroundRun";
     }
   });
 
@@ -199,7 +201,6 @@ define([
     if (!execution) throw "Orphan task detected";
 
     if (event.name === "CompilationFailure") {
-      var debug = 1
       debug && console.log("CompilationFailure: ", event);
       execution.compilationErrors.push(event.serialized);
     } else if (event.name === "TestEvent") {
@@ -208,7 +209,24 @@ define([
     }
   });
 
+  subTypeEventStream("BackgroundJobEvent").each(function(message) {
+    var execution = executionsById[message.event.serialized.executionId];
+    var jobId = message.event.jobId;
+    if (message.event.name == "BackgroundJobStarted"){
+      debug && console.log("BackgroundJobStarted: ", message);
+      executionsByJobId[jobId] = execution;
+      execution.jobIds.push(jobId);
+    } else if (message.event.name == "BackgroundJobFinished") {
+      debug && console.log("BackgroundJobFinished: ", message);
+      removeExecution(execution, true);
+      delete executionsByJobId[jobId];
+    }
+  });
+
   subTypeEventStream("ExecutionWaiting").each(function(message) {
+
+    // If the execution is to stop execution...
+    if (stopJob(message)) return;
 
     var execution = new Execution(message);
     debug && console.log("Waiting execution ", execution);
@@ -221,13 +239,13 @@ define([
     switch(execution.commandId){
       case "compile":
         // Reset the compilation errors
-        workingTasks.compile(workingTasks.compile()+1);
+        pendingTasks.compile(pendingTasks.compile()+1);
         break;
       case "run":
-        workingTasks.run(workingTasks.run()+1);
+        pendingTasks.run(pendingTasks.run()+1);
         break;
       case "test":
-        workingTasks.test(workingTasks.test()+1);
+        pendingTasks.test(pendingTasks.test()+1);
         break;
     }
   });
@@ -236,6 +254,19 @@ define([
     var execution = executionsById[message.event.id];
     if (execution) {
       execution.started(new Date());
+      // Increment active tasks (to make icons glowing)
+      switch(execution.commandId){
+        case "compile":
+          // Reset the compilation errors
+          workingTasks.compile(workingTasks.compile()+1);
+          break;
+        case "run":
+          workingTasks.run(workingTasks.run()+1);
+          break;
+        case "test":
+          workingTasks.test(workingTasks.test()+1);
+          break;
+      }
     }
   });
 
@@ -246,24 +277,32 @@ define([
     var succeeded = message.subType == "ExecutionSuccess";
     var execution = executionsById[id];
 
-    if (!execution) throw "No execution for this id."
+    if (execution && !execution.jobIds().length) {
+      removeExecution(execution, succeeded);
+    }
+  }
+
+  function removeExecution(execution, succeeded) {
+
     // we want succeeded flag up-to-date when finished notifies
     execution.succeeded(succeeded);
-    execution.finished(new Date());
-
     taskComplete(execution.commandId, succeeded); // Throw an event
+    execution.finished(new Date());
 
     // Decrement active tasks (to stop icons glowing if no pending task ;; if counter is 0)
     switch(execution.commandId){
       case "compile":
         workingTasks.compile(workingTasks.compile()-1);
+        pendingTasks.compile(pendingTasks.compile()-1);
         if (succeeded) SbtEvents.successfulBuild.push(succeeded);
         break;
       case "run":
         workingTasks.run(workingTasks.run()-1);
+        pendingTasks.run(pendingTasks.run()-1);
         break;
       case "test":
         workingTasks.test(workingTasks.test()-1);
+        pendingTasks.test(pendingTasks.test()-1);
         break;
     }
 
@@ -295,8 +334,7 @@ define([
       }
     }
 
-    delete executionsById[id];
-    return execution;
+    delete executionsById[execution.executionId];
   }
 
   subTypeEventStream("BuildStructureChanged").each(function(message) {
@@ -375,6 +413,17 @@ define([
     }
   });
 
+  // Killing an execution
+  function stopJob(message) {
+    if (message.event && message.event.command && message.event.command.slice(0, 7) == "jobStop") {
+      var id = message.event.command.slice(8);
+      if (executionsById[id]) executionsById[id].stopping(true);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   /**
   Execution object constructor
   */
@@ -392,8 +441,10 @@ define([
     self.finished    = ko.observable(0); // 0 here stands for no Date() object, yet
     self.finished.extend({ notify: 'always' });
     self.succeeded   = ko.observable();
+    self.stopping    = ko.observable(false);
+    self.jobIds      = ko.observableArray([]);
 
-    if (self.commandId == "runMain") self.commandId = "run";
+    if (self.commandId == "runMain" || self.commandId == "backgroundRunMain" || self.commandId == "backgroundRun") self.commandId = "run";
 
     // Data produced:
     self.tasks          = {};
@@ -410,7 +461,13 @@ define([
     });
     self.time = ko.computed(function() {
       if (self.finished() && self.started()){
-        return (self.succeeded()?"Completed in ":"Failed after ")+Math.round((self.finished() - self.started()) /1000) +" s";
+        var time = Math.round((self.finished() - self.started()) /1000) +" s";
+        var status = self.stopping()||self.jobIds().length?"Stopped after":self.succeeded()?"Completed in":"Failed after";
+        return status +" "+ time;
+      } else if (self.jobIds().length){
+        return "Running in backgound";
+      } else if (self.stopping()) {
+        return "Stopping the task...";
       } else if (self.started()) {
         return "Running for " + Math.round((new Date() - self.started()) /1000) +" s";
       } else {
@@ -447,6 +504,33 @@ define([
     notifications.unshift(this);
   }
 
+  /**
+  Kill tasks by command name (or all pending tasks)
+  */
+  function killTask(task) {
+    executions().filter(function(execution) {
+      return !execution.finished() && (execution.jobIds().length || (!task || execution.command == task));
+    }).forEach(killExecution);
+  }
+  function killExecution(execution) {
+    if (execution.jobIds().length){
+      execution.jobIds().forEach(function(id) {
+        requestExecution("jobStop "+id);
+      });
+    } else {
+      cancelExecution(execution.executionId);
+    }
+  }
+
+  /**
+  Check if a task is pending
+  */
+  function pendingTask(task) {
+    return !!executions().filter(function(execution) {
+      return !task || execution.command == task;
+    }).length;
+  }
+
   return {
     sbtRequest:              sbtRequest,
     deferredPossibleAutoCompletions: deferredPossibleAutoCompletions,
@@ -456,12 +540,14 @@ define([
     cancelDeferredExecution: cancelDeferredExecution,
     executions:              executions,
     workingTasks:            workingTasks,
+    pendingTasks:            pendingTasks,
     testResults:             testResults,
     compilationErrors:       compilationErrors,
     errorCounters:           errorCounters,
     taskCompleteEvent:       taskCompleteEvent,
     notifications:           notifications,
     SbtEvents:               SbtEvents,
+    kill:                    killExecution,
     active: {
       turnedOn:     "",
       compiling:    "",
@@ -469,12 +555,13 @@ define([
       testing:      ""
     },
     actions: {
+      kill:         killTask,
       turnOnOff:    function() {},
       compile:      function() {
         requestExecution("compile");
       },
       run:          function() {
-        requestExecution('run');
+        requestExecution(runCommand());
       },
       test:         function() {
         requestExecution("test");

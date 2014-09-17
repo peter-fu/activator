@@ -1,23 +1,23 @@
 <div id="appStatus">
-  <button class="running" data-bind="css: {active: onoff.active, working: onoff.working, disabled: onoff.disabled},  click: onoff.click">
+  <button class="onoff" data-bind="appStatusButton: onoff">
     <svg class="icon" data-bind="svg: '/assets/icons/onoff.svg'"/>
     <span class="tooltip" data-bind="text: onoff.text"></span>
     <span class="sticker success"><span class="shape"><svg class="mark" data-bind="svg: '/assets/icons/success-mini.svg'"/></span></span>
     <span class="sticker error"><span class="shape"><svg class="mark" data-bind="svg: '/assets/icons/error-mini.svg'"/></span></span>
   </button>
-  <button class="refresh" data-bind="css: {active: compile.active, working: compile.working, disabled: compile.disabled},  click: compile.click">
+  <button class="compile" data-bind="appStatusButton: compile">
     <svg class="icon" data-bind="svg: '/assets/icons/build.svg'"/>
     <span class="tooltip" data-bind="text: compile.text"></span>
     <span class="sticker success"><span class="shape"><svg class="mark" data-bind="svg: '/assets/icons/success-mini.svg'"/></span></span>
     <span class="sticker error"><span class="shape"><svg class="mark" data-bind="svg: '/assets/icons/error-mini.svg'"/></span></span>
   </button>
-  <button class="console" data-bind="css: {active: run.active, working: run.working, disabled: run.disabled},  click: run.click">
+  <button class="run" data-bind="appStatusButton: run">
     <svg class="icon" data-bind="svg: '/assets/icons/run.svg'"/>
     <span class="tooltip" data-bind="text: run.text"></span>
     <span class="sticker success"><span class="shape"><svg class="mark" data-bind="svg: '/assets/icons/success-mini.svg'"/></span></span>
     <span class="sticker error"><span class="shape"><svg class="mark" data-bind="svg: '/assets/icons/error-mini.svg'"/></span></span>
   </button>
-  <button class="testing" data-bind="css: {active: testing.active, working: testing.working, disabled: testing.disabled},  click: testing.click">
+  <button class="test" data-bind="appStatusButton: testing">
     <svg class="icon" data-bind="svg: '/assets/icons/test.svg'"/>
     <span class="tooltip" data-bind="text: testing.text"></span>
     <span class="sticker success"><span class="shape"><svg class="mark" data-bind="svg: '/assets/icons/success-mini.svg'"/></span></span>

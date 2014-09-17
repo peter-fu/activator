@@ -300,8 +300,11 @@ object AppManager {
           val eventsSub = client.handleEvents({ event =>
             import sbt.protocol._
             val json = event match {
-              case e: LogEvent =>
-                Sbt.wrapEvent(e)
+              case log: LogEvent => log match {
+                case e: TaskLogEvent => Sbt.wrapEvent(e)
+                case e: CoreLogEvent => Sbt.wrapEvent(e)
+                case e: BackgroundJobLogEvent => Sbt.wrapEvent(e)
+              }
               case _ =>
                 Sbt.synthesizeLogEvent(LogMessage.DEBUG, event.toString)
             }
@@ -317,7 +320,7 @@ object AppManager {
                 result match {
                   case TaskSuccess(value) if value.value.isDefined => namePromise.trySuccess(value.stringValue)
                   case TaskSuccess(_) => namePromise.tryFailure(new RuntimeException("Project has no value for name setting"))
-                  case f: TaskFailure[_] => namePromise.tryFailure(new RuntimeException(s"Failed to get name setting from project ${f.message}"))
+                  case f: TaskFailure[_, _] => namePromise.tryFailure(new RuntimeException(s"Failed to get name setting from project ${f.message}"))
                 }
               }
 

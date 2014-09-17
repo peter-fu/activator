@@ -13,9 +13,9 @@
             <a data-bind="click: function(){ sbtExecCommand('clean') }">Clean</a>
           </dd>
         </dl>
-        <button data-bind="click: function(){ sbtExecCommand('compile') }">
+        <button data-bind="click: mainBuildAction">
           <svg data-bind="svg: '/assets/icons/build.svg'"/>
-          Compile
+          <span class="mainAction" data-bind="text: mainBuildName"></span>
         </button>
       </div>
     </header>

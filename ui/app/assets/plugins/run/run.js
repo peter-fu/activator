@@ -23,6 +23,16 @@ define([
   var sbtExecCommand = function(cmd){
     sbt.tasks.requestExecution(cmd);
   }
+  var mainRunAction = function() {
+    if (sbt.tasks.pendingTasks.run()){
+      sbt.tasks.actions.kill("run");
+    } else {
+      sbt.tasks.actions.run();
+    }
+  }
+  var mainRunName = ko.computed(function() {
+    return sbt.tasks.pendingTasks.run()?"Stop":"Run";
+  });
 
   sbt.app.inspectorActivated.subscribe(function(active) {
     if (!active && window.location.hash.indexOf("#run/system") != 0) {
@@ -38,7 +48,9 @@ define([
     rerunOnBuild: sbt.app.settings.rerunOnBuild,
     automaticResetInspect: sbt.app.settings.automaticResetInspect,
     showLogDebug: sbt.app.settings.showLogDebug,
-    inspectorActivated: sbt.app.inspectorActivated
+    inspectorActivated: sbt.app.inspectorActivated,
+    mainRunAction: mainRunAction,
+    mainRunName: mainRunName
   }
 
   // Subplugins titles
