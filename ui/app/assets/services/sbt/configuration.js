@@ -64,9 +64,7 @@ define([
         if (data.indexOf(content) >= 0){
           callback();
         } else {
-          if (confirm("Your project is not ready for this version of Activator, do you want to update it?")) {
-            ajax.save(path, appendTofile?data+content:content).success(callback);
-          }
+          ajax.save(path, appendTofile?data+content:content).success(callback);
         }
       })
     }
