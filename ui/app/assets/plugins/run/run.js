@@ -39,7 +39,7 @@ define([
     return sbt.tasks.pendingTasks.run()?"Stop":"Run";
   });
 
-  sbt.app.inspectorActivated.subscribe(function(active) {
+  sbt.app.inspectActivated.subscribe(function(active) {
     if (!active && window.location.hash.indexOf("#run/system") != 0) {
       window.location.hash = "run/system";
     } else if(active) {
@@ -58,7 +58,7 @@ define([
     rerunOnBuild: sbt.app.settings.rerunOnBuild,
     automaticResetInspect: sbt.app.settings.automaticResetInspect,
     showLogDebug: sbt.app.settings.showLogDebug,
-    inspectorActivated: sbt.app.inspectorActivated,
+    inspectActivated: sbt.app.inspectActivated,
     mainRunAction: mainRunAction,
     mainRunName: mainRunName
   }
