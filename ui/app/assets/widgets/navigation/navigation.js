@@ -26,6 +26,7 @@ define([
     appStatus: appStatus,
     typesafe: typesafe,
     counters: sbt.tasks.errorCounters,
+    workingTasks: sbt.tasks.workingTasks,
     showFirstCompileError: function(c, e) {
       e.preventDefault();
       var ers = sbt.tasks.compilationErrors();
@@ -33,27 +34,8 @@ define([
         window.location.hash = "#code"+ fs.relative(ers[0].position.sourcePath)+":"+ers[0].position.line;
       }
     },
-
-    links: {
-      'Learn': {
-        'tutorial': "Tutorial",
-        'documentation': "Documentation"
-      },
-      'Develop': {
-        'build': "Build",
-        'code': "Code",
-        'run': "Run",
-        'test': "Test"
-      },
-      'Deliver': {
-        'versioning': "Versioning",
-        'issues': "Issues",
-        'integration': "Continuous Integration",
-        'deploy': "Deploy",
-        'monitor': "Monitor"
-      }
-    }
   }
+
 
   var activate = function(scope) {
     var $scope = $(scope);

@@ -24,6 +24,7 @@ define([
     var addingBackgroundFile = ko.observable(false);
     var editingBuildFile = ko.observable(false);
 
+    // On start, we ensure that we have a background.sbt file and the corresponding config in build.sbt
     checkFileContent(serverAppModel.location+backgroundRunPluginFileLocation, backgroundRunPluginFileContent, function() {
       addingEchoFile(true);
     });

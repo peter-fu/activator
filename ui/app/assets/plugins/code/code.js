@@ -80,7 +80,7 @@ define([
       event.preventDefault();
       event.stopPropagation();
     }
-    if (doc.edited() && !confirm("This file has unsaved changes, do you confirm closing without saving?")) return;
+    if (doc && doc.edited() && !confirm("This file has unsaved changes, do you confirm closing without saving?")) return;
     var docIndex = openedDocuments.indexOf(doc);
     if (docIndex >= 0){
       var sel = selectedDocument();
