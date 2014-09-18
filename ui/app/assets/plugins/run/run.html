@@ -31,7 +31,7 @@
           <div class="switch" data-bind="switchButton: inspectorActivated">
             <div class="inner"></div>
           </div>
-          [debug] Activate inspector
+          Activate inspector
         </li>
         <li>
           <div class="switch" data-bind="switchButton: automaticResetInspect">
@@ -63,9 +63,8 @@
         <span class="cache counter">0&ndash;</span>
       <!-- /ko -->
       <!-- ko ifnot: inspectorActivated -->
-        <p class="locked expand"> 
-          The inspector is disabled when using an external monitoring tool. You can go on the
-          <a href="#monitor">monitor tab</a> to turn it off.
+        <p class="locked"> 
+          The inspector is disabled.
         </p>
       <!-- /ko -->
     </footer>

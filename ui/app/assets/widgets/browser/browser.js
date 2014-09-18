@@ -40,7 +40,7 @@ define([
     fs.newName(this.location, name).success(this.parent.load.bind(this.parent));
   }
   FileNode.prototype.openFile = function() {
-    window.location.hash = "#code/"+fs.relative(this.location);
+    window.location.hash = "#code"+fs.relative(this.location);
   }
 
   function TreeNode(node, parent) {
