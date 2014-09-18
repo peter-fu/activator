@@ -4,8 +4,6 @@
 define([
   "main/plugins",
   "services/sbt",
-  "services/inspect/connection",
-  'widgets/echoInstaller/echoInstaller',
   "widgets/layout/layout",
   "text!./run.html",
   "css!./run",
@@ -16,14 +14,11 @@ define([
 ], function(
   plugins,
   sbt,
-  connection,
-  echoInstaller,
   layout,
   tpl
 ) {
 
   var subplugin = ko.observable();
-  var currentPlugin;
   var inspects = ko.observable();
   var sbtExecCommand = function(cmd){
     sbt.tasks.requestExecution(cmd);
@@ -42,11 +37,6 @@ define([
   sbt.app.inspectorActivated.subscribe(function(active) {
     if (!active && window.location.hash.indexOf("#run/system") != 0) {
       window.location.hash = "run/system";
-    } else if(active) {
-      sbt.tasks.actions.kill();
-      echoInstaller(function() {
-        sbt.tasks.actions.run();
-      });
     }
   })
 
@@ -77,14 +67,9 @@ define([
     },
     route: plugins.route('run', function(url, breadcrumb, plugin) {
       subplugin(plugin.render());
-      currentPlugin = plugin;
       breadcrumb([['run/', "Run"],['run/'+url.parameters[0], subPlugins[url.parameters[0]]]]);
-    }, "run/system"),
-
-    keyboard: function(key, meta, e) {
-      if (currentPlugin.keyboard) {
-        currentPlugin.keyboard(key, meta, e);
-      };
-    }
+    }, "run/system")
   }
+
+
 });

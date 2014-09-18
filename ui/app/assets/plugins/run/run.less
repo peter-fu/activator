@@ -7,9 +7,9 @@
   .row();
   overflow: hidden;
   .list-col {
-    width: 400px;
+    min-width: 300px;
     overflow: auto;
-    .expand(0);
+    .expand(1);
   }
   .stats {
     .expand(5);
@@ -20,7 +20,6 @@
 }
 
 .run .locked {
-  .expand();
   background: @red;
   color: #fff;
   padding: 10px;
@@ -29,46 +28,5 @@
   a {
     color: @white;
     text-decoration: underline;
-  }
-}
-
-.subheader {
-  .align-items();
-  input {
-    background: none;
-    font-size: inherit;
-    display: block;
-    .expand();
-    .placeholder(rgba(255,255,255,.6));
-    color: white;
-  }
-  .reset {
-    color: white;
-    width: 20px;
-    height: 20px;
-    text-align: center;
-    line-height: 20px;
-  }
-}
-
-.run .pluginBlock {
-  .expand();
-}
-.run .table-wrapper {
-  table {
-    width: 100%;
-  }
-  th {
-    text-align: left;
-    padding: 0 20px;
-    height: 25px;
-    line-height: 25px;
-    background: @white-dkr;
-    color: @grey-dkr;
-    font-size: 13px;
-    text-transform: uppercase;
-  }
-  td {
-    padding: 0 20px;
   }
 }

@@ -48,8 +48,6 @@ define(['./router'], function(router) {
           e.target.blur();
           $(document.body).scrollReveal();
           return false;
-        } else {
-          $(".dropdown.opened").removeClass("opened");
         }
       }
     }).keydown(function(e){

@@ -91,10 +91,6 @@ define([
     confirm: function(bodies) {
       modal.html("").append(ko.bindhtml(tpl, bodies));
       show();
-    },
-
-    hideModal: function() {
-      hide();
     }
 
   }

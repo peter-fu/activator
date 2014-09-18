@@ -7,7 +7,6 @@ define([
   './sbt/logs',
   './sbt/tasks',
   './sbt/events',
-  './sbt/configuration',
   './sbt/tests'
 ],function(
   app,
@@ -15,7 +14,6 @@ define([
   logs,
   tasks,
   events,
-  configuration,
   tests
 ) {
 
@@ -25,7 +23,6 @@ define([
     logs:           logs,
     tasks:          tasks,
     events:         events,
-    configuration:  configuration,
     tests:          tests
   };
 

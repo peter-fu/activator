@@ -34,9 +34,8 @@ define(function() {
 
   $(document.body).on("click", ".dropdown:not(.dropdownNoEvent)",function(e){
     $(this).toggleClass("opened");
-  }).on("click", ".dropdown:not(.dropdownNoEvent) dd",function(e){
-    e.stopPropagation();
   });
+
 
   // Custom ko bindings
 
@@ -214,11 +213,7 @@ define(function() {
   // This allows to style SVG in css (including css transition and animations)
   ko.bindingHandlers.svg = {
     init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-      $(element)
-        .attr({
-          width: "18px", // putting default small value,
-          height: "18px" // to avoid cranky blinking
-        });
+      $(element).css({ width: "16px", height: "16px" });
       $.get(valueAccessor(), function(data) {
         var img = $(document.adoptNode(data.querySelector('svg')));
         $(element).replaceWith(img);
@@ -241,19 +236,6 @@ define(function() {
         bufferArray = [];
         timer = null;
       }, 20);
-    }
-  }
-
-  // Format micro-seconds in ms and s
-  function roundDecimal(n) {
-    return Math.round(n*10)/10;
-  }
-  ko.bindingHandlers.formatTime = {
-    update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-      var value = valueAccessor();
-      if (value > 10e5) element.innerText = roundDecimal(value/10e5)+" s"
-      if (value > 10e2) element.innerText = roundDecimal(value/10e2)+" ms"
-      else              element.innerText = roundDecimal(value)     +" µs"
     }
   }
 
@@ -281,11 +263,5 @@ define(function() {
     return dom;
   }
 
-  ko.once = function(observable, callback) {
-    var subscription = observable.subscribe(function(newValue) {
-      callback(newValue);
-      subscription.dispose();
-    });
-  }
 
 });

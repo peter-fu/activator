@@ -2,148 +2,84 @@
   <header>
     <h1>Actors</h1>
   </header>
-  <!-- ko if: actors().length -->
   <section>
     <div class="pluginBlock list-col">
-
       <footer>
-        <dl class="dropdown">
-          <dt>
-            <svg data-bind="svg: '/assets/icons/gear-mini.svg'"></svg>
-          </dt>
-          <dd>
-            <p>
-              <label>Limit</label>
-              <select data-bind="options: filters.limitSizeValues, value: filters.limitSize"></select>
-            </p>
-            <p>
-              <label>Order direction</label>
-              <select data-bind="value: filters.orderByDesc">
-                <option value="true">Descending</option>
-                <option value="false">Ascending</option>
-              </select>
-            </p>
-            <p>
-              <label><input type="checkbox" data-bind="checked: filters.hideAnonymous"> Hide anonymous actors</label>
-            </p>
-            <p>
-              <label><input type="checkbox" zdata-bind="checked: fullActorPath"> Show full actor paths</label>
-            </p>
-          </dd>
-        </dl>
-        <span>Showing 50 of 277</span>
-        <p>
-          <label>Order by</label>
-          <select data-bind="options: filters.orderByValues, value: filters.orderBy"></select>
-        </p>
+        <p>Show all</p>
       </footer>
-
-      <div class="subheader">
-        <input type="text" class="fullTextSearch" placeholder="Filter actors" data-bind="value:fullTextSearch, event: {keyup: doSearch}"/>
-        <span class="reset" data-bind="visible: fullTextSearch, click: resetSearch">×</span>
-      </div>
-      <ul class="list" data-bind="foreach: actors">
-        <li>
-          <h2>
-            <a data-bind="text: name, attr: { href: actorLink }"></a>
+      <ul class="list">
+        <li class="queued">
+          <h2><a href="#">Build assets</a>
           </h2>
-          <span class="deviation-counter right" data-bind="text: deviations, visible: deviations"></span>
-          <p class="path" data-bind="text: parent"></p>
-          <p class="throughput" data-bind="text: throughput"></p>
-          <p class="maxMailboxSize" data-bind="text: maxMailboxSize"></p>
-          <p class="maxTimeInMailbox" data-bind="text: maxTimeInMailbox"></p>
-<!-- 
-          <p class="props">
-            <span class="throughput right" data-bind="text: throughput"></span>
-            <span class="maxTimeInMailbox right" data-bind="formatTime: maxTimeInMailbox"></span>
-            <span class="maxMailboxSize right" data-bind="text: maxMailboxSize"></span>
-          </p>
- -->
+          <p>queued</p>
+        </li>
+        <li class="pending">
+          <h2><a href="#">Build project</a>
+          </h2>
+          <p>running for 8.2s</p>
+        </li>
+        <li class="failed">
+          <h2><a href="#">Build project</a>
+          </h2>
+          <p>failed after 8.2s</p>
+        </li>
+        <li class="completed">
+          <h2><a href="#">Build dependencies</a>
+          </h2>
+          <p>completed in 8.2s</p>
+        </li>
+        <li class="completed">
+          <h2><a href="#">Resolve dependencies</a>
+          </h2>
+          <p>completed in 8.2s</p>
         </li>
       </ul>
     </div>
-    <!-- ko if: currentActor() -->
-    <!-- ko with: currentActor() -->
     <div class="pluginBlock dark stats actor">
       <div class="subheader">
-        <h2 data-bind="text: scope.actorPath">akka://application/user/distributedPubSubMediator/region-5-7-21</h2>
+        <h2>Task Name</h2>
       </div>
+      <h3>Sub tasks</h3>
       <div class="table-wrapper">
         <table>
-            <thead>
-              <tr>
-                <th colspan="2"><span>Message Information</span></th>
-              </tr>
-            </thead>
-            <tbody class="listing">
-              <tr><td>Processed</td><td data-bind="text: processedMessagesCount">7</td></tr>
-              <tr><td>Tell</td><td data-bind="text: tellMessagesCount">7</td></tr>
-              <tr><td>Ask</td><td data-bind="text: askMessagesCount">0</td></tr>
-            </tbody>
-            <thead>
-              <tr><th colspan="2"><span>Mailbox Information</span></th></tr>
-            </thead>
-            <tbody class="listing">
-              <tr><td>Max mailbox size</td><td data-bind="text: maxMailboxSize">2</td></tr>
-              <tr><td>Max mailbox size time</td><td xdata-bind="text: $root.formatDate(maxMailboxSizeTimestamp)">18:05:47:881</td></tr>
-              <tr><td>Max time in mailbox</td><td xdata-bind="text: $root.formatUnits(maxTimeInMailbox.unit, maxTimeInMailbox.value)">173 µs</td></tr>
-              <tr><td>Max time in mailbox time</td><td xdata-bind="text: $root.formatDate(maxTimeInMailboxTimestamp)">18:05:47:780</td></tr>
-              <tr><td>Mean mailbox size</td><td xdata-bind="text: $root.shorten(meanMailboxSize)">1.142</td></tr>
-              <tr><td>Mean time in mailbox</td><td xdata-bind="text: $root.formatUnits(meanTimeInMailbox.unit, meanTimeInMailbox.value)">93 µs</td></tr>
-            </tbody>
-
-            <!-- xxxxko if: totalMessageRate
-            <thead>
-              <tr><th colspan="2"><span>Rates</span></th></tr>
-            </thead>
-            <tbody class="listing">
-              <tr><td>Total message</td><td xdata-bind="text: $root.shorten(totalMessageRate)">104.8</td></tr>
-              <tr><td>Receive</td><td xdata-bind="text: $root.shorten(receiveRate)">48.38</td></tr>
-              <tr><td>Tell</td><td xdata-bind="text: $root.shorten(tellRate)">48.38</td></tr>
-              <tr><td>Ask</td><td xdata-bind="text: $root.shorten(askRate)">0</td></tr>
-              <tr><td>Mean processed message</td><td data-bind="text: $root.formatUnits(meanProcessedMessageRateUnit, $root.shorten(meanProcessedMessageRate))">0.005 msg/s</td></tr>
-            </tbody>
-       /ko -->
-
-            <thead>
-              <tr>
-                <th colspan="2">
-                  <div xdata-bind="if: $root.hasDeviations()"></div>
-                  <div xdata-bind="if: !$root.hasDeviations()">
-                    <span>Deviations</span>
-                  </div>
-                </th>
-              </tr>
-            </thead>
-            <tbody class="listing">
-              <tr><td>Errors</td><td data-bind="text: errorCount">0</td></tr>
-              <tr><td>Warnings</td><td data-bind="text: warningCount">0</td></tr>
-              <tr><td>Dead letters</td><td data-bind="text: deadletterCount">0</td></tr>
-              <tr><td>Unhandled messages</td><td data-bind="text: unhandledMessageCount">0</td></tr>
-            </tbody>
+          <tr>
+            <th>Updating sbt launch jar</th>
+            <td>Queued</td>
+          </tr>
+          <tr>
+            <th>SUB TASK</th>
+            <td>Queued</td>
+          </tr>
+          <tr>
+            <th>SUB TASK</th>
+            <td>Running for 2s</td>
+          </tr>
+          <tr>
+            <th>SUB TASK</th>
+            <td>Running for 2s</td>
+          </tr>
+          <tr class="error">
+            <th>SUB TASK</th>
+            <td>Failed after 2s</td>
+          </tr>
+          <tr>
+            <th>SUB TASK</th>
+            <td>Completed in 2s</td>
+          </tr>
+          <tr>
+            <th>SUB TASK</th>
+            <td>Completed in 2s</td>
+          </tr>
+          <tr>
+            <th>SUB TASK</th>
+            <td>Completed in 2s</td>
+          </tr>
         </table>
       </div>
-    </div>
-    <!-- /ko -->
-    <!-- /ko -->
-    <!-- ko ifnot: currentActor() -->
-    <div class="pluginBlock dark">
-        <!-- TODO: Show some stats here? -->
-        <p class="emptyList">
-          Select an actor in the list to get some more datas.
-        </p>
-    </div>
-    <!-- /ko -->
-  </section>
-  <!-- /ko -->
-  <!-- ko ifnot: actors().length -->
-  <section>
-    <div class="pluginBlock dark">
-      <p class="emptyList">
-          You can see actor information here but so far there has been no activity in your application or you're running an unsupported version of Akka (&gt;2.3.4).
-      </p>
+      <h3>Logs</h3>
+      <ul class="logs">
+        <li class="x">lol</li>
+      </ul>
     </div>
   </section>
-  <!-- /ko -->
-
 </article>
