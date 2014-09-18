@@ -19,7 +19,7 @@ define([
       callback: callback,
       ok: "OK"
     });
-  }
+  };
 
   var OpenInIdea = function(callback, state) {
     modals.show({
@@ -28,10 +28,15 @@ define([
       callback: callback,
       ok: "OK"
     });
-  }
+  };
+
+  var CloseModalWindow = function () {
+    modals.hideModal();
+  };
 
   return {
     Eclipse : OpenInEclipse,
-    Idea : OpenInIdea
+    Idea : OpenInIdea,
+    CloseModalWindow: CloseModalWindow
   };
 });

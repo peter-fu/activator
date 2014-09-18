@@ -13,6 +13,22 @@ define(function() {
         }
         require(['plugins/'+root+'/'+url.parameters[0]+'/'+url.parameters[0]], function(plugin) {
           callback(url, breadcrumb, plugin)
+          if (plugin.route && url.parameters[1]){
+            var p = {
+              path: url,
+              plugin: url.parameters[0],
+              pluginUrl: "plugins/" + url.parameters[0] + "/" + url.parameters[0],
+              parameters: url.parameters.slice(1)
+            }
+            plugin.route(p, breadcrumb);
+          } else if (plugin.route){
+            var p = {
+              path: url,
+              plugin: url.parameters[0],
+              pluginUrl: "plugins/" + url.parameters[0] + "/" + url.parameters[0]
+            }
+            plugin.route(p, breadcrumb);
+          }
         }, function() {
           console.log("404 TODO") // TODO
         });

@@ -112,10 +112,10 @@ define([
   */
   var runCommand = ko.computed(function() {
     if (app.currentMainClass()){
-      return "backgroundRunMain "+ app.currentMainClass();
+      return (app.inspectorActivated()?"echo:":"")+"backgroundRunMain "+ app.currentMainClass();
     }
     else {
-      return "backgroundRun";
+      return (app.inspectorActivated()?"echo:":"")+"backgroundRun";
     }
   });
 
@@ -352,10 +352,6 @@ define([
     }
   });
 
-  subTypeEventStream("ClientOpened").each(function(message) {
-    debug && console.log("Client opened");
-  });
-
   subTypeEventStream("RequestExecution").each(function(message) {
     debug && console.log("Received request execution result", message);
 
@@ -413,6 +409,15 @@ define([
     }
   });
 
+  // Application ready
+  var applicationReady = ko.observable(false);
+  subTypeEventStream('ClientOpened').each(function (msg) {
+    applicationReady(true);
+  });
+  subTypeEventStream('ClientClosed').each(function (msg) {
+    applicationReady(false);
+  });
+
   // Killing an execution
   function stopJob(message) {
     if (message.event && message.event.command && message.event.command.slice(0, 7) == "jobStop") {
@@ -444,7 +449,7 @@ define([
     self.stopping    = ko.observable(false);
     self.jobIds      = ko.observableArray([]);
 
-    if (self.commandId == "runMain" || self.commandId == "backgroundRunMain" || self.commandId == "backgroundRun") self.commandId = "run";
+    if (self.commandId == "runMain" || self.commandId == "echo" || self.commandId == "backgroundRunMain" || self.commandId == "backgroundRun") self.commandId = "run";
 
     // Data produced:
     self.tasks          = {};
@@ -522,6 +527,10 @@ define([
     }
   }
 
+  function stopRunningTasks(){
+
+  }
+
   /**
   Check if a task is pending
   */
@@ -548,6 +557,7 @@ define([
     notifications:           notifications,
     SbtEvents:               SbtEvents,
     kill:                    killExecution,
+    applicationReady:        applicationReady,
     active: {
       turnedOn:     "",
       compiling:    "",
@@ -561,7 +571,7 @@ define([
         requestExecution("compile");
       },
       run:          function() {
-        requestExecution(runCommand());
+        return requestExecution(runCommand());
       },
       test:         function() {
         requestExecution("test");

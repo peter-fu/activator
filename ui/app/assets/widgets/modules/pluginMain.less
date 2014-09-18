@@ -43,6 +43,10 @@
 
   footer {
     .order();
+    g {
+      fill: @yellow-text;
+    }
+    white-space: nowrap;
     height: 35px;
     line-height: 33px;
     background: @yellow;
@@ -55,7 +59,25 @@
       padding: 0 10px;
       border-right: 1px solid @yellow-dkr;
     }
-
+    .dropdown {
+      padding: 0;
+      height: 34px;
+      width: 34px;
+      dt {
+        height: inherit;
+        width: inherit;
+        text-align: center;
+      }
+      dd {
+        padding: 10px;
+      }
+      svg {
+        margin-top: 8px;
+      }
+    }
+    select {
+      max-width: 100px;
+    }
     .groupRight {
       float: right;
       & > * {
@@ -77,4 +99,10 @@
     .trbl(100px, 0 0 0);
   }
 
+}
+
+.emptyList {
+  padding: 20px;
+  text-align: center;
+  font-size: 17px;
 }

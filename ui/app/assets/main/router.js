@@ -43,7 +43,7 @@ define(function() {
       path: url,
       plugin: plugin,
       pluginUrl: "plugins/" + plugin + "/" + plugin,
-      parameters: url.split(/\/+/).slice(1)
+      parameters: url.split("/").slice(1)
     }
   }
 
