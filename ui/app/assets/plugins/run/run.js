@@ -32,6 +32,9 @@ define([
     if (sbt.tasks.pendingTasks.run()){
       sbt.tasks.actions.kill("run");
     } else {
+      if (sbt.app.settings.automaticResetInspect()) {
+        connection.reset();
+      }
       sbt.tasks.actions.run();
     }
   }
