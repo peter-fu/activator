@@ -115,7 +115,7 @@ define([
       return (app.inspectorActivated()?"echo:":"")+"backgroundRunMain "+ app.currentMainClass();
     }
     else {
-      return (app.inspectorActivated()?"echo:":"")+"echo:backgroundRun";
+      return (app.inspectorActivated()?"echo:":"")+"backgroundRun";
     }
   });
 
