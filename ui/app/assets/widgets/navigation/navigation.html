@@ -15,6 +15,7 @@
     <dd>
       <a data-bind="memorizeLinks: '#build', isActiveUrl: '#build'">
         Build
+        <span class="stamp" data-bind="visible: workingTasks.compile()"></span>
         <span class="counter" data-bind="text: counters.build, visible: counters.build()"></span>
       </a>
       <a data-bind="memorizeLinks: '#code', isActiveUrl: '#code'">
@@ -23,10 +24,12 @@
       </a>
       <a data-bind="memorizeLinks: '#run', isActiveUrl: '#run'">
         Run
+        <span class="stamp" data-bind="visible: workingTasks.run()"></span>
         <span class="counter" data-bind="text: counters.run, visible: counters.run()"></span>
       </a>
       <a data-bind="memorizeLinks: '#test', isActiveUrl: '#test'">
         Test
+        <span class="stamp" data-bind="visible: workingTasks.test()"></span>
         <span class="counter" data-bind="text: counters.test, visible: counters.test()"></span>
       </a>
     </dd>
