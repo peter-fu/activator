@@ -52,13 +52,6 @@
           <p class="throughput" data-bind="text: throughput"></p>
           <p class="maxMailboxSize" data-bind="text: maxMailboxSize"></p>
           <p class="maxTimeInMailbox" data-bind="text: maxTimeInMailbox"></p>
-<!-- 
-          <p class="props">
-            <span class="throughput right" data-bind="text: throughput"></span>
-            <span class="maxTimeInMailbox right" data-bind="formatTime: maxTimeInMailbox"></span>
-            <span class="maxMailboxSize right" data-bind="text: maxMailboxSize"></span>
-          </p>
- -->
         </li>
       </ul>
     </div>
@@ -91,20 +84,6 @@
               <tr><td>Mean mailbox size</td><td xdata-bind="text: $root.shorten(meanMailboxSize)">1.142</td></tr>
               <tr><td>Mean time in mailbox</td><td xdata-bind="text: $root.formatUnits(meanTimeInMailbox.unit, meanTimeInMailbox.value)">93 µs</td></tr>
             </tbody>
-
-            <!-- xxxxko if: totalMessageRate
-            <thead>
-              <tr><th colspan="2"><span>Rates</span></th></tr>
-            </thead>
-            <tbody class="listing">
-              <tr><td>Total message</td><td xdata-bind="text: $root.shorten(totalMessageRate)">104.8</td></tr>
-              <tr><td>Receive</td><td xdata-bind="text: $root.shorten(receiveRate)">48.38</td></tr>
-              <tr><td>Tell</td><td xdata-bind="text: $root.shorten(tellRate)">48.38</td></tr>
-              <tr><td>Ask</td><td xdata-bind="text: $root.shorten(askRate)">0</td></tr>
-              <tr><td>Mean processed message</td><td data-bind="text: $root.formatUnits(meanProcessedMessageRateUnit, $root.shorten(meanProcessedMessageRate))">0.005 msg/s</td></tr>
-            </tbody>
-       /ko -->
-
             <thead>
               <tr>
                 <th colspan="2">
