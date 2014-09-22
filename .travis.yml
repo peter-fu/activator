@@ -15,7 +15,4 @@ env:
   - TASKS=offlineTests
 
 notifications:
-  email:
-    - activator@typesafe.com
   flowdock: 2eb8fdbb08ad2e595a21edea64252a22
-            
