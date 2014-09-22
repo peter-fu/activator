@@ -112,10 +112,10 @@ define([
   */
   var runCommand = ko.computed(function() {
     if (app.currentMainClass()){
-      return (app.inspectorActivated()?"echo:":"")+"backgroundRunMain "+ app.currentMainClass();
+      return (app.inspectActivated()?"echo:":"")+"backgroundRunMain "+ app.currentMainClass();
     }
     else {
-      return (app.inspectorActivated()?"echo:":"")+"backgroundRun";
+      return (app.inspectActivated()?"echo:":"")+"backgroundRun";
     }
   });
 

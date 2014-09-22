@@ -28,10 +28,10 @@
           Run on build
         </li>
         <li>
-          <div class="switch" data-bind="switchButton: inspectorActivated">
+          <div class="switch" data-bind="switchButton: inspectActivated">
             <div class="inner"></div>
           </div>
-          Activate inspector
+          Activate Inspect
         </li>
         <li>
           <div class="switch" data-bind="switchButton: automaticResetInspect">
@@ -58,24 +58,24 @@
       </ul>
     </div>
     <footer>
-      <!-- ko if: inspectorActivated -->
+      <!-- ko if: inspectActivated -->
         <span class="expand">Data collected for</span>
         <span class="cache counter">0&ndash;</span>
       <!-- /ko -->
-      <!-- ko ifnot: inspectorActivated -->
+      <!-- ko ifnot: inspectActivated -->
         <p class="locked"> 
-          The inspector is disabled.
+          Inspect is disabled.
         </p>
       <!-- /ko -->
     </footer>
     <ul class="list links">
       <li class="system"><a href="#run/system">System</a>
       </li>
-      <li class="actors" data-bind="visible: inspectorActivated"><a href="#run/actors">Actors</a>
+      <li class="actors" data-bind="visible: inspectActivated"><a href="#run/actors">Actors</a>
       </li>
-      <li class="requests" data-bind="visible: inspectorActivated"><a href="#run/requests">Requests</a>
+      <li class="requests" data-bind="visible: inspectActivated"><a href="#run/requests">Requests</a>
       </li>
-      <li class="deviations" data-bind="visible: inspectorActivated"><a href="#run/deviations">Deviations</a>
+      <li class="deviations" data-bind="visible: inspectActivated"><a href="#run/deviations">Deviations</a>
       </li>
     </ul>
   </nav>
