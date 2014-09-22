@@ -16,7 +16,7 @@ object Dependencies {
   val playVersion = "2.3.3"
   val akkaVersion = "2.3.4"
   val slickVersion = "2.1.0"
-  val echoPluginVersion = "0.1.6"
+  val echoPluginVersion = "0.1.7"
   val activatorAnalyticsVersion = "0.1.6"
   val aspectJVersion = "1.7.3"
 

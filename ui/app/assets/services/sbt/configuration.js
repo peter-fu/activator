@@ -14,7 +14,7 @@ define([
     var uiFileEchoSettings = "\n\nfork in run := true";
 
     var echoPluginFileLocation = "/project/echo.sbt";
-    var echoPluginFileContent = "addSbtPlugin(\"com.typesafe.sbt\" % \"sbt-echo\" % \"0.1.6\")";
+    var echoPluginFileContent = "addSbtPlugin(\"com.typesafe.sbt\" % \"sbt-echo\" % \"0.1.7\")";
 
     // Is this safe to do, i.e. is the location and name always the same for an Activator project?
     var buildFileLocation = "/build.sbt";
