@@ -27,3 +27,5 @@ project/activator-sbt-eclipse-shim.sbt
 project/activator-sbt-idea-shim.sbt
 .sbtserver
 project/.sbtserver
+build.sbt
+project/background.sbt
