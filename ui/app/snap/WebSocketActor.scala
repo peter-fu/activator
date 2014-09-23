@@ -149,9 +149,9 @@ abstract class WebSocketActor[MessageType](implicit frameFormatter: FrameFormatt
         ready = true
       case TimeoutAfterHalfCompleted =>
         if (!(incomingCompleted && outgoingCompleted)) {
-          log.warning("websocket actor had incoming completed=" + incomingCompleted +
+          log.debug("websocket actor had incoming completed=" + incomingCompleted +
             " and outgoing completed=" + outgoingCompleted +
-            " and timed out before the other one completed; force-terminating")
+            " and timed out before the other one completed; terminating")
           incomingCompleted = true
           outgoingCompleted = true
         }
