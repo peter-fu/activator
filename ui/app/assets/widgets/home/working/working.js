@@ -15,7 +15,7 @@ define([
       var logs = $("#loading-logs", dom);
       var wrapper = $("article", dom)[0];
 
-      websocket.subscribe({type: "sbt", subType: "LogEvent"}).fork().each(function(message) {
+      websocket.subscribe({type: "sbt", subType: "CoreLogEvent"}).fork().each(function(message) {
         logs.append($("<li/>").html(message.event.entry.message).attr("data-type", message.event.entry.level));
         wrapper.scrollTop = 9e9;
       });
