@@ -109,6 +109,18 @@ define(function() {
     }
   }
 
+  ko.bindingHandlers.isExactUrl = {
+    init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+      var url = valueAccessor();
+      var isActive = ko.computed(function() {
+        return urlChange() == url;
+      });
+      ko.applyBindingsToNode(element, { css: {'active': isActive} });
+    },
+    update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+    }
+  }
+
   // Just pass a function in the template, to call it
   ko.bindingHandlers['exec'] = {
     init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {

@@ -10,6 +10,7 @@ define([
   var formatUnits = function(u, v) { return format.shorten(v) + ' ' + u };
 
   function setListFilters(filters) {
+    connection.filters.actors($.extend(connection.filters.actors(), filters));
   }
   var actorsList = ko.observable([]);
 
@@ -69,7 +70,6 @@ define([
 
   var currentActor = ko.observable();
   function setCurrentActorId(id) {
-    console.log(id)
 
     if (id){
       connection.filters.actor({

@@ -15,27 +15,37 @@ define([
   tpl
 ) {
 
-  var fullTextSearch  = ko.observable("");
-  var limitSize       = ko.observable(50);
-  var orderByDesc     = ko.observable(true);
-  var orderBy         = ko.observable("");
-  var hideAnonymous   = ko.observable(true);
-
   var limitSizeValues = [50, 100, 200, 500];
-  var orderByValues   = ["Name", "Path", "Errors", "Throughput", "Max time in Mailbox", "Max Mailbox Size"];
+  // var orderByValues   = ["Name", "Path", "Errors", "Throughput", "Max time in Mailbox", "Max Mailbox Size"];
+  var orderByValues = [
+    { value: "actorName",        text: "Name" },
+    { value: "actorPath",        text: "Path" },
+    { value: "maxMailboxSize",   text: "Max Mailbox Size" },
+    { value: "maxTimeInMailbox", text: "Max time in Mailbox" },
+    { value: "deviation",        text: "Errors" }
+  ]
+
+  var fullTextSearch  = ko.observable("");
+  var limitSize       = ko.observable(limitSizeValues[0]);
+  var orderByDesc     = ko.observable(true);
+  var orderBy         = ko.observable(orderByValues[0]);
+  var hideAnonymous   = ko.observable(true);
 
   var listFilters = ko.computed(function() {
     return {
-      fullTextSearch: fullTextSearch(),
-      limitSize:      limitSize(),
-      orderByDesc:    orderByDesc(),
-      orderBy:        orderBy(),
-      hideAnonymous:  hideAnonymous()
+      // fullTextSearch: fullTextSearch(),
+      // limitSize:      limitSize(),
+      sortDirection:  orderByDesc(),
+      sortCommand:    orderBy()
+      // hideAnonymous:  hideAnonymous()
     }
+  });
+  listFilters.subscribe(function(v) {
+    actors.setListFilters(v);
   });
 
   var filteredActorsList = ko.computed(function() {
-    return actors.list().filter(filterActorList).map(formatActorList).sort(sortActorList);
+    return actors.list().map(formatActorList);
   });
 
   function formatActorList(_actor) {
@@ -48,7 +58,7 @@ define([
   }
 
   function filterActorList(actor) {
-    return true;
+    return true; // TODO
   }
 
   function sortActorList(actorA, actorB) {
@@ -63,12 +73,23 @@ define([
     fullTextSearch(event.target.value);
   }
 
+  function openActor(actor){
+    window.location.hash = actor.actorLink;
+  }
+  function closeActor(actor){
+    window.location.hash = "#run/actors";
+    actors.setCurrentActorId(null);
+    actors.currentActor(null);
+  }
+
   var State = {
     actors: filteredActorsList,
     fullTextSearch: fullTextSearch,
     resetSearch: resetSearch,
     doSearch: doSearch,
     currentActor: actors.currentActor,
+    openActor: openActor,
+    closeActor: closeActor,
     filters: {
       limitSize:       limitSize,
       orderByDesc:     orderByDesc,
@@ -86,6 +107,7 @@ define([
         actors.setCurrentActorId(url.parameters.join("/"));
         connection.filters.active(['actors', 'actor']);
       } else {
+        closeActor();
         connection.filters.active(['actors']);
       }
     },
@@ -100,6 +122,8 @@ define([
         e.preventDefault();
         e.stopPropagation();
         return false;
+      } else if (key == "ESC"){
+        closeActor();
       }
     }
   }

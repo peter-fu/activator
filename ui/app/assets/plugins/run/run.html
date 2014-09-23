@@ -69,13 +69,13 @@
       <!-- /ko -->
     </footer>
     <ul class="list links">
-      <li class="system"><a href="#run/system">System</a>
+      <li class="system" data-bind="isActiveUrl: '#run/system'"><a href="#run/system">System</a>
       </li>
-      <li class="actors" data-bind="visible: inspectorActivated"><a href="#run/actors">Actors</a>
+      <li class="actors" data-bind="visible: inspectorActivated, isActiveUrl: '#run/actors'"><a href="#run/actors">Actors</a>
       </li>
-      <li class="requests" data-bind="visible: inspectorActivated"><a href="#run/requests">Requests</a>
+      <li class="requests" data-bind="visible: inspectorActivated, isActiveUrl: '#run/requests'"><a href="#run/requests">Requests</a>
       </li>
-      <li class="deviations" data-bind="visible: inspectorActivated"><a href="#run/deviations">Deviations</a>
+      <li class="deviations" data-bind="visible: inspectorActivated, isActiveUrl: '#run/deviations'"><a href="#run/deviations">Deviations</a>
       </li>
     </ul>
   </nav>
