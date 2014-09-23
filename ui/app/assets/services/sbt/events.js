@@ -12,19 +12,20 @@ define([
     .each(function() {
       if (app.settings.recompileOnChange()){
         debug && console.log("app.rerunOnBuild is on: Requesting 'compile' task")
-        tasks.requestExecution("compile");
+        tasks.actions.compile();
       }
     });
 
   tasks.SbtEvents.successfulBuild
     .each(function() {
       if (app.settings.rerunOnBuild()){
-        debug && console.log("app.rerunOnBuild is on: Requesting 'run' task")
-        tasks.requestExecution("run");
+        debug && console.log("app.rerunOnBuild is on: Requesting 'run' task");
+        tasks.actions.kill();
+        tasks.actions.run();
       }
       if (app.settings.retestOnSuccessfulBuild()){
         debug && console.log("app.retestOnSuccessfulBuild is on: Requesting 'test' task")
-        tasks.requestExecution("test");
+        tasks.actions.test();
       }
     });
 
