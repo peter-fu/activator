@@ -132,6 +132,18 @@
   flex-grow: @size;
 }
 
+.flex-fix() {
+  -webkit-flex-shrink: 0;
+  flex-shrink: 0;
+  -webkit-box-flex: 0;
+  -moz-box-flex: 0;
+  -o-box-flex: 0;
+  -ms-box-flex: 0;
+  box-flex: 0;
+  -webkit-flex-grow: 0;
+  flex-grow: 0;
+}
+
 .order(@rank: 1) {
   -webkit-box-ordinal-group: @rank;
   -moz-box-ordinal-group: @rank;

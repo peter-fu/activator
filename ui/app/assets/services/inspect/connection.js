@@ -7,7 +7,6 @@ define([
   var defaultTime = { "startTime": "", "endTime": "", "rolling": "20minutes" };
 
   var streams = {
-    overview:   websocket.subscribe('type', 'overview'),
     actor:      websocket.subscribe('type', 'actor'),
     actors:     websocket.subscribe('type', 'actors'),
     deviation:  websocket.subscribe('type', 'deviation'),
@@ -19,7 +18,6 @@ define([
   var filters = {
     active:     ko.observable([]).extend({ throttle: 50 }), // Store the activated filters labels
 
-    overview:   ko.observable().extend({ throttle: 50 }),
     actor:      ko.observable().extend({ throttle: 50 }),
     actors:     ko.observable().extend({ throttle: 50 }),
     deviation:  ko.observable().extend({ throttle: 50 }),
@@ -27,6 +25,15 @@ define([
     request:    ko.observable().extend({ throttle: 50 }),
     requests:   ko.observable().extend({ throttle: 50 })
   }
+
+  var overview = [{
+    "name": "overview",
+    "paging": {
+      "offset": 0,
+      "limit": 10000
+    },
+    "scope": {}
+  }];
 
   /**
    Send an InspectRequest
@@ -52,7 +59,7 @@ define([
   function request(){
     setTimeout(function() {
       send({
-        modules: filters.active().map(function(label) { return filters[label](); }),
+        modules: filters.active().map(function(label) { return filters[label](); }).concat(overview),
         time: defaultTime // TODO: Time? Should we get rid of it?
       });
     },10)

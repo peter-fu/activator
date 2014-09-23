@@ -31,7 +31,7 @@
           <div class="switch" data-bind="switchButton: inspectActivated">
             <div class="inner"></div>
           </div>
-          Activate Inspect
+          Activate inspector
         </li>
         <li>
           <div class="switch" data-bind="switchButton: automaticResetInspect">
@@ -64,18 +64,18 @@
       <!-- /ko -->
       <!-- ko ifnot: inspectActivated -->
         <p class="locked"> 
-          Inspect is disabled.
+          The inspector is disabled.
         </p>
       <!-- /ko -->
     </footer>
     <ul class="list links">
-      <li class="system"><a href="#run/system">System</a>
+      <li class="system" data-bind="isActiveUrl: '#run/system'"><a href="#run/system">System</a>
       </li>
-      <li class="actors" data-bind="visible: inspectActivated"><a href="#run/actors">Actors</a>
+      <li class="actors" data-bind="visible: inspectActivated, isActiveUrl: '#run/actors'"><a href="#run/actors">Actors</a>
       </li>
-      <li class="requests" data-bind="visible: inspectActivated"><a href="#run/requests">Requests</a>
+      <li class="requests" data-bind="visible: inspectActivated, isActiveUrl: '#run/requests'"><a href="#run/requests">Requests</a>
       </li>
-      <li class="deviations" data-bind="visible: inspectActivated"><a href="#run/deviations">Deviations</a>
+      <li class="deviations" data-bind="visible: inspectActivated, isActiveUrl: '#run/deviations'"><a href="#run/deviations">Deviations</a>
       </li>
     </ul>
   </nav>
