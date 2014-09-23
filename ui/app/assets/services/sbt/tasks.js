@@ -527,10 +527,6 @@ define([
     }
   }
 
-  function stopRunningTasks(){
-
-  }
-
   /**
   Check if a task is pending
   */

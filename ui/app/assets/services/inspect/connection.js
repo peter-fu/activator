@@ -32,12 +32,6 @@ define([
    Send an InspectRequest
    */
   function send(message){
-    console.log("-------------")
-    console.log(JSON.stringify({
-      request: 'InspectRequest',
-      location: message
-    }));
-
     websocket.send({
       request: 'InspectRequest',
       location: message

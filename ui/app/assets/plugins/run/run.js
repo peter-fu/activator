@@ -48,7 +48,7 @@ define([
         sbt.tasks.actions.run();
       });
     }
-  })
+  });
 
   var State = {
     subplugin: subplugin,
