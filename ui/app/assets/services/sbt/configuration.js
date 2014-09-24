@@ -9,12 +9,14 @@ define([
     ajax) {
 
     // plugin information
-    var backgroundRunPluginFileLocation = "/project/background.sbt";
-    var backgroundRunPluginFileContent = "addSbtPlugin(\"com.typesafe.sbtrc\" % \"ui-interface-0-13\" % \"1.0-d5ba9ed9c1d31e3431aeca5e429d290b56cb0b14\")";
+    var backgroundRunPluginFileLocation = "/project/sbt-ui.sbt";
+    var backgroundRunPluginFileContent = "// This plugin represents functionality that is to be added to sbt in the future\n\n" +
+      "addSbtPlugin(\"com.typesafe.sbtrc\" % \"ui-interface-0-13\" % \"1.0-d5ba9ed9c1d31e3431aeca5e429d290b56cb0b14\")";
     var uiFileEchoSettings = "\n\nfork in run := true";
 
-    var echoPluginFileLocation = "/project/echo.sbt";
-    var echoPluginFileContent = "addSbtPlugin(\"com.typesafe.sbt\" % \"sbt-echo\" % \"0.1.7\")";
+    var echoPluginFileLocation = "/project/inspect.sbt";
+    var echoPluginFileContent = "// This plugin runs apps with the \"echo\" trace infrastructure which backs up the Inspect functionality in Activator\n\n" +
+      "addSbtPlugin(\"com.typesafe.sbt\" % \"sbt-echo\" % \"0.1.7\")";
 
     // Is this safe to do, i.e. is the location and name always the same for an Activator project?
     var buildFileLocation = "/build.sbt";

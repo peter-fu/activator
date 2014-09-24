@@ -4,7 +4,8 @@
 define(['./generator', 'widgets/openIn/openIn'], function (generator, openIn) {
   var projectFile = ".project";
   var pluginFileLocation = "/project/eclipse.sbt";
-  var pluginFileContent = "addSbtPlugin(\"com.typesafe.sbteclipse\" % \"sbteclipse-plugin\" % \"2.5.0\")";
+  var pluginFileContent = "// This plugin adds commands to generate IDE project files\n\n" +
+    "addSbtPlugin(\"com.typesafe.sbteclipse\" % \"sbteclipse-plugin\" % \"2.5.0\")";
   var sbtCommand = "eclipse";
 
   var generate = function(overrideExisting) {
