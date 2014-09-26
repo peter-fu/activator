@@ -14,10 +14,17 @@ define([
     debug && console.log("starting search on " + keywords);
     return $.when(fs.search(keywords), sbt.tasks.deferredPossibleAutoCompletions(keywords))
       .then(function(searchValues, sbtCompletions) {
-        sbtCompletions.sort(function(a,b) { return a.title.length > b.title.length });
-        options( searchValues.concat(sbtCompletions) );
+        var filtered = sbtCompletions.filter(function (el) { 
+          return !endsWith(el.title, ":");
+        });
+        filtered.sort(function(a,b) { return a.title.length > b.title.length });
+        options( searchValues.concat(filtered) );
     });
   }
+
+  var endsWith = function(str, suffix) {
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+  };
 
   return {
     combinedSearch: combinedSearch
