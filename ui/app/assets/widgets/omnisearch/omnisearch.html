@@ -10,7 +10,6 @@
     <li data-bind="click: function(opt){ $root.exec(opt); }, css: {selected: parseFloat($index()) == $parent.selected()}">
       <span class="type" data-bind="svg: '/assets/icons/'+type+'.svg'"></span>
       <span class="title" data-bind="text: title || execute"></span>
-      <span class="subtitle" data-bind="text: subtitle"></span>
     </li>
     <!-- /ko -->
   </ul>

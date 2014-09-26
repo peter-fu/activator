@@ -16,13 +16,25 @@ define([
       .then(function(searchValues, sbtCompletions) {
         var filtered = sbtCompletions.filter(function (el) { 
           return !endsWith(el.title, ":");
+        }).filter(function (el) {
+          return !endsWith(el.title, "*");
         });
-        filtered.sort(function(a,b) { return a.title.length > b.title.length });
+
+        filtered.sort(function(a,b) {
+          var aa = a.title.toLowerCase(), bb = b.title.toLowerCase();
+          if (aa < bb)
+            return -1;
+          else if (bb < aa)
+            return 1;
+          else
+            return 0;
+        });
+
         var result =
-          [{"heading": "Commands:"}].concat(
+          [{"heading": "Tasks (select to execute):"}].concat(
             filtered
           ).concat(
-            [{"heading": "Files:"}]
+            [{"heading": "Files (select to open):"}]
           ).concat(
             searchValues
           );
