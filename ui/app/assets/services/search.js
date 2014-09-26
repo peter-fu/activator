@@ -18,7 +18,15 @@ define([
           return !endsWith(el.title, ":");
         });
         filtered.sort(function(a,b) { return a.title.length > b.title.length });
-        options( searchValues.concat(filtered) );
+        var result =
+          [{"heading": "Commands:"}].concat(
+            filtered
+          ).concat(
+            [{"heading": "Files:"}]
+          ).concat(
+            searchValues
+          );
+        options(result);
     });
   }
 
