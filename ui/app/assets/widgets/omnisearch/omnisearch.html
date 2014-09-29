@@ -2,13 +2,10 @@
   <input type="text" name="keywords" placeholder="Type a command or keywords" autocomplete="off" data-bind="value: searchString, valueUpdate: 'afterkeydown', event: {'keyup': keyUp,'keydown': keyDown,'focus': focus,'blur': blur}">
   <ul data-bind="css: {active: active, empty: empty}, foreach: options">
     <!-- ko if: $data.heading -->
-    <li>
-        <span class="title" data-bind="text: heading"></span>
-    </li>
+    <li class="heading" data-bind="text: heading"></li>
     <!-- /ko -->
     <!-- ko if: $data.type -->
-    <li data-bind="click: function(opt){ $root.exec(opt); }, css: {selected: parseFloat($index()) == $parent.selected()}">
-      <span class="type" data-bind="svg: '/assets/icons/'+type+'.svg'"></span>
+    <li class="option" data-bind="click: function(opt){ $root.exec(opt); }, css: {selected: parseFloat($index()) == $parent.selected()}">
       <span class="title" data-bind="text: title || execute"></span>
     </li>
     <!-- /ko -->

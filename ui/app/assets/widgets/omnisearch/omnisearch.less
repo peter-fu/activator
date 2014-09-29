@@ -55,25 +55,19 @@
       color: @grey;
       padding: 10px 30px;
     }
+    .heading {
+      background: @slate-ltr;
+      color: @grey;
+      text-transform: uppercase;
+      font-weight: 900;
+      font-size: 11px;
+      line-height: 14px;
+    }
     li {
       line-height: 15px;
       padding: 5px 10px;
-      min-height: 30px;
       overflow: hidden;
-      cursor: pointer;
       .row();
-      &:nth-child(odd) {
-        background-color: rgba(0,0,0,.05);
-      }
-      &.selected, &:hover {
-        background-color: @red;
-        .subtitle {
-          color: @red-ltr;
-        }
-        svg g {
-          fill: white;
-        }
-      }
       .title {
         color: white;
         font-weight: 500;
@@ -85,6 +79,20 @@
       }
       svg {
         margin: 1px 0 0;
+      }
+    }
+    .option {
+      &:nth-child(odd) {
+        background-color: rgba(0,0,0,.05);
+      }
+      &.selected, &:hover {
+        background-color: @red;
+        .subtitle {
+          color: @red-ltr;
+        }
+        svg g {
+          fill: white;
+        }
       }
     }
   }
