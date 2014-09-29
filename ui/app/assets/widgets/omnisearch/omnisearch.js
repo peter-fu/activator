@@ -39,10 +39,12 @@ define([
   function scrollToSelected(){
     var $omnisearch = $('#omnisearch ul');
     var $selected = $omnisearch.find('li.selected');
-    if ($selected.position().top < 0) {
-      $omnisearch.scrollTop($omnisearch.scrollTop() + $selected.position().top);
-    } else if ($selected.position().top + $selected.outerHeight() >= $omnisearch.height()) {
-      $omnisearch.scrollTop($omnisearch.scrollTop() + $selected.position().top + $selected.outerHeight() - $omnisearch.height());
+    if (typeof $selected.position() !== 'undefined') {
+      if ($selected.position().top < 0) {
+        $omnisearch.scrollTop($omnisearch.scrollTop() + $selected.position().top);
+      } else if ($selected.position().top + $selected.outerHeight() >= $omnisearch.height()) {
+        $omnisearch.scrollTop($omnisearch.scrollTop() + $selected.position().top + $selected.outerHeight() - $omnisearch.height());
+      }
     }
   }
 

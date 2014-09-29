@@ -14,10 +14,34 @@ define([
     debug && console.log("starting search on " + keywords);
     return $.when(fs.search(keywords), sbt.tasks.deferredPossibleAutoCompletions(keywords))
       .then(function(searchValues, sbtCompletions) {
-        sbtCompletions.sort(function(a,b) { return a.title.length > b.title.length });
-        options( searchValues.concat(sbtCompletions) );
+        var filtered = sbtCompletions.filter(function (el) { 
+          return !endsWith(el.title, ":");
+        }).filter(function (el) {
+          return !endsWith(el.title, "*");
+        });
+
+        filtered.sort(function(a,b) {
+          var aa = a.title.toLowerCase(), bb = b.title.toLowerCase();
+          if (aa < bb)
+            return -1;
+          else if (bb < aa)
+            return 1;
+          else
+            return 0;
+        });
+
+        var result = [];
+        if (searchValues.length)
+          result = result.concat([{"heading": "Files (select to open)"}],searchValues);
+        if (filtered.length)
+          result = result.concat([{"heading": "Tasks (select to execute)"}],filtered);
+        options(result);
     });
   }
+
+  var endsWith = function(str, suffix) {
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+  };
 
   return {
     combinedSearch: combinedSearch
