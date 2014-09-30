@@ -92,7 +92,7 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
     // self can be null after we are destroyed
     val selfCopy = self
     if (selfCopy != null)
-      selfCopy ! NotifyWebSocket(Sbt.synthesizeLogEvent(level, message))
+      selfCopy ! NotifyWebSocket(SbtProtocol.synthesizeLogEvent(level, message))
   }
 
   override def receive = {
