@@ -301,12 +301,12 @@ object AppManager {
             import sbt.protocol._
             val json = event match {
               case log: LogEvent => log match {
-                case e: TaskLogEvent => Sbt.wrapEvent(e)
-                case e: CoreLogEvent => Sbt.wrapEvent(e)
-                case e: BackgroundJobLogEvent => Sbt.wrapEvent(e)
+                case e: TaskLogEvent => SbtProtocol.wrapEvent(e)
+                case e: CoreLogEvent => SbtProtocol.wrapEvent(e)
+                case e: BackgroundJobLogEvent => SbtProtocol.wrapEvent(e)
               }
               case _ =>
-                Sbt.synthesizeLogEvent(LogMessage.DEBUG, event.toString)
+                SbtProtocol.synthesizeLogEvent(LogMessage.DEBUG, event.toString)
             }
             eventHandler.foreach(_.apply(json))
           })

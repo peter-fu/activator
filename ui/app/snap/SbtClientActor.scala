@@ -59,11 +59,11 @@ class SbtClientActor(val client: SbtClient) extends Actor with ActorLogging {
   }
 
   private def forwardOverSocket[T <: Event: Writes: ClassTag](event: T): Unit = {
-    context.parent ! NotifyWebSocket(Sbt.wrapEvent(event))
+    context.parent ! NotifyWebSocket(SbtProtocol.wrapEvent(event))
   }
 
   def produceLog(level: String, message: String): Unit = {
-    context.parent ! NotifyWebSocket(Sbt.synthesizeLogEvent(level, message))
+    context.parent ! NotifyWebSocket(SbtProtocol.synthesizeLogEvent(level, message))
   }
 
   override def receive = {
