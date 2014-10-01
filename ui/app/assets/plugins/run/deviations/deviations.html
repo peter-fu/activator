@@ -1,8 +1,199 @@
-<article class="plugin">
+<article class="plugin actors" >
   <header>
     <h1>Deviations</h1>
   </header>
+  <!-- ko if: hasDeviations() -->
   <section>
-    <p>Deviations</p>
+  <div class="pluginBlock actors-list">
+
+  <div class="spacer">
+    <table class="table-list">
+        <!-- ko if: data().errorCount -->
+        <thead>
+          <tr>
+            <th>Errors</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody class="listing" data-bind="foreach: data().errors">
+        <tr data-bind="click: $root.openDeviation">
+          <td class="message">
+            <a data-bind="text: message, attr: { href: eventLink, 'data-hover-text': 'hover' }"></a>
+          </td>
+          <td class="timestamp" data-bind="text: timestamp"></td>
+        </tr>
+        </tbody>
+        <!-- /ko -->
+        <!-- ko if: data().warningCount -->
+        <thead>
+        <tr>
+          <th>Warnings</th>
+          <th>Time</th>
+        </tr>
+        </thead>
+        <tbody class="listing" data-bind="foreach: data().warnings">
+        <tr data-bind="click: $root.openDeviation">
+          <td class="message">
+            <a data-bind="text: message, attr: { href: eventLink, 'data-hover-text': 'hover' }"></a>
+          </td>
+          <td class="timestamp" data-bind="text: timestamp"></td>
+        </tr>
+        </tbody>
+        <!-- /ko -->
+        <!-- ko if: data().deadletterCount -->
+        <thead>
+        <tr>
+          <th>Dead Letters</th>
+          <th>Time</th>
+        </tr>
+        </thead>
+        <tbody class="listing" data-bind="foreach: data().deadletters">
+        <tr data-bind="click: $root.openDeviation">
+          <td class="message">
+            <a data-bind="text: message, attr: { href: eventLink, 'data-hover-text': 'hover' }"></a>
+          </td>
+          <td class="timestamp" data-bind="text: timestamp"></td>
+        </tr>
+        </tbody>
+        <!-- /ko -->
+        <!-- ko if: data().unhandledMessageCount -->
+        <thead>
+        <tr>
+          <th>Unhandled Messages</th>
+          <th>Time</th>
+        </tr>
+        </thead>
+        <tbody class="listing" data-bind="foreach: data().unhandledMessages">
+        <tr data-bind="click: $root.openDeviation">
+          <td class="message">
+            <a data-bind="text: message, attr: { href: eventLink, 'data-hover-text': 'hover' }"></a>
+          </td>
+          <td class="timestamp" data-bind="text: timestamp"></td>
+        </tr>
+        </tbody>
+        <!-- /ko -->
+        <!-- ko if: data().deadlockCount -->
+        <thead>
+        <tr>
+          <th>Deadlocks</th>
+          <th>Time</th>
+        </tr>
+        </thead>
+        <tbody class="listing" data-bind="foreach: data().deadlocks">
+        <tr data-bind="click: $root.openDeviation">
+          <td class="message">
+            <a data-bind="text: message, attr: { href: eventLink, 'data-hover-text': 'hover' }"></a>
+          </td>
+          <td class="timestamp" data-bind="text: timestamp"></td>
+        </tr>
+        </tbody>
+        <!-- /ko -->
+      </table>
+    </div>
+  </div>
+
+
+    <!-- ko if: currentDeviation() -->
+    <!-- ko with: currentDeviation() -->
+    <div class="pluginBlock dark stats deviation">
+      <div class="subheader">
+        <h2 data-bind="text: node +' / '+actorSystem"></h2>
+        <button class="closeActor" data-bind="click: $root.closeDeviation">
+          <svg data-bind="svg: '/assets/icons/close-mini.svg'"></svg>
+        </button>
+      </div>
+
+
+
+
+
+            <h2 class="deviationType" data-bind="text: deviationType"></h2>
+            <table class="deviationEvent">
+                <tr>
+                    <th>Time</th>
+                    <td data-bind="text: deviationTime"></td>
+                </tr>
+                <!-- ko if: $root.showOnlyMessage() -->
+                <tr>
+                    <th>Message</th>
+                    <td class="fulltext" data-bind="text: deviationReason"></td>
+                </tr>
+                <!-- /ko -->
+                <!-- ko if: $root.showDeadlocks() -->
+                <tr>
+                    <th>Message</th>
+                    <td data-bind="text: deviationActorPath"></td>
+                </tr>
+                <tr>
+                    <th>Deadlocks</th>
+                    <td class="fulltext" data-bind="text: deadlocks"></td>
+                </tr>
+                <!-- /ko -->
+                <!-- ko if: $root.showActorInfo() -->
+                <tr>
+                    <th>Actor</th>
+                    <td data-bind="text: deviationActorPath"></td>
+                </tr>
+                <tr>
+                    <th>Reason</th>
+                    <td class="fulltext" data-bind="text: deviationReason"></td>
+                </tr>
+                <!-- /ko -->
+                <!-- ko if: $root.showFromTo() -->
+                <tr>
+                    <th>Message</th>
+                    <td data-bind="text: errorMessage"></td>
+                </tr>
+                <tr>
+                    <th>From actor</th>
+                    <td data-bind="text: messageFrom"></td>
+                </tr>
+                <tr>
+                    <th>To actor</th>
+                    <td data-bind="text: messageTo"></td>
+                </tr>
+                <!-- /ko -->
+            </table>
+            <h2>Trace Tree</h2>
+            <div class="traceTree">
+                <div class="traceTree">
+                    <!-- ko if: traceTree -->
+                    <div data-bind="template: { name : 'trace-tree-template', data: traceTree }"></div>
+                    <!-- /ko -->
+                </div>
+            </div>
+
+    <div id="splash" data-bind="visible: !$root.dataFound">
+        No data for requested event found.  Possible reasons:<br>
+        <br>
+        either the details for the event requested have been purged from the in-memory data store or<br>
+        <br>
+        the requested event ID is invalid.
+    </div>
+
+
+
+
+
+
+
+
+    </div>
+    <!-- /ko -->
+    <!-- /ko -->
   </section>
+    <!-- /ko -->
+
+
+    <!-- ko ifnot: hasDeviations() -->
+  <section>
+    <div class="pluginBlock dark">
+      <p class="emptyList">
+          Everything is running nicely.
+      </p>
+    </div>
+  </section>
+  <!-- /ko -->
+
+
 </article>

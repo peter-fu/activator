@@ -63,9 +63,11 @@ define([
   // Single actor selected
   connection.streams.actor
     .map(function(message) {
-      var actor = message.data.actor;
-      actor.deviationCount = actor.errorCount + actor.warningCount + actor.deadletterCount + actor.unhandledMessageCount;
-      currentActor(message.data.actor)
+      if (message){
+        var actor = message.data.actor;
+        actor.deviationCount = actor.errorCount + actor.warningCount + actor.deadletterCount + actor.unhandledMessageCount;
+        currentActor(message.data.actor);
+      }
     })
 
   var currentActor = ko.observable();

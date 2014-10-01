@@ -405,7 +405,7 @@ define([
   // discoveredMainClasses
   valueChanged.matchOnAttribute('key', 'discoveredMainClasses').each(function(message) {
     app.mainClasses(message.value); // All main classes
-    if (!app.currentMainClass() && message.value[0]){
+    if (message.value[0] && ((app.currentMainClass() && message.value.indexOf(app.currentMainClass()) < 0) || !app.currentMainClass())){
       app.currentMainClass(message.value[0]); // Selected main class, if empty
     }
   });
