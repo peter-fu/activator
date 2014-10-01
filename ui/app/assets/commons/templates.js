@@ -34,7 +34,7 @@ define(function() {
 
   $(document.body).on("click", ".dropdown:not(.dropdownNoEvent)",function(e){
     $(this).toggleClass("opened");
-  }).on("click", ".dropdown:not(.dropdownNoEvent) dd",function(e){
+  }).on("click", ".dropdown dd.prevent",function(e){
     e.stopPropagation();
   });
 

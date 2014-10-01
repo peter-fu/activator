@@ -25,8 +25,8 @@ define([
     currentProject:     currentProject,
     removeExistingProjects: removeExistingProjects,
     mainClasses:        mainClasses,
-    currentMainClass:   currentMainClass,
-    inspectActivated: settings.observable("build.activateInspect-"+serverAppModel.id, false),
+    currentMainClass:   settings.observable("build.mainClass-"+serverAppModel.id, false), //currentMainClass,
+    inspectActivated:   settings.observable("build.activateInspect-"+serverAppModel.id, false),
     versions: {
       scala:            ko.observable(false),
       akka:             ko.observable(false),
