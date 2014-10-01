@@ -76,7 +76,7 @@ class ProjectWatcher(val location: File, val newSourcesSocket: ActorRef, val app
         } else if (source == sbtBuildWatcher) {
           appActor ! ReloadSbtBuild
         } else {
-          log.warning("Unknown files changed notification from {}", source)
+          log.debug("Unknown files changed notification from {}", source)
         }
     }
   }
@@ -139,7 +139,7 @@ class ProjectWatcher(val location: File, val newSourcesSocket: ActorRef, val app
       }
     } catch {
       case e: IOException =>
-        log.warning(s"Failed to scan directory $location", e)
+        log.debug(s"Failed to scan directory $location", e)
     }
   }
 

@@ -16,7 +16,7 @@ class AppWebSocketActor extends WebSocketActor[JsValue] with ActorLogging {
       case InspectRequest(m) => for (cActor <- consoleActor) cActor ! HandleRequest(json)
       case WebSocketActor.Ping(ping) => produce(WebSocketActor.Pong(ping.cookie))
       case SbtRequest(req) => handleSbtPayload(req.json)
-      case _ => log.info("unhandled message on web socket: {}", json)
+      case _ => log.debug("unhandled message on web socket: {}", json)
     }
   }
 
@@ -54,7 +54,7 @@ class AppWebSocketActor extends WebSocketActor[JsValue] with ActorLogging {
               case SbtClientResponse(serialId, executionId: Long, command) =>
                 sendResult(AppWebSocketActor.requestExecution, serialId, JsNumber(executionId))
               case other =>
-                log.warning(s"sbt could not execute command: $other")
+                log.debug(s"sbt could not execute command: $other")
             }
           case AppWebSocketActor.cancelExecution =>
             if (payload.executionId.isDefined) {
@@ -62,10 +62,10 @@ class AppWebSocketActor extends WebSocketActor[JsValue] with ActorLogging {
                 case SbtClientResponse(serialId, result: Boolean, _) =>
                   sendResult(AppWebSocketActor.cancelExecution, serialId, JsBoolean(result))
                 case other =>
-                  log.warning("sbt could not cancel command")
+                  log.debug("sbt could not cancel command")
               }
             } else {
-              log.info("Cannot cancel sbt request without execution id.")
+              log.debug("Cannot cancel sbt request without execution id.")
               None
             }
           case AppWebSocketActor.possibleAutoCompletions =>
@@ -73,14 +73,14 @@ class AppWebSocketActor extends WebSocketActor[JsValue] with ActorLogging {
               case SbtClientResponse(serialId, choicesAny: Set[_], command) =>
                 val choices = choicesAny.map(_.asInstanceOf[sbt.protocol.Completion])
                 sendResult(AppWebSocketActor.possibleAutoCompletions, serialId, JsArray(choices.toList map { Json.toJson(_) }), command)
-              case other => log.warning(s"sbt could not execute possible auto completions")
+              case other => log.debug(s"sbt could not execute possible auto completions")
             }
           case other =>
-            log.info("Unknown sbt request type: $other")
+            log.debug("Unknown sbt request type: $other")
             None
         }
       case e: JsError =>
-        log.warning(s"Could not parse $json to valid SbtPayload. Error is: $e")
+        log.debug(s"Could not parse $json to valid SbtPayload. Error is: $e")
         None
     }
   }
