@@ -14,37 +14,38 @@ define([
       "addSbtPlugin(\"com.typesafe.sbtrc\" % \"ui-interface-0-13\" % \"1.0-d5ba9ed9c1d31e3431aeca5e429d290b56cb0b14\")";
     var uiFileEchoSettings = "\n\nfork in run := true";
 
+    // this file isn't required to exist, if it doesn't we should create
+    var buildFileLocation = "/build.sbt";
+
     var echoPluginFileLocation = "/project/inspect.sbt";
     var echoPluginFileContent = "// This plugin runs apps with the \"echo\" trace infrastructure which backs up the Inspect functionality in Activator\n\n" +
       "addSbtPlugin(\"com.typesafe.sbt\" % \"sbt-echo\" % \"0.1.7\")";
 
-    // Is this safe to do, i.e. is the location and name always the same for an Activator project?
-    var buildFileLocation = "/build.sbt";
-    var buildFileEchoSettings = "\n\nechoSettings";
-
-    var addingEchoFile = ko.observable(false);
-    var addingBackgroundFile = ko.observable(false);
-    var editingBuildFile = ko.observable(false);
+    var addedEchoFile = ko.observable(false);
+    var addedBackgroundFile = ko.observable(false);
+    var addedForkInRun = ko.observable(false);
 
     // On start, we ensure that we have a background.sbt file and the corresponding config in build.sbt
     checkFileContent(serverAppModel.location+backgroundRunPluginFileLocation, backgroundRunPluginFileContent, function() {
-      addingEchoFile(true);
+      addedBackgroundFile(true);
     });
     checkFileContent(serverAppModel.location+buildFileLocation, uiFileEchoSettings, function() {
-      editingBuildFile(true);
+      addedForkInRun(true);
     }, true);
 
     var echoReady = ko.computed(function() {
-      return (tasks.applicationReady() && addingEchoFile() && addingBackgroundFile() && editingBuildFile());
+      // TODO this is completely broken because applicationReady is probably true to begin with,
+      // then temporarily false AFTER we edit all the build files, but echoReady is going to
+      // be briefly true before we restart (when we want it to be true only after).
+      // I think we should replace applicationReady with checking that the needed tasks are
+      // present in the build.
+      return (tasks.applicationReady() && addedEchoFile() && addedBackgroundFile() && addedForkInRun());
     });
 
     function echoInstalledAndReady(callback){
       checkFileContent(serverAppModel.location+echoPluginFileLocation, echoPluginFileContent, function() {
-        addingBackgroundFile(true);
+        addedEchoFile(true);
       });
-      checkFileContent(serverAppModel.location+buildFileLocation, buildFileEchoSettings, function() {
-        editingBuildFile(true);
-      }, true);
 
       echoReady() && callback();
       ko.once(echoReady, function(ready) {
@@ -75,9 +76,9 @@ define([
 
     return {
       echoInstalledAndReady: echoInstalledAndReady,
-      addingEchoFile:        addingEchoFile,
-      addingBackgroundFile:  addingBackgroundFile,
-      editingBuildFile:      editingBuildFile,
+      addedEchoFile:         addedEchoFile,
+      addedBackgroundFile:   addedBackgroundFile,
+      addedForkInRun:        addedForkInRun,
       echoReady:             echoReady
     };
 });
