@@ -141,7 +141,7 @@ define([
   /**
    * Returns the result of the cancel execution directly (deferred).
    * Use only when the caller must get the result back in "this" call.
-   * Default should be to use "cancelExection" as this has better overall performance.
+   * Default should be to use "cancelExecution" as this has better overall performance.
    */
   function cancelDeferredExecution(id) {
     var serialId = cancelExecution(id);
@@ -388,6 +388,7 @@ define([
           execute: message.partialCommand + completion.append,
           callback: function () {
             requestExecution(message.partialCommand + completion.append);
+            window.location.hash = "#build";
           }
         }
       }));

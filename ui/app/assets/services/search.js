@@ -31,10 +31,10 @@ define([
         });
 
         var result = [];
-        if (searchValues.length)
-          result = result.concat([{"heading": "Files (select to open)"}],searchValues);
         if (filtered.length)
           result = result.concat([{"heading": "Tasks (select to execute)"}],filtered);
+        if (searchValues.length)
+          result = result.concat([{"heading": "Files (select to open)"}],searchValues);
         options(result);
     });
   }
