@@ -4,7 +4,7 @@
   </header>
   <!-- ko if: actors().length -->
   <section>
-    <div class="pluginBlock actors-list">
+    <div class="pluginBlock list actors-list">
 
       <footer>
         <dl class="dropdown">
@@ -52,7 +52,7 @@
         <tbody data-bind="foreach: actors">
           <tr data-bind="click: $root.openActor, isExactUrl: actorLink">
             <th>
-              <a data-bind="text: name"></a>
+              <span class="title" data-bind="text: name"></span>
             </th>
             <td class="throughput" data-bind="text: throughput"></td>
             <td class="maxMailboxSize" data-bind="text: maxMailboxSize"></td>
@@ -65,13 +65,14 @@
     </div>
     <!-- ko if: currentActor() -->
     <!-- ko with: currentActor() -->
-    <div class="pluginBlock dark stats actor">
+    <div class="pluginBlock dark item-view actor">
       <div class="subheader">
         <h2 data-bind="text: scope.actorPath">akka://application/user/distributedPubSubMediator/region-5-7-21</h2>
-        <button class="closeActor" data-bind="click: $root.closeActor">
+        <button class="close-view" data-bind="click: $root.closeActor">
           <svg data-bind="svg: '/assets/icons/close-mini.svg'"/>
         </button>
       </div>
+      <div class="spacer">
       <div class="table-wrapper">
         <table>
             <thead>
@@ -112,6 +113,7 @@
               <tr><td>Unhandled messages</td><td data-bind="text: unhandledMessageCount">0</td></tr>
             </tbody>
         </table>
+      </div>
       </div>
     </div>
     <!-- /ko -->

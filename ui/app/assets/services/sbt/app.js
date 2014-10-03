@@ -40,6 +40,12 @@ define([
       automaticResetInspect:    settings.observable("build.automaticResetInspect", false),
       recompileOnChange:        settings.observable("build.recompileOnChange", true),
       showLogDebug:             settings.observable("build.showLogDebug", false)
+    },
+    deviationPrefs: {
+      showSystemMessages:       settings.observable("inspect.deviation.showSystemMessages",false),
+      showNanoSeconds:          settings.observable("inspect.deviation.showNanoSeconds",false),
+      showActorSystems:         settings.observable("inspect.deviation.showActorSystems",false),
+      showTraceInformation:     settings.observable("inspect.deviation.showTraceInformation",false)
     }
   }
 

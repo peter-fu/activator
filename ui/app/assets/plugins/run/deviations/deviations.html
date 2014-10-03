@@ -1,10 +1,10 @@
-<article class="plugin actors" >
+<article class="plugin actors"  data-bind="css: { opened: currentDeviation }">
   <header>
     <h1>Deviations</h1>
   </header>
   <!-- ko if: hasDeviations() -->
   <section>
-  <div class="pluginBlock actors-list">
+  <div class="pluginBlock list deviations-list">
 
   <div class="spacer">
     <table class="table-list">
@@ -18,7 +18,7 @@
         <tbody class="listing" data-bind="foreach: data().errors">
         <tr data-bind="click: $root.openDeviation">
           <td class="message">
-            <a data-bind="text: message, attr: { href: eventLink, 'data-hover-text': 'hover' }"></a>
+            <span class="title" data-bind="text: message, attr: { 'data-hover-text': 'hover' }"></span>
           </td>
           <td class="timestamp" data-bind="text: timestamp"></td>
         </tr>
@@ -34,7 +34,7 @@
         <tbody class="listing" data-bind="foreach: data().warnings">
         <tr data-bind="click: $root.openDeviation">
           <td class="message">
-            <a data-bind="text: message, attr: { href: eventLink, 'data-hover-text': 'hover' }"></a>
+            <span class="title" data-bind="text: message, attr: { 'data-hover-text': 'hover' }"></span>
           </td>
           <td class="timestamp" data-bind="text: timestamp"></td>
         </tr>
@@ -50,7 +50,7 @@
         <tbody class="listing" data-bind="foreach: data().deadletters">
         <tr data-bind="click: $root.openDeviation">
           <td class="message">
-            <a data-bind="text: message, attr: { href: eventLink, 'data-hover-text': 'hover' }"></a>
+            <span class="title" data-bind="text: message, attr: { 'data-hover-text': 'hover' }"></span>
           </td>
           <td class="timestamp" data-bind="text: timestamp"></td>
         </tr>
@@ -66,7 +66,7 @@
         <tbody class="listing" data-bind="foreach: data().unhandledMessages">
         <tr data-bind="click: $root.openDeviation">
           <td class="message">
-            <a data-bind="text: message, attr: { href: eventLink, 'data-hover-text': 'hover' }"></a>
+            <span class="title" data-bind="text: message, attr: { 'data-hover-text': 'hover' }"></span>
           </td>
           <td class="timestamp" data-bind="text: timestamp"></td>
         </tr>
@@ -82,7 +82,7 @@
         <tbody class="listing" data-bind="foreach: data().deadlocks">
         <tr data-bind="click: $root.openDeviation">
           <td class="message">
-            <a data-bind="text: message, attr: { href: eventLink, 'data-hover-text': 'hover' }"></a>
+            <span class="title" data-bind="text: message, attr: { 'data-hover-text': 'hover' }"></span>
           </td>
           <td class="timestamp" data-bind="text: timestamp"></td>
         </tr>
@@ -95,89 +95,105 @@
 
     <!-- ko if: currentDeviation() -->
     <!-- ko with: currentDeviation() -->
-    <div class="pluginBlock dark stats deviation">
+    <div class="pluginBlock dark item-view deviation">
+      <footer>
+        <dl class="dropdown">
+          <dt>
+            <svg data-bind="svg: '/assets/icons/gear-mini.svg'"></svg>
+          </dt>
+          <dd class="prevent">
+            <p>
+              <label><input type="checkbox" data-bind="checked: $root.prefs.showNanoSeconds"> Show nanoseconds</label>
+            </p>
+            <p>
+              <label><input type="checkbox" data-bind="checked: $root.prefs.showSystemMessages"> Show system messages</label>
+            </p>
+            <p>
+              <label><input type="checkbox" data-bind="checked: $root.prefs.showActorSystems"> Show actor systems</label>
+            </p>
+            <p>
+              <label><input type="checkbox" data-bind="checked: $root.prefs.showTraceInformation"> Show trace informations</label>
+            </p>
+          </dd>
+        </dl>
+      </footer>
+
       <div class="subheader">
-        <h2 data-bind="text: node +' / '+actorSystem"></h2>
-        <button class="closeActor" data-bind="click: $root.closeDeviation">
+        <h2 class="deviationType" data-bind="text: deviationType"></h2>
+        <button class="close-view" data-bind="click: $root.closeDeviation">
           <svg data-bind="svg: '/assets/icons/close-mini.svg'"></svg>
         </button>
       </div>
+      <div class="spacer">
+      <div class="table-wrapper">
+        <table class="deviationEvent">
+          <tbody>
+            <tr>
+              <td>Time</td>
+              <td data-bind="text: deviationTime"></td>
+            </tr>
+            <!-- ko if: deviationReason -->
+            <tr>
+              <td>Message</td>
+              <td class="fulltext" data-bind="text: deviationReason"></td>
+            </tr>
+            <!-- /ko -->
+            <!-- ko if: deviationActorPath -->
+            <tr>
+              <td>Actor Path</td>
+              <td data-bind="text: deviationActorPath"></td>
+            </tr>
+            <tr>
+              <td>Deadlocks</td>
+              <td class="fulltext" data-bind="text: deadlocks"></td>
+            </tr>
+            <!-- /ko -->
+            <!-- ko if: deviationActorPath -->
+            <tr>
+              <td>Actor</td>
+              <td data-bind="text: deviationActorPath"></td>
+            </tr>
+            <!-- /ko -->
+            <!-- ko if: deviationReason -->
+            <tr>
+              <td>Reason</td>
+              <td class="fulltext" data-bind="text: deviationReason"></td>
+            </tr>
+            <!-- /ko -->
+            <!-- ko if: errorMessage && messageFrom && messageTo -->
+            <tr>
+              <td>Error</td>
+              <td data-bind="text: errorMessage"></td>
+            </tr>
+            <tr>
+              <td>From actor</td>
+              <td data-bind="text: messageFrom"></td>
+            </tr>
+            <tr>
+              <td>To actor</td>
+              <td data-bind="text: messageTo"></td>
+            </tr>
+            <!-- /ko -->
+          </tbody>
+        </table>
+        <!-- ko if: traceTree -->
+        <div class="subheader">
+          <h2>Trace Tree</h2>
+        </div>
+        <div class="traceTree" data-bind="include: traceTree"></div>
+        <!-- /ko -->
 
+  <!--     <div id="splash" data-bind="visible: !$root.dataFound">
+          No data for requested event found.  Possible reasons:<br>
+          <br>
+          either the details for the event requested have been purged from the in-memory data store or<br>
+          <br>
+          the requested event ID is invalid.
+      </div>
+   -->
 
-
-
-
-            <h2 class="deviationType" data-bind="text: deviationType"></h2>
-            <table class="deviationEvent">
-                <tr>
-                    <th>Time</th>
-                    <td data-bind="text: deviationTime"></td>
-                </tr>
-                <!-- ko if: $root.showOnlyMessage() -->
-                <tr>
-                    <th>Message</th>
-                    <td class="fulltext" data-bind="text: deviationReason"></td>
-                </tr>
-                <!-- /ko -->
-                <!-- ko if: $root.showDeadlocks() -->
-                <tr>
-                    <th>Message</th>
-                    <td data-bind="text: deviationActorPath"></td>
-                </tr>
-                <tr>
-                    <th>Deadlocks</th>
-                    <td class="fulltext" data-bind="text: deadlocks"></td>
-                </tr>
-                <!-- /ko -->
-                <!-- ko if: $root.showActorInfo() -->
-                <tr>
-                    <th>Actor</th>
-                    <td data-bind="text: deviationActorPath"></td>
-                </tr>
-                <tr>
-                    <th>Reason</th>
-                    <td class="fulltext" data-bind="text: deviationReason"></td>
-                </tr>
-                <!-- /ko -->
-                <!-- ko if: $root.showFromTo() -->
-                <tr>
-                    <th>Message</th>
-                    <td data-bind="text: errorMessage"></td>
-                </tr>
-                <tr>
-                    <th>From actor</th>
-                    <td data-bind="text: messageFrom"></td>
-                </tr>
-                <tr>
-                    <th>To actor</th>
-                    <td data-bind="text: messageTo"></td>
-                </tr>
-                <!-- /ko -->
-            </table>
-            <h2>Trace Tree</h2>
-            <div class="traceTree">
-                <div class="traceTree">
-                    <!-- ko if: traceTree -->
-                    <div data-bind="template: { name : 'trace-tree-template', data: traceTree }"></div>
-                    <!-- /ko -->
-                </div>
-            </div>
-
-    <div id="splash" data-bind="visible: !$root.dataFound">
-        No data for requested event found.  Possible reasons:<br>
-        <br>
-        either the details for the event requested have been purged from the in-memory data store or<br>
-        <br>
-        the requested event ID is invalid.
-    </div>
-
-
-
-
-
-
-
-
+      </div>
+      </div>
     </div>
     <!-- /ko -->
     <!-- /ko -->
@@ -187,7 +203,7 @@
 
     <!-- ko ifnot: hasDeviations() -->
   <section>
-    <div class="pluginBlock dark">
+    <div class="pluginBlock dark expand">
       <p class="emptyList">
           Everything is running nicely.
       </p>

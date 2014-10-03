@@ -7,6 +7,7 @@ define([
   var defaultTime = { "startTime": "", "endTime": "", "rolling": "20minutes" };
 
   var streams = {
+    overview:   websocket.subscribe('type', 'overview'),
     actor:      websocket.subscribe('type', 'actor'),
     actors:     websocket.subscribe('type', 'actors'),
     deviation:  websocket.subscribe('type', 'deviation'),
@@ -34,6 +35,21 @@ define([
     },
     "scope": {}
   }];
+
+  var stats = ko.observable({
+    "type": "overview",
+    "data": {
+      "metadata": {
+        "playPatternCount": 0,
+        "actorPathCount": 0
+      },
+      "deviations": {
+        "deviationCount": 0
+      },
+      "currentStorageTime": 0
+    }
+  });
+  streams.overview.map(stats);
 
   /**
    Send an InspectRequest
@@ -70,6 +86,7 @@ define([
   });
 
   return {
+    stats:        stats,
     streams:      streams,
     filters:      filters,
     request:      request,

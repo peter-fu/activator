@@ -224,17 +224,23 @@ define(function() {
   }
 
   // This allows to style SVG in css (including css transition and animations)
+  var cache = {};
   ko.bindingHandlers.svg = {
     init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+      var url = valueAccessor();
       $(element)
         .attr({
           width: "18px", // putting default small value,
           height: "18px" // to avoid cranky blinking
         });
-      $.get(valueAccessor(), function(data) {
-        var img = $(document.adoptNode(data.querySelector('svg')));
-        $(element).replaceWith(img);
-      }, 'xml');
+      if (cache[url]){
+        $(element).replaceWith(cache[url].clone());
+      } else {
+        $.get(url, function(data) {
+          cache[url] = $(document.adoptNode(data.querySelector('svg')));
+          $(element).replaceWith(cache[url].clone());
+        }, 'xml');
+      }
     }
   }
 
@@ -269,6 +275,13 @@ define(function() {
     }
   }
 
+  ko.bindingHandlers.format = {
+    update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+      var __ = valueAccessor(), formatter = __[0], value = __[1];
+      element.innerText = formatter(value);
+    }
+  }
+
   // Utility functions
   ko.domRemoved = function(target, callback) {
     return setTimeout(function() {
@@ -298,6 +311,20 @@ define(function() {
       callback(newValue);
       subscription.dispose();
     });
+  }
+
+
+  ko.tpl = function(tag, attrs, children){
+    var element = document.createElement(tag);
+    if (typeof children == "string") {
+      element.appendChild(document.createTextNode(children));
+    } else {
+      children.forEach(function(child){
+        if (!!child) element.appendChild(child);
+      });
+    }
+    ko.applyBindingsToNode(element, attrs);
+    return element;
   }
 
 });
