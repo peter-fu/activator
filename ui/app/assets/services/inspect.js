@@ -2,13 +2,16 @@
  Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
  */
 define([
-  './inspect/actors'
+  './inspect/actors',
+  './inspect/deviations'
 ],function(
-  actors
+  actors,
+  deviations
 ) {
 
   return {
-    actors:         actors
+    actors:         actors,
+    deviations:     deviations
   };
 
 });

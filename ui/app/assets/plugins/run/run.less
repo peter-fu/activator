@@ -3,6 +3,9 @@
  */
 @import "../../commons/_base";
 
+@import "../../widgets/inspect/inspect-list";
+@import "../../widgets/inspect/inspect-view";
+
 .run .plugin section {
   .row();
   overflow: hidden;
@@ -11,12 +14,18 @@
     overflow: auto;
     .expand(0);
   }
-  .stats {
+  .item-view {
     .expand(5);
+    overflow: auto;
   }
   .logs-wrapper {
     width: 100%;
   }
+}
+
+.run .spacer {
+  .expand();
+  overflow: auto;
 }
 
 .run .locked {
@@ -51,24 +60,31 @@
   }
 }
 
-.run .pluginBlock {
+.run .expand {
   .expand();
 }
-.run .table-wrapper {
-  table {
-    width: 100%;
+
+.run .links {
+  li {
+    .row();
   }
-  th {
-    text-align: left;
-    padding: 0 20px;
-    height: 25px;
-    line-height: 25px;
-    background: @white-dkr;
-    color: @grey-dkr;
-    font-size: 13px;
-    text-transform: uppercase;
+  a {
+    .expand();
   }
-  td {
-    padding: 0 20px;
+  .counter {
+    padding: 0 4px;
+    border-radius: 2px;
+    background: @slate;
+    color: @grey-ltr;
+    &.error {
+      background: @red-dkr;
+      color: #fff;
+    }
   }
 }
+
+
+
+
+
+

@@ -3,120 +3,21 @@
  */
 @import "./commons/_base";
 
-.plugin.actors {
-  .spacer {
-    .expand();
-    overflow: auto;
+.actors {
+  .throughput, .maxMailboxSize, .maxTimeInMailbox {
+    width: 130px;
+    text-align: right;
   }
-  .table-list {
-    width: 100%;
-    thead {
-      background: @blue-dkr;
-      color: rgba(0,0,0,.4);
-      box-shadow: inset 0 2px 0 rgba(0,0,0,.04);
-      height: 34px;
-      line-height: 34px;
-      padding: 0 20px;
-      th {
-        // padding: 0;
-      }
-      td {
-        font-size: 11px;
-        line-height: 11px;
-      }
-      input {
-        padding: 4px 5px;
-        background: @blue-dkr;
-        font: inherit;
-        color: #fff;
-        .placeholder(rgba(255,255,255,.6));
-        height: 34px;
-        line-height: 34px;
-        width: 260px;
-        &:focus {
-          background: @red;
-        }
-      }
-    }
-    tbody {
-      td, th {
-        border: 1px solid @white-ltr;
-      }
-      tr {
-        position: relative;
-        cursor: pointer;
-        &:hover {
-          background: @white-ltr;
-          border-color: @white-dkr;
-          color: @slate;
-        }
-        &.active {
-          background: @grey;
-          color: #fff;
-          border-color: @grey-dkr;
-          a {
-            color: #fff;
-          }
-        }
-      }
-    }
-    td, th {
-      padding: 5px 10px;
-    }
-    .throughput, .maxMailboxSize, .maxTimeInMailbox {
-      width: 130px;
-      text-align: right;
-    }
-    th {
-      text-align: left;
-      width: 260px;
-      color: #fff;
-    }
-    p {
-      font-size: 12px;
-    }
-    .props {
-      .row();
-      span {
-        width: 33.33%
-      }
-    }
-    .deviation-counter {
-      background: @red;
-      color: white;
-      border-radius: 2px;
-      padding: 3px 6px;
-      font-size: 11px;
-    }
-  }
-
-}
-
-.actor {
-  position: relative;
-  .closeActor {
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    padding: 2px;
-    top: 7px;
-    right: 7px;
-    background: @grey-dkr;
-    border-radius: 10px;
-    g {
-      fill: @slate-dkr;
-    }
-    &:hover {
-      background: @grey-ltr;
-    }
+  .deviation-counter {
+    background: @red;
+    color: white;
+    border-radius: 2px;
+    padding: 3px 6px;
+    font-size: 11px;
   }
 }
 
-.opened {
-  .actors-list {
-    width: 390px;
-    .flex-fix();
-  }
+.opened.actors {
   .table-list[data-ordering] td {
     display: none;
   }

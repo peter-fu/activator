@@ -69,13 +69,20 @@
       <!-- /ko -->
     </footer>
     <ul class="list links">
-      <li class="system" data-bind="isActiveUrl: '#run/system'"><a href="#run/system">System</a>
+      <li class="system" data-bind="isActiveUrl: '#run/system'">
+        <a href="#run/system">System</a>
       </li>
-      <li class="actors" data-bind="visible: inspectActivated, isActiveUrl: '#run/actors'"><a href="#run/actors">Actors</a>
+      <li class="actors" data-bind="visible: inspectActivated, isActiveUrl: '#run/actors'">
+        <a href="#run/actors">Actors</a>
+        <span class="counter" data-bind="text: stats().data.metadata.actorPathCount, visible: stats().data.metadata.actorPathCount"></span>
       </li>
-      <li class="deviations" data-bind="visible: inspectActivated, isActiveUrl: '#run/deviations'"><a href="#run/deviations">Actor Issues</a>
+      <li class="deviations" data-bind="visible: inspectActivated, isActiveUrl: '#run/deviations'">
+        <a href="#run/deviations">Actor Issues</a>
+        <span class="counter error" data-bind="text: stats().data.deviations.deviationCount, visible: stats().data.deviations.deviationCount"></span>
       </li>
-      <li class="requests" data-bind="visible: inspectActivated, isActiveUrl: '#run/requests'"><a href="#run/requests">Requests</a>
+      <li class="requests" data-bind="visible: inspectActivated, isActiveUrl: '#run/requests'">
+        <a href="#run/requests">Requests</a>
+        <span class="counter" data-bind="text: stats().data.metadata.playPatternCount, visible: stats().data.metadata.playPatternCount"></span>
       </li>
     </ul>
   </nav>

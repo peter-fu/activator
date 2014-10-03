@@ -2,6 +2,7 @@
  Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
  */
 define([
+  'services/sbt/app',
   "services/inspect/connection",
   "services/inspect/deviations",
   "services/inspect/deviation",
@@ -11,6 +12,7 @@ define([
   "css!../actors/actors",
   "css!widgets/modules/modules"
 ], function(
+  app,
   connection,
   deviations,
   deviation,
@@ -34,7 +36,8 @@ define([
     }),
     data: deviations.list,
     currentDeviation: deviation,
-    openDeviation: openDeviation
+    openDeviation: openDeviation,
+    prefs: app.deviationPrefs
   }
 
   return {
