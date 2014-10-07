@@ -1,30 +1,28 @@
 define([
-  './connection',
   'widgets/trace/trace',
   'commons/format'
 ],function(
-  connection,
   trace,
   format
 ){
 
-  var currentDeviation = ko.observable();
-
   // Create a new deviation everytime.
   //Much more efficient than tons of observables
   var Deviation = function(data) {
+    if (!data) throw "There is no data for this deviation. It might have expired.";
+
     var self = this;
     self.node                 = data.traceEvent.node;
+    self.message              = data.traceEvent.message;
     self.actorSystem          = data.traceEvent.actorSystem;
     self.deviationType        = data.traceEvent.type;
     self.deviationTime        = data.traceEvent.timestamp;
     self.deviationReason      = data.traceEvent.annotation && data.traceEvent.annotation.reason;
     self.deviationActorPath   = data.traceEvent.annotation && data.traceEvent.annotation.actorInfo;
-    self.deadlocks            = data.traceEvent.id;
-    self.deviationReason      = data.traceEvent.annotation.message;
-    self.errorMessage         = data.traceEvent.id;
-    self.messageFrom          = data.traceEvent.id;
-    self.messageTo            = data.traceEvent.id;
+    self.deviationReason      = data.traceEvent.annotation && data.traceEvent.annotation.reaseon;
+    self.errorMessage         = data.traceEvent.annotation.message;
+    self.messageFrom          = data.traceEvent.annotation && data.traceEvent.annotation.sender && data.traceEvent.annotation.sender.actorPath;
+    self.messageTo            = data.traceEvent.annotation && data.traceEvent.annotation.recipient && data.traceEvent.annotation.recipient.actorPath;
 
     self.traceTreeHtml        = "";
 
@@ -39,17 +37,49 @@ define([
     self.extractActorInfo     = extractActorInfo(data);
     self.extractActorPath     = extractActorPath(data);
 
-    extractData(self, data);
+    // Parse all the children, until finding an event with the same type as the deviation
+    extractData(data);
+    function extractData(trace){
+      if (self.deviationType == data.traceEvent.type) {
+        trace.highlight = true;
+        trace = trace.traceEvent;
+        // Ok, this is the child we're looking for...
+        if (trace && trace.type && trace.type == "Error") // ???? Not sure
+          $.extend(self, {
+            reason: trace.annotation.reason,
+            actorPath: trace.annotation.actorInfo && trace.annotation.actorInfo.actorPath // Maybe(actorPath)
+          });
+        else if (trace && trace.type && (trace.type == "EventStreamDeadLetter" || trace.type == "EventStreamUnhandledMessage"))
+          $.extend(self, {
+            deviationTime : format.formatTime(new Date(trace.timestamp)),
+            errorMessage  : trace.annotation.message,
+            messageFrom   : trace.annotation.sender.actorPath,
+            messageTo     : trace.annotation.recipient.actorPath
+          });
+        else if (trace && trace.type && (trace.type == "EventStreamWarning" || trace.type == "EventStreamError"))
+          $.extend(self, {
+            deviationReason: trace.annotation.message
+          });
+        else if (trace && trace.type && trace.type == "DeadlockedThreads")
+          $.extend(self, {
+            deviationReason: trace.annotation.message
+            // deadlocks      : trace.annotation.join("\n") // This must be some kind of mistake, copied from original
+          });
+        else
+          throw "No data for this error";
+      } else {
+        if (trace.children && trace.children.length > 0) {
+          var r;
+          for(var i = 0; i < json.children.length; i++) {
+            r = extractData(self, trace.children[i]);
+            if (r) return r;
+          }
+        }
+      }
+    }
 
-    self.traceTree = trace(data.traceTree);
+    self.traceTree = trace(data);
   }
-
-  connection.streams.deviation
-    .map(function(message) {
-      debug && console.log("Deviation received",message)
-      return currentDeviation(new Deviation(message.data));
-    })
-
 
   // -- SYSTEM
   var systemEvents = ["EventStreamError","EventStreamWarning","EventStreamDeadLetter","EventStreamUnhandledMessage",
@@ -96,44 +126,41 @@ define([
     return result;
   }
 
-  // Parse all the children, until finding an event with the same type as the deviation
-  function extractData(self, data){
-    if (self.deviationType == data.traceEvent.type) {
-      data = data.traceEvent;
-      // Ok, this is the child we're looking for...
-      if (data && data.type && data.type == "Error") // ???? Not sure
-        $.extend(self, {
-          reason: data.annotation.reason,
-          actorPath: data.annotation.actorInfo && data.annotation.actorInfo.actorPath // Maybe(actorPath)
-        });
-      else if (data && data.type && (data.type == "EventStreamDeadLetter" || data.type == "EventStreamUnhandledMessage"))
-        $.extend(self, {
-          deviationTime : format.formatTime(new Date(data.timestamp)),
-          errorMessage  : data.annotation.message,
-          messageFrom   : data.annotation.sender.actorPath,
-          messageTo     : data.annotation.recipient.actorPath
-        });
-      else if (data && data.type && (data.type == "EventStreamWarning" || data.type == "EventStreamError"))
-        $.extend(self, {
-          deviationReason: data.annotation.message
-        });
-      else if (data && data.type && data.type == "DeadlockedThreads")
-        $.extend(self, {
-          deviationReason: data.annotation.message
-          // deadlocks      : data.annotation.join("\n") // This must be some kind of mistake, copied from original
-        });
-      else
-        throw "No data for this error";
-    } else {
-      if (data.children && data.children.length > 0) {
-        var r;
-        for(var i = 0; i < json.children.length; i++) {
-          r = extractData(self, data.children[i]);
-          if (r) return r;
-        }
+  function recreateMessage(message,prefix) { return prefix+"("+message+")"; }
+
+  function extractMessage(message, sysMsgType) {
+    var msgPrefix = sysMsgType || "[Unknown]";
+
+    var result;
+    if (message != undefined) {
+      if (typeof message == "string"){
+        result = message;
       }
-    }
+      else if (message.cause   != undefined) {
+        result = recreateMessage(message.cause,msgPrefix);
+      }
+      else if (message.child   != undefined && message.cause != undefined) {
+        result = recreateMessage(extractActorInfo(message.child)+", "+message.cause,msgPrefix);
+      }
+      else if (message.child   != undefined) {
+        result = recreateMessage(extractActorInfo(message.child),msgPrefix);
+      }
+      else if (message.subject != undefined) {
+        result = recreateMessage(extractActorInfo(message.subject),msgPrefix);
+      }
+      else if (message.watchee != undefined && message.watcher != undefined) {
+        result = recreateMessage(extractActorInfo(message.watchee)+", "+extractActorInfo(message.watcher),msgPrefix);
+      }
+      else if (message.watched != undefined && message.existenceConfirmed != undefined && message.addressTerminated != undefined) {
+        result = recreateMessage(extractActorInfo(message.watched)+", "+message.existenceConfirmed+", "+message.addressTerminated,msgPrefix);
+      }
+      else {
+        result = "[unknown message]";
+      }
+    } else result = "";
+
+    return result;
   }
 
-  return currentDeviation;
+  return Deviation;
 });

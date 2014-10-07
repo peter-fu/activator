@@ -43,7 +43,7 @@
 
 .subheader {
   .align-items();
-  input {
+  input[type=text] {
     background: none;
     font-size: inherit;
     display: block;
@@ -73,8 +73,11 @@
   }
   .counter {
     padding: 0 4px;
+    text-align: center;
+    min-width: 20px;
+    font-size: 11px;
     border-radius: 2px;
-    background: @slate;
+    background: @grey-text;
     color: @grey-ltr;
     &.error {
       background: @red-dkr;
@@ -84,6 +87,9 @@
 }
 
 
+.run .opened .list {
+  .flex-fix();
+}
 
 
 

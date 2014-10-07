@@ -5,6 +5,7 @@ define([
   "services/inspect/connection",
   "services/inspect/actors",
   "main/plugins",
+  "commons/format",
   "text!./actors.html",
   "css!./actors",
   "css!widgets/modules/modules"
@@ -12,6 +13,7 @@ define([
   connection,
   actors,
   plugins,
+  format,
   tpl
 ) {
 
@@ -82,6 +84,21 @@ define([
     actors.currentActor(null);
   }
 
+  function toggleOrdering(name){
+    return function() {
+      if (orderBy() == name)
+        orderByDesc(orderByDesc()=="asc"?"desc":"asc")
+      else
+        orderBy(name)
+    }
+  }
+
+  function isOrdering(name) {
+    return ko.computed(function() {
+      return orderBy() == name?orderByDesc():false;
+    });
+  }
+
   var State = {
     actors: filteredActorsList,
     fullTextSearch: fullTextSearch,
@@ -91,13 +108,18 @@ define([
     openActor: openActor,
     closeActor: closeActor,
     filters: {
+      isOrdering:      isOrdering,
+      toggleOrdering:  toggleOrdering,
       limitSize:       limitSize,
       orderByDesc:     orderByDesc,
       orderBy:         orderBy,
       hideAnonymous:   hideAnonymous,
       limitSizeValues: limitSizeValues,
       orderByValues:   orderByValues
-    }
+    },
+    formatTime: format.formatTime,
+    formatUnits: format.units,
+    shorten: format.shortenNumber
   }
 
   return {

@@ -33,48 +33,58 @@ define([
   var _div = _n("div"), _span = _n("span");
 
 
-  function renderEventTrace(data) {
-    var children = data.children;
-    data = data.event;
+  function renderTree(root) {
+    function renderEventTrace(data) {
+      var children = data.children;
+      data = data.event;
+      var highlight = root.traceEvent.type == data.type;
+      var show = ko.computed(function() {
+        return (highlight || !isSystemEvent(data) || app.deviationPrefs.showSystemMessages());
+      })
 
-    return _div('event',{css: {'error': isFailureEvent(data.type)}} ,[
-      _div("type", data.type),
-      _div([
-        _span("label","Time"),
-        _span("value", format.formatTime(data.timestamp))
-      ]),
-      _div({ visible: app.deviationPrefs.showNanoSeconds }, [
-        _span("label","Nano"),
-        _span("value", data.nanoTime + "")
-      ]),
-      _div({ visible: app.deviationPrefs.showActorSystems }, [
-        _span("label","Actor System"),
-        _span("value", data.actorSystem)
-      ]),
-      _div({ visible: app.deviationPrefs.showTraceInformation }, [
-        _div([
-          _span("label","Id"),
-          _span("value", data.id)
+      return _div('event',{css: {'error': isFailureEvent(data.type)}} ,[
+        _div("event-desc", {visible: show, css: {'highlight': highlight}}, [
+          _div("type", data.type),
+          _div([
+            _span("label","Time"),
+            _span("value", format.formatTime(data.timestamp))
+          ]),
+          _div({ visible: app.deviationPrefs.showNanoSeconds }, [
+            _span("label","Nano"),
+            _span("value", data.nanoTime + "")
+          ]),
+          _div({ visible: app.deviationPrefs.showActorSystems }, [
+            _span("label","Actor System"),
+            _span("value", data.actorSystem)
+          ]),
+          _div({ visible: app.deviationPrefs.showTraceInformation }, [
+            _div([
+              _span("label","Id"),
+              _span("value", data.id)
+            ]),
+            _div([
+              _span("label","Trace"),
+              _span("value", extractTrace(data.trace))
+            ])
+          ]),
+          _div({ visible: isActorEvent(data) }, [
+            _span("label","Actor"),
+            _span("value", extractActorPath(data.annotation))
+          ]),
+          (data.annotation && data.annotation.message != undefined) && _div([
+            _span("label","Message"),
+            _span("value", extractMessage(data.annotation.message,data.annotation.sysMsgType))
+          ]),
+          (data.annotation && data.annotation.reason != undefined) && _div([
+            _span("label","Reason"),
+            _span("value", data.annotation.reason)
+          ])
         ]),
-        _div([
-          _span("label","Trace"),
-          _span("value", extractTrace(data.trace))
-        ])
-      ]),
-      _div({ visible: isActorEvent(data) }, [
-        _span("label","Actor"),
-        _span("value", extractActorPath(data.annotation))
-      ]),
-      (data.annotation && data.annotation.message != undefined) && _div([
-        _span("label","Message"),
-        _span("value", extractMessage(data.annotation.message,data.annotation.sysMsgType))
-      ]),
-      (data.annotation && data.annotation.reason != undefined) && _div([
-        _span("label","Reason"),
-        _span("value", data.annotation.reason)
-      ]),
-      (children && children.length) && _div("children", children.map(renderEventTrace))
-    ])
+        (children && children.length) && _div("children", children.map(renderEventTrace))
+      ])
+    }
+
+    return renderEventTrace(root.traceTree);
   }
 
 
@@ -158,5 +168,5 @@ define([
     return result;
   }
 
-  return renderEventTrace;
+  return renderTree;
 });

@@ -1,9 +1,11 @@
 define([
   './connection',
+  './deviation',
   'commons/format'
   // './deviation'
 ],function(
   connection,
+  Deviation,
   format
   // deviation
 ){
@@ -28,6 +30,7 @@ define([
 
   var deviationsList = ko.observable();
   var currentDeviation = ko.observable();
+  var errorDeviation = ko.observable();
   var setListFilters = function() {};
 
   // format list
@@ -35,17 +38,10 @@ define([
     return list.map(function(item) {
       debug && console.log(item);
       item.timestamp = format.formatTime(new Date(item.timestamp));
-      item.eventLink = "#run/deviations/"+item.event
+      item.eventLink = "#run/actorIssues/"+item.event
       return item;
     });
   }
-
-  // Single actor selected
-  // connection.streams.deviation
-  //   .map(function(message) {
-  //     debug && console.log(message)
-  //     currentDeviation(new Deviation(message.data))
-  //   })
 
   function setCurrentDeviationId(id) {
     if (id){
@@ -59,9 +55,23 @@ define([
     }
   }
 
+  connection.streams.deviation
+    .map(function(message) {
+      debug && console.log("Deviation received",message)
+      try {
+        var d = new Deviation(message.data);
+        currentDeviation(d);
+        errorDeviation(null);
+      } catch (er) {
+        currentDeviation(null);
+        errorDeviation(er);
+      }
+    });
+
   return {
     list: deviationsList,
     currentDeviation: currentDeviation,
+    errorDeviation: errorDeviation,
     setListFilters: setListFilters,
     setCurrentDeviationId: setCurrentDeviationId
   }

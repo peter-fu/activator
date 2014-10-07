@@ -42,18 +42,16 @@
       <table class="table-list" data-bind="attr: { 'data-ordering': filters.orderBy }">
         <thead>
           <tr>
-            <th>Actor Name</th>
-            <td class="throughput" title="Throughput">Throughput</td>
-            <td class="maxMailboxSize" title="Max Mailbox Size">Max Mailbox Size</td>
-            <td class="maxTimeInMailbox" title="Max Time in Mailbox">Max Time in Mailbox</td>
-            <td class="path" title="Path">Path</td>
+            <th data-bind="click: filters.toggleOrdering('actorName'), attr: {'data-orderDir': filters.isOrdering('actorName')}">Actor Name</th>
+            <td data-bind="click: filters.toggleOrdering('throughput'), attr: {'data-orderDir': filters.isOrdering('throughput')}" class="throughput" title="Throughput">Throughput</td>
+            <td data-bind="click: filters.toggleOrdering('maxMailboxSize'), attr: {'data-orderDir': filters.isOrdering('maxMailboxSize')}" class="maxMailboxSize" title="Max Mailbox Size">Max Mailbox Size</td>
+            <td data-bind="click: filters.toggleOrdering('maxTimeInMailbox'), attr: {'data-orderDir': filters.isOrdering('maxTimeInMailbox')}" class="maxTimeInMailbox" title="Max Time in Mailbox">Max Time in Mailbox</td>
+            <td data-bind="click: filters.toggleOrdering('actorPath'), attr: {'data-orderDir': filters.isOrdering('actorPath')}" class="path" title="Path">Path</td>
           </tr>
         </thead>
         <tbody data-bind="foreach: actors">
           <tr data-bind="click: $root.openActor, isExactUrl: actorLink">
-            <th>
-              <span class="title" data-bind="text: name"></span>
-            </th>
+            <th data-bind="text: name"></th>
             <td class="throughput" data-bind="text: throughput"></td>
             <td class="maxMailboxSize" data-bind="text: maxMailboxSize"></td>
             <td class="maxTimeInMailbox" data-bind="text: maxTimeInMailbox"></td>
@@ -81,36 +79,33 @@
               </tr>
             </thead>
             <tbody class="listing">
-              <tr><td>Processed</td><td data-bind="text: processedMessagesCount">7</td></tr>
-              <tr><td>Tell</td><td data-bind="text: tellMessagesCount">7</td></tr>
-              <tr><td>Ask</td><td data-bind="text: askMessagesCount">0</td></tr>
+              <tr><td>Processed</td><td class="value" data-bind="text: processedMessagesCount"></td></tr>
+              <tr><td>Tell</td><td class="value" data-bind="text: tellMessagesCount"></td></tr>
+              <tr><td>Ask</td><td class="value" data-bind="text: askMessagesCount"></td></tr>
             </tbody>
             <thead>
               <tr><th colspan="2"><span>Mailbox Information</span></th></tr>
             </thead>
             <tbody class="listing">
-              <tr><td>Max mailbox size</td><td data-bind="text: maxMailboxSize">2</td></tr>
-              <tr><td>Max mailbox size time</td><td xdata-bind="text: $root.formatDate(maxMailboxSizeTimestamp)">18:05:47:881</td></tr>
-              <tr><td>Max time in mailbox</td><td xdata-bind="text: $root.formatUnits(maxTimeInMailbox.unit, maxTimeInMailbox.value)">173 µs</td></tr>
-              <tr><td>Max time in mailbox time</td><td xdata-bind="text: $root.formatDate(maxTimeInMailboxTimestamp)">18:05:47:780</td></tr>
-              <tr><td>Mean mailbox size</td><td xdata-bind="text: $root.shorten(meanMailboxSize)">1.142</td></tr>
-              <tr><td>Mean time in mailbox</td><td xdata-bind="text: $root.formatUnits(meanTimeInMailbox.unit, meanTimeInMailbox.value)">93 µs</td></tr>
+              <tr><td>Max mailbox size</td><td class="value" data-bind="text: maxMailboxSize">2</td></tr>
+              <tr><td>Max mailbox size time</td><td class="value" data-bind="text: $root.formatTime(maxMailboxSizeTimestamp)"></td></tr>
+              <tr><td>Max time in mailbox</td><td class="value" data-bind="text: $root.formatUnits(maxTimeInMailbox.unit, maxTimeInMailbox.value)"></td></tr>
+              <tr><td>Max time in mailbox time</td><td class="value" data-bind="text: $root.formatTime(maxTimeInMailboxTimestamp)"></td></tr>
+              <tr><td>Mean mailbox size</td><td class="value" data-bind="text: $root.shorten(meanMailboxSize)"></td></tr>
+              <tr><td>Mean time in mailbox</td><td class="value" data-bind="text: $root.formatUnits(meanTimeInMailbox.unit, meanTimeInMailbox.value)"></td></tr>
             </tbody>
-            <thead>
+            <thead xdata-bind="if: !$root.hasDeviations()">
               <tr>
                 <th colspan="2">
-                  <div xdata-bind="if: $root.hasDeviations()"></div>
-                  <div xdata-bind="if: !$root.hasDeviations()">
-                    <span>Deviations</span>
-                  </div>
+                  <span>Deviations</span>
                 </th>
               </tr>
             </thead>
             <tbody class="listing">
-              <tr><td>Errors</td><td data-bind="text: errorCount">0</td></tr>
-              <tr><td>Warnings</td><td data-bind="text: warningCount">0</td></tr>
-              <tr><td>Dead letters</td><td data-bind="text: deadletterCount">0</td></tr>
-              <tr><td>Unhandled messages</td><td data-bind="text: unhandledMessageCount">0</td></tr>
+              <tr><td>Errors</td><td class="value" data-bind="text: errorCount"></td></tr>
+              <tr><td>Warnings</td><td class="value" data-bind="text: warningCount"></td></tr>
+              <tr><td>Dead letters</td><td class="value" data-bind="text: deadletterCount"></td></tr>
+              <tr><td>Unhandled messages</td><td class="value" data-bind="text: unhandledMessageCount"></td></tr>
             </tbody>
         </table>
       </div>

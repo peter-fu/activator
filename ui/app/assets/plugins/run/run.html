@@ -60,7 +60,7 @@
     <footer>
       <!-- ko if: inspectActivated -->
         <span class="expand">Data collected for</span>
-        <span class="cache counter">0&ndash;</span>
+        <span class="cache counter" data-bind="formatTime: stats().data.currentStorageTime * 1000">0&ndash;</span>
       <!-- /ko -->
       <!-- ko ifnot: inspectActivated -->
         <p class="locked"> 
@@ -76,8 +76,8 @@
         <a href="#run/actors">Actors</a>
         <span class="counter" data-bind="text: stats().data.metadata.actorPathCount, visible: stats().data.metadata.actorPathCount"></span>
       </li>
-      <li class="deviations" data-bind="visible: inspectActivated, isActiveUrl: '#run/deviations'">
-        <a href="#run/deviations">Actor Issues</a>
+      <li class="actorIssues" data-bind="visible: inspectActivated, isActiveUrl: '#run/actorIssues'">
+        <a href="#run/actorIssues">Actor Issues</a>
         <span class="counter error" data-bind="text: stats().data.deviations.deviationCount, visible: stats().data.deviations.deviationCount"></span>
       </li>
       <li class="requests" data-bind="visible: inspectActivated, isActiveUrl: '#run/requests'">

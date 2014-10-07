@@ -4,11 +4,12 @@
 @import "./commons/_base";
 
 .run .list {
-  .title {
-    color: @blue-text;
-  }
   .table-list {
     width: 100%;
+    td, th {
+      padding: 5px 10px;
+      border-bottom: 1px solid @white-ltr;
+    }
     thead {
       background: @blue-dkr;
       color: rgba(0,0,0,.4);
@@ -16,13 +17,8 @@
       height: 34px;
       line-height: 34px;
       padding: 0 20px;
-      th {
-        // padding: 0;
-      }
-      td {
-        font-size: 11px;
-        line-height: 11px;
-      }
+      font-size: 11px;
+      line-height: 11px;
       input {
         padding: 4px 5px;
         background: @blue-dkr;
@@ -38,8 +34,8 @@
       }
     }
     tbody {
-      td, th {
-        border: 1px solid @white-ltr;
+      th {
+        color: @blue-text;
       }
       tr {
         position: relative;
@@ -49,27 +45,37 @@
           border-color: @white-dkr;
           color: @slate;
         }
-        &.active {
+        &.active td, &.active th {
           background: @grey;
           color: #fff;
           border-color: @grey-dkr;
-          a {
-            color: #fff;
-          }
         }
       }
-    }
-    td, th {
-      padding: 5px 10px;
     }
     th {
       text-align: left;
       width: 260px;
-      color: #fff;
     }
     p {
       font-size: 12px;
     }
+  }
+
+  [data-orderDir]{
+    color: #fff;
+    &:before {
+      content: "";
+      display: inline-block;
+      text-align: left;
+      width: 15px;
+      opacity: .5;
+    }
+  }
+  [data-orderDir='asc']:before {
+    content: "▲";
+  }
+  [data-orderDir='desc']:before {
+    content: "▼";
   }
 
 }
