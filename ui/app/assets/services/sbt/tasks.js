@@ -108,6 +108,19 @@ define([
   }
 
   /**
+   * Reset inspect data
+   */
+  function resetInspect() {
+    debug && console.log("Reset Inspect datas")
+    websocket.send({
+      "commands": [{
+        "module": "lifecycle",
+        "command": "reset"
+      }]
+    });
+  }
+
+  /**
   Run command
   */
   var runCommand = ko.computed(function() {
@@ -568,11 +581,15 @@ define([
         requestExecution("compile");
       },
       run:          function() {
+        if (app.settings.automaticResetInspect()){
+          resetInspect();
+        }
         return requestExecution(runCommand());
       },
       test:         function() {
         requestExecution("test");
-      }
+      },
+      resetInspect: resetInspect
     }
   }
 
