@@ -64,7 +64,8 @@ define([
     showLogDebug: sbt.app.settings.showLogDebug,
     inspectActivated: sbt.app.inspectActivated,
     mainRunAction: mainRunAction,
-    mainRunName: mainRunName
+    mainRunName: mainRunName,
+    customCommands: sbt.app.customCommands
   }
 
   // Subplugins titles
