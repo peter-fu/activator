@@ -5,23 +5,21 @@ define([
   'services/sbt/app',
   "services/inspect/connection",
   "services/inspect/deviations",
-  "services/inspect/deviation",
   "main/plugins",
-  "text!./deviations.html",
-  "css!./deviations",
+  "text!./actorIssues.html",
+  "css!./actorIssues",
   "css!../actors/actors",
   "css!widgets/modules/modules"
 ], function(
   app,
   connection,
   deviations,
-  deviation,
   plugins,
   tpl
 ) {
 
   function closeDeviation(){
-    window.location.hash = "#run/deviations";
+    window.location.hash = "#run/actorIssues";
     deviations.setCurrentDeviationId(null);
     deviations.currentDeviation(null);
   }
@@ -30,12 +28,14 @@ define([
   }
 
   var State = {
+    closeDeviation: closeDeviation,
     hasDeviations: ko.computed(function() {
       var d = deviations.list();
       return d && d.deviationCount;
     }),
     data: deviations.list,
-    currentDeviation: deviation,
+    currentDeviation: deviations.currentDeviation,
+    errorDeviation: deviations.errorDeviation,
     openDeviation: openDeviation,
     prefs: app.deviationPrefs
   }
@@ -46,7 +46,7 @@ define([
     },
     route: function(url, breadcrumb) {
       if (url.parameters){
-        breadcrumb(breadcrumb().concat([['run/deviations/'+url.parameters.join("/"), url.parameters.slice(-1)[0]]]));
+        breadcrumb(breadcrumb().concat([['run/actorIssues/'+url.parameters.join("/"), url.parameters.slice(-1)[0]]]));
         deviations.setCurrentDeviationId(url.parameters[0]);
         connection.filters.active(['deviations', 'deviation']);
       } else {
@@ -54,6 +54,12 @@ define([
         connection.filters.active(['deviations']);
       }
     },
+    keyboard: function(key, meta, e) {
+      if (key == "ESC"){
+        closeDeviation();
+      }
+    }
   }
+
 
 });

@@ -1,4 +1,4 @@
-<article class="plugin actors"  data-bind="css: { opened: currentDeviation }">
+<article class="plugin deviations"  data-bind="css: { opened: currentDeviation() || errorDeviation() }">
   <header>
     <h1>Deviations</h1>
   </header>
@@ -12,14 +12,12 @@
         <thead>
           <tr>
             <th>Errors</th>
-            <th>Time</th>
+            <td>Time</td>
           </tr>
         </thead>
         <tbody class="listing" data-bind="foreach: data().errors">
         <tr data-bind="click: $root.openDeviation">
-          <td class="message">
-            <span class="title" data-bind="text: message, attr: { 'data-hover-text': 'hover' }"></span>
-          </td>
+          <th class="message" data-bind="text: message, attr: { 'data-hover-text': 'hover' }"></th>
           <td class="timestamp" data-bind="text: timestamp"></td>
         </tr>
         </tbody>
@@ -28,14 +26,12 @@
         <thead>
         <tr>
           <th>Warnings</th>
-          <th>Time</th>
+          <td>Time</td>
         </tr>
         </thead>
         <tbody class="listing" data-bind="foreach: data().warnings">
         <tr data-bind="click: $root.openDeviation">
-          <td class="message">
-            <span class="title" data-bind="text: message, attr: { 'data-hover-text': 'hover' }"></span>
-          </td>
+          <th class="message" data-bind="text: message, attr: { 'data-hover-text': 'hover' }"></th>
           <td class="timestamp" data-bind="text: timestamp"></td>
         </tr>
         </tbody>
@@ -44,14 +40,12 @@
         <thead>
         <tr>
           <th>Dead Letters</th>
-          <th>Time</th>
+          <td>Time</td>
         </tr>
         </thead>
         <tbody class="listing" data-bind="foreach: data().deadletters">
         <tr data-bind="click: $root.openDeviation">
-          <td class="message">
-            <span class="title" data-bind="text: message, attr: { 'data-hover-text': 'hover' }"></span>
-          </td>
+          <th class="message" data-bind="text: message, attr: { 'data-hover-text': 'hover' }"></th>
           <td class="timestamp" data-bind="text: timestamp"></td>
         </tr>
         </tbody>
@@ -60,14 +54,12 @@
         <thead>
         <tr>
           <th>Unhandled Messages</th>
-          <th>Time</th>
+          <td>Time</td>
         </tr>
         </thead>
         <tbody class="listing" data-bind="foreach: data().unhandledMessages">
         <tr data-bind="click: $root.openDeviation">
-          <td class="message">
-            <span class="title" data-bind="text: message, attr: { 'data-hover-text': 'hover' }"></span>
-          </td>
+          <th class="message" data-bind="text: message, attr: { 'data-hover-text': 'hover' }"></th>
           <td class="timestamp" data-bind="text: timestamp"></td>
         </tr>
         </tbody>
@@ -76,14 +68,12 @@
         <thead>
         <tr>
           <th>Deadlocks</th>
-          <th>Time</th>
+          <td>Time</td>
         </tr>
         </thead>
         <tbody class="listing" data-bind="foreach: data().deadlocks">
         <tr data-bind="click: $root.openDeviation">
-          <td class="message">
-            <span class="title" data-bind="text: message, attr: { 'data-hover-text': 'hover' }"></span>
-          </td>
+          <th class="message" data-bind="text: message, attr: { 'data-hover-text': 'hover' }"></th>
           <td class="timestamp" data-bind="text: timestamp"></td>
         </tr>
         </tbody>
@@ -92,7 +82,11 @@
     </div>
   </div>
 
-
+    <!-- ko if: errorDeviation() -->
+    <div class="pluginBlock dark item-view deviation"> 
+      <p data-bind="text:errorDeviation"></p>
+    </div>
+    <!-- /ko -->
     <!-- ko if: currentDeviation() -->
     <!-- ko with: currentDeviation() -->
     <div class="pluginBlock dark item-view deviation">

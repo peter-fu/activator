@@ -5,8 +5,11 @@
 
 .deviation {
   .event {
-    padding: 5px 0 5px 20px;
     border-left: 1px dotted rgba(255,255,255, 0.1);
+    padding-left: 20px;
+  }
+  .event-desc {
+    padding: 5px;
   }
   .event .type {
     font-weight: bold;
@@ -18,5 +21,14 @@
   }
   .event.error .type {
     color: #F16665;
+  }
+  .highlight {
+    background: @slate-dkr;
+  }
+}
+
+.deviations.opened {
+  .table-list td {
+    display: none;
   }
 }
