@@ -160,8 +160,8 @@ define([
         self.currentFiles($.map(fileConfigs, function(config) {
           return new File(config);
         }));
-      }).error(function() {
-        alert('Failed to load directory listing for: ' + dir);
+      }).error(function(e) {
+        alert(e.responseText);
       });
     },
     select: function() {
