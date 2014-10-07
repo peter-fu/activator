@@ -162,6 +162,18 @@
   align-items: @align;
 }
 
+.justify-content(@align: center) {
+  -webkit-justify-content: @align;
+  justify-content: @align;
+  -ms-flex-pack: @align;
+}
+
+.align-content(@align: center) {
+  -webkit-align-content: @align;
+  align-content: @align;
+  -ms-flex-item-content: @align;
+}
+
 .align-self(@align: center) {
   -webkit-align-self: @align;
   align-self: @align;

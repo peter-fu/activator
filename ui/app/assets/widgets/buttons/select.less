@@ -9,6 +9,9 @@
   &:hover {
     border-color: @white-dkr;
   }
+  dt, dd {
+    .ellipsis();
+  }
   dt {
     font-weight: inherit;
     color: inherit;
@@ -50,7 +53,7 @@
   dd {
     margin-top: 1px;
     background: @slate;
-    width: 100%;
+    min-width: 100%;
     a {
       display: block;
       padding: 4px 10px;
