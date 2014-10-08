@@ -1,6 +1,7 @@
 @REM activator launcher script
 @REM
-@REM Envioronment:
+@REM Environment:
+@REM In order for Activator to work you must have Java available on the classpath
 @REM JAVA_HOME - location of a JDK home dir (optional if java on path)
 @REM CFG_OPTS  - JVM options (optional)
 @REM Configuration:
@@ -28,6 +29,8 @@ if defined var1 (
     echo JAVA_OPTS          Environment variable, if unset uses ""
     echo SBT_OPTS           Environment variable, if unset uses ""
     echo ACTIVATOR_OPTS     Environment variable, if unset uses ""
+    echo.
+    echo Please note that in order for Activator to work you must have Java available on the classpath
     echo.
     goto :end
   )
