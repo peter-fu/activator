@@ -574,6 +574,7 @@ define([
     notifications:           notifications,
     SbtEvents:               SbtEvents,
     kill:                    killExecution,
+    clientReady:             clientReady,
     applicationReady:        applicationReady,
     applicationNotReady:     applicationNotReady,
     active: {
