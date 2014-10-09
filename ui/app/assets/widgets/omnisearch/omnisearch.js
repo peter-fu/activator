@@ -25,6 +25,16 @@ define([
     pendingQueries(pendingQueries()-1);
   })
 
+  var t = ko.computed(function() {
+    return options().map(function(a, i) {
+      if (!selected() && i == 0) selected(a);
+      a.isSelected = ko.computed(function() {
+        return a.subtitle == selected().subtitle;
+      });
+      return a;
+    })
+  })
+
   searchString.subscribe(function(keywords) {
     // Don't search until at least two characters are entered and search string isn't the same as last
     pendingQueries(pendingQueries()+1);
@@ -57,32 +67,35 @@ define([
     empty: empty,
     searchString: searchString,
 
-    keyDown: function(state,e) {
+    keyDown: function repeat(state,e) {
+      var index = options().indexOf(selected());
       // Up
       if (e.keyCode == 38) {
           e.preventDefault();
-          if (selected() > 0) {
-            selected(selected() - 1);
+          if (index > 0) {
+            selected(options()[index - 1]);
           } else {
-            selected(options().length - 1);
+            selected(options()[options().length - 1]);
           }
+          if (!selected().subtitle) repeat(state,e)
           scrollToSelected();
           return false;
       }
       // Down
       else if (e.keyCode == 40) {
           e.preventDefault();
-          if (selected() < options().length - 1) {
-            selected(selected() + 1);
+          if (index < options().length - 1) {
+            selected(options()[index + 1]);
           } else {
-            selected(0);
+            selected(options()[0]);
           }
+          if (!selected().subtitle) repeat(state,e)
           scrollToSelected();
           return false;
       }
       // autocomplete on TAB
       else if (e.keyCode == 9) {
-        e.target.value = options()[selected()].execute;
+        e.target.value = selected().execute;
         return false;
       }
       else return true;
@@ -102,7 +115,7 @@ define([
         // Return
         case 13:
           e.preventDefault();
-          var selectedItem = options()[selected()];
+          var selectedItem = selected();
           if (selectedItem) {
             State.exec(selectedItem);
             e.target.blur();
@@ -133,7 +146,7 @@ define([
       debug && console.log(option)
       option.callback(option);
       options([]);
-      selected(0);
+      selected(null);
       searchString("");
       document.body.focus();
     }
