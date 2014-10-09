@@ -424,12 +424,19 @@ define([
   });
 
   // Application ready
-  var applicationReady = ko.observable(false);
+  var clientReady = ko.observable(false);
+  var applicationReady = ko.computed(function() {
+    return app.mainClasses().length && clientReady();
+  });
+  var applicationNotReady = ko.computed(function() { return !applicationReady(); });
   subTypeEventStream('ClientOpened').each(function (msg) {
-    applicationReady(true);
+    console.log("Client:", msg)
+    clientReady(true);
   });
   subTypeEventStream('ClientClosed').each(function (msg) {
-    applicationReady(false);
+    console.log("Client:", msg);
+    app.mainClasses([]);
+    clientReady(false);
   });
 
   // Killing an execution
@@ -568,6 +575,7 @@ define([
     SbtEvents:               SbtEvents,
     kill:                    killExecution,
     applicationReady:        applicationReady,
+    applicationNotReady:     applicationNotReady,
     active: {
       turnedOn:     "",
       compiling:    "",

@@ -3,7 +3,7 @@
     <header>
       <h1>Run</h1>
       <div class="buttons">
-        <dl class="dropdown">
+        <dl class="dropdown" data-bind="css: {disabled: sbt.tasks.applicationNotReady}">
           <dt>
             <svg data-bind="svg: '/assets/icons/more.svg'"/>
           </dt>
@@ -13,7 +13,7 @@
             <!-- <a>Options</a> -->
           </dd>
         </dl>
-        <button data-bind="click: mainRunAction">
+        <button data-bind="css: {disabled: sbt.tasks.applicationNotReady}, click: mainRunAction">
           <svg data-bind="svg: '/assets/icons/run.svg'"/>
           <span class="mainAction" data-bind="text: mainRunName"></span>
         </button>
