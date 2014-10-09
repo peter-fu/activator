@@ -396,17 +396,29 @@ define([
   });
 
   var valueChanged = subTypeEventStream("ValueChanged").map(function(message) {
+    var valueOrNull = null;
+    if (message.event.value.success)
+      valueOrNull = message.event.value.value;
+    debug && console.log("ValueChanged for ", message.event.key.key.name, valueOrNull, message.event);
     return {
       key: message.event.key.key.name,
-      value: message.event.value.value
+      value: valueOrNull,
+      // TODO insert a project object instance from our projects list ?
+      //project: message.event.key.scope.project,
+      scopedKey: message.event.key
     }
   });
 
   // discoveredMainClasses
   valueChanged.matchOnAttribute('key', 'discoveredMainClasses').each(function(message) {
-    app.mainClasses(message.value); // All main classes
-    if (!app.currentMainClass() && message.value[0]){
-      app.currentMainClass(message.value[0]); // Selected main class, if empty
+    var discovered = [];
+    if (message.value && message.value.length)
+      discovered = message.value;
+    // TODO this is broken, if there are two projects with main classes we'll just
+    // pick "last one wins," we need to separately track main classes per-project.
+    app.mainClasses(discovered); // All main classes
+    if (!app.currentMainClass() && discovered[0]){
+      app.currentMainClass(discovered[0]); // Selected main class, if empty
     }
   });
 
