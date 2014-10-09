@@ -25,7 +25,7 @@ define([
     var addedBackgroundFile = ko.observable(false);
     var addedForkInRun = ko.observable(false);
 
-    // On start, we ensure that we have a background.sbt file and the corresponding config in build.sbt
+    // On start, we ensure that we have a sbt-ui.sbt file and the corresponding config in build.sbt
     checkFileContent(serverAppModel.location+backgroundRunPluginFileLocation, backgroundRunPluginFileContent, function() {
       addedBackgroundFile(true);
     });
@@ -43,16 +43,18 @@ define([
     });
 
     function echoInstalledAndReady(callback){
-      checkFileContent(serverAppModel.location+echoPluginFileLocation, echoPluginFileContent, function() {
-        addedEchoFile(true);
-      });
-
-      echoReady() && callback();
-      ko.once(echoReady, function(ready) {
-        if (ready){
-          callback();
-        }
-      });
+      if (echoReady()) callback();
+      else {
+        checkFileContent(serverAppModel.location+echoPluginFileLocation, echoPluginFileContent, function() {
+          addedEchoFile(true);
+        });
+        var subscription = echoReady.subscribe(function(ready) {
+          if (ready){
+            callback();
+            subscription.dispose();
+          }
+        });
+      }
     }
 
     function checkFileContent(path, content, callback, appendTofile){
@@ -62,6 +64,7 @@ define([
         dataType: 'text',
         data: { location: path }
       }).error(function(e) {
+        tasks.clientReady(false);
         // File is not here / can't be opened
         ajax.create(path, false, content).then(callback);
       }).success(function(data) {
