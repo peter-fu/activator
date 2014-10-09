@@ -1,8 +1,8 @@
 <article class="plugin deviations"  data-bind="css: { opened: currentDeviation() || errorDeviation() }">
+  <!-- ko if: hasDeviations() -->
   <header>
     <h1>Deviations</h1>
   </header>
-  <!-- ko if: hasDeviations() -->
   <section>
   <div class="pluginBlock list deviations-list">
 
@@ -195,14 +195,11 @@
     <!-- /ko -->
 
 
-    <!-- ko ifnot: hasDeviations() -->
-  <section>
-    <div class="pluginBlock dark expand">
-      <p class="emptyList">
-          Everything is running nicely.
-      </p>
-    </div>
-  </section>
+  <!-- ko ifnot: hasDeviations() -->
+  <div class="hint">
+    <p>Everything is fine</p>
+    <span>So far there has been no activity in your application or you're running an unsupported version of Akka (&gt;2.3.4)</span>
+  </div>
   <!-- /ko -->
 
 

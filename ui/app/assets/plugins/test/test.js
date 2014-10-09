@@ -46,7 +46,8 @@ define([
     retestOnSuccessfulBuild: sbt.app.settings.retestOnSuccessfulBuild,
     sbtExecCommand: sbtExecCommand,
     mainTestAction: mainTestAction,
-    mainTestName: mainTestName
+    mainTestName: mainTestName,
+    sbt: sbt
   }
 
   return {

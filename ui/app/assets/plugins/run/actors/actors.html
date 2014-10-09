@@ -1,8 +1,8 @@
 <article class="plugin actors" data-bind="css: { opened: currentActor }">
+  <!-- ko if: actors().length -->
   <header>
     <h1>Actors</h1>
   </header>
-  <!-- ko if: actors().length -->
   <section>
     <div class="pluginBlock list actors-list">
 
@@ -116,13 +116,10 @@
   </section>
   <!-- /ko -->
   <!-- ko ifnot: actors().length -->
-  <section>
-    <div class="pluginBlock dark">
-      <p class="emptyList">
-          You can see actor information here but so far there has been no activity in your application or you're running an unsupported version of Akka (&gt;2.3.4).
-      </p>
-    </div>
-  </section>
+  <div class="hint">
+    <p>You can see actors information here</p>
+    <span>But so far there has been no activity in your application or you're running an unsupported version of Akka (&gt;2.3.4)</span>
+  </div>
   <!-- /ko -->
 
 </article>

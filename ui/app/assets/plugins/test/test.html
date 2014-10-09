@@ -3,7 +3,7 @@
     <header>
       <h1>Test</h1>
       <div class="buttons">
-        <dl class="dropdown">
+        <dl class="dropdown" data-bind="css: {disabled: sbt.tasks.applicationNotReady}">
           <dt>
             <svg data-bind="svg: '/assets/icons/more.svg'"/>
           </dt>
@@ -11,7 +11,7 @@
             <a data-bind="click: function(){ sbtExecCommand('test') }">Test</a>
           </dd>
         </dl>
-        <button data-bind="click: mainTestAction">
+        <button data-bind="css: {disabled: sbt.tasks.applicationNotReady}, click: mainTestAction">
           <svg data-bind="svg: '/assets/icons/test.svg'"/>
           <span class="mainAction" data-bind="text: mainTestName"></span>
         </button>
@@ -30,6 +30,14 @@
       <li><a href="#test/results">Test results</a></li>
     </ul>
   </nav>
+  <!-- ko ifnot: results().length -->
+  <article class="plugin">
+  <div class="hint">
+    <p>Run the tests to see some data</p>
+  </div>
+  </article>
+  <!-- /ko -->
+  <!-- ko if: results().length -->
   <article class="plugin">
     <header>
       <h1>Test results</h1>
@@ -43,4 +51,5 @@
       </ul>
     </section>
   </article>
+  <!-- /ko -->
 </main>
