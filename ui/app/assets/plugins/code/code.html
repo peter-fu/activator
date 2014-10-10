@@ -1,16 +1,11 @@
 <main id="wrapper" class="code">
   <!-- ko include: browser.render() --><!-- /ko -->
   <!-- ko ifnot: visible -->
-  <article class="intro typo">
-    <div class="description">
-      <h1>Your app's code</h1>
-      <p>Here is the code for your application. You can browse, read and edit it right in Activator or choose to open the poject in your favorite IDE / Text editor.</p>
-      <p class="openIn">
-        <button class="button">Reveal folder</button>
-        <button class="button" data-bind="click: generateEclipseFiles">Create Eclipse project</button>
-        <button class="button" data-bind="click: generateIdeaFiles">Create Idea project</button>
-      </p>
-    </div>
+  <article class="plugin">
+  <div class="hint code">
+    <p>Browse your app's code</p>
+    <span>You can also open it in your favorite editor the same way</span>
+  </div>
   </article>
   <!-- /ko -->
   <!-- ko if: visible -->
@@ -38,7 +33,9 @@
         <!-- /ko -->
         <!-- ko ifnot: selectedDocument().isText -->
           <div class="bin-file">
-            <p>We cannot display this content</p>
+            <div class="hint no-data">
+              <p>We cannot display this content</p>
+            </div>
           </div>
         <!-- /ko -->
       <!-- /ko -->

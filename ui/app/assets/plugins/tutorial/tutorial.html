@@ -19,41 +19,43 @@
     </ul>
   </nav>
   <!-- ko ifnot: page() -->
-  <article class="intro typo">
-    <!-- ko if: metaData() -->
-      <div class="description">
-        <h1 data-bind="text: metaData().title"></h1>
-        <p data-bind="text: metaData().description"></p>
-        <p class="author">
-          <cite>
-            by <span data-bind="text: metaData().authorName"></span>
-            <!-- ko if: metaData().authorTwitter -->
-            (<a target="_blank" data-bind="text: '@'+metaData().authorTwitter, href: 'http://twitter.com/'+metaData().authorTwitter"></a>)
+  <article class="plugin">
+    <div class="intro typo stack">
+      <!-- ko if: metaData() -->
+        <div class="description">
+          <h1 data-bind="text: metaData().title"></h1>
+          <p data-bind="text: metaData().description"></p>
+          <p class="author">
+            <cite>
+              by <span data-bind="text: metaData().authorName"></span>
+              <!-- ko if: metaData().authorTwitter -->
+              (<a target="_blank" data-bind="text: '@'+metaData().authorTwitter, href: 'http://twitter.com/'+metaData().authorTwitter"></a>)
+              <!-- /ko -->
+            </cite>
+            <!-- ko if: metaData().sourceLink -->
+            - <a target="_blank" class="source" data-bind="text: metaData().sourceLink, href: metaData().sourceLink"></a>
             <!-- /ko -->
-          </cite>
-          <!-- ko if: metaData().sourceLink -->
-          - <a target="_blank" class="source" data-bind="text: metaData().sourceLink, href: metaData().sourceLink"></a>
-          <!-- /ko -->
-        </p>
-      </div>
-      <!-- ko if: (metaData().authorLink && metaData().authorBio && metaData().authorName) -->
-      <div class="training">
-        <a target="_blank" data-bind="href: metaData().authorLink">
-          <!-- ko if: metaData().authorLogo -->
-          <img data-bind="attr: {src: metaData().authorLogo}">
-          <!-- /ko -->
-          <h3 data-bind="text: metaData().authorName"></h3>
-        </a>
-        <p data-bind="text: metaData().authorBio"></p>
-      </div>
+          </p>
+        </div>
+        <!-- ko if: (metaData().authorLink && metaData().authorBio && metaData().authorName) -->
+        <div class="training">
+          <a target="_blank" data-bind="href: metaData().authorLink">
+            <!-- ko if: metaData().authorLogo -->
+            <img data-bind="attr: {src: metaData().authorLogo}">
+            <!-- /ko -->
+            <h3 data-bind="text: metaData().authorName"></h3>
+          </a>
+          <p data-bind="text: metaData().authorBio"></p>
+        </div>
+        <!-- /ko -->
       <!-- /ko -->
-    <!-- /ko -->
-    <!-- ko ifnot: metaData() -->
-      <div class="description">
-        <h1>Tutorial</h1>
-        <p>No descrption for this tutorial.</p>
-      </div>
-    <!-- /ko -->
+      <!-- ko ifnot: metaData() -->
+        <div class="description">
+          <h1>Tutorial</h1>
+          <p>No descrption for this tutorial.</p>
+        </div>
+      <!-- /ko -->
+    </div>
   </article>
   <!-- /ko -->
   <!-- ko if: page() -->
@@ -67,7 +69,7 @@
   <!-- /ko -->
   <!-- /ko -->
   <!-- ko ifnot: hasTutorial -->
-  <div id="noTutorial">
+  <div class="hint no-data">
     <p>No tutorial available.</p>
     <p>You can find tutorials <a href="/home">on the home page</a></p>
   </div>
