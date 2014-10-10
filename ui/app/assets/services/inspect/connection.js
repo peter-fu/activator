@@ -19,7 +19,6 @@ define([
   var filters = {
     active:     ko.observable([]).extend({ throttle: 50 }), // Store the activated filters labels
 
-    overview:   ko.observable().extend({ throttle: 50 }),
     actor:      ko.observable().extend({ throttle: 50 }),
     actors:     ko.observable().extend({ throttle: 50 }),
     deviation:  ko.observable().extend({ throttle: 50 }),
@@ -27,6 +26,30 @@ define([
     request:    ko.observable().extend({ throttle: 50 }),
     requests:   ko.observable().extend({ throttle: 50 })
   }
+
+  var overview = [{
+    "name": "overview",
+    "paging": {
+      "offset": 0,
+      "limit": 10000
+    },
+    "scope": {}
+  }];
+
+  var stats = ko.observable({
+    "type": "overview",
+    "data": {
+      "metadata": {
+        "playPatternCount": 0,
+        "actorPathCount": 0
+      },
+      "deviations": {
+        "deviationCount": 0
+      },
+      "currentStorageTime": 0
+    }
+  });
+  streams.overview.map(stats);
 
   /**
    Send an InspectRequest
@@ -52,7 +75,7 @@ define([
   function request(){
     setTimeout(function() {
       send({
-        modules: filters.active().map(function(label) { return filters[label](); }),
+        modules: filters.active().map(function(label) { return filters[label](); }).concat(overview),
         time: defaultTime // TODO: Time? Should we get rid of it?
       });
     },10)
@@ -63,6 +86,7 @@ define([
   });
 
   return {
+    stats:        stats,
     streams:      streams,
     filters:      filters,
     request:      request,

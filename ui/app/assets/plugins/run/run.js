@@ -58,6 +58,7 @@ define([
     sbtExecCommand: sbtExecCommand,
     inspects: inspects,
     sbt: sbt,
+    stats: connection.stats,
     rerunOnBuild: sbt.app.settings.rerunOnBuild,
     automaticResetInspect: sbt.app.settings.automaticResetInspect,
     showLogDebug: sbt.app.settings.showLogDebug,

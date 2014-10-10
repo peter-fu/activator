@@ -25,8 +25,8 @@ define([
     currentProject:     currentProject,
     removeExistingProjects: removeExistingProjects,
     mainClasses:        mainClasses,
-    currentMainClass:   currentMainClass,
-    inspectActivated: settings.observable("build.activateInspect-"+serverAppModel.id, false),
+    currentMainClass:   settings.observable("build.mainClass-"+serverAppModel.id, false), //currentMainClass,
+    inspectActivated:   settings.observable("build.activateInspect-"+serverAppModel.id, false),
     versions: {
       scala:            ko.observable(false),
       akka:             ko.observable(false),
@@ -40,6 +40,12 @@ define([
       automaticResetInspect:    settings.observable("build.automaticResetInspect", false),
       recompileOnChange:        settings.observable("build.recompileOnChange", true),
       showLogDebug:             settings.observable("build.showLogDebug", false)
+    },
+    deviationPrefs: {
+      showSystemMessages:       settings.observable("inspect.deviation.showSystemMessages",false),
+      showNanoSeconds:          settings.observable("inspect.deviation.showNanoSeconds",false),
+      showActorSystems:         settings.observable("inspect.deviation.showActorSystems",false),
+      showTraceInformation:     settings.observable("inspect.deviation.showTraceInformation",false)
     }
   }
 

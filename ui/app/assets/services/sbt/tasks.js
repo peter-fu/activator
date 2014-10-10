@@ -108,6 +108,19 @@ define([
   }
 
   /**
+   * Reset inspect data
+   */
+  function resetInspect() {
+    debug && console.log("Reset Inspect datas")
+    websocket.send({
+      "commands": [{
+        "module": "lifecycle",
+        "command": "reset"
+      }]
+    });
+  }
+
+  /**
   Run command
   */
   var runCommand = ko.computed(function() {
@@ -405,18 +418,25 @@ define([
   // discoveredMainClasses
   valueChanged.matchOnAttribute('key', 'discoveredMainClasses').each(function(message) {
     app.mainClasses(message.value); // All main classes
-    if (!app.currentMainClass() && message.value[0]){
+    if (message.value[0] && ((app.currentMainClass() && message.value.indexOf(app.currentMainClass()) < 0) || !app.currentMainClass())){
       app.currentMainClass(message.value[0]); // Selected main class, if empty
     }
   });
 
   // Application ready
-  var applicationReady = ko.observable(false);
+  var clientReady = ko.observable(false);
+  var applicationReady = ko.computed(function() {
+    return app.mainClasses().length && clientReady();
+  });
+  var applicationNotReady = ko.computed(function() { return !applicationReady(); });
   subTypeEventStream('ClientOpened').each(function (msg) {
-    applicationReady(true);
+    console.log("Client:", msg)
+    clientReady(true);
   });
   subTypeEventStream('ClientClosed').each(function (msg) {
-    applicationReady(false);
+    console.log("Client:", msg);
+    app.mainClasses([]);
+    clientReady(false);
   });
 
   // Killing an execution
@@ -554,7 +574,9 @@ define([
     notifications:           notifications,
     SbtEvents:               SbtEvents,
     kill:                    killExecution,
+    clientReady:             clientReady,
     applicationReady:        applicationReady,
+    applicationNotReady:     applicationNotReady,
     active: {
       turnedOn:     "",
       compiling:    "",
@@ -568,11 +590,15 @@ define([
         requestExecution("compile");
       },
       run:          function() {
+        if (app.settings.automaticResetInspect()){
+          resetInspect();
+        }
         return requestExecution(runCommand());
       },
       test:         function() {
         requestExecution("test");
-      }
+      },
+      resetInspect: resetInspect
     }
   }
 

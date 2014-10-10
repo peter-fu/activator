@@ -34,7 +34,7 @@ define(function() {
 
   $(document.body).on("click", ".dropdown:not(.dropdownNoEvent)",function(e){
     $(this).toggleClass("opened");
-  }).on("click", ".dropdown:not(.dropdownNoEvent) dd",function(e){
+  }).on("click", ".dropdown dd.prevent",function(e){
     e.stopPropagation();
   });
 
@@ -102,6 +102,18 @@ define(function() {
       var url = valueAccessor();
       var isActive = ko.computed(function() {
         return (urlChange()+"/").indexOf(url+"/") == 0;
+      });
+      ko.applyBindingsToNode(element, { css: {'active': isActive} });
+    },
+    update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+    }
+  }
+
+  ko.bindingHandlers.isExactUrl = {
+    init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+      var url = valueAccessor();
+      var isActive = ko.computed(function() {
+        return urlChange() == url;
       });
       ko.applyBindingsToNode(element, { css: {'active': isActive} });
     },
@@ -212,17 +224,23 @@ define(function() {
   }
 
   // This allows to style SVG in css (including css transition and animations)
+  var cache = {};
   ko.bindingHandlers.svg = {
     init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+      var url = valueAccessor();
       $(element)
         .attr({
           width: "18px", // putting default small value,
           height: "18px" // to avoid cranky blinking
         });
-      $.get(valueAccessor(), function(data) {
-        var img = $(document.adoptNode(data.querySelector('svg')));
-        $(element).replaceWith(img);
-      }, 'xml');
+      if (cache[url]){
+        $(element).replaceWith(cache[url].clone());
+      } else {
+        $.get(url, function(data) {
+          cache[url] = $(document.adoptNode(data.querySelector('svg')));
+          $(element).replaceWith(cache[url].clone());
+        }, 'xml');
+      }
     }
   }
 
@@ -251,9 +269,18 @@ define(function() {
   ko.bindingHandlers.formatTime = {
     update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
       var value = valueAccessor();
-      if (value > 10e5) element.innerText = roundDecimal(value/10e5)+" s"
-      if (value > 10e2) element.innerText = roundDecimal(value/10e2)+" ms"
-      else              element.innerText = roundDecimal(value)     +" µs"
+      if      (value == 0) element.innerText = "0–"
+      else if (value > 60e6) element.innerText = roundDecimal(value/60e6)+" min"
+      else if (value > 10e5) element.innerText = roundDecimal(value/10e5)+" s"
+      else if (value > 10e2) element.innerText = roundDecimal(value/10e2)+" ms"
+      else                   element.innerText = roundDecimal(value)     +" µs"
+    }
+  }
+
+  ko.bindingHandlers.format = {
+    update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+      var __ = valueAccessor(), formatter = __[0], value = __[1];
+      element.innerText = formatter(value);
     }
   }
 
@@ -286,6 +313,20 @@ define(function() {
       callback(newValue);
       subscription.dispose();
     });
+  }
+
+
+  ko.tpl = function(tag, attrs, children){
+    var element = document.createElement(tag);
+    if (typeof children == "string") {
+      element.appendChild(document.createTextNode(children));
+    } else {
+      children.forEach(function(child){
+        if (!!child) element.appendChild(child);
+      });
+    }
+    ko.applyBindingsToNode(element, attrs);
+    return element;
   }
 
 });

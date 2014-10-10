@@ -1,42 +1,44 @@
 /*
  Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
  */
-@import "../../../commons/_base";
+@import "./commons/_base";
 
-.plugin.actors {
-  .list {
-    li {
-      padding-right: 50px;
+.actors {
+  .throughput, .maxMailboxSize, .maxTimeInMailbox {
+    width: 130px;
+    text-align: right;
+  }
+  .deviation-counter {
+    background: @red;
+    color: white;
+    border-radius: 2px;
+    padding: 3px 6px;
+    font-size: 11px;
+  }
+}
+
+.opened.actors {
+  .table-list[data-ordering] td {
+    display: none;
+  }
+  .table-list[data-ordering='throughput'] td.throughput,
+  .table-list[data-ordering='deviation'] td.throughput,
+  .table-list[data-ordering='actorName'] td.throughput {
+    display: table-cell;
+  }
+  .table-list[data-ordering='maxMailboxSize'] td.maxMailboxSize {
+    display: table-cell;
+  }
+  .table-list[data-ordering='maxTimeInMailbox'] td.maxTimeInMailbox {
+    display: table-cell;
+  }
+  .table-list[data-ordering='actorPath'] {
+    td.path {
+      display: table-cell;
     }
-    h2 {
-      overflow: hidden;
-      font-size: 14px;
-      a {
-        .cover();
-        .ellipsis();
-        min-width: 100%;
-        text-align: left;
-        float: right;
-      }
-    }
-    p {
-      font-size: 12px;
-    }
-    .props {
-      .row();
-      span {
-        width: 33.33%
-      }
-    }
-    .deviation-counter {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: @red;
-      color: white;
-      border-radius: 2px;
-      padding: 3px 6px;
-      font-size: 11px;
+    th {
+      display: none;
     }
   }
+
 }

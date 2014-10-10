@@ -1,17 +1,17 @@
-<article class="plugin actors">
+<article class="plugin actors" data-bind="css: { opened: currentActor }">
   <header>
     <h1>Actors</h1>
   </header>
   <!-- ko if: actors().length -->
   <section>
-    <div class="pluginBlock list-col">
+    <div class="pluginBlock list actors-list">
 
       <footer>
         <dl class="dropdown">
           <dt>
             <svg data-bind="svg: '/assets/icons/gear-mini.svg'"></svg>
           </dt>
-          <dd>
+          <dd class="prevent">
             <p>
               <label>Limit</label>
               <select data-bind="options: filters.limitSizeValues, value: filters.limitSize"></select>
@@ -19,8 +19,8 @@
             <p>
               <label>Order direction</label>
               <select data-bind="value: filters.orderByDesc">
-                <option value="true">Descending</option>
-                <option value="false">Ascending</option>
+                <option value="desc">Descending</option>
+                <option value="asc">Ascending</option>
               </select>
             </p>
             <p>
@@ -34,33 +34,43 @@
         <span>Showing 50 of 277</span>
         <p>
           <label>Order by</label>
-          <select data-bind="options: filters.orderByValues, value: filters.orderBy"></select>
+          <select data-bind="options: filters.orderByValues, optionsText: 'text', optionsValue: 'value', value: filters.orderBy"></select>
         </p>
       </footer>
 
-      <div class="subheader">
-        <input type="text" class="fullTextSearch" placeholder="Filter actors" data-bind="value:fullTextSearch, event: {keyup: doSearch}"/>
-        <span class="reset" data-bind="visible: fullTextSearch, click: resetSearch">×</span>
+      <div class="spacer">
+      <table class="table-list" data-bind="attr: { 'data-ordering': filters.orderBy }">
+        <thead>
+          <tr>
+            <th data-bind="click: filters.toggleOrdering('actorName'), attr: {'data-orderDir': filters.isOrdering('actorName')}">Actor Name</th>
+            <td data-bind="click: filters.toggleOrdering('throughput'), attr: {'data-orderDir': filters.isOrdering('throughput')}" class="throughput" title="Throughput">Throughput</td>
+            <td data-bind="click: filters.toggleOrdering('maxMailboxSize'), attr: {'data-orderDir': filters.isOrdering('maxMailboxSize')}" class="maxMailboxSize" title="Max Mailbox Size">Max Mailbox Size</td>
+            <td data-bind="click: filters.toggleOrdering('maxTimeInMailbox'), attr: {'data-orderDir': filters.isOrdering('maxTimeInMailbox')}" class="maxTimeInMailbox" title="Max Time in Mailbox">Max Time in Mailbox</td>
+            <td data-bind="click: filters.toggleOrdering('actorPath'), attr: {'data-orderDir': filters.isOrdering('actorPath')}" class="path" title="Path">Path</td>
+          </tr>
+        </thead>
+        <tbody data-bind="foreach: actors">
+          <tr data-bind="click: $root.openActor, isExactUrl: actorLink">
+            <th data-bind="text: name"></th>
+            <td class="throughput" data-bind="text: throughput"></td>
+            <td class="maxMailboxSize" data-bind="text: maxMailboxSize"></td>
+            <td class="maxTimeInMailbox" data-bind="text: maxTimeInMailbox"></td>
+            <td class="path" data-bind="text: parent"></td>
+          </tr>
+        </tbody>
+      </table>
       </div>
-      <ul class="list" data-bind="foreach: actors">
-        <li>
-          <h2>
-            <a data-bind="text: name, attr: { href: actorLink }"></a>
-          </h2>
-          <span class="deviation-counter right" data-bind="text: deviations, visible: deviations"></span>
-          <p class="path" data-bind="text: parent"></p>
-          <p class="throughput" data-bind="text: throughput"></p>
-          <p class="maxMailboxSize" data-bind="text: maxMailboxSize"></p>
-          <p class="maxTimeInMailbox" data-bind="text: maxTimeInMailbox"></p>
-        </li>
-      </ul>
     </div>
     <!-- ko if: currentActor() -->
     <!-- ko with: currentActor() -->
-    <div class="pluginBlock dark stats actor">
+    <div class="pluginBlock dark item-view actor">
       <div class="subheader">
         <h2 data-bind="text: scope.actorPath">akka://application/user/distributedPubSubMediator/region-5-7-21</h2>
+        <button class="close-view" data-bind="click: $root.closeActor">
+          <svg data-bind="svg: '/assets/icons/close-mini.svg'"/>
+        </button>
       </div>
+      <div class="spacer">
       <div class="table-wrapper">
         <table>
             <thead>
@@ -69,49 +79,39 @@
               </tr>
             </thead>
             <tbody class="listing">
-              <tr><td>Processed</td><td data-bind="text: processedMessagesCount">7</td></tr>
-              <tr><td>Tell</td><td data-bind="text: tellMessagesCount">7</td></tr>
-              <tr><td>Ask</td><td data-bind="text: askMessagesCount">0</td></tr>
+              <tr><td>Processed</td><td class="value" data-bind="text: processedMessagesCount"></td></tr>
+              <tr><td>Tell</td><td class="value" data-bind="text: tellMessagesCount"></td></tr>
+              <tr><td>Ask</td><td class="value" data-bind="text: askMessagesCount"></td></tr>
             </tbody>
             <thead>
               <tr><th colspan="2"><span>Mailbox Information</span></th></tr>
             </thead>
             <tbody class="listing">
-              <tr><td>Max mailbox size</td><td data-bind="text: maxMailboxSize">2</td></tr>
-              <tr><td>Max mailbox size time</td><td xdata-bind="text: $root.formatDate(maxMailboxSizeTimestamp)">18:05:47:881</td></tr>
-              <tr><td>Max time in mailbox</td><td xdata-bind="text: $root.formatUnits(maxTimeInMailbox.unit, maxTimeInMailbox.value)">173 µs</td></tr>
-              <tr><td>Max time in mailbox time</td><td xdata-bind="text: $root.formatDate(maxTimeInMailboxTimestamp)">18:05:47:780</td></tr>
-              <tr><td>Mean mailbox size</td><td xdata-bind="text: $root.shorten(meanMailboxSize)">1.142</td></tr>
-              <tr><td>Mean time in mailbox</td><td xdata-bind="text: $root.formatUnits(meanTimeInMailbox.unit, meanTimeInMailbox.value)">93 µs</td></tr>
+              <tr><td>Max mailbox size</td><td class="value" data-bind="text: maxMailboxSize">2</td></tr>
+              <tr><td>Max mailbox size time</td><td class="value" data-bind="text: $root.formatTime(maxMailboxSizeTimestamp)"></td></tr>
+              <tr><td>Max time in mailbox</td><td class="value" data-bind="text: $root.formatUnits(maxTimeInMailbox.unit, maxTimeInMailbox.value)"></td></tr>
+              <tr><td>Max time in mailbox time</td><td class="value" data-bind="text: $root.formatTime(maxTimeInMailboxTimestamp)"></td></tr>
+              <tr><td>Mean mailbox size</td><td class="value" data-bind="text: $root.shorten(meanMailboxSize)"></td></tr>
+              <tr><td>Mean time in mailbox</td><td class="value" data-bind="text: $root.formatUnits(meanTimeInMailbox.unit, meanTimeInMailbox.value)"></td></tr>
             </tbody>
-            <thead>
+            <thead xdata-bind="if: !$root.hasDeviations()">
               <tr>
                 <th colspan="2">
-                  <div xdata-bind="if: $root.hasDeviations()"></div>
-                  <div xdata-bind="if: !$root.hasDeviations()">
-                    <span>Deviations</span>
-                  </div>
+                  <span>Deviations</span>
                 </th>
               </tr>
             </thead>
             <tbody class="listing">
-              <tr><td>Errors</td><td data-bind="text: errorCount">0</td></tr>
-              <tr><td>Warnings</td><td data-bind="text: warningCount">0</td></tr>
-              <tr><td>Dead letters</td><td data-bind="text: deadletterCount">0</td></tr>
-              <tr><td>Unhandled messages</td><td data-bind="text: unhandledMessageCount">0</td></tr>
+              <tr><td>Errors</td><td class="value" data-bind="text: errorCount"></td></tr>
+              <tr><td>Warnings</td><td class="value" data-bind="text: warningCount"></td></tr>
+              <tr><td>Dead letters</td><td class="value" data-bind="text: deadletterCount"></td></tr>
+              <tr><td>Unhandled messages</td><td class="value" data-bind="text: unhandledMessageCount"></td></tr>
             </tbody>
         </table>
       </div>
+      </div>
     </div>
     <!-- /ko -->
-    <!-- /ko -->
-    <!-- ko ifnot: currentActor() -->
-    <div class="pluginBlock dark">
-        <!-- TODO: Show some stats here? -->
-        <p class="emptyList">
-          Select an actor in the list to the left.
-        </p>
-    </div>
     <!-- /ko -->
   </section>
   <!-- /ko -->

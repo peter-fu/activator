@@ -15,8 +15,9 @@ define([
   return function(callback) {
     modals.show({
       title: "Configuring project...",
-      text: "Activator is adding the Inspector to your project.",
-      body: ko.bindhtml(tpl, configuration)
+      text: "Activator is adding the Inspector to your project. This might take a minute.",
+      body: ko.bindhtml(tpl, configuration),
+      cancel: "close"
     });
     configuration.echoInstalledAndReady(function() {
       modals.hideModal();

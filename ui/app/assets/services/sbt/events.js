@@ -18,7 +18,7 @@ define([
 
   tasks.SbtEvents.successfulBuild
     .each(function() {
-      if (app.settings.rerunOnBuild()){
+      if (app.settings.rerunOnBuild() && tasks.applicationReady()){
         debug && console.log("app.rerunOnBuild is on: Requesting 'run' task");
         tasks.actions.kill();
         tasks.actions.run();

@@ -3,7 +3,7 @@
     <header>
       <h1>Run</h1>
       <div class="buttons">
-        <dl class="dropdown">
+        <dl class="dropdown" data-bind="css: {disabled: sbt.tasks.applicationNotReady}">
           <dt>
             <svg data-bind="svg: '/assets/icons/more.svg'"/>
           </dt>
@@ -13,7 +13,7 @@
             <!-- <a>Options</a> -->
           </dd>
         </dl>
-        <button data-bind="click: mainRunAction">
+        <button data-bind="css: {disabled: sbt.tasks.applicationNotReady}, click: mainRunAction">
           <svg data-bind="svg: '/assets/icons/run.svg'"/>
           <span class="mainAction" data-bind="text: mainRunName"></span>
         </button>
@@ -31,7 +31,7 @@
           <div class="switch" data-bind="switchButton: inspectActivated">
             <div class="inner"></div>
           </div>
-          Activate Inspect
+          Activate inspector
         </li>
         <li>
           <div class="switch" data-bind="switchButton: automaticResetInspect">
@@ -60,22 +60,29 @@
     <footer>
       <!-- ko if: inspectActivated -->
         <span class="expand">Data collected for</span>
-        <span class="cache counter">0&ndash;</span>
+        <span class="cache counter" data-bind="formatTime: stats().data.currentStorageTime * 1000">0&ndash;</span>
       <!-- /ko -->
       <!-- ko ifnot: inspectActivated -->
         <p class="locked"> 
-          Inspect is disabled.
+          The inspector is disabled.
         </p>
       <!-- /ko -->
     </footer>
     <ul class="list links">
-      <li class="system"><a href="#run/system">System</a>
+      <li class="system" data-bind="isActiveUrl: '#run/system'">
+        <a href="#run/system">System</a>
       </li>
-      <li class="actors" data-bind="visible: inspectActivated"><a href="#run/actors">Actors</a>
+      <li class="actors" data-bind="visible: inspectActivated, isActiveUrl: '#run/actors'">
+        <a href="#run/actors">Actors</a>
+        <span class="counter" data-bind="text: stats().data.metadata.actorPathCount, visible: stats().data.metadata.actorPathCount"></span>
       </li>
-      <li class="requests" data-bind="visible: inspectActivated"><a href="#run/requests">Requests</a>
+      <li class="actorIssues" data-bind="visible: inspectActivated, isActiveUrl: '#run/actorIssues'">
+        <a href="#run/actorIssues">Actor Issues</a>
+        <span class="counter error" data-bind="text: stats().data.deviations.deviationCount, visible: stats().data.deviations.deviationCount"></span>
       </li>
-      <li class="deviations" data-bind="visible: inspectActivated"><a href="#run/deviations">Deviations</a>
+      <li class="requests" data-bind="visible: inspectActivated, isActiveUrl: '#run/requests'">
+        <a href="#run/requests">Requests</a>
+        <span class="counter" data-bind="text: stats().data.metadata.playPatternCount, visible: stats().data.metadata.playPatternCount"></span>
       </li>
     </ul>
   </nav>
