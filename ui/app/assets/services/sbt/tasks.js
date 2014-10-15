@@ -557,6 +557,16 @@ define([
     }).length;
   }
 
+  $("body").on("click","button[data-exec]",function() {
+    var command = $(this).attr('data-exec');
+    if (command == "run"){
+      command = runCommand();
+    }
+    if (command) {
+      requestExecution(command);
+    }
+  });
+
   return {
     sbtRequest:              sbtRequest,
     deferredPossibleAutoCompletions: deferredPossibleAutoCompletions,

@@ -46,7 +46,8 @@ define([
       showNanoSeconds:          settings.observable("inspect.deviation.showNanoSeconds",false),
       showActorSystems:         settings.observable("inspect.deviation.showActorSystems",false),
       showTraceInformation:     settings.observable("inspect.deviation.showTraceInformation",false)
-    }
+    },
+    customCommands:     ko.observableArray([])
   }
 
 });

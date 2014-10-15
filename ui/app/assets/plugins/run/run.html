@@ -10,7 +10,9 @@
           <dd>
             <a data-bind="click: sbt.tasks.actions.run">Run</a>
             <a data-bind="click: function(){ sbtExecCommand('start') }">Start</a>
-            <!-- <a>Options</a> -->
+            <!-- ko foreach: customCommands() -->
+            <a data-bind="click: function(){ sbtExecCommand(command) }, text: title"></a>
+            <!-- /ko -->
           </dd>
         </dl>
         <button data-bind="css: {disabled: sbt.tasks.applicationNotReady}, click: mainRunAction">

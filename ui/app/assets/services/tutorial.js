@@ -1,7 +1,11 @@
 /*
  Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
  */
-define(function() {
+define([
+  'services/sbt/app'
+],function(
+  app
+) {
 
   var metaData =      ko.observable(),
       pages =         ko.observableArray([]),
@@ -42,6 +46,17 @@ define(function() {
         _pages = [],
         _table = [];
     $(htmlNodes).filter("div").each(function(i,el){
+      $("button[data-exec]", el).each(function() {
+        var title = $(this).text();
+        var command = $(this).attr('data-exec');
+        if (command == 'run' || command == 'compile' || command == 'start') return;
+        if (!app.customCommands().filter(function(i) { return i.command == command }).length){
+          app.customCommands.push({
+            command: command,
+            title: title
+          })
+        }
+      });
       $("a", el).each(function(j, link) {
         // Open external links in new window.
         if (link.getAttribute('href').indexOf("http://") == 0 && !link.target){
