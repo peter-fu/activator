@@ -1,8 +1,8 @@
 <article class="plugin deviations"  data-bind="css: { opened: currentDeviation() || errorDeviation() }">
+  <!-- ko if: hasDeviations() -->
   <header>
     <h1>Deviations</h1>
   </header>
-  <!-- ko if: hasDeviations() -->
   <section>
   <div class="pluginBlock list deviations-list">
 
@@ -195,14 +195,11 @@
     <!-- /ko -->
 
 
-    <!-- ko ifnot: hasDeviations() -->
-  <section>
-    <div class="pluginBlock dark expand">
-      <p class="emptyList">
-          Everything is running nicely.
-      </p>
-    </div>
-  </section>
+  <!-- ko ifnot: hasDeviations() -->
+  <div class="hint fine">
+    <p>You rock!</p>
+    <span>There has been no actor errors found in your application</span>
+  </div>
   <!-- /ko -->
 
 

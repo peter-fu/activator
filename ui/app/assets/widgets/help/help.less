@@ -36,3 +36,51 @@
     color: @blue;
   }
 }
+
+
+.hint {
+  text-align: center;
+  width: 400px;
+  margin: 100px auto;
+  padding-top: 120px;
+  color: @grey-text;
+  p {
+    font-size: 20px;
+    margin: 0 0 20px 0;
+  }
+  a {
+    color: @grey-text;
+    text-decoration: underline;
+  }
+  button {
+    background: none;
+    border: 1px solid @grey-dkr;
+    color: @grey-text;
+    padding: 3px 10px;
+    border-radius: 3px;
+    &:hover {
+      border: 1px solid @grey-text;
+      background: @grey-text;
+      color: #fff;
+    }
+  }
+  background: url(/assets/icons/screen-help.svg) center top no-repeat;
+  &.no-data {
+    background: url(/assets/icons/screen-no-data.svg) center top no-repeat;
+  }
+  &.code {
+    background: url(/assets/icons/screen-code.svg) center top no-repeat;
+  }
+  &.run {
+    background: url(/assets/icons/screen-run.svg) center top no-repeat;
+  }
+  &.actors {
+    background: url(/assets/icons/screen-actor.svg) center top no-repeat;
+  }
+  &.fine {
+    background: url(/assets/icons/screen-fine.svg) center top no-repeat;
+  }
+  &.test {
+    background: url(/assets/icons/screen-test.svg) center top no-repeat;
+  }
+}
