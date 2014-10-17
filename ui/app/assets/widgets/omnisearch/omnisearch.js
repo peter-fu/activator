@@ -16,24 +16,17 @@ define([
       pendingQueries = ko.observable(0),
       active = ko.observable(false),
       options = ko.observable([]).extend({ notify: 'always' }),
-      selected = ko.observable(0),
+      selected = ko.observable(null),
       empty = ko.computed(function() {
         return searchString().length >= 2 && options().length == 0;
       });
 
-  options.subscribe(function() {
+  options.subscribe(function(opts) {
     pendingQueries(pendingQueries()-1);
-  })
-
-  var t = ko.computed(function() {
-    return options().map(function(a, i) {
-      if (!selected() && i == 0) selected(a);
-      a.isSelected = ko.computed(function() {
-        return a.subtitle == selected().subtitle;
-      });
-      return a;
-    })
-  })
+    if (!selected() || opts.filter(function(a){ return a.subtitle && a.subtitle == selected().subtitle; }).length == 0) {
+      selected(opts[1] || null);
+    }
+  });
 
   searchString.subscribe(function(keywords) {
     // Don't search until at least two characters are entered and search string isn't the same as last
