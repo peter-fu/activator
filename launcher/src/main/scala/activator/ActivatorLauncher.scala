@@ -303,7 +303,10 @@ object ActivatorProxyAuthenticator {
         f.setAccessible(true)
         Some(f.get(null).asInstanceOf[Authenticator])
       } catch {
-        case t: Throwable => None
+        case t: Throwable =>
+          if (ACTIVATOR_PROXY_DEBUG())
+            System.out.println(s"Unable to get original proxy Authenticator ${t.getClass.getName} ${t.getMessage}")
+          None
       }
     }
     originalAuthenticator match {
