@@ -96,14 +96,21 @@ public class ActivatorProperties {
     return file.replaceAll(" ", "%20");
   }
 
-  private static String uriToFilename(String uri) {
+  private static String uriToFilename(String uriString) {
+    String fileString = cleanUriFileString(uriString);
     try {
-      return new java.io.File(new java.net.URI(cleanUriFileString(uri))).getAbsolutePath();
+      java.net.URI uri = new java.net.URI(fileString);
+      // Fix UNC path problem on Windows http://www.tomergabel.com/JavaMishandlesUNCPathsOnWindows.aspx
+      if (uri.getAuthority() != null) {
+        fileString = fileString.replace("file://", "file:/");
+        uri = new java.net.URI(fileString);
+      }
+      return new java.io.File(uri).getAbsolutePath();
     } catch(java.net.URISyntaxException ex) {
       // TODO - fix this error handling to not suck.
-      throw new RuntimeException("BAD URI: " + uri);
+      throw new RuntimeException("BAD URI: " + fileString);
     } catch(java.lang.IllegalArgumentException ex) {
-      throw new RuntimeException("BAD URI: " + uri + "\n", ex);
+      throw new RuntimeException("BAD URI: " + fileString + "\n", ex);
     }
   }
 

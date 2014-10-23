@@ -19,7 +19,7 @@ object ActivatorBuild {
       .setPreference(IndentSpaces, 2)
   }
 
-  val typesafeIvyReleases = Resolver.url("typesafe-ivy-private-releases", new URL("http://private-repo.typesafe.com/typesafe/ivy-releases/"))(Resolver.ivyStylePatterns)
+  val typesafeIvyReleases = Resolver.url("typesafe-ivy-private-releases", new URL("https://private-repo.typesafe.com/typesafe/ivy-releases/"))(Resolver.ivyStylePatterns)
 
   private val fixWhitespace = TaskKey[Seq[File]]("fix-whitespace")
 
@@ -38,8 +38,8 @@ object ActivatorBuild {
       organization := "com.typesafe.activator",
       version <<= version in ThisBuild,
       crossPaths := false,
-      resolvers += "typesafe-mvn-releases" at "http://repo.typesafe.com/typesafe/releases/",
-      resolvers += Resolver.url("typesafe-ivy-releases", new URL("http://repo.typesafe.com/typesafe/releases/"))(Resolver.ivyStylePatterns),
+      resolvers += "typesafe-mvn-releases" at "https://repo.typesafe.com/typesafe/releases/",
+      resolvers += Resolver.url("typesafe-ivy-releases", new URL("https://repo.typesafe.com/typesafe/releases/"))(Resolver.ivyStylePatterns),
       // TODO - Publish to ivy for sbt plugins, maven central otherwise?
       publishTo := Some(typesafeIvyReleases),
       publishMavenStyle := false,
