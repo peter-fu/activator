@@ -37,7 +37,7 @@ class SbtClientActor(val client: SbtClient) extends Actor with ActorLogging {
           client.lookupScopedKey(name) map { scopeds =>
             scopeds map { scoped =>
               log.debug(s"Subscribing to key ${scoped}")
-              client.watch(TaskKey[Seq[String]](scoped)) { (key, result) =>
+              client.rawWatch(TaskKey[Seq[String]](scoped)) { (key, result) =>
                 self ! ValueChanged(key, result)
               }
             }
@@ -73,7 +73,7 @@ class SbtClientActor(val client: SbtClient) extends Actor with ActorLogging {
       case _: BuildStructureChanged =>
         // this should not happen unless during development, hence the error level
         log.error(s"Received event which should have been filtered out by SbtClient ${event}")
-      case changed: ValueChanged[_, _] => forwardOverSocket(changed)
+      case changed: ValueChanged => forwardOverSocket(changed)
       case entry: LogEvent => entry match {
         case e: CoreLogEvent => forwardOverSocket(e)
         case e: TaskLogEvent => forwardOverSocket(e)

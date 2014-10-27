@@ -411,7 +411,7 @@ define([
   var valueChanged = subTypeEventStream("ValueChanged").map(function(message) {
     return {
       key: message.event.key.key.name,
-      value: message.event.value.value
+      value: message.event.value.serialized
     }
   });
 
@@ -430,11 +430,9 @@ define([
   });
   var applicationNotReady = ko.computed(function() { return !applicationReady(); });
   subTypeEventStream('ClientOpened').each(function (msg) {
-    console.log("Client:", msg)
     clientReady(true);
   });
   subTypeEventStream('ClientClosed').each(function (msg) {
-    console.log("Client:", msg);
     app.mainClasses([]);
     clientReady(false);
   });
