@@ -40,6 +40,7 @@ article.logsPlugin {
       .monospace();
       color: @grey;
       line-height: 16px;
+      white-space: pre;
     }
 
     li[data-type='success'] { border-color: #6AB729; color: #D7F3AC; }
@@ -48,10 +49,13 @@ article.logsPlugin {
     li[data-level='warn']   { border-color: #F89614; }
     li[data-level='info']   { border-color: #53cdec; }
     li[data-level='debug']  { border-color: @slate; color: @grey-dkr; }
+
+    li[data-level='debug'] { display: none; }
+    &.show-debug li[data-level='debug'] { display: block; }
   }
 
 
-  .table-wrapper, ul {
+  .table-wrapper, .logs {
     .expand();
     overflow: auto;
   }

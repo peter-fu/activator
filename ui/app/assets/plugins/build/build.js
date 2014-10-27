@@ -20,6 +20,7 @@ define([
 ) {
 
   var subplugin = ko.observable();
+  var currentPlugin;
 
   var sbtExecCommand = function(cmd){
     sbt.tasks.requestExecution(cmd);
@@ -57,10 +58,15 @@ define([
 
   return {
     render: function(url) {
+      subplugin(null);
+      currentPlugin = null;
       layout.renderPlugin(ko.bindhtml(tpl, State))
     },
     route: plugins.route('build', function(url, breadcrumb, plugin) {
-      subplugin(plugin.render());
+      if (currentPlugin != plugin.id){
+        currentPlugin = plugin.id;
+        subplugin(plugin.render());
+      }
       if (url.parameters){
         breadcrumb([['build/', "Build"],['build/'+url.parameters[0], subPlugins[url.parameters[0]]]]);
       }
