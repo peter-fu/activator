@@ -17,13 +17,13 @@
               <!-- ko if: compilationErrors.length -->
               <span class="compilationErrors">
                 <span class="compilationErrorsNumber" data-bind="text: compilationErrors.length"></span>
-                Compilation error(s)
+                compilation error(s)
               </span>
               <!-- /ko -->
               <!-- ko if: testResults.length -->
               <span class="testResults">
                 <span class="testResultsNumber" data-bind="text: testResults.filter(function(t){ return t.outcome == 'passed'}).length"></span>/<span class="testResultsNumber" data-bind="text: testResults.length"></span>
-                Test(s) passed
+                test(s) passed
               </span>
               <!-- /ko -->
             <!-- /ko -->

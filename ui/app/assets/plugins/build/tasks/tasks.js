@@ -97,7 +97,7 @@ define([
       if (url.parameters){
         currentExecution(url.parameters[0])
       } else {
-        currentExecution(0)
+        currentExecution(null);
       }
     },
 
