@@ -3,9 +3,11 @@
  */
 define([
   'commons/websocket',
+  './tasks',
   './app'
 ], function(
   websocket,
+  tasks,
   app
 ) {
 
@@ -15,12 +17,30 @@ define([
   // Websocket Handlers
   var logEvent = websocket.subscribe("type", "sbt");
 
-  logEvent
-    .match(function(m) {
-      return (m.subType == "CoreLogEvent" || m.subType == "TaskLogEvent");
-    })
-    .filter(filterDebug)
-    .each(pushTo(logs));
+  /**
+  Logs, by execution/task
+  */
+  var logs = ko.observableArray([]);
+
+  logEvent.matchOnAttribute("subType", "TaskLogEvent").filter(filterDebug).map(function(m) {
+    if (m.event.taskId) {
+      m.executionId = tasks.findExecutionIdByTaskId(m.event.taskId);
+    }
+    return m;
+  }).each(function(m) {
+    logs.push(m);
+  });
+
+  logEvent.matchOnAttribute("subType", "CoreLogEvent").filter(filterDebug).each(function(m) {
+    logs.push(m);
+  });
+
+  function filterDebug(m) {
+    if (m.event.entry && m.event.entry.level)
+      return m.event.entry.level != "debug" || (app.settings.showLogDebug() || debug);
+    else
+      return true;
+  }
 
   logEvent
     .matchOnAttribute("subType", "BackgroundJobLogEvent")

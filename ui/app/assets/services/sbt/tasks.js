@@ -23,6 +23,14 @@ define([
   var executionsByJobId = {};
   var tasksById = {};
 
+  function findExecutionIdByTaskId(id) {
+    return tasksById[id] && tasksById[id].executionId;
+  }
+
+  function findExecutionByTaskId(id) {
+    return executionsById[id] && executionsById[id].command;
+  }
+
   /**
   Tasks status
   */
@@ -199,12 +207,8 @@ define([
     var task = tasksById[message.event.taskId];
     if (task) {
       // we want succeeded flag up-to-date when finished notifies
-      // task.succeeded(message.event.success);
       task.finished(true);
       delete tasksById[task.taskId];
-      if(executionsById[task.executionId]) {
-        delete executionsById[task.executionId].tasks[task.taskId];
-      }
     }
   });
 
@@ -346,8 +350,6 @@ define([
         new Notification("Build error", "#build/tasks", "build");
       }
     }
-
-    delete executionsById[execution.executionId];
   }
 
   subTypeEventStream("BuildStructureChanged").each(function(message) {
@@ -642,6 +644,8 @@ define([
     cancelExecution:         cancelExecution,
     cancelDeferredExecution: cancelDeferredExecution,
     executions:              executions,
+    findExecutionByTaskId:   findExecutionByTaskId,
+    findExecutionIdByTaskId: findExecutionIdByTaskId,
     workingTasks:            workingTasks,
     pendingTasks:            pendingTasks,
     testResults:             testResults,

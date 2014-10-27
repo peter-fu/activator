@@ -3,6 +3,26 @@
  */
 define(function() {
 
+  var cache = {};
+  function route(plugin, url, breadcrumb) {
+    if (plugin.route && url.parameters[1]){
+      var p = {
+        path: url,
+        plugin: url.parameters[0],
+        pluginUrl: "plugins/" + url.parameters[0] + "/" + url.parameters[0],
+        parameters: url.parameters.slice(1)
+      }
+      plugin.route(p, breadcrumb);
+    } else if (plugin.route){
+      var p = {
+        path: url,
+        plugin: url.parameters[0],
+        pluginUrl: "plugins/" + url.parameters[0] + "/" + url.parameters[0]
+      }
+      plugin.route(p, breadcrumb);
+    }
+  }
+
   return {
     route: function(root, callback, def) {
       return function(url, breadcrumb) {
@@ -11,24 +31,17 @@ define(function() {
           window.location.hash = def;
           return;
         }
-        require(['plugins/'+root+'/'+url.parameters[0]+'/'+url.parameters[0]], function(plugin) {
+        pPath = 'plugins/'+root+'/'+url.parameters[0]+'/'+url.parameters[0];
+        if (cache[pPath]){
+          callback(url, breadcrumb, cache[pPath]);
+          route(cache[pPath], url, breadcrumb)
+          return;
+        }
+        require([pPath], function(plugin) {
+          plugin.id = pPath;
+          cache[pPath] = plugin;
           callback(url, breadcrumb, plugin)
-          if (plugin.route && url.parameters[1]){
-            var p = {
-              path: url,
-              plugin: url.parameters[0],
-              pluginUrl: "plugins/" + url.parameters[0] + "/" + url.parameters[0],
-              parameters: url.parameters.slice(1)
-            }
-            plugin.route(p, breadcrumb);
-          } else if (plugin.route){
-            var p = {
-              path: url,
-              plugin: url.parameters[0],
-              pluginUrl: "plugins/" + url.parameters[0] + "/" + url.parameters[0]
-            }
-            plugin.route(p, breadcrumb);
-          }
+          route(plugin, url, breadcrumb)
         }, function() {
           console.log("404 TODO") // TODO
         });
