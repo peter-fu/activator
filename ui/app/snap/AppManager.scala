@@ -15,6 +15,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import play.api.libs.json.JsObject
 import java.util.concurrent.atomic.AtomicInteger
+import scala.util.{ Failure, Success }
 import scala.util.control.NonFatal
 import activator._
 
@@ -316,14 +317,13 @@ object AppManager {
             if (keys.isEmpty) {
               namePromise.tryFailure(new RuntimeException("Project has no 'name' setting"))
             } else {
-              val sub = client.watch(SettingKey[String](keys.head)) { (key, result) =>
-                result match {
-                  case TaskSuccess(value) if value.value.isDefined => namePromise.trySuccess(value.stringValue)
-                  case TaskSuccess(_) => namePromise.tryFailure(new RuntimeException("Project has no value for name setting"))
-                  case f: TaskFailure[_, _] => namePromise.tryFailure(new RuntimeException(s"Failed to get name setting from project ${f.message}"))
+              val sub =
+                client.watch[String](SettingKey[String](keys.head)) { (key, result) =>
+                  result match {
+                    case Success(name) => namePromise.trySuccess(name)
+                    case Failure(e) => namePromise.tryFailure(new RuntimeException(s"Failed to get name setting from project: ${e.toString}"))
+                  }
                 }
-              }
-
               nameFuture.onComplete { _ => sub.cancel() }
             }
           }
