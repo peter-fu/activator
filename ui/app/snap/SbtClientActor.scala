@@ -41,7 +41,7 @@ class SbtClientActor(val client: SbtClient) extends Actor with ActorLogging {
           client.lookupScopedKey(name) map { scopeds =>
             scopeds map { scoped =>
               log.debug(s"Subscribing to key ${scoped}")
-              client.watch(TaskKey[Seq[String]](scoped)) { (key, result) =>
+              client.rawWatch(TaskKey[Seq[String]](scoped)) { (key, result) =>
                 self ! ValueChanged(key, result)
               }
             }
@@ -75,8 +75,9 @@ class SbtClientActor(val client: SbtClient) extends Actor with ActorLogging {
       case _: ClosedEvent =>
         self ! PoisonPill
       case _: BuildStructureChanged =>
+        // this should not happen unless during development, hence the error level
         log.error(s"Received event which should have been filtered out by SbtClient ${event}")
-      case changed: ValueChanged[_, _] => forwardOverSocket(changed)
+      case changed: ValueChanged => forwardOverSocket(changed)
       case entry: LogEvent => entry match {
         case e: CoreLogEvent => forwardOverSocket(e)
         case e: TaskLogEvent => forwardOverSocket(e)
@@ -109,13 +110,13 @@ class SbtClientActor(val client: SbtClient) extends Actor with ActorLogging {
           log.debug("possible autocompletions for " + pac.command.get)
           client.possibleAutocompletions(pac.command.get, detailLevel = pac.detailLevel.getOrElse(0))
         case rsd: RequestSelfDestruct =>
-          log.info("Asking sbt to exit")
+          log.debug("Asking sbt to exit")
           client.requestSelfDestruct()
           Future.successful(None)
       }
     } recover {
       case NonFatal(e) =>
-        log.error(s"request to sbt failed ${e.getMessage}", e)
+        log.debug(s"request to sbt failed ${e.getMessage}")
         produceLog(LogMessage.DEBUG, s"request $req failed: ${e.getClass.getName}: ${e.getMessage}")
         Status.Failure(e)
     } map { result =>

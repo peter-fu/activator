@@ -5,6 +5,7 @@
 
 .tutorial {
   .page {
+    background: #fff;
     .typo();
     padding: 0 14px;
   }
@@ -56,5 +57,28 @@
   padding: 20px;
   a {
     color: @blue;
+  }
+}
+
+.tutorial button[data-exec] {
+  padding: 0 10px 0 2px;
+  border-radius: 10px;
+  background: @blue;
+  color: white;
+  font-weight: bold;
+  display: inline-block;
+  height: 19px;
+  &:before {
+    border-radius: 10px;
+    display: inline-block;
+    content: ">";
+    height: 15px;
+    width: 15px;
+    background: white;
+    color: @blue;
+    margin-right: 4px;
+  }
+  &:hover {
+    background: @blue-text;
   }
 }

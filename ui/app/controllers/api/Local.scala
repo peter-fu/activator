@@ -252,6 +252,6 @@ object Local extends Controller {
    * In case of such a directory File.listFiles will return null and since we have to use Java 6
    * we cannot use java.nio.* to handle this in a nicer way.
    */
-  private def canAccess(file: File): Boolean = file.listFiles != null
+  private def canAccess(file: File): Boolean = if (!file.isDirectory) true else file.listFiles != null
 
 }

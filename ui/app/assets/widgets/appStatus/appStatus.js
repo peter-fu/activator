@@ -11,7 +11,7 @@ define([
   tpl
 ) {
 
-  var off = ko.observable(false);
+  var off = sbt.tasks.applicationNotReady;
 
   var onoff = new StatusButton({
     labels: {

@@ -4,6 +4,7 @@
 @import "../../commons/_base";
 
 .pluginBlock {
+  background: #fff;
   .column();
   .subheader {
     .row();
@@ -15,8 +16,16 @@
       font-size: 12px;
       border: none;
       color: @grey-dkr;
+      .row();
       label, dl, button, select {
-        margin: 0 0 0 5px;
+        .align-self(center);
+        margin: 0 0 0 8px;
+        height: 18px;
+        line-height: 18px;
+        border-radius: 2px;
+      }
+      button {
+        padding: 0 6px;
       }
     }
     button {
@@ -46,6 +55,9 @@
     h3, .table-wrapper th {
       background: @grey-dkr;
       color: @slate-dkr;
+    }
+    td.value {
+      color: @white-dkr;
     }
   }
 

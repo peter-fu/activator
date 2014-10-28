@@ -108,6 +108,19 @@ define([
   }
 
   /**
+   * Reset inspect data
+   */
+  function resetInspect() {
+    debug && console.log("Reset Inspect datas")
+    websocket.send({
+      "commands": [{
+        "module": "lifecycle",
+        "command": "reset"
+      }]
+    });
+  }
+
+  /**
   Run command
   */
   var runCommand = ko.computed(function() {
@@ -398,7 +411,7 @@ define([
   var valueChanged = subTypeEventStream("ValueChanged").map(function(message) {
     var valueOrNull = null;
     if (message.event.value.success)
-      valueOrNull = message.event.value.value;
+      valueOrNull = message.event.value.serialized;
     debug && console.log("ValueChanged for ", message.event.key.key.name, valueOrNull, message.event);
     return {
       key: message.event.key.key.name,
@@ -417,7 +430,7 @@ define([
     // TODO this is broken, if there are two projects with main classes we'll just
     // pick "last one wins," we need to separately track main classes per-project.
     app.mainClasses(discovered); // All main classes
-    if (!app.currentMainClass() && discovered[0]){
+    if (discovered[0] && ((app.currentMainClass() && discovered.indexOf(app.currentMainClass()) < 0) || !app.currentMainClass())) {
       app.currentMainClass(discovered[0]); // Selected main class, if empty
     }
   });
@@ -480,12 +493,17 @@ define([
   });
 
   // Application ready
-  var applicationReady = ko.observable(false);
+  var clientReady = ko.observable(false);
+  var applicationReady = ko.computed(function() {
+    return app.mainClasses().length && clientReady();
+  });
+  var applicationNotReady = ko.computed(function() { return !applicationReady(); });
   subTypeEventStream('ClientOpened').each(function (msg) {
-    applicationReady(true);
+    clientReady(true);
   });
   subTypeEventStream('ClientClosed').each(function (msg) {
-    applicationReady(false);
+    app.mainClasses([]);
+    clientReady(false);
   });
 
   // Killing an execution
@@ -606,6 +624,16 @@ define([
     }).length;
   }
 
+  $("body").on("click","button[data-exec]",function() {
+    var command = $(this).attr('data-exec');
+    if (command == "run"){
+      command = runCommand();
+    }
+    if (command) {
+      requestExecution(command);
+    }
+  });
+
   return {
     sbtRequest:              sbtRequest,
     deferredPossibleAutoCompletions: deferredPossibleAutoCompletions,
@@ -623,7 +651,9 @@ define([
     notifications:           notifications,
     SbtEvents:               SbtEvents,
     kill:                    killExecution,
+    clientReady:             clientReady,
     applicationReady:        applicationReady,
+    applicationNotReady:     applicationNotReady,
     active: {
       turnedOn:     "",
       compiling:    "",
@@ -637,11 +667,15 @@ define([
         requestExecution("compile");
       },
       run:          function() {
+        if (app.settings.automaticResetInspect()){
+          resetInspect();
+        }
         return requestExecution(runCommand());
       },
       test:         function() {
         requestExecution("test");
-      }
+      },
+      resetInspect: resetInspect
     }
   }
 

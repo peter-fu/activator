@@ -74,16 +74,16 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
     val now = System.currentTimeMillis()
     val delta = now - startedConnecting
 
-    log.info(s"Opened connection to sbt for ${location} AppActor=${self.path.name} after ${delta}ms (${delta.toDouble / 1000.0}s)")
+    log.debug(s"Opened connection to sbt for ${location} AppActor=${self.path.name} after ${delta}ms (${delta.toDouble / 1000.0}s)")
     produceLog(LogMessage.DEBUG, s"Opened sbt at '${location}'")
     self ! OpenClient(client)
   }, { (reconnecting, message) =>
     startedConnecting = System.currentTimeMillis()
-    log.info(s"Connection to sbt closed (reconnecting=${reconnecting}: ${message})")
+    log.debug(s"Connection to sbt closed (reconnecting=${reconnecting}: ${message})")
     produceLog(LogMessage.INFO, s"Lost or failed sbt connection: ${message}")
     self ! CloseClient
     if (!reconnecting) {
-      log.info(s"SbtConnector gave up and isn't reconnecting; killing AppActor ${self.path.name}")
+      log.debug(s"SbtConnector gave up and isn't reconnecting; killing AppActor ${self.path.name}")
       self ! PoisonPill
     }
   })
@@ -98,10 +98,10 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
   override def receive = {
     case Terminated(ref) =>
       if (ref == socket) {
-        log.info(s"socket terminated, killing AppActor ${self.path.name}")
+        log.debug(s"socket terminated, killing AppActor ${self.path.name}")
         self ! PoisonPill
       } else if (ref == projectWatcher) {
-        log.info(s"projectWatcher terminated, killing AppActor ${self.path.name}")
+        log.debug(s"projectWatcher terminated, killing AppActor ${self.path.name}")
         self ! PoisonPill
       } else if (Some(ref) == sbtClientActor) {
         log.debug(s"clientActor terminated, dropping it")
@@ -116,7 +116,7 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
       case CreateWebSocket =>
         log.debug("got CreateWebSocket")
         if (webSocketCreated) {
-          log.warning("Attempt to create websocket for app a second time {}", config.id)
+          log.debug("Attempt to create websocket for app a second time {}", config.id)
           sender ! WebSocketAlreadyUsed
         } else {
           webSocketCreated = true
@@ -130,7 +130,7 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
         }
       case InitialTimeoutExpired =>
         if (!webSocketCreated) {
-          log.warning("Nobody every connected to {}, killing it", config.id)
+          log.debug("Nobody ever connected to {}, killing it", config.id)
           self ! PoisonPill
         }
       case UpdateSourceFiles(files) =>

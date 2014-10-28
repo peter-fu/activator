@@ -58,12 +58,14 @@ define([
     sbtExecCommand: sbtExecCommand,
     inspects: inspects,
     sbt: sbt,
+    stats: connection.stats,
     rerunOnBuild: sbt.app.settings.rerunOnBuild,
     automaticResetInspect: sbt.app.settings.automaticResetInspect,
     showLogDebug: sbt.app.settings.showLogDebug,
     inspectActivated: sbt.app.inspectActivated,
     mainRunAction: mainRunAction,
-    mainRunName: mainRunName
+    mainRunName: mainRunName,
+    customCommands: sbt.app.customCommands
   }
 
   // Subplugins titles

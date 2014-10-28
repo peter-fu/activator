@@ -5,7 +5,7 @@
     <li class="heading" data-bind="text: heading"></li>
     <!-- /ko -->
     <!-- ko if: $data.type -->
-    <li class="option" data-bind="click: function(opt){ $root.exec(opt); }, css: {selected: isSelected}">
+    <li class="option" data-bind="click: function(opt){ $root.exec(opt); }, css: {selected: $root.selected() && subtitle == $root.selected().subtitle }">
       <span class="title" data-bind="text: title || execute"></span>
     </li>
     <!-- /ko -->

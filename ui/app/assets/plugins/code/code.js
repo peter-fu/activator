@@ -16,8 +16,8 @@ define([
   "widgets/editor/editor",
   "commons/settings",
   "css!./code",
-  "css!widgets/intro/intro",
-  "css!widgets/buttons/button"
+  "css!widgets/buttons/button",
+  "css!widgets/help/help"
 ], function(
   fs,
   sbt,

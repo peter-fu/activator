@@ -92,7 +92,7 @@ class HomePageActor extends WebSocketActor[JsValue] with ActorLogging {
     case OpenExistingApplication(msg) => openExistingApplication(msg.location)
     case CreateNewApplication(msg) => createNewApplication(msg.location, msg.templateId, msg.projectName)
     case _ =>
-      log.error(s"HomeActor: received unknown msg: $json")
+      log.debug(s"HomeActor: received unknown msg: $json")
       produce(BadRequest(json.toString, Seq("Could not parse JSON for request")))
   }
 
@@ -154,7 +154,7 @@ class HomePageActor extends WebSocketActor[JsValue] with ActorLogging {
         RedirectToApplication(id)
       // TODO - Return with form and flash errors?
       case ProcessFailure(errors) =>
-        log.warning(s"HomeActor: Failed to find application: ${errors map (_.msg) mkString "\n\t"}")
+        log.debug(s"HomeActor: Failed to find application: ${errors map (_.msg) mkString "\n\t"}")
         BadRequest(request, errors map (_.msg))
     } recover {
       case NonFatal(e) => BadRequest(request, Seq(s"${e.getClass.getName}: ${e.getMessage}"))

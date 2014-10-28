@@ -15,6 +15,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import play.api.libs.json.JsObject
 import java.util.concurrent.atomic.AtomicInteger
+import scala.util.{ Failure, Success }
 import scala.util.control.NonFatal
 import activator._
 
@@ -53,7 +54,7 @@ class AppCacheActor extends Actor with ActorLogging {
             }
           } catch {
             case e: Exception =>
-              log.warning("cleaning up app {} which failed to load due to '{}'", socketId, e.getMessage)
+              log.debug("cleaning up app {} which failed to load due to '{}'", socketId, e.getMessage)
               false
           }
         } else {
@@ -160,7 +161,7 @@ class KeepAliveActor extends Actor with ActorLogging {
         keepAlives -= ref
         serial += 1
       } else {
-        log.warning("Ref was not in the keep alives set {}", ref)
+        log.debug("Ref was not in the keep alives set {}", ref)
       }
       if (keepAlives.isEmpty) {
         log.debug("scheduling CheckForExit")
@@ -316,14 +317,13 @@ object AppManager {
             if (keys.isEmpty) {
               namePromise.tryFailure(new RuntimeException("Project has no 'name' setting"))
             } else {
-              val sub = client.watch(SettingKey[String](keys.head)) { (key, result) =>
-                result match {
-                  case TaskSuccess(value) if value.value.isDefined => namePromise.trySuccess(value.stringValue)
-                  case TaskSuccess(_) => namePromise.tryFailure(new RuntimeException("Project has no value for name setting"))
-                  case f: TaskFailure[_, _] => namePromise.tryFailure(new RuntimeException(s"Failed to get name setting from project ${f.message}"))
+              val sub =
+                client.watch[String](SettingKey[String](keys.head)) { (key, result) =>
+                  result match {
+                    case Success(name) => namePromise.trySuccess(name)
+                    case Failure(e) => namePromise.tryFailure(new RuntimeException(s"Failed to get name setting from project: ${e.toString}"))
+                  }
                 }
-              }
-
               nameFuture.onComplete { _ => sub.cancel() }
             }
           }
@@ -331,7 +331,7 @@ object AppManager {
         def onError(reconnecting: Boolean, message: String): Unit = {
           if (reconnecting) {
             // error for reason other than close
-            Logger.error(s"Error connecting to sbt: ${message}")
+            Logger.debug(s"Error connecting to sbt: ${message}")
           } else {
             // this happens on our explicit close, but should be a no-op if we've already
             // gotten the project name
@@ -352,15 +352,15 @@ object AppManager {
 
       val resultFuture: Future[ProcessResult[AppConfig]] =
         nameFuture map { name =>
-          Logger.info("got project name from sbt: '" + name + "'")
+          Logger.debug("got project name from sbt: '" + name + "'")
           name
         } recover {
           case NonFatal(e) =>
             // here we need to just recover, because if you can't open the app
             // you can't work on it to fix it
-            Logger.info(s"error getting name from sbt: ${e.getClass.getName}: ${e.getMessage}")
+            Logger.debug(s"error getting name from sbt: ${e.getClass.getName}: ${e.getMessage}")
             val name = location.getName
-            Logger.info("using file basename as app name: " + name)
+            Logger.debug("using file basename as app name: " + name)
             name
         } flatMap { name =>
           RootConfig.rewriteUser { root =>
@@ -389,7 +389,7 @@ object AppManager {
   }
 
   def onApplicationStop() = {
-    Logger.warn("AppManager onApplicationStop is disabled pending some refactoring so it works with FakeApplication in tests")
+    Logger.debug("AppManager onApplicationStop is disabled pending some refactoring so it works with FakeApplication in tests")
     //Logger.debug("Killing app cache actor onApplicationStop")
     //appCache ! PoisonPill
   }

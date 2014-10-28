@@ -3,7 +3,7 @@
     <header>
       <h1>Build</h1>
       <div class="buttons">
-        <dl class="dropdown">
+        <dl class="dropdown" data-bind="css: {disabled: sbt.tasks.applicationNotReady}">
           <dt>
             <svg data-bind="svg: '/assets/icons/more.svg'"/>
           </dt>
@@ -13,7 +13,7 @@
             <a data-bind="click: function(){ sbtExecCommand('clean') }">Clean</a>
           </dd>
         </dl>
-        <button data-bind="click: mainBuildAction">
+        <button data-bind="css: {disabled: sbt.tasks.applicationNotReady}, click: mainBuildAction">
           <svg data-bind="svg: '/assets/icons/build.svg'"/>
           <span class="mainAction" data-bind="text: mainBuildName"></span>
         </button>
