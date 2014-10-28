@@ -33,7 +33,7 @@ define([
       if(ers.length){
         window.location.hash = "#code"+ fs.relative(ers[0].position.sourcePath)+":"+ers[0].position.line;
       }
-    },
+    }
   }
 
 

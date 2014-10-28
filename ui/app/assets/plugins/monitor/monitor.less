@@ -1,0 +1,44 @@
+/*
+ Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
+ */
+@import "../../commons/_base";
+
+.monitor .suite {
+  li {
+    border-bottom: 1px solid #ddd;
+    font-size: 15px;
+  }
+  label {
+    display: block;
+    padding: 15px;
+  }
+  input {
+    margin-right: 10px;
+  }
+
+  [data-status="passed"] {
+    color: green;
+  }
+  [data-status="failed"] {
+    color: #fff;
+    background: @red;
+  }
+  [data-status="pending"] {
+    color: gray;
+  }
+  .disabled {
+    background: @clear;
+    color: @grey;
+  }
+  .error {
+    opacity: .7;
+    padding: 10px 15px;
+    margin-top: -15px;
+    .monospace();
+  }
+
+}
+
+.monitor .plugin section {
+  background: #fff;
+}

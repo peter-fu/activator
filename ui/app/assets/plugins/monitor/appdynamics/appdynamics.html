@@ -1,0 +1,82 @@
+<article class="plugin">
+    <header>
+        <img src="/public/images/monitor/appdynamics.png">
+    </header>
+    <section class="warning">
+        Third-party monitoring disables the local inspector.
+    </section>
+    <section class="activate appdynamics">
+        <div class="col">
+            <!-- ko if: needProvision -->
+            <h2>Get the AppDynamics Agent</h2>
+            <p>The AppDynamics Agent collects performance metrics from your application. This data is sent to AppDynamics for analysis.</p>
+            <h3>Enter your AppDynamics account information</h3>
+            <p>In order to download the AppDynamics agent you need to supply your AppDynamics credentials (this information will not be stored).  If you do not have an AppDynamics account, you can <a href="https://portal.appdynamics.com/account/signup/signupForm/" target="_blank">signup here</a></p>
+            <form>
+                <p>
+                    <label>Email:</label><input type="text" id="username" data-bind="value: username, valueUpdate: 'input', css: {error: usernameInvalid() }"/>
+                </p>
+                <p>
+                    <label>Password:</label><input type="password" id="password" data-bind="value: password, valueUpdate: 'input', css: {error: passwordInvalid() }"/>
+                </p>
+                <p>
+                    <label></label>
+                    <button class="button big install" data-bind="click: provisionAppDynamics, disable: usernameInvalid() || passwordInvalid() ">Download</button>
+                    <span class="downloading" data-bind="text: downloading"></span>
+                </p>
+            </form>
+            <!-- /ko -->
+            <!-- ko ifnot: needProvision-->
+            <h2>The AppDynamics tracing agent has been downloaded!</h2>
+            <p>You may enable AppDynamics from the <a href="#run">run</a> tab.</p>
+            <p><button class="button" data-bind="click: deprovisionAppDynamics">Re-download agent</button></p>
+            <!-- /ko -->
+        </div>
+
+        <div class="col">
+            <h2>Agent configuration</h2>
+            <p>You must provide some configuration information in order to use AppDynamics.  Items in red are not properly configured.</p>
+            <form>
+                <p>
+                    <label for="appDynamicsHostName">Collector host name:</label><input type="text" id="appDynamicsHostName" data-bind="value: hostName, valueUpdate: 'input', css: {error: hostNameInvalid() }"/>
+                </p>
+                <p>
+                    <label for="appDynamicsPort">Collector port:</label><input type="text" id="appDynamicsPort" data-bind="value: port, valueUpdate: 'input', css: {error: portInvalid() }"/>
+                </p>
+                <p>
+                    <label for="appDynamicsSslEnabled">SSL enabled:</label><input type="checkbox" id="appDynamicsSslEnabled" data-bind="checked: sslEnabled"/>
+                </p>
+                <p>
+                    <label for="appDynamicsAccountName">Account name:</label><input type="text" id="appDynamicsAccountName" data-bind="value: accountName, valueUpdate: 'input', css: {error: accountNameInvalid() }"/>
+                </p>
+                <p>
+                    <label for="appDynamicsAccessKey">Access key:</label><input type="text" id="appDynamicsAccessKey" data-bind="value: accessKey, valueUpdate: 'input', css: {error: accessKeyInvalid() }"/>
+                </p>
+                <p>
+                    <label for="appDynamicsNodeName">Node name:</label><input type="text" id="appDynamicsNodeName" data-bind="value: nodeName, valueUpdate: 'input', css: {error: nodeNameInvalid() }"/>
+                </p>
+                <p>
+                    <label for="appDynamicsTierName">Tier name:</label><input type="text" id="appDynamicsTierName" data-bind="value: tierName, valueUpdate: 'input',  css: {error: tierNameInvalid() }"/>
+                </p>
+            </form>
+            <!-- ko if: changed -->
+            <!-- ko if: canSave -->
+            <label></label><button class="button" data-bind="click: saveConfig">Save config</button>
+            <button data-bind="click: cancelSave">Cancel</button>
+            <!-- /ko -->
+            <!-- ko ifnot: canSave -->
+            <p class="err">
+                AppDynamics is not properly configured.  Please correct items marked in red.
+            </p>
+            <!-- /ko -->
+            <!-- /ko -->
+            <!-- ko ifnot: changed -->
+            <div>
+                <h2>AppDynamics is properly configured!</h2>
+                <p>You can change these values at any time.</p>
+            </div>
+            <!-- /ko -->
+        </div>
+    </section>
+    <section class="error" data-bind="visible: error, text: error"></section>
+</article>
