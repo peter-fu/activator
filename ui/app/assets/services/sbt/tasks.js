@@ -2,13 +2,11 @@
  Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
  */
 define([
-  'main/router',
   'commons/websocket',
   'commons/stream',
   'commons/types',
   './app'
 ], function(
-  router,
   websocket,
   Stream,
   types,
@@ -35,38 +33,20 @@ define([
   Tasks status
   */
   var workingTasks = {
-    compile: ko.observable(false),
-    run: ko.observable(false),
-    test: ko.observable(false)
+    compile:  ko.observable(false),
+    run:      ko.observable(false),
+    test:     ko.observable(false)
   }
   var pendingTasks = {
-    compile: ko.observable(false),
-    run: ko.observable(false),
-    test: ko.observable(false)
-  }
-
-  /**
-  Error counters
-  */
-  var errorCounters = {
-    build: ko.observable(0),
-    code:  ko.observable(0),
-    run:   ko.observable(0),
-    test:  ko.observable(0)
+    compile:  ko.observable(false),
+    run:      ko.observable(false),
+    test:     ko.observable(false)
   }
 
   /**
   Stream Events
   */
-  var SbtEvents = {
-    successfulBuild:  Stream()
-  }
-
-  /**
-  Notification list
-  TODO: Improve what we display, and where it links
-  */
-  var notifications = ko.observableArray([]);
+  var SbtEvents = Stream();
 
   /**
   Observable as an event dispatcher for complete tasks
@@ -75,7 +55,7 @@ define([
   taskCompleteEvent.extend({ notify: 'always' });
   function taskComplete(command, succeded){
     taskCompleteEvent({
-      command: command,
+      command:  command,
       succeded: succeded
     });
   }
@@ -235,7 +215,7 @@ define([
       execution.jobIds.push(jobId);
     } else if (message.event.name == "BackgroundJobFinished") {
       debug && console.log("BackgroundJobFinished: ", message);
-      removeExecution(execution, true);
+      postExecutionProcess(execution, true);
       delete executionsByJobId[jobId];
     }
   });
@@ -295,11 +275,11 @@ define([
     var execution = executionsById[id];
 
     if (execution && !execution.jobIds().length) {
-      removeExecution(execution, succeeded);
+      postExecutionProcess(execution, succeeded);
     }
   }
 
-  function removeExecution(execution, succeeded) {
+  function postExecutionProcess(execution, succeeded) {
 
     // we want succeeded flag up-to-date when finished notifies
     execution.succeeded(succeeded);
@@ -311,7 +291,6 @@ define([
       case "compile":
         workingTasks.compile(workingTasks.compile()-1);
         pendingTasks.compile(pendingTasks.compile()-1);
-        if (succeeded) SbtEvents.successfulBuild.push(succeeded);
         break;
       case "run":
         workingTasks.run(workingTasks.run()-1);
@@ -326,30 +305,9 @@ define([
     compilationErrors(execution.compilationErrors);
     if (execution.testResults.length) {
       testResults(execution.testResults);
-      errorCounters.test(execution.testResults.filter(function(t) {
-        return t.outcome == "failed";
-      }).length);
     }
 
-    // Update counters
-    errorCounters.code(execution.compilationErrors.filter(function(m) {
-      return m.severity == "Error";
-    }).length);
-    // Failed tasks
-    if (!succeeded){
-      if ((execution.commandId == "run") && router.current().id != "run"){
-        errorCounters.run(errorCounters.run()+1);
-        new Notification("Runtime error", "#run/", "run");
-      } else if (execution.commandId == "test"){
-        // Only show notification if we don't see the result
-        if (router.current().id != "test") {
-          new Notification("Test failed", "#test/results", "test");
-        }
-      } else if (router.current().id != "build"){
-        errorCounters.build(errorCounters.build()+1);
-        new Notification("Build error", "#build/tasks", "build");
-      }
-    }
+    SbtEvents.push(execution);
   }
 
   subTypeEventStream("BuildStructureChanged").each(function(message) {
@@ -497,7 +455,7 @@ define([
   // Application ready
   var clientReady = ko.observable(false);
   var applicationReady = ko.computed(function() {
-    return app.mainClasses().length && clientReady();
+    return app.mainClasses() && app.mainClasses().length && clientReady();
   });
   var applicationNotReady = ko.computed(function() { return !applicationReady(); });
   subTypeEventStream('ClientOpened').each(function (msg) {
@@ -538,6 +496,7 @@ define([
     self.succeeded   = ko.observable();
     self.stopping    = ko.observable(false);
     self.jobIds      = ko.observableArray([]);
+    self.logs        = ko.observableArray([]);
 
     if (self.commandId == "runMain" || self.commandId == "echo" || self.commandId == "backgroundRunMain" || self.commandId == "backgroundRun") self.commandId = "run";
 
@@ -545,7 +504,6 @@ define([
     self.tasks          = {};
     self.compilationErrors  = [];
     self.testResults    = [];
-    self.notifications  = [];
 
     // Statuses
     self.running = ko.computed(function() {
@@ -588,16 +546,6 @@ define([
     self.succeeded = ko.observable(0); // 0 here stands for no Date() object
   }
 
-  /**
-  Notification object constructor
-  */
-  function Notification(text, link, type) {
-    this.text = text;
-    this.link = link;
-    this.type = type;
-    this.read = ko.observable(false);
-    notifications.unshift(this);
-  }
 
   /**
   Kill tasks by command name (or all pending tasks)
@@ -641,8 +589,6 @@ define([
     deferredPossibleAutoCompletions: deferredPossibleAutoCompletions,
     requestExecution:        requestExecution,
     requestDeferredExecution: requestDeferredExecution,
-    cancelExecution:         cancelExecution,
-    cancelDeferredExecution: cancelDeferredExecution,
     executions:              executions,
     findExecutionByTaskId:   findExecutionByTaskId,
     findExecutionIdByTaskId: findExecutionIdByTaskId,
@@ -650,9 +596,7 @@ define([
     pendingTasks:            pendingTasks,
     testResults:             testResults,
     compilationErrors:       compilationErrors,
-    errorCounters:           errorCounters,
     taskCompleteEvent:       taskCompleteEvent,
-    notifications:           notifications,
     SbtEvents:               SbtEvents,
     kill:                    killExecution,
     clientReady:             clientReady,

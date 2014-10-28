@@ -12,6 +12,22 @@
           <tr data-bind="css: { active: running, error: error, stopping: stopping, openned: $root.currentExecution() == executionId }, click: $root.openLogs">
             <td class="status" data-bind="click: $root.rerunTask"><span></span></td>
             <td class="command" data-bind="text: command"></td>
+            <td class="data">
+            <!-- ko if: finished() -->
+              <!-- ko if: compilationErrors.length -->
+              <span class="compilationErrors">
+                <span class="compilationErrorsNumber" data-bind="text: compilationErrors.length"></span>
+                Compilation error(s)
+              </span>
+              <!-- /ko -->
+              <!-- ko if: testResults.length -->
+              <span class="testResults">
+                <span class="testResultsNumber" data-bind="text: testResults.filter(function(t){ return t.outcome == 'passed'}).length"></span>/<span class="testResultsNumber" data-bind="text: testResults.length"></span>
+                Test(s) passed
+              </span>
+              <!-- /ko -->
+            <!-- /ko -->
+            </td>
             <td class="time" data-bind="text: time"></td>
           </tr>
         </table>
