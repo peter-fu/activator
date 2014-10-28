@@ -20,8 +20,6 @@ define([
   /**
   Logs, by execution/task
   */
-  var logs = ko.observableArray([]);
-
   logEvent.matchOnAttribute("subType", "TaskLogEvent").filter(filterDebug).map(function(m) {
     if (m.event.taskId) {
       m.executionId = tasks.findExecutionIdByTaskId(m.event.taskId);

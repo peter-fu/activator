@@ -13,14 +13,14 @@ define([
 ){
 
   var State = {
-    notifications: sbt.tasks.notifications,
+    notifications: sbt.events.notifications,
     notificationsReadCount: ko.computed(function() {
-      return sbt.tasks.notifications().filter(function(n) {
+      return sbt.events.notifications().filter(function(n) {
         return !n.read();
       }).length;
     }),
     markAsRead: function() {
-      sbt.tasks.notifications().forEach(function(n) {
+      sbt.events.notifications().forEach(function(n) {
         n.read(true);
       });
     }

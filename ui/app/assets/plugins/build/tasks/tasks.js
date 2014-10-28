@@ -22,7 +22,7 @@ define([
   var currentExecution = ko.observable();
 
   function scrollToBottom() {
-    $("ul.logs")[0].scrollTop = 9e9;
+    $(".logs")[0].scrollTop = 9e9;
     State.memoLogsScroll('stick');
   }
 
@@ -68,7 +68,7 @@ define([
     },
 
     render: function(){
-      sbt.tasks.errorCounters.build(0);
+      sbt.events.errorCounters.build(0);
       return ko.bindhtml(tpl, State)
     }
   }
