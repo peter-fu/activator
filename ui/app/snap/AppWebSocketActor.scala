@@ -1,21 +1,30 @@
 package snap
 
-import akka.actor.{ ActorRef, Status, ActorLogging }
+import akka.actor._
+import akka.event.LoggingAdapter
 import akka.pattern._
 import console.ClientController.HandleRequest
+import play.api.Play
 import play.api.libs.json.Json._
 import play.api.libs.json._
+import snap.AppDynamicsRequest.{ Deprovisioned, AvailableResponse, Provisioned }
 import snap.JsonHelper._
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.reflect.ClassTag
+import scala.util.{ Failure, Success }
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 class AppWebSocketActor extends WebSocketActor[JsValue] with ActorLogging {
   implicit val timeout = WebSocketActor.timeout
 
+  lazy val appDynamicsConfig = AppDynamics.fromConfig(Play.current.configuration.underlying)
+  lazy val appDynamicsActor: ActorRef = context.actorOf(monitor.AppDynamics.props(appDynamicsConfig, defaultContext))
+
   override def onMessage(json: JsValue): Unit = {
     json match {
-      case InspectRequest(m) => for (cActor <- consoleActor) cActor ! HandleRequest(json)
       case WebSocketActor.Ping(ping) => produce(WebSocketActor.Pong(ping.cookie))
       case SbtRequest(req) => handleSbtPayload(req.json)
+      case InspectRequest(m) => for (cActor <- consoleActor) cActor ! HandleRequest(json)
+      case AppDynamicsRequest(m) => handleAppDynamicsRequest(m)
       case _ => log.debug("unhandled message on web socket: {}", json)
     }
   }
@@ -85,6 +94,34 @@ class AppWebSocketActor extends WebSocketActor[JsValue] with ActorLogging {
     }
   }
 
+  def handleAppDynamicsRequest(in: AppDynamicsRequest.Request): Unit = {
+    in match {
+      case x @ AppDynamicsRequest.Provision(username, password) =>
+        val sink = context.actorOf(Props(new ProvisioningSink(ProvisioningSinkState(), log => new ProvisioningSinkUnderlying(log, produce))))
+        askAppDynamics[monitor.AppDynamics.Provisioned](monitor.AppDynamics.Provision(sink, username, password), x,
+          f => s"Failed to provision AppDynamics: ${f.getMessage}")(_ => produce(toJson(x.response)))
+      case x @ AppDynamicsRequest.Available =>
+        askAppDynamics[monitor.AppDynamics.AvailableResponse](monitor.AppDynamics.Available, x,
+          f => s"Failed AppDynamics availability check: ${f.getMessage}")(r => produce(toJson(x.response(r.result))))
+      case x @ AppDynamicsRequest.Deprovision =>
+        askAppDynamics[monitor.AppDynamics.Deprovisioned.type](monitor.AppDynamics.Deprovision, x,
+          f => s"Failed AppDynamics deprovisioning: ${f.getMessage}")(r => produce(toJson(x.response)))
+    }
+  }
+
+  def askAppDynamics[T <: monitor.AppDynamics.Response](msg: monitor.AppDynamics.Request, omsg: AppDynamicsRequest.Request, onFailure: Throwable => String)(body: T => Unit)(implicit tag: ClassTag[T]): Unit = {
+    appDynamicsActor.ask(msg).mapTo[monitor.AppDynamics.Response].onComplete {
+      case Success(r: monitor.AppDynamics.ErrorResponse) => produce(toJson(omsg.error(r.message)))
+      case Success(`tag`(r)) => body(r)
+      case Success(r: monitor.AppDynamics.Response) =>
+        log.error(s"Unexpected response from request: $msg got: $r expected: ${tag.toString()}")
+      case Failure(f) =>
+        val errorMsg = onFailure(f)
+        log.error(f, errorMsg)
+        produce(toJson(omsg.error(errorMsg)))
+    }
+  }
+
   override def subReceive: Receive = {
     case NotifyWebSocket(json) =>
       log.debug("sending message on web socket: {}", json)
@@ -137,4 +174,63 @@ object SbtPayload {
     (__ \ "type").read[String] and
     (__ \ "command").read[String] and
     (__ \ "executionId").readNullable[Long])(SbtPayload.apply _)
+}
+
+case class ProvisioningSinkState(progress: Int = 0)
+
+class ProvisioningSinkUnderlying(log: LoggingAdapter, produce: JsValue => Unit) {
+  import monitor.Provisioning._
+  def onMessage(state: ProvisioningSinkState, status: Status, sender: ActorRef, self: ActorRef, context: ActorContext): ProvisioningSinkState = status match {
+    case x @ Authenticating(diagnostics, url) =>
+      produce(toJson(x))
+      state
+    case x @ ProvisioningError(message, exception) =>
+      println("**** PROVISIONING ERROR: " + toJson(x))
+      produce(toJson(x))
+      log.error(exception, message)
+      context stop self
+      state
+    case x @ Downloading(url) =>
+      produce(toJson(x))
+      state
+    case x @ Progress(Left(value)) =>
+      val p = state.progress
+      if ((value / 100000) != p) {
+        produce(toJson(x))
+        state.copy(progress = value / 100000)
+      } else state
+    case x @ Progress(Right(value)) =>
+      val p = state.progress
+      if ((value.toInt / 10) != p) {
+        produce(toJson(x))
+        state.copy(progress = value.toInt / 10)
+      } else state
+    case x @ DownloadComplete(url) =>
+      produce(toJson(x))
+      state
+    case x @ Validating =>
+      produce(toJson(x))
+      state
+    case x @ Extracting =>
+      produce(toJson(x))
+      state
+    case x @ Complete =>
+      produce(toJson(x))
+      context stop self
+      state
+  }
+}
+
+class ProvisioningSink(init: ProvisioningSinkState,
+  underlyingBuilder: LoggingAdapter => ProvisioningSinkUnderlying) extends Actor with ActorLogging {
+  val underlying = underlyingBuilder(log)
+  import monitor.Provisioning._
+  override def receive: Receive = {
+    var state = init
+
+    {
+      case x: Status =>
+        state = underlying.onMessage(state, x, sender, self, context)
+    }
+  }
 }

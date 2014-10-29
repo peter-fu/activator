@@ -3,100 +3,214 @@
  */
 define([
   "main/plugins",
+  "services/monitor/appdynamicscontroller",
   "text!./appdynamics.html",
-  "css!./appdynamics",
-  "css!widgets/modules/modules",
-  "css!widgets/lists/logs"
+  "css!./appdynamics"
 ], function(
   plugins,
+  appdynamics,
   tpl
   ) {
 
-  var needProvision = ko.observable();
-  var deprovisionAppDynamics = ko.observable();
-  var hostName = ko.observable();
-  var port = ko.observable();
-  var sslEnabled = ko.observable();
-  var accountName = ko.observable();
-  var accessKey = ko.observable();
-  var nodeName = ko.observable();
-  var tierName = ko.observable();
+    var downloadDescriptions = {
+      'authenticating': 'Authenticating',
+      'downloadComplete': 'Download Complete',
+      'validating': 'Validating',
+      'extracting': 'Extracting',
+      'complete': 'Complete'
+    };
 
-  var nodeNameInvalid = ko.observable();
-  var tierNameInvalid = ko.observable();
-  var hostNameInvalid = ko.observable();
-  var portInvalid = ko.observable();
-  var accountNameInvalid = ko.observable();
-  var accessKeyInvalid = ko.observable();
+    var available = appdynamics.available;
+    var needProvision = ko.computed(function () {
+      return !available();
+    });
 
-  var changed = ko.observable();
-  var canSave = ko.observable();
-  var shouldSave = ko.observable();
+    var downloadEnabled = ko.observable(false);
+    var downloadClass = ko.computed(function() {
+      var enabled = (available() == false);
+      downloadEnabled(enabled);
+      return enabled ? "enabled" : "disabled";
+    });
 
-  var error = ko.observable();
-  /*
-  var canSave = ko.computed(function () {
-    return checkCanSave(hostName(),port(),sslEnabled(),accountName(),accessKey(),nodeName(),tierName());
-  });
+    var provisionDownloadSubscription = ko.observable(null);
 
-  var changed = ko.computed(function () {
-    return checkIsDifferent(hostName(),port(),sslEnabled(),accountName(),accessKey(),nodeName(),tierName());
-  });
+    var username = ko.observable();
+    var password = ko.observable();
+    var usernameInvalid = ko.observable();
+    var passwordInvalid = ko.observable();
+    var downloading = ko.observable("");
 
-  var shouldSave = ko.computed(function () {
-    return (canSave() && changed());
-  });
+    var hostName = ko.observable(appdynamics.hostName());
+    var port = ko.observable(appdynamics.port());
+    var sslEnabled = ko.observable(appdynamics.sslEnabled());
+    var accountName = ko.observable(appdynamics.accountName());
+    var accessKey = ko.observable(appdynamics.accessKey());
+    var nodeName = ko.observable(appdynamics.nodeName());
+    var tierName = ko.observable(appdynamics.tierName());
 
-  var nodeNameInvalid = ko.computed(function() {
-    return !appdynamics.validNodeName.test(nodeName());
-  });
+    var hostNameInvalid = ko.computed(function() {
+      return !appdynamics.validHostName.test(hostName());
+    });
 
-  var tierNameInvalid = ko.computed(function() {
-    return !appdynamics.validTierName.test(tierName());
-  });
+    var portInvalid = ko.computed(function () {
+      return (!appdynamics.validPort.test(port()));
+    });
 
-  var hostNameInvalid = ko.computed(function() {
-    return !appdynamics.validHostName.test(hostName());
-  });
+    var nodeNameInvalid = ko.computed(function() {
+      return !appdynamics.validNodeName.test(nodeName());
+    });
 
-  var portInvalid = ko.computed(function () {
-    return (!appdynamics.validPort.test(port()));
-  });
+    var tierNameInvalid = ko.computed(function() {
+      return !appdynamics.validTierName.test(tierName());
+    });
 
-  var accountNameInvalid = ko.computed(function () {
-    return (!appdynamics.validAccountName.test(accountName()));
-  });
+    var accountNameInvalid = ko.computed(function () {
+      return (!appdynamics.validAccountName.test(accountName()));
+    });
 
-  var accessKeyInvalid = ko.computed(function () {
-    return (!appdynamics.validAccessKey.test(accessKey()));
-  });
-  */
+    var accessKeyInvalid = ko.computed(function () {
+      return (!appdynamics.validAccessKey.test(accessKey()));
+    });
 
-  var State = {
-    needProvision: needProvision,
-    deprovisionAppDynamics: deprovisionAppDynamics,
-    hostName: hostName,
-    port: port,
-    sslEnabled: sslEnabled,
-    accountName: accountName,
-    accessKey: accessKey,
-    nodeName: nodeName,
-    tierName: tierName,
-    nodeNameInvalid: nodeNameInvalid,
-    tierNameInvalid: tierNameInvalid,
-    hostNameInvalid: hostNameInvalid,
-    portInvalid: portInvalid,
-    accountNameInvalid: accountNameInvalid,
-    accessKeyInvalid: accessKeyInvalid,
-    canSave: canSave,
-    changed: changed,
-    shouldSave: shouldSave,
-    error: error
-  };
+    var provisionAppDynamics = function() {
+      if (downloadEnabled()) {
+        error("");
+        provisionDownloadSubscription(appdynamics.setObserveProvision(provisionObserver));
+        appdynamics.provision(username(), password());
+      } else {
+        error("Download is not enabled. Please clear out any warnings and retry.")
+      }
+    };
 
-  return {
-    render: function(){
-      return ko.bindhtml(tpl, State);
+    var deprovisionAppDynamics = function () {
+      if (!downloadEnabled()) {
+        error("");
+        appdynamics.deprovision();
+      }
+    };
+
+    var provisionObserver = function(event) {
+      var message = "";
+      if (event.type == "provisioningError") {
+        message = "Error provisioning AppDynamics: " + event.message;
+        downloading(message);
+        error(message);
+      } else if (event.type == "downloading") {
+        downloading("Downloading: " + event.url);
+      } else if (event.type == "progress") {
+        message = "";
+        if (event.percent) {
+          message = event.percent.toFixed(0) + "%";
+        } else {
+          message = event.bytes + " bytes";
+        }
+        downloading("Progress: " + message);
+      } else {
+        message = downloadDescriptions[event.type] || "UNKNOWN STATE";
+        downloading(message);
+      }
+
+      if (event.type == "complete" || event.type == "provisioningError") {
+        appdynamics.unsetObserveProvision();
+        provisionDownloadSubscription(null); // TODO: is this observable needed anymore?
+      }
+    };
+
+    var canSave = ko.computed(function () {
+      return (appdynamics.validNodeName.test(nodeName()) &&
+        appdynamics.validTierName.test(tierName()) &&
+        appdynamics.validHostName.test(hostName()) &&
+        appdynamics.validPort.test(port()) &&
+        appdynamics.validAccountName.test(accountName()) &&
+        appdynamics.validAccessKey.test(accessKey()));
+    });
+
+    var changed = ko.computed(function () {
+      return (appdynamics.nodeName() != nodeName() ||
+        appdynamics.tierName() != tierName() ||
+        appdynamics.sslEnabled() != sslEnabled() ||
+        appdynamics.hostName() != hostName() ||
+        appdynamics.port() != port() ||
+        appdynamics.accountName() != accountName() ||
+        appdynamics.accessKey() != accessKey());
+    });
+
+    var shouldSave = ko.computed(function () {
+      return (canSave() && changed());
+    });
+
+    var saveConfig = function() {
+      if (appdynamics.validNodeName.test(nodeName()) &&
+        appdynamics.validTierName.test(tierName()) &&
+        appdynamics.validHostName.test(hostName()) &&
+        appdynamics.validPort.test(port()) &&
+        appdynamics.validAccountName.test(accountName()) &&
+        appdynamics.validAccessKey.test(accessKey())) {
+        appdynamics.nodeName(nodeName());
+        appdynamics.tierName(tierName());
+        appdynamics.hostName(hostName());
+        appdynamics.port(port());
+        appdynamics.accountName(accountName());
+        appdynamics.accessKey(accessKey());
+        appdynamics.sslEnabled(sslEnabled());
+        return true;
+      } else {
+        return false;
+      }
+    };
+
+    var cancelSave = function() {
+      hostName((function () {
+        var hn = appdynamics.hostName();
+        if (hn == "") {
+          return ".saas.appdynamics.com";
+        } else {
+          return hn;
+        }
+      })());
+      port(appdynamics.port());
+      sslEnabled(appdynamics.sslEnabled());
+      accountName(appdynamics.accountName());
+      accessKey(appdynamics.accessKey());
+      nodeName(appdynamics.nodeName());
+      tierName(appdynamics.tierName());
+    };
+
+    var error = ko.observable();
+
+    var State = {
+      needProvision: needProvision,
+      provisionAppDynamics: provisionAppDynamics,
+      username: username,
+      password: password,
+      usernameInvalid: usernameInvalid,
+      passwordInvalid: passwordInvalid,
+      downloading: downloading,
+      deprovisionAppDynamics: deprovisionAppDynamics,
+      hostName: hostName,
+      port: port,
+      sslEnabled: sslEnabled,
+      accountName: accountName,
+      accessKey: accessKey,
+      nodeName: nodeName,
+      tierName: tierName,
+      nodeNameInvalid: nodeNameInvalid,
+      tierNameInvalid: tierNameInvalid,
+      hostNameInvalid: hostNameInvalid,
+      portInvalid: portInvalid,
+      accountNameInvalid: accountNameInvalid,
+      accessKeyInvalid: accessKeyInvalid,
+      canSave: canSave,
+      changed: changed,
+      shouldSave: shouldSave,
+      saveConfig: saveConfig,
+      cancelSave: cancelSave,
+      error: error
+    };
+
+    return {
+      render: function () {
+        return ko.bindhtml(tpl, State);
+      }
     }
-  }
-});
+ });

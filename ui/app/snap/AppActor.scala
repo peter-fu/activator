@@ -37,6 +37,8 @@ case class SbtClientResponse(serialId: Long, result: Any, command: Option[String
 case object WebSocketAlreadyUsed extends AppReply
 case class WebSocketCreatedReply(created: Boolean) extends AppReply
 
+class InstrumentationRequestException(message: String) extends Exception(message)
+
 class AppActor(val config: AppConfig) extends Actor with ActorLogging {
 
   AppManager.registerKeepAlive(self)

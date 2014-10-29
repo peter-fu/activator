@@ -2,7 +2,7 @@
  * Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
  */
 require.config({
-  baseUrl:  '/public',
+  baseUrl:  '/public'
 });
 
 var vendors = [

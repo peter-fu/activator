@@ -1,44 +1,124 @@
 /*
- Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
- */
-@import "../../commons/_base";
+Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
+*/
 
-.monitor .suite {
-  li {
-    border-bottom: 1px solid #ddd;
-    font-size: 15px;
+@import '../../commons/_base.less';
+
+#wrapper .monitor {
+  .clear-after();
+  header, section, aside {
+    padding: 20px;
   }
-  label {
-    display: block;
-    padding: 15px;
+  header {
+    background: #fff;
+    color: @grey-text;
+  }
+  p {
+    margin: 1em 0;
+  }
+  a {
+    color: @blue-text;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  .button {
+    background: @blue;
+    color: white;
+  }
+  .install {
+    width: 150px;
   }
   input {
-    margin-right: 10px;
+    font: inherit;
+    padding: 2px 8px;
+    border: 2px solid @white-dkr;
+    border-radius: 3px;
+  }
+  .change {
+    float: right;
+    color: @grey;
+    margin: 10px;
+  }
+  .choose, .provider header {
+    background: @slate !important;
+    color: #fff;
+    clear: both;
+  }
+  aside {
+    background: @blue;
+    color: #fff;
+    width: 300px;
+    float: right;
+    margin: 20px -20px 20px 20px;
+    .button {
+      display: block;
+      width: 150px;
+      text-align: center;
+      margin: 10px auto 0;
+      .title();
+      font-size: 12px;
+      background: #fff;
+      color: @blue;
+    }
   }
 
-  [data-status="passed"] {
-    color: green;
-  }
-  [data-status="failed"] {
-    color: #fff;
-    background: @red;
-  }
-  [data-status="pending"] {
-    color: gray;
-  }
-  .disabled {
-    background: @clear;
+  h4 {
+    text-align: center;
+    text-transform: uppercase;
     color: @grey;
+    margin: 10px;
+  }
+  #providers {
+    text-align: center;
+    a {
+      margin: 10px;
+      display: inline-block;
+      background: @slate-ltr;
+      border: 1px solid @grey-dkr;
+      border-radius: 3px;
+      line-height: 100px;
+      text-align: center;
+      height: 100px;
+      width: 170px;
+      position: relative;
+      &:hover, &.active {
+        background: fadeout(@blue, 80%);
+        border-color: @blue;
+      }
+    }
+    img {
+      margin: auto;
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+    }
+  }
+
+  .warning {
+    background: @yellow;
+    color: @yellow-text;
+    clear: both;
   }
   .error {
-    opacity: .7;
-    padding: 10px 15px;
-    margin-top: -15px;
-    .monospace();
+    background: @red-ltr;
+    color: @red-text;
+    clear: both;
   }
 
-}
-
-.monitor .plugin section {
-  background: #fff;
+  .activate {
+    .clear-after();
+  }
+  .col {
+    width: 50%;
+    float: left;
+    &:first-child {
+      padding-right: 10px;
+    }
+    &:last-child {
+      padding-left: 10px;
+    }
+  }
 }

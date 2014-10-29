@@ -59,15 +59,11 @@ object Dependencies {
   val luceneAnalyzerCommon = "org.apache.lucene" % "lucene-analyzers-common" % luceneVersion
   val luceneQueryParser = "org.apache.lucene" % "lucene-queryparser" % luceneVersion
 
-
   // WebJars for the Activator UI
   val requirejs        = "org.webjars" % "requirejs" % "2.1.11"
   val jquery           = "org.webjars" % "jquery" % "2.0.3"
   val knockout         = "org.webjars" % "knockout" % "3.0.0"
   val ace              = "org.webjars" % "ace" % "1.1.3"
-  // TODO : Use again when there is are new webjars versions to be pulled in
-  //val requireCss       = "org.webjars" % "require-css" % "0.0.7-3"
-  //val requireText      = "org.webjars" % "requirejs-text" % "2.0.10"
   val keymage          = "org.webjars" % "keymage" % "1.0.1"
 
   // Analyzers used by Inspect
