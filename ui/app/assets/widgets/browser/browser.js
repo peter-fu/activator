@@ -14,6 +14,7 @@ define([
     this.name          = node.name;
     this.location      = node.location;
     this.humanLocation = node.humanLocation;
+    this.url           = fs.relative(node.humanLocation);
     this.isOpened      = false;
     this.isDirectory   = false;
     this.isHidden      = (node.name[0] == ".");
@@ -47,6 +48,7 @@ define([
     this.name          = node.name;
     this.location      = node.location;
     this.humanLocation = node.humanLocation;
+    this.url           = fs.relative(node.humanLocation);
     this.isRoot        = node.isRoot;
     this.isDirectory   = node.isDirectory;
     this.children      = ko.observableArray([]);
