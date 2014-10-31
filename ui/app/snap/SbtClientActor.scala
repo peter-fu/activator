@@ -33,7 +33,11 @@ class SbtClientActor(val client: SbtClient) extends Actor with ActorLogging {
       Seq("discoveredMainClasses",
         "mainClasses",
         "mainClass",
-        "libraryDependencies") map { name =>
+        "libraryDependencies",
+        "echo:echoTraceSupported",
+        "echo:echoPlayVersionReport",
+        "echo:echoAkkaVersionReport",
+        "echo:echoTracePlayVersion") map { name =>
           client.lookupScopedKey(name) map { scopeds =>
             scopeds map { scoped =>
               log.debug(s"Subscribing to key ${scoped}")
