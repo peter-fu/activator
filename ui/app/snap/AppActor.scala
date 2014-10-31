@@ -51,7 +51,7 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
 
   // TODO configName/humanReadableName are cut-and-pasted into AppManager, fix
   val connector = SbtConnector(configName = "activator", humanReadableName = "Activator", location)
-  val socket = context.actorOf(Props[AppWebSocketActor], name = "socket")
+  val socket = context.actorOf(Props(new AppWebSocketActor(config)), name = "socket")
   val projectWatcher = context.actorOf(Props(new ProjectWatcher(location, newSourcesSocket = socket, appActor = self)),
     name = "projectWatcher")
   var sbtClientActor: Option[ActorRef] = None

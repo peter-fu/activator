@@ -3,7 +3,7 @@
  */
 define([
   "main/plugins",
-  "services/monitor/appdynamicscontroller",
+  "services/monitoring/appdynamicscontroller",
   "text!./appdynamics.html",
   "css!./appdynamics"
 ], function(
@@ -78,7 +78,7 @@ define([
         provisionDownloadSubscription(appdynamics.setObserveProvision(provisionObserver));
         appdynamics.provision(username(), password());
       } else {
-        error("Download is not enabled. Please clear out any warnings and retry.")
+        error("Download is not enabled. Please fix all warnings and retry.");
       }
     };
 
@@ -93,10 +93,9 @@ define([
       var message = "";
       if (event.type == "provisioningError") {
         message = "Error provisioning AppDynamics: " + event.message;
-        downloading(message);
         error(message);
       } else if (event.type == "downloading") {
-        downloading("Downloading: " + event.url);
+        message = "Downloading: " + event.url;
       } else if (event.type == "progress") {
         message = "";
         if (event.percent) {
@@ -104,11 +103,11 @@ define([
         } else {
           message = event.bytes + " bytes";
         }
-        downloading("Progress: " + message);
       } else {
         message = downloadDescriptions[event.type] || "UNKNOWN STATE";
-        downloading(message);
       }
+
+      downloading(message);
 
       if (event.type == "complete" || event.type == "provisioningError") {
         appdynamics.unsetObserveProvision();

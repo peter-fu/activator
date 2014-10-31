@@ -4,9 +4,9 @@
 define([
   'main/plugins',
   'services/sbt',
-  'text!./monitor.html',
+  'text!./monitoring.html',
   "widgets/layout/layout",
-  'css!./monitor',
+  'css!./monitoring',
   "css!widgets/buttons/switch",
   "css!widgets/menu/menu",
   "css!widgets/buttons/select",
@@ -35,11 +35,11 @@ define([
     render: function(url){
       layout.renderPlugin(ko.bindhtml(tpl, State));
     },
-    route: plugins.route('monitor', function(url, breadcrumb, plugin) {
+    route: plugins.route('monitoring', function(url, breadcrumb, plugin) {
       if (url.parameters){
-        breadcrumb([['monitor/', "Monitor"],['monitor/'+url.parameters[0], subPlugins[url.parameters[0]]]]);
+        breadcrumb([['monitoring/', "Monitor"],['monitoring/'+url.parameters[0], subPlugins[url.parameters[0]]]]);
       }
       provider(plugin.render());
-    }, "monitor")
+    }, "monitoring")
   }
 });

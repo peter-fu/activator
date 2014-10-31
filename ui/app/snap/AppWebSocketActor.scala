@@ -13,11 +13,12 @@ import scala.reflect.ClassTag
 import scala.util.{ Failure, Success }
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-class AppWebSocketActor extends WebSocketActor[JsValue] with ActorLogging {
+class AppWebSocketActor(val config: AppConfig) extends WebSocketActor[JsValue] with ActorLogging {
   implicit val timeout = WebSocketActor.timeout
 
   lazy val appDynamicsConfig = AppDynamics.fromConfig(Play.current.configuration.underlying)
   lazy val appDynamicsActor: ActorRef = context.actorOf(monitor.AppDynamics.props(appDynamicsConfig, defaultContext))
+  lazy val newRelicActor: ActorRef = context.actorOf(monitor.NewRelic.props(NewRelic.fromConfig(Play.current.configuration.underlying), defaultContext))
 
   override def onMessage(json: JsValue): Unit = {
     json match {
@@ -25,6 +26,7 @@ class AppWebSocketActor extends WebSocketActor[JsValue] with ActorLogging {
       case SbtRequest(req) => handleSbtPayload(req.json)
       case InspectRequest(m) => for (cActor <- consoleActor) cActor ! HandleRequest(json)
       case AppDynamicsRequest(m) => handleAppDynamicsRequest(m)
+      case NewRelicRequest(m) => handleNewRelicRequest(m)
       case _ => log.debug("unhandled message on web socket: {}", json)
     }
   }
@@ -122,6 +124,44 @@ class AppWebSocketActor extends WebSocketActor[JsValue] with ActorLogging {
     }
   }
 
+  def handleNewRelicRequest(in: NewRelicRequest.Request): Unit = {
+    import monitor.NewRelic._
+    in match {
+      case x @ NewRelicRequest.Provision =>
+        val sink = context.actorOf(Props(new ProvisioningSink(ProvisioningSinkState(), log => new ProvisioningSinkUnderlying(log, produce))))
+        askNewRelic[monitor.NewRelic.Provisioned](monitor.NewRelic.Provision(sink), x,
+          f => s"Failed to provision New Relic: ${f.getMessage}")(_ => produce(toJson(x.response)))
+      case x @ NewRelicRequest.Available =>
+        askNewRelic[monitor.NewRelic.AvailableResponse](monitor.NewRelic.Available, x,
+          f => s"Failed New Relic availability check: ${f.getMessage}")(r => produce(toJson(x.response(r.result))))
+      case x @ NewRelicRequest.EnableProject(key, name) =>
+        askNewRelic[ProjectEnabled](monitor.NewRelic.EnableProject(config.location, key, name), x,
+          f => s"Failed to enable project[${config.location}] for New Relic: ${f.getMessage}")(_ => produce(toJson(x.response)))
+      case x @ NewRelicRequest.IsProjectEnabled =>
+        askNewRelic[IsProjectEnabledResult](monitor.NewRelic.IsProjectEnabled(config.location), x,
+          f => s"Failed check if New Relic enabled: ${f.getMessage}")(r => produce(toJson(x.response(r.result))))
+      case x @ NewRelicRequest.Deprovision =>
+        askNewRelic[monitor.NewRelic.Deprovisioned.type](monitor.NewRelic.Deprovision, x,
+          f => s"Failed New Relic deprovisioning: ${f.getMessage}")(r => produce(toJson(x.response)))
+      case x @ NewRelicRequest.IsSupportedJavaVersion =>
+        askNewRelic[IsSupportedJavaVersionResult](monitor.NewRelic.IsSupportedJavaVersion, x,
+          f => s"Failed checking for supported Java version: ${f.getMessage}")(r => produce(toJson(x.response(r.result, r.version))))
+    }
+  }
+
+  def askNewRelic[T <: monitor.NewRelic.Response](msg: monitor.NewRelic.Request, originalMsg: NewRelicRequest.Request, onFailure: Throwable => String)(body: T => Unit)(implicit tag: ClassTag[T]): Unit = {
+    newRelicActor.ask(msg).mapTo[monitor.NewRelic.Response].onComplete {
+      case Success(r: monitor.NewRelic.ErrorResponse) => produce(toJson(originalMsg.error(r.message)))
+      case Success(`tag`(r)) => body(r)
+      case Success(r: monitor.NewRelic.Response) =>
+        log.error(s"Unexpected response from request: $msg got: $r expected: ${tag.toString()}")
+      case Failure(f) =>
+        val errorMsg = onFailure(f)
+        log.error(f, errorMsg)
+        produce(toJson(originalMsg.error(errorMsg)))
+    }
+  }
+
   override def subReceive: Receive = {
     case NotifyWebSocket(json) =>
       log.debug("sending message on web socket: {}", json)
@@ -185,7 +225,6 @@ class ProvisioningSinkUnderlying(log: LoggingAdapter, produce: JsValue => Unit) 
       produce(toJson(x))
       state
     case x @ ProvisioningError(message, exception) =>
-      println("**** PROVISIONING ERROR: " + toJson(x))
       produce(toJson(x))
       log.error(exception, message)
       context stop self

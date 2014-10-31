@@ -49,8 +49,6 @@ define(['commons/utils',
   var stream = websocket.subscribe('type', 'monitoring');
 
   stream.map(function (response) {
-    console.log(">> monitoring RESP: ", response);
-
     if (response.subtype === 'appdynamics') {
       if (response.event.type === "availableResponse") {
         debug && console.log("setting available to: ",response.event.result);

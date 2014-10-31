@@ -199,7 +199,6 @@ abstract class WebSocketActor[MessageType](implicit frameFormatter: FrameFormatt
   protected def subReceive: Receive = Map.empty
 
   protected def onMessage(message: MessageType): Unit = {
-
   }
 
   protected final def produce(message: MessageType): Unit = {
