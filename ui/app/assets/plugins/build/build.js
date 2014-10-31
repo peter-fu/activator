@@ -64,7 +64,6 @@ define([
     },
     route: plugins.route('build', function(url, breadcrumb, plugin) {
       sbt.events.unreadBuildErrors().forEach(function(execution){
-        console.log(">>>>>>>>>>>>>>>>>>>>>>", execution.read())
         execution.read(true);
       });
       if (currentPlugin != plugin.id){
