@@ -4,14 +4,13 @@ Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
 
 @import '../../commons/_base.less';
 
-#wrapper .monitor {
-  .clear-after();
-  header, section, aside {
-    padding: 20px;
-  }
+#wrapper.monitor article {
   header {
+    height: 60px;
+  }
+  .activate {
     background: #fff;
-    color: @grey-text;
+    padding: 10px
   }
   p {
     margin: 1em 0;
@@ -28,6 +27,13 @@ Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
   }
   .install {
     width: 150px;
+  }
+  label {
+    display: inline-block;
+    width: 50%;
+  }
+  input[type=text], input[type=password]{
+    width: 50%;
   }
   input {
     font: inherit;
@@ -100,7 +106,7 @@ Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
   .warning {
     background: @yellow;
     color: @yellow-text;
-    clear: both;
+    padding: 10px;
   }
   .error {
     background: @red-ltr;
