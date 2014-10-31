@@ -216,7 +216,7 @@ class ActivatorLauncher extends AppMain {
 
     if (needCheck) {
       downloadLatestVersion() map { version =>
-        if (version != APP_VERSION()) {
+        if (version != APP_VERSION() || !file.exists()) {
           try {
             if (file.getParentFile() != null)
               file.getParentFile().mkdirs()
