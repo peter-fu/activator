@@ -1,10 +1,8 @@
-<dl id="notifications" class="dropdown">
-  <dt data-bind="click: markAsRead">
-    <span class="counter" data-bind="text: notificationsReadCount"></span>
+<dl id="notifications" data-bind="click: function(){ console.log('uo') }, attr: { 'data-status': appStatus().id }">
+  <dt>
+    <span class="counter"></span>
     <div class="sticker success"><span class="shape"><svg class="mark" data-bind="svg: '/assets/icons/success-mini.svg'"/></span></div>
     <div class="sticker error"><span class="shape"><svg class="mark" data-bind="svg: '/assets/icons/error-mini.svg'"/></span></div>
   </dt>
-  <dd data-bind="foreach: notifications">
-    <a data-bind="text: text, href: link, attr: {type: type}, css: {read: read}"></a>
-  </dd>
+  <dd data-bind="text: appStatus().label"></dd>
 </dl>

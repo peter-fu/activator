@@ -64,6 +64,11 @@ define([
   Task Event results (compile errors and tests)
   */
   var testResults = ko.observableArray([]);
+  var testErrors = ko.computed(function() {
+    return testResults().filter(function(t) {
+      return t.outcome == "failed";
+    });
+  });
   var compilationErrors = ko.observableArray([]);
 
   /**
@@ -206,6 +211,9 @@ define([
     }
   });
 
+  // We hard-code the association between a BackgroundJob and its Execution
+  // The Execution that invokes it, ends right after the BackgroundJob started
+  // It just makes things easier to force the excution to keep a reference of the job(s)
   subTypeEventStream("BackgroundJobEvent").each(function(message) {
     var execution = executionsById[message.event.serialized.executionId];
     var jobId = message.event.jobId;
@@ -279,6 +287,7 @@ define([
     }
   }
 
+  // As a separate function to handle both execution and background jobs
   function postExecutionProcess(execution, succeeded) {
 
     // we want succeeded flag up-to-date when finished notifies
@@ -466,6 +475,16 @@ define([
     clientReady(false);
   });
 
+  // Build status
+  var buildReady = ko.observable(true);
+  subTypeEventStream("BuildLoaded").each(function(message) {
+    buildReady(true);
+  });
+  subTypeEventStream("BuildFailedToLoad").each(function(message) {
+    buildReady(false);
+  });
+
+
   // Killing an execution
   function stopJob(message) {
     if (message.event && message.event.command && message.event.command.slice(0, 7) == "jobStop") {
@@ -495,8 +514,8 @@ define([
     self.finished.extend({ notify: 'always' });
     self.succeeded   = ko.observable();
     self.stopping    = ko.observable(false);
+    self.read        = ko.observable(false);
     self.jobIds      = ko.observableArray([]);
-    self.logs        = ko.observableArray([]);
 
     if (self.commandId == "runMain" || self.commandId == "echo" || self.commandId == "backgroundRunMain" || self.commandId == "backgroundRun") self.commandId = "run";
 
@@ -596,10 +615,12 @@ define([
     pendingTasks:            pendingTasks,
     testResults:             testResults,
     compilationErrors:       compilationErrors,
+    testErrors:              testErrors,
     taskCompleteEvent:       taskCompleteEvent,
     SbtEvents:               SbtEvents,
     kill:                    killExecution,
     clientReady:             clientReady,
+    buildReady:              buildReady,
     applicationReady:        applicationReady,
     applicationNotReady:     applicationNotReady,
     active: {
