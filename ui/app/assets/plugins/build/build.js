@@ -63,6 +63,9 @@ define([
       layout.renderPlugin(ko.bindhtml(tpl, State))
     },
     route: plugins.route('build', function(url, breadcrumb, plugin) {
+      sbt.events.unreadBuildErrors().forEach(function(execution){
+        execution.read(true);
+      });
       if (currentPlugin != plugin.id){
         currentPlugin = plugin.id;
         subPlugin(plugin.render());

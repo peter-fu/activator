@@ -24,31 +24,19 @@
   z-index: 10;
 }
 
-#user, #notifications, #layoutManager, #help {
+#user, #layoutManager, #help {
   .square(50px);
   width: 52px;
   border-left: 2px solid @slate-dkr;
   dt {
     .square(50px);
-    background-position: center center;    
+    background-position: center center;
   }
 }
 
-#notifications, #help {
+#help {
   dt {
     text-align: center;
-  }
-  .counter {
-    display: inline-block;
-    .square(30px);
-    line-height: 25px;
-    border-radius: 15px;
-    border: 3px solid @grey-dkr;
-    font-size: 16px;
-    margin: 11px;
-    &.glow {
-      border-color: @red;
-    }
   }
   dd {
     background: @slate-dkr;
