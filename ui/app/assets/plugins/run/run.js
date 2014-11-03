@@ -22,7 +22,7 @@ define([
   tpl
 ) {
 
-  var subplugin = ko.observable();
+  var subPlugin = ko.observable();
   var currentPlugin;
   var inspects = ko.observable();
   var sbtExecCommand = function(cmd){
@@ -54,7 +54,7 @@ define([
   });
 
   var State = {
-    subplugin: subplugin,
+    subPlugin: subPlugin,
     sbtExecCommand: sbtExecCommand,
     inspects: inspects,
     sbt: sbt,
@@ -81,7 +81,7 @@ define([
       layout.renderPlugin(ko.bindhtml(tpl, State))
     },
     route: plugins.route('run', function(url, breadcrumb, plugin) {
-      subplugin(plugin.render());
+      subPlugin(plugin.render());
       currentPlugin = plugin;
       breadcrumb([['run/', "Run"],['run/'+url.parameters[0], subPlugins[url.parameters[0]]]]);
     }, "run/system"),
