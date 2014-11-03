@@ -23,9 +23,9 @@ define([
       var ers = sbt.tasks.compilationErrors();
       // Goto first compile error
       var url = "#code"+ fs.relative(ers[0].position.sourcePath)+":"+ers[0].position.line;
-      return { id: "compilationError", label: ers.length+" Compilation error(s)", url: url }
+      return { id: "compilationError", label: ers.length+" compilation error(s)", url: url }
     } else if(sbt.tasks.testErrors().length){
-      return { id: "testFailed", label: sbt.tasks.testErrors().length+" Test(s) have failed", url: "#test" }
+      return { id: "testFailed", label: sbt.tasks.testErrors().length+" test(s) failed", url: "#test" }
     } else if(!websocket.isOpened()){
       return { id: "disconnected", label: "Connection lost", url: "#build" }
     } else {
