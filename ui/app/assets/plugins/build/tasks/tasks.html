@@ -9,7 +9,7 @@
       </div>
       <div class="table-wrapper" data-bind="logScroll: memoTaskScroll">
         <table data-bind="foreach: sbt.tasks.executions">
-          <tr data-bind="css: { active: running, error: error, stopping: stopping, openned: $root.currentExecution() == executionId }, click: $root.openLogs">
+          <tr data-bind="css: { active: running, error: error, stopping: stopping, opened: $root.currentExecution() == executionId }, click: $root.openLogs">
             <td class="status" data-bind="click: $root.rerunTask"><span></span></td>
             <td class="command" data-bind="text: command"></td>
             <td class="data">

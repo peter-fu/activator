@@ -34,16 +34,16 @@ define(function() {
         pPath = 'plugins/'+root+'/'+url.parameters[0]+'/'+url.parameters[0];
         if (cache[pPath]){
           callback(url, breadcrumb, cache[pPath]);
-          route(cache[pPath], url, breadcrumb)
+          route(cache[pPath], url, breadcrumb);
           return;
         }
         require([pPath], function(plugin) {
           plugin.id = pPath;
           cache[pPath] = plugin;
-          callback(url, breadcrumb, plugin)
-          route(plugin, url, breadcrumb)
+          callback(url, breadcrumb, plugin);
+          route(plugin, url, breadcrumb);
         }, function() {
-          console.log("404 TODO") // TODO
+          console.log("404 TODO"); // TODO
         });
       }
     }
