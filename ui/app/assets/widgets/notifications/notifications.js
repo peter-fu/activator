@@ -17,7 +17,6 @@ define([
 ){
 
   var appStatus = ko.computed(function() {
-    console.log(sbt.tasks.testErrors());
     if(!sbt.tasks.buildReady()){
       return { id: "buildFailed", label: "", url: "" }
     } else if(sbt.tasks.compilationErrors().length){
