@@ -32,6 +32,7 @@ define([
   }
 
   function send(msg) {
+    debug && console.debug("Sending:", JSON.stringify(msg))
     websocket.send(JSON.stringify(msg));
   }
 

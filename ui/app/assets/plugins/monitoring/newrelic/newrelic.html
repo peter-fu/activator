@@ -1,37 +1,78 @@
 <article class="plugin provider">
-  <header>
-    <img src="/public/images/monitoring/newrelic.png">
-  </header>
-  <div class="warning">
-    Third-party monitoring disables the local inspector.
-  </div>
   <section class="activate">
-
-    <!-- ko if: needProvision -->
-    <h2>Get the New Relic Agent</h2>
-    <p>The New Relic Agent collects data about your application.  This data is sent to New Relic for analysis.</p>
-    <section class="warning">
-      New Relic monitoring is only available for Play applications.
-    </section>
-    <p>
-      <button class="button big install" data-bind="click: provisionNewRelic">Download</button>
-      <span data-bind="visible: downloading"><span data-bind="text: downloading"></span></span>
-    </p>
-    <h2>Enter your licence key</h2>
-    <p>To get your licence key, you need to <a href="https://rpm.newrelic.com/" target="_blank">Login</a> or <a href="https://www.newrelic.com/typesafe" target="_blank">Signup</a> to your New Relic account fist. Then your licence key is available in the application setup screen (<a href="/public/plugins/monitor/solutions/newrelic/LicenseKey.png" target="_blank">see this screenshot</a>)</p>
-    <p>
-      <input type="text" id="licenseKey" data-bind="value: licenseKey, valueUpdate: 'input'"/>
-      <button class="button" data-bind="click: saveLicenseKey">Save</button>
-    </p>
-    <!-- /ko -->
-    <!-- ko ifnot: needProvision-->
-    <h2>You're ready to go!</h2>
-    <p>
-      The New Relic Agent has been downloaded and your key configured.  You may enable New Relic for <a href="http://www.playframework.com/" target="_blank">Play</a>-based templates
-      from the <a href="#run">run</a> tab.
-    </p>
-    <p><button data-bind="click: resetKey">Reset key</button></p>
-    <!-- /ko -->
+    <div class="tabs-navigation">
+      <img src="/public/images/monitoring/newrelic.png">
+      <ul>
+        <li data-bind="css: { active: selectedTab() == 'notice' }, click: function(){selectedTab('notice')} ">
+          Notice
+        </li>
+        <li data-bind="css: { active: selectedTab() == 'download' }, click: function(){selectedTab('download')} ">
+          Download
+        </li>
+        <li data-bind="css: { active: selectedTab() == 'configure' }, click: function(){selectedTab('configure')} ">
+          Configure
+        </li>
+        <li data-bind="css: { active: selectedTab() == 'running' }, click: function(){selectedTab('running')} ">
+          Running
+        </li>
+      </ul>
+    </div>
+    <div class="tabs-step notice" data-bind="css: { openned: selectedTab() == 'notice' }">
+        <h2>New Relic notice</h2>
+        <dl class="notice-list">
+            <dt>Configure it, test it, push it</dt>
+            <dd>Use Activator to configure your app, run it in local, then in production!</dd>
+            <dt>See the data on New Relic dashboard</dt>
+            <dd>Your datas are sent to New Relic server, and are not accessible in Activator</dd>
+            <dt>New Relic only works with Play applications</dt>
+            <dd>You won't be able to see informations about Actors on your dashboard</dd>
+            <dt>New Relic can’t run with Activator Inspect</dt>
+            <dd>New Relic and Activator use Java Agents to gather data, and can’t run alongside</dd>
+            <dt>New Relic is not a live debugging tool</dt>
+            <dd>There is latency with NewRelic’s servers, for fast turn around use Inspect</dd>
+        </dl>
+        <p>
+          <button class="button" data-bind="click: function(){selectedTab('download')} ">Got it!</button>
+        </p>
+    </div>
+    <div class="tabs-step download"  data-bind="css: { openned: selectedTab() == 'download' }">
+      <!-- ko if: needProvision -->
+      <h2>Get the New Relic Agent</h2>
+      <p>The New Relic Agent collects data about your application. Let us install it for you.</p>
+      <p>
+        <button class="button big install" data-bind="click: provisionNewRelic">Download</button>
+      </p>
+      <p data-bind="visible: downloading"><span data-bind="text: downloading"></span></p>
+      <p class="error" data-bind="visible: error, text: error"></p>
+      <!-- /ko -->
+    </div>
+    <div class="tabs-step configure" data-bind="css: { openned: selectedTab() == 'configure' }">
+      <h2>Enter your licence key</h2>
+      <p>To get your licence key, you need to <a href="https://rpm.newrelic.com/" target="_blank">Login</a> or <a href="https://www.newrelic.com/typesafe" target="_blank">Signup</a> to your New Relic account fist. Then your licence key is available in the application setup screen (<a href="/public/plugins/monitor/solutions/newrelic/LicenseKey.png" target="_blank">see this screenshot</a>)</p>
+      <p>
+        <input type="text" id="licenseKey" data-bind="value: licenseKey, valueUpdate: 'input'"/>
+        <button class="button" data-bind="click: saveLicenseKey">Save</button>
+      </p>
+      <!-- ko ifnot: needProvision-->
+      <h2>You're ready to go!</h2>
+      <p>
+        The New Relic Agent has been downloaded and your key configured.  You may enable New Relic for <a href="http://www.playframework.com/" target="_blank">Play</a>-based templates
+        from the <a href="#run">run</a> tab.
+      </p>
+      <p><button data-bind="click: resetKey">Reset key</button></p>
+      <!-- /ko -->
+      <p class="error" data-bind="visible: error, text: error"></p>
+    </div>
+    <div class="tabs-step running" data-bind="css: { openned: selectedTab() == 'running' }">
+      <h2>Running your app with New Relic</h2>
+      <ol class="notice-list">
+        <li>Download the Java Agent</li>
+        <li>Configure it <a data-bind="click: function(){selectedTab('configure')}">here</a></li>
+        <li>Go to the <a href="#run">Run section</a></li>
+        <li>Choose <b>NewRelic</b> as monitoring</li>
+        <li>Run your app clicking the run button (see image bellow)</li>
+      </ol>
+      <img src="/assets/help/newrelic-run.png" width="424">
+    </div>
   </section>
-  <section class="error" data-bind="visible: error, text: error"></section>
 </article>

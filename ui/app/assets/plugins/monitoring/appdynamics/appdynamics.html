@@ -1,15 +1,42 @@
 <article class="plugin provider">
-    <header>
-        <img src="/public/images/monitoring/appdynamics.png">
-    </header>
-    <div class="warning">
-        Third-party monitoring disables the local inspector.
-    </div>
     <section class="activate appdynamics">
-        <div class="col">
+        <div class="tabs-navigation">
+            <img src="/public/images/monitoring/appdynamics.png">
+            <ul>
+                <li data-bind="css: { active: selectedTab() == 'notice' }, click: function(){selectedTab('notice')} ">
+                    Notice
+                </li>
+                <li data-bind="css: { active: selectedTab() == 'download' }, click: function(){selectedTab('download')} ">
+                    Download
+                </li>
+                <li data-bind="css: { active: selectedTab() == 'configure' }, click: function(){selectedTab('configure')} ">
+                    Configure
+                </li>
+                <li data-bind="css: { active: selectedTab() == 'running' }, click: function(){selectedTab('running')} ">
+                    Running
+                </li>
+            </ul>
+        </div>
+        <div class="tabs-step notice" data-bind="css: { openned: selectedTab() == 'notice' }">
+            <h2>AppDynamics notice</h2>
+            <dl class="notice-list">
+                <dt>Configure it, test it, push it</dt>
+                <dd>Use Activator to configure your app, run it in local, then in production!</dd>
+                <dt>See the data on AppDynamics dashboard</dt>
+                <dd>Your datas are sent to AppDynamics server, and are not accessible in Activator</dd>
+                <dt>AppDynamics can’t run with Activator Inspect</dt>
+                <dd>AppDynamics and Activator use Java Agents to gather data, and can’t run alongside</dd>
+                <dt>AppDynamics is not a live debugging tool</dt>
+                <dd>There is latency with AppDynamics's servers, for fast turn around use Inspect</dd>
+            </dl>
+            <p>
+                <button class="button" data-bind="click: function(){selectedTab('download')} ">Got it!</button>
+            </p>
+        </div>
+        <div class="tabs-step download" data-bind="css: { openned: selectedTab() == 'download' }">
             <!-- ko if: needProvision -->
             <h2>Get the AppDynamics Agent</h2>
-            <p>The AppDynamics Agent collects performance metrics from your application. This data is sent to AppDynamics for analysis.</p>
+            <p>The AppDynamics Agent collects performance metrics from your application.</p>
             <h3>Enter your AppDynamics account information</h3>
             <p>In order to download the AppDynamics agent you need to supply your AppDynamics credentials (this information will not be stored).  If you do not have an AppDynamics account, you can <a href="https://portal.appdynamics.com/account/signup/signupForm/" target="_blank">signup here</a></p>
             <form>
@@ -22,8 +49,8 @@
                 <p>
                     <label></label>
                     <button class="button big install" data-bind="click: provisionAppDynamics, disable: usernameInvalid() || passwordInvalid() ">Download</button>
-                    <span class="downloading" data-bind="text: downloading"></span>
                 </p>
+                <p class="downloading" data-bind="text: downloading"></p>
             </form>
             <!-- /ko -->
             <!-- ko ifnot: needProvision-->
@@ -31,9 +58,10 @@
             <p>You may enable AppDynamics from the <a href="#run">run</a> tab.</p>
             <p><button class="button" data-bind="click: deprovisionAppDynamics">Re-download agent</button></p>
             <!-- /ko -->
+            <p class="error" data-bind="visible: error, text: error"></p>
         </div>
 
-        <div class="col">
+        <div class="tabs-step configure" data-bind="css: { openned: selectedTab() == 'configure' }">
             <h2>Agent configuration</h2>
             <p>You must provide some configuration information in order to use AppDynamics.  Items in red are not properly configured.</p>
             <form style="border: 2px;">
@@ -58,25 +86,26 @@
                 <p>
                     <label for="appDynamicsTierName">Tier name:</label><input type="text" id="appDynamicsTierName" data-bind="value: tierName, valueUpdate: 'input',  css: {error: tierNameInvalid() }"/>
                 </p>
+                <label></label><button class="button" data-bind="click: saveConfig, enable: canSave() && changed()">Save config</button>
+                <button class="button light" data-bind="click: cancelSave, enable: changed">Cancel</button>
             </form>
-            <!-- ko if: changed -->
-            <!-- ko if: canSave -->
-            <label></label><button class="button" data-bind="click: saveConfig">Save config</button>
-            <button data-bind="click: cancelSave">Cancel</button>
-            <!-- /ko -->
             <!-- ko ifnot: canSave -->
             <p class="err">
                 AppDynamics is not properly configured.  Please correct items marked in red.
             </p>
             <!-- /ko -->
-            <!-- /ko -->
-            <!-- ko ifnot: changed -->
-            <div>
-                <h2>AppDynamics is properly configured!</h2>
-                <p>You can change these values at any time.</p>
-            </div>
-            <!-- /ko -->
+            <p class="error" data-bind="visible: error, text: error"></p>
+        </div>
+        <div class="tabs-step running" data-bind="css: { openned: selectedTab() == 'running' }">
+            <h2>Running your app with AppDynamics</h2>
+            <ol class="notice-list">
+                <li>Download the Java Agent</li>
+                <li>Configure it <a data-bind="click: function(){selectedTab('configure')}">here</a></li>
+                <li>Go to the <a href="#run">Run section</a></li>
+                <li>Choose <b>AppDynamics</b> as monitoring</li>
+                <li>Run your app clicking the run button (see image bellow)</li>
+            </ol>
+            <img src="/assets/help/appdynamics-run.png" width="424">
         </div>
     </section>
-    <section class="error" data-bind="visible: error, text: error"></section>
 </article>

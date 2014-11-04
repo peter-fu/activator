@@ -4,11 +4,13 @@
 define([
   "main/plugins",
   "services/monitoring/appdynamicscontroller",
+  "services/monitoring/monitoringSolutions",
   "text!./appdynamics.html",
   "css!./appdynamics"
 ], function(
   plugins,
   appdynamics,
+  monitoringSolutions,
   tpl
   ) {
 
@@ -19,6 +21,8 @@ define([
       'extracting': 'Extracting',
       'complete': 'Complete'
     };
+
+    var selectedTab = ko.observable("notice");
 
     var available = appdynamics.available;
     var needProvision = ko.computed(function () {
@@ -107,7 +111,11 @@ define([
         message = downloadDescriptions[event.type] || "UNKNOWN STATE";
       }
 
-      downloading(message);
+      if (event.type != "provisioningError") {
+        downloading(message);
+      } else {
+        downloading('');
+      }
 
       if (event.type == "complete" || event.type == "provisioningError") {
         appdynamics.unsetObserveProvision();
@@ -152,8 +160,11 @@ define([
         appdynamics.accountName(accountName());
         appdynamics.accessKey(accessKey());
         appdynamics.sslEnabled(sslEnabled());
+
+        monitoringSolutions.addAppDynamicsToSolutions();
         return true;
       } else {
+        monitoringSolutions.removeAppDynamicsFromSolutions();
         return false;
       }
     };
@@ -204,7 +215,8 @@ define([
       shouldSave: shouldSave,
       saveConfig: saveConfig,
       cancelSave: cancelSave,
-      error: error
+      error: error,
+      selectedTab: selectedTab
     };
 
     return {

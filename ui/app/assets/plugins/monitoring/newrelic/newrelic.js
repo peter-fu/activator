@@ -4,6 +4,7 @@
 define([
   "main/plugins",
   "services/monitoring/newreliccontroller",
+  "services/monitoring/monitoringSolutions",
   "text!./newrelic.html",
   "css!./newrelic",
   "css!widgets/modules/modules",
@@ -11,6 +12,7 @@ define([
 ], function(
   plugins,
   newrelic,
+  monitoringSolutions,
   tpl
   ) {
 
@@ -21,6 +23,8 @@ define([
     'complete': 'Complete'
   };
 
+  var selectedTab = ko.observable("notice");
+
   var licenseKeySaved = newrelic.licenseKeySaved();
   var available = newrelic.available();
   var downloadEnabled = ko.observable(false);
@@ -28,7 +32,6 @@ define([
   var licenseKey = ko.observable(newrelic.licenseKey());
   var downloading = ko.observable("");
   var error = ko.observable();
-
 
   var needProvision = ko.computed(function() {
     return !available || !licenseKeySaved;
@@ -91,6 +94,9 @@ define([
     if (developerKeyEnabled() && !licenseKeyInvalid()) {
       console.log("**** saving...2");
       newrelic.licenseKey(licenseKey());
+      monitoringSolutions.addNewRelicToSolutions();
+    } else {
+      monitoringSolutions.removeNewRelicFromSolutions();
     }
   };
 
@@ -110,7 +116,8 @@ define([
     downloading: downloading,
     licenseKey: licenseKey,
     saveLicenseKey: saveLicenseKey,
-    error: error
+    error: error,
+    selectedTab: selectedTab
   };
 
   return {

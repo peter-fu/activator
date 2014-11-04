@@ -8,9 +8,56 @@ Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
   header {
     height: 60px;
   }
+  h2 {
+    color: @slate;
+  }
   .activate {
+    .row();
+  }
+  .tabs-navigation {
+    width: 200px;
+    box-shadow: inset -4px 0 0 rgba(0, 0, 0, 0.05), inset -1px 0 0 rgba(0, 0, 0, 0.1);
+    padding: 10px 0 0 10px;
+    background: @blue;
+    color: @blue-ltr;
+    ul {
+      margin: 10px 0;
+    }
+    li {
+      cursor: pointer;
+      padding: 15px;
+      font-size: 16px;
+      font-weight: 500;
+      &:hover {
+        // background: @grey-ltr;
+        // color: @grey-text;
+        background: @blue-dkr;
+        color: #fff;
+      }
+      &.active {
+        // background: #fff;
+        // color: @slate;
+        background: #fff;
+        color: @blue;
+      }
+    }
+  }
+  .notice-list {
+    dt {
+      margin: 20px 0 3px;
+      font-size: 18px;
+    }
+  }
+
+  .tabs-step {
+    .expand();
+    overflow: auto;
+    display: none;
+    padding: 35px 50px;
     background: #fff;
-    padding: 10px
+    &.openned {
+      display: block;
+    }
   }
   p {
     margin: 1em 0;
@@ -22,11 +69,27 @@ Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
     }
   }
   .button {
+    border: 2px solid @blue;
     background: @blue;
     color: white;
+    &.light {
+      background: none;
+      color: @blue;
+    }
+    &:disabled {
+      border-color: @white-dkr;
+      background: @white-dkr;
+      &.light {
+        background: none;
+        color: @white-dkr;
+      }
+    }
   }
   .install {
     width: 150px;
+  }
+  form {
+    max-width: 500px;
   }
   label {
     display: inline-block;
@@ -40,6 +103,10 @@ Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
     padding: 2px 8px;
     border: 2px solid @white-dkr;
     border-radius: 3px;
+    &.error {
+      color: @red;
+      border-color: @red;
+    }
   }
   .change {
     float: right;
@@ -108,23 +175,17 @@ Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
     color: @yellow-text;
     padding: 10px;
   }
-  .error {
-    background: @red-ltr;
-    color: @red-text;
+  p.error {
+    color: @red;
     clear: both;
   }
 
-  .activate {
-    .clear-after();
-  }
-  .col {
-    width: 50%;
-    float: left;
-    &:first-child {
-      padding-right: 10px;
-    }
-    &:last-child {
-      padding-left: 10px;
+  ol {
+    margin: 4px 0 20px;
+    li {
+      margin: 5px 20px;
+      list-style-type: decimal;
     }
   }
+
 }
