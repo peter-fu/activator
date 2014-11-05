@@ -25,7 +25,7 @@ define([
     return tasksById[id] && tasksById[id].executionId;
   }
 
-  function findExecutionByTaskId(id) {
+  function findCommandByExecutionId(id) {
     return executionsById[id] && executionsById[id].command;
   }
 
@@ -46,7 +46,7 @@ define([
   /**
   Stream Events
   */
-  var SbtEvents = Stream();
+  var ProcessedExecutionsStream = Stream();
 
   /**
   Observable as an event dispatcher for complete tasks
@@ -307,7 +307,7 @@ define([
       testResults(execution.testResults);
     }
 
-    SbtEvents.push(execution);
+    ProcessedExecutionsStream.push(execution);
   }
 
   subTypeEventStream("BuildStructureChanged").each(function(message) {
@@ -588,14 +588,14 @@ define([
     requestExecution:        requestExecution,
     requestDeferredExecution: requestDeferredExecution,
     executions:              executions,
-    findExecutionByTaskId:   findExecutionByTaskId,
+    findCommandByExecutionId:   findCommandByExecutionId,
     findExecutionIdByTaskId: findExecutionIdByTaskId,
     workingTasks:            workingTasks,
     pendingTasks:            pendingTasks,
     testResults:             testResults,
     compilationErrors:       compilationErrors,
     taskCompleteEvent:       taskCompleteEvent,
-    SbtEvents:               SbtEvents,
+    ProcessedExecutionsStream:               ProcessedExecutionsStream,
     kill:                    killExecution,
     clientReady:             clientReady,
     applicationReady:        applicationReady,

@@ -36,7 +36,7 @@ define([
     notifications.unshift(this);
   }
 
-  tasks.SbtEvents.each(function(execution) {
+  tasks.ProcessedExecutionsStream.each(function(execution) {
 
     if (execution.testResults){
       errorCounters.test(execution.testResults.filter(function(t) {
