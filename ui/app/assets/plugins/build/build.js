@@ -19,11 +19,7 @@ define([
   layout
 ) {
 
-<<<<<<< HEAD
   var subPlugin = ko.observable();
-=======
-  var subplugin = ko.observable();
->>>>>>> Being able to display logs per tasks
   var currentPlugin;
 
   var sbtExecCommand = function(cmd){
@@ -62,22 +58,14 @@ define([
 
   return {
     render: function(url) {
-<<<<<<< HEAD
       subPlugin(null);
-=======
-      subplugin(null);
->>>>>>> Being able to display logs per tasks
       currentPlugin = null;
       layout.renderPlugin(ko.bindhtml(tpl, State))
     },
     route: plugins.route('build', function(url, breadcrumb, plugin) {
       if (currentPlugin != plugin.id){
         currentPlugin = plugin.id;
-<<<<<<< HEAD
         subPlugin(plugin.render());
-=======
-        subplugin(plugin.render());
->>>>>>> Being able to display logs per tasks
       }
       if (url.parameters){
         breadcrumb([['build/', "Build"],['build/'+url.parameters[0], subPlugins[url.parameters[0]]]]);

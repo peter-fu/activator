@@ -371,7 +371,7 @@ define([
   var valueChanged = subTypeEventStream("ValueChanged").map(function(message) {
     var valueOrNull = null;
     if (message.event.value.success)
-      valueOrNull = message.event.value.serialized;
+      valueOrNull = message.event.value;
     debug && console.log("ValueChanged for ", message.event.key.key.name, valueOrNull, message.event);
     return {
       key: message.event.key.key.name,
@@ -384,14 +384,12 @@ define([
 
   // discoveredMainClasses
   valueChanged.matchOnAttribute('key', 'discoveredMainClasses').each(function(message) {
-    var discovered = [];
-    if (message.value && message.value.length)
-      discovered = message.value;
-    // TODO this is broken, if there are two projects with main classes we'll just
-    // pick "last one wins," we need to separately track main classes per-project.
-    app.mainClasses(discovered); // All main classes
-    if (discovered[0] && ((app.currentMainClass() && discovered.indexOf(app.currentMainClass()) < 0) || !app.currentMainClass())) {
-      app.currentMainClass(discovered[0]); // Selected main class, if empty
+    var discovered = message.value && message.value.serialized || [];
+    if (discovered) {
+      app.mainClasses(discovered); // All main classes
+      if (!app.currentMainClass() && discovered[0]){
+        app.currentMainClass(discovered[0]); // Selected main class, if empty
+      }
     }
   });
 
@@ -428,25 +426,25 @@ define([
   });
 
   valueChanged.matchOnAttribute('key', 'echoTraceSupported').each(function(message) {
-    inspectSupported(message.value === true);
+    inspectSupported(message.value.value === true);
   });
 
   valueChanged.matchOnAttribute('key', 'echoAkkaVersionReport').each(function(message) {
     var report = "";
-    if (message.value)
-      report = message.value;
+    if (message.value.value)
+      report = message.value.value;
     inspectAkkaVersionReport(report);
   });
 
   valueChanged.matchOnAttribute('key', 'echoPlayVersionReport').each(function(message) {
     var report = "";
-    if (message.value)
-      report = message.value;
+    if (message.value.value)
+      report = message.value.value;
     inspectPlayVersionReport(report);
   });
 
   valueChanged.matchOnAttribute('key', 'echoTracePlayVersion').each(function(message) {
-    if (message.value && message.value != '')
+    if (message.value.value && message.value.value != '')
       inspectHasPlayVersion(true);
     else
       inspectHasPlayVersion(false);
