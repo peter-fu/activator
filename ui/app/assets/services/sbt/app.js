@@ -14,6 +14,7 @@ define([
     this.projects([]);
   };
 
+  var mainClass = ko.observable(null);
   var mainClasses = ko.observable([]);
 
   return {
@@ -23,6 +24,7 @@ define([
     projects:           projects,
     currentProject:     currentProject,
     removeExistingProjects: removeExistingProjects,
+    mainClass:          mainClass,
     mainClasses:        mainClasses,
     currentMainClass:   settings.observable("build.mainClass-"+serverAppModel.id, false), //currentMainClass,
     versions: {

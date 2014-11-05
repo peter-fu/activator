@@ -462,10 +462,15 @@ define([
       inspectHasPlayVersion(false);
   });
 
+  // mainClass
+  valueChanged.matchOnAttribute('key', 'mainClass').each(function(message) {
+    app.mainClass(message.value);
+  });
+
   // Application ready
   var clientReady = ko.observable(false);
   var applicationReady = ko.computed(function() {
-    return app.mainClasses() && app.mainClasses().length && clientReady();
+    return (app.mainClasses().length || app.mainClass() !== null) && clientReady();
   });
   var applicationNotReady = ko.computed(function() { return !applicationReady(); });
   subTypeEventStream('ClientOpened').each(function (msg) {
@@ -473,6 +478,7 @@ define([
   });
   subTypeEventStream('ClientClosed').each(function (msg) {
     app.mainClasses([]);
+    app.mainClass(null);
     clientReady(false);
   });
 
