@@ -2,13 +2,11 @@
  Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
  */
 define([
-  'main/router',
   'commons/websocket',
   'commons/stream',
   'commons/types',
   './app'
 ], function(
-  router,
   websocket,
   Stream,
   types,
@@ -23,42 +21,32 @@ define([
   var executionsByJobId = {};
   var tasksById = {};
 
+  function findExecutionIdByTaskId(id) {
+    return tasksById[id] && tasksById[id].executionId;
+  }
+
+  function findCommandByExecutionId(id) {
+    return executionsById[id] && executionsById[id].command;
+  }
+
   /**
   Tasks status
   */
   var workingTasks = {
-    compile: ko.observable(false),
-    run: ko.observable(false),
-    test: ko.observable(false)
+    compile:  ko.observable(false),
+    run:      ko.observable(false),
+    test:     ko.observable(false)
   }
   var pendingTasks = {
-    compile: ko.observable(false),
-    run: ko.observable(false),
-    test: ko.observable(false)
-  }
-
-  /**
-  Error counters
-  */
-  var errorCounters = {
-    build: ko.observable(0),
-    code:  ko.observable(0),
-    run:   ko.observable(0),
-    test:  ko.observable(0)
+    compile:  ko.observable(false),
+    run:      ko.observable(false),
+    test:     ko.observable(false)
   }
 
   /**
   Stream Events
   */
-  var SbtEvents = {
-    successfulBuild:  Stream()
-  }
-
-  /**
-  Notification list
-  TODO: Improve what we display, and where it links
-  */
-  var notifications = ko.observableArray([]);
+  var ProcessedExecutionsStream = Stream();
 
   /**
   Observable as an event dispatcher for complete tasks
@@ -67,7 +55,7 @@ define([
   taskCompleteEvent.extend({ notify: 'always' });
   function taskComplete(command, succeded){
     taskCompleteEvent({
-      command: command,
+      command:  command,
       succeded: succeded
     });
   }
@@ -199,12 +187,8 @@ define([
     var task = tasksById[message.event.taskId];
     if (task) {
       // we want succeeded flag up-to-date when finished notifies
-      // task.succeeded(message.event.success);
       task.finished(true);
       delete tasksById[task.taskId];
-      if(executionsById[task.executionId]) {
-        delete executionsById[task.executionId].tasks[task.taskId];
-      }
     }
   });
 
@@ -231,7 +215,7 @@ define([
       execution.jobIds.push(jobId);
     } else if (message.event.name == "BackgroundJobFinished") {
       debug && console.log("BackgroundJobFinished: ", message);
-      removeExecution(execution, true);
+      postExecutionProcess(execution, true);
       delete executionsByJobId[jobId];
     }
   });
@@ -291,11 +275,11 @@ define([
     var execution = executionsById[id];
 
     if (execution && !execution.jobIds().length) {
-      removeExecution(execution, succeeded);
+      postExecutionProcess(execution, succeeded);
     }
   }
 
-  function removeExecution(execution, succeeded) {
+  function postExecutionProcess(execution, succeeded) {
 
     // we want succeeded flag up-to-date when finished notifies
     execution.succeeded(succeeded);
@@ -307,7 +291,6 @@ define([
       case "compile":
         workingTasks.compile(workingTasks.compile()-1);
         pendingTasks.compile(pendingTasks.compile()-1);
-        if (succeeded) SbtEvents.successfulBuild.push(succeeded);
         break;
       case "run":
         workingTasks.run(workingTasks.run()-1);
@@ -322,32 +305,9 @@ define([
     compilationErrors(execution.compilationErrors);
     if (execution.testResults.length) {
       testResults(execution.testResults);
-      errorCounters.test(execution.testResults.filter(function(t) {
-        return t.outcome == "failed";
-      }).length);
     }
 
-    // Update counters
-    errorCounters.code(execution.compilationErrors.filter(function(m) {
-      return m.severity == "Error";
-    }).length);
-    // Failed tasks
-    if (!succeeded){
-      if ((execution.commandId == "run") && router.current().id != "run"){
-        errorCounters.run(errorCounters.run()+1);
-        new Notification("Runtime error", "#run/", "run");
-      } else if (execution.commandId == "test"){
-        // Only show notification if we don't see the result
-        if (router.current().id != "test") {
-          new Notification("Test failed", "#test/results", "test");
-        }
-      } else if (router.current().id != "build"){
-        errorCounters.build(errorCounters.build()+1);
-        new Notification("Build error", "#build/tasks", "build");
-      }
-    }
-
-    delete executionsById[execution.executionId];
+    ProcessedExecutionsStream.push(execution);
   }
 
   subTypeEventStream("BuildStructureChanged").each(function(message) {
@@ -411,7 +371,7 @@ define([
   var valueChanged = subTypeEventStream("ValueChanged").map(function(message) {
     var valueOrNull = null;
     if (message.event.value.success)
-      valueOrNull = message.event.value.serialized;
+      valueOrNull = message.event.value;
     debug && console.log("ValueChanged for ", message.event.key.key.name, valueOrNull, message.event);
     return {
       key: message.event.key.key.name,
@@ -424,14 +384,12 @@ define([
 
   // discoveredMainClasses
   valueChanged.matchOnAttribute('key', 'discoveredMainClasses').each(function(message) {
-    var discovered = [];
-    if (message.value && message.value.length)
-      discovered = message.value;
-    // TODO this is broken, if there are two projects with main classes we'll just
-    // pick "last one wins," we need to separately track main classes per-project.
-    app.mainClasses(discovered); // All main classes
-    if (discovered[0] && ((app.currentMainClass() && discovered.indexOf(app.currentMainClass()) < 0) || !app.currentMainClass())) {
-      app.currentMainClass(discovered[0]); // Selected main class, if empty
+    var discovered = message.value && message.value.serialized || [];
+    if (discovered) {
+      app.mainClasses(discovered); // All main classes
+      if (!app.currentMainClass() && discovered[0]){
+        app.currentMainClass(discovered[0]); // Selected main class, if empty
+      }
     }
   });
 
@@ -468,25 +426,25 @@ define([
   });
 
   valueChanged.matchOnAttribute('key', 'echoTraceSupported').each(function(message) {
-    inspectSupported(message.value === true);
+    inspectSupported(message.value.value === true);
   });
 
   valueChanged.matchOnAttribute('key', 'echoAkkaVersionReport').each(function(message) {
     var report = "";
-    if (message.value)
-      report = message.value;
+    if (message.value.value)
+      report = message.value.value;
     inspectAkkaVersionReport(report);
   });
 
   valueChanged.matchOnAttribute('key', 'echoPlayVersionReport').each(function(message) {
     var report = "";
-    if (message.value)
-      report = message.value;
+    if (message.value.value)
+      report = message.value.value;
     inspectPlayVersionReport(report);
   });
 
   valueChanged.matchOnAttribute('key', 'echoTracePlayVersion').each(function(message) {
-    if (message.value && message.value != '')
+    if (message.value.value && message.value.value != '')
       inspectHasPlayVersion(true);
     else
       inspectHasPlayVersion(false);
@@ -495,7 +453,7 @@ define([
   // Application ready
   var clientReady = ko.observable(false);
   var applicationReady = ko.computed(function() {
-    return app.mainClasses().length && clientReady();
+    return app.mainClasses() && app.mainClasses().length && clientReady();
   });
   var applicationNotReady = ko.computed(function() { return !applicationReady(); });
   subTypeEventStream('ClientOpened').each(function (msg) {
@@ -536,6 +494,7 @@ define([
     self.succeeded   = ko.observable();
     self.stopping    = ko.observable(false);
     self.jobIds      = ko.observableArray([]);
+    self.logs        = ko.observableArray([]);
 
     if (self.commandId == "runMain" || self.commandId == "echo" || self.commandId == "backgroundRunMain" || self.commandId == "backgroundRun") self.commandId = "run";
 
@@ -543,7 +502,6 @@ define([
     self.tasks          = {};
     self.compilationErrors  = [];
     self.testResults    = [];
-    self.notifications  = [];
 
     // Statuses
     self.running = ko.computed(function() {
@@ -586,16 +544,6 @@ define([
     self.succeeded = ko.observable(0); // 0 here stands for no Date() object
   }
 
-  /**
-  Notification object constructor
-  */
-  function Notification(text, link, type) {
-    this.text = text;
-    this.link = link;
-    this.type = type;
-    this.read = ko.observable(false);
-    notifications.unshift(this);
-  }
 
   /**
   Kill tasks by command name (or all pending tasks)
@@ -639,17 +587,15 @@ define([
     deferredPossibleAutoCompletions: deferredPossibleAutoCompletions,
     requestExecution:        requestExecution,
     requestDeferredExecution: requestDeferredExecution,
-    cancelExecution:         cancelExecution,
-    cancelDeferredExecution: cancelDeferredExecution,
     executions:              executions,
+    findCommandByExecutionId:   findCommandByExecutionId,
+    findExecutionIdByTaskId: findExecutionIdByTaskId,
     workingTasks:            workingTasks,
     pendingTasks:            pendingTasks,
     testResults:             testResults,
     compilationErrors:       compilationErrors,
-    errorCounters:           errorCounters,
     taskCompleteEvent:       taskCompleteEvent,
-    notifications:           notifications,
-    SbtEvents:               SbtEvents,
+    ProcessedExecutionsStream:               ProcessedExecutionsStream,
     kill:                    killExecution,
     clientReady:             clientReady,
     applicationReady:        applicationReady,

@@ -9,10 +9,26 @@
       </div>
       <div class="table-wrapper" data-bind="logScroll: memoTaskScroll">
         <table data-bind="foreach: sbt.tasks.executions">
-          <tr data-bind="css: { active: running, error: error, stopping: stopping }, click: function(){ $root.rerunTask($data) }">
-            <td class="status"><span></span></td>
-            <th data-bind="text: command"></th>
-            <td data-bind="text: time"></td>
+          <tr data-bind="css: { active: running, error: error, stopping: stopping, opened: $root.currentExecution() == executionId }, click: $root.openLogs">
+            <td class="status" data-bind="click: $root.rerunTask"><span></span></td>
+            <td class="command" data-bind="text: command"></td>
+            <td class="data">
+            <!-- ko if: finished() -->
+              <!-- ko if: compilationErrors.length -->
+              <span class="compilationErrors">
+                <span class="compilationErrorsNumber" data-bind="text: compilationErrors.length"></span>
+                compilation error(s)
+              </span>
+              <!-- /ko -->
+              <!-- ko if: testResults.length -->
+              <span class="testResults">
+                <span class="testResultsNumber" data-bind="text: testResults.filter(function(t){ return t.outcome == 'passed'}).length"></span>/<span class="testResultsNumber" data-bind="text: testResults.length"></span>
+                test(s) passed
+              </span>
+              <!-- /ko -->
+            <!-- /ko -->
+            </td>
+            <td class="time" data-bind="text: time"></td>
           </tr>
         </table>
       </div>
@@ -23,14 +39,18 @@
         <div class="group">
           <label>
             <input type="checkbox" data-bind="checked: sbt.app.settings.showLogDebug" />
-            Show debug
+            Activate debug
           </label>
           <button data-bind="click: clear">Clear</button>
         </div>
       </div>
-      <ul class="logs" data-bind="logScroll: memoLogsScroll, foreach: sbt.logs.logs">
+      <div class="filtering" data-bind="visible: currentExecution">
+        <span class="close" data-bind="click: closeLogs">×</span> Showing logs for <span class="command" data-bind="text: sbt.tasks.findCommandByExecutionId(currentExecution())"></span>
+      </div>
+      <ul class="logs" data-bind="logScroll: memoLogsScroll, foreach: logs, css: { 'show-debug': sbt.app.settings.showLogDebug }">
         <li data-bind="text: event.entry.message, attr: { 'data-level': event.entry.level, 'data-type': event.entry.type }"></li>
       </ul>
+      <div class="toBottom" data-bind="click: scrollToBottom, css: { hide: memoLogsScroll() == 'stick'}">⤓</div>
     </div>
   </section>
 </article>

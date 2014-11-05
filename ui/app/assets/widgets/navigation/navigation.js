@@ -25,7 +25,7 @@ define([
     appManager: appManager,
     appStatus: appStatus,
     typesafe: typesafe,
-    counters: sbt.tasks.errorCounters,
+    counters: sbt.events.errorCounters,
     workingTasks: sbt.tasks.workingTasks,
     showFirstCompileError: function(c, e) {
       e.preventDefault();

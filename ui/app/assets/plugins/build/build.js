@@ -19,7 +19,8 @@ define([
   layout
 ) {
 
-  var subplugin = ko.observable();
+  var subPlugin = ko.observable();
+  var currentPlugin;
 
   var sbtExecCommand = function(cmd){
     sbt.tasks.requestExecution(cmd);
@@ -46,7 +47,7 @@ define([
   }
 
   var State = {
-    subplugin: subplugin,
+    subPlugin: subPlugin,
     sbtExecCommand: sbtExecCommand,
     setProject: setProject,
     recompileOnChange: sbt.app.settings.recompileOnChange,
@@ -57,10 +58,15 @@ define([
 
   return {
     render: function(url) {
+      subPlugin(null);
+      currentPlugin = null;
       layout.renderPlugin(ko.bindhtml(tpl, State))
     },
     route: plugins.route('build', function(url, breadcrumb, plugin) {
-      subplugin(plugin.render());
+      if (currentPlugin != plugin.id){
+        currentPlugin = plugin.id;
+        subPlugin(plugin.render());
+      }
       if (url.parameters){
         breadcrumb([['build/', "Build"],['build/'+url.parameters[0], subPlugins[url.parameters[0]]]]);
       }
