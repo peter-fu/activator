@@ -4,7 +4,7 @@
             <img src="/public/images/monitoring/appdynamics.png">
             <ul>
                 <li data-bind="css: { active: selectedTab() == 'notice' }, click: function(){selectedTab('notice')} ">
-                    Notice
+                    About
                 </li>
                 <li data-bind="css: { active: selectedTab() == 'download' }, click: function(){selectedTab('download')} ">
                     Download
@@ -18,16 +18,23 @@
             </ul>
         </div>
         <div class="tabs-step notice" data-bind="css: { openned: selectedTab() == 'notice' }">
-            <h2>AppDynamics notice</h2>
+            <h2>About AppDynamics</h2>
             <dl class="notice-list">
-                <dt>Configure it, test it, push it</dt>
-                <dd>Use Activator to configure your app, run it in local, then in production!</dd>
-                <dt>See the data on AppDynamics dashboard</dt>
-                <dd>Your datas are sent to AppDynamics server, and are not accessible in Activator</dd>
-                <dt>AppDynamics can’t run with Activator Inspect</dt>
-                <dd>AppDynamics and Activator use Java Agents to gather data, and can’t run alongside</dd>
-                <dt>AppDynamics is not a live debugging tool</dt>
-                <dd>There is latency with AppDynamics's servers, for fast turn around use Inspect</dd>
+                <dt>Download, Configure and Run with AppDynamics Monitoring Enabled</dt>
+                <dd>Activator can be used to configure and run your application locally with AppDynamics gathering monitoring information.</dd>
+                <dd>Use the 'Download' and 'Configure' steps here below to get started.</dd>
+                <dt>AppDynamics Dashboard</dt>
+                <dd>The monitoring data is pushed to the AppDynamics server and shown in a separate dashboard.</dd>
+                <dd>See AppDynamics documentation for more information about how to use the dashboard.</dd>
+                <dt>Potential Latency</dt>
+                <dd>There might be some latency using AppDynamics monitoring as data has to be pushed, gathered and presented remotely.</dd>
+                <dd>Make sure you give AppDynamics some time to gather the data and also that there is some sort of activity in your application.</dd>
+                <dt>About Activator Inspect and AppDynamics</dt>
+                <dd>AppDynamics and Activator Inspect both use Java agents to gather data and they cannot be run simultaneously.</dd>
+                <dd>Use Inspect when you want to try monitor the behavior of your application quickly and locally.</dd>
+                <dd>AppDynamics should be used for production monitoring.</dd>
+                <dt>Next Steps</dt>
+                <dd>Click on the 'Got It' button here below to continue with the AppDynamics setup.</dd>
             </dl>
             <p>
                 <button class="button" data-bind="click: function(){selectedTab('download')} ">Got it!</button>
@@ -38,7 +45,8 @@
             <h2>Get the AppDynamics Agent</h2>
             <p>The AppDynamics Agent collects performance metrics from your application.</p>
             <h3>Enter your AppDynamics account information</h3>
-            <p>In order to download the AppDynamics agent you need to supply your AppDynamics credentials (this information will not be stored).  If you do not have an AppDynamics account, you can <a href="https://portal.appdynamics.com/account/signup/signupForm/" target="_blank">signup here</a></p>
+            <p>In order to download the AppDynamics agent you need to supply your AppDynamics credentials (this information will not be stored).<p>
+            <p>If you do not have an AppDynamics account, you can <a href="https://portal.appdynamics.com/account/signup/signupForm/" target="_blank">signup here.</a></p>
             <form>
                 <p>
                     <label>Email:</label><input type="text" id="username" data-bind="value: username, valueUpdate: 'input', css: {error: usernameInvalid() }"/>
@@ -63,7 +71,7 @@
 
         <div class="tabs-step configure" data-bind="css: { openned: selectedTab() == 'configure' }">
             <h2>Agent configuration</h2>
-            <p>You must provide some configuration information in order to use AppDynamics.  Items in red are not properly configured.</p>
+            <p>You must provide some configuration information in order to use AppDynamics.</p>
             <form style="border: 2px;">
                 <p>
                     <label for="appDynamicsHostName">Collector host name:</label><input type="text" id="appDynamicsHostName" data-bind="value: hostName, valueUpdate: 'input', css: {error: hostNameInvalid() }"/>
@@ -91,18 +99,18 @@
             </form>
             <!-- ko ifnot: canSave -->
             <p class="err">
-                AppDynamics is not properly configured.  Please correct items marked in red.
+                AppDynamics is not properly configured. Please correct items marked in red.
             </p>
             <!-- /ko -->
             <p class="error" data-bind="visible: error, text: error"></p>
         </div>
         <div class="tabs-step running" data-bind="css: { openned: selectedTab() == 'running' }">
-            <h2>Running your app with AppDynamics</h2>
+            <h2>Steps to set up and run with AppDynamics Monitoring</h2>
             <ol class="notice-list">
-                <li>Download the Java Agent</li>
+                <li><a data-bind="click: function(){selectedTab('download')}">Download</a> the Java Agent</li>
                 <li>Configure it <a data-bind="click: function(){selectedTab('configure')}">here</a></li>
                 <li>Go to the <a href="#run">Run section</a></li>
-                <li>Choose <b>AppDynamics</b> as monitoring</li>
+                <li>Choose <b>AppDynamics</b> as preferred monitoring tool</li>
                 <li>Run your app clicking the run button (see image bellow)</li>
             </ol>
             <img src="/assets/help/appdynamics-run.png" width="424">

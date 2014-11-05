@@ -145,8 +145,6 @@ object AppDynamics {
           sender ! r.error(s"Failure deprovisioning AppDynamics: ${e.getMessage}")
       }
       case r @ Available => try {
-        println(">>> in AppDynamics actor - received: " + r)
-
         val v = AD.hasAppDynamics(config.extractRoot())
         sender ! r.response(v)
       } catch {
