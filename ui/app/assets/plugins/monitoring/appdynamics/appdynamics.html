@@ -94,7 +94,8 @@
                 <p>
                     <label for="appDynamicsTierName">Tier name:</label><input type="text" id="appDynamicsTierName" data-bind="value: tierName, valueUpdate: 'input',  css: {error: tierNameInvalid() }"/>
                 </p>
-                <label></label><button class="button" data-bind="click: saveConfig, enable: canSave() && changed()">Save config</button>
+                <label></label>
+                <button class="button" data-bind="click: saveConfig, enable: canSave() && changed()">Save config</button>
                 <button class="button light" data-bind="click: cancelSave, enable: changed">Cancel</button>
             </form>
             <!-- ko ifnot: canSave -->

@@ -88,11 +88,10 @@ define([
   };
 
   var saveLicenseKey = function () {
-    console.log("**** saving...1");
-    console.log(">> ", developerKeyEnabled());
-    console.log(">> ", !licenseKeyInvalid());
-    if (developerKeyEnabled() && !licenseKeyInvalid()) {
-      console.log("**** saving...2");
+    if (licenseKeyInvalid()) {
+      error("Invalid license key (must be 40 characters long and can only contain A-Z and 0-9).");
+    } else if (developerKeyEnabled()) {
+      error("");
       newrelic.licenseKey(licenseKey());
       monitoringSolutions.addNewRelicToSolutions();
     } else {
@@ -101,11 +100,10 @@ define([
   };
 
   var licenseKeyInvalid = ko.computed(function() {
-    var key = licenseKey();
-    return !newrelic.validKey.test(key);
+    return !newrelic.validKey.test(licenseKey());
   });
 
-  var resetKey = function () {
+  var resetLicenseKey = function () {
     licenseKey("");
     newrelic.licenseKey("");
   };
@@ -116,6 +114,7 @@ define([
     downloading: downloading,
     licenseKey: licenseKey,
     saveLicenseKey: saveLicenseKey,
+    resetLicenseKey: resetLicenseKey,
     error: error,
     selectedTab: selectedTab
   };
