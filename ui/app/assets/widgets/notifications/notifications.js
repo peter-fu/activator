@@ -18,7 +18,7 @@ define([
 
   var appStatus = ko.computed(function() {
     if(!sbt.tasks.buildReady()){
-      return { id: "buildFailed", label: "", url: "" }
+      return { id: "buildFailed", label: "Build loading has failed", url: "#build" }
     } else if(sbt.tasks.compilationErrors().length){
       var ers = sbt.tasks.compilationErrors();
       // Goto first compile error
