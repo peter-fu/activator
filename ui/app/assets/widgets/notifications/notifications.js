@@ -18,7 +18,7 @@ define([
 
   var appStatus = ko.computed(function() {
     if(!sbt.tasks.buildReady()){
-      return { id: "buildFailed", label: "Build loading has failed", url: "#build" }
+      return { id: "buildFailed", label: "Build loading has failed", url: "#build/tasks" }
     } else if(sbt.tasks.compilationErrors().length){
       var ers = sbt.tasks.compilationErrors();
       // Goto first compile error
@@ -27,9 +27,9 @@ define([
     } else if(sbt.tasks.testErrors().length){
       return { id: "testFailed", label: sbt.tasks.testErrors().length+" test(s) failed", url: "#test" }
     } else if(!websocket.isOpened()){
-      return { id: "disconnected", label: "Connection lost", url: "#build" }
+      return { id: "disconnected", label: "Connection lost", url: "#build/tasks" }
     } else {
-      return { id: "ok", label: "Activator is running smoothly", url: "#build" }
+      return { id: "ok", label: "Activator is running smoothly", url: "#build/tasks" }
     }
   });
 
