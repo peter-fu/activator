@@ -35,7 +35,7 @@
   <body style="background: #97ABB8;">
 
   <script type="text/html" id="nodetemplate">
-    <li data-bind="css: {directory: isDirectory, hiddenNode: isHidden, open: isOpened}">
+    <li data-bind="css: {directory: isDirectory, hiddenNode: isHidden, open: isOpened}, isExactUrl: '#code'+url">
       <!-- ko if: isDirectory -->
       <span data-bind="text: name, click: toggleOpen, contextmenu: contextmenu"></span>
       <ul data-bind="template: { name: 'nodetemplate', foreach: children }">
