@@ -22,7 +22,7 @@ define([
         location: location
       }
     });
-  };
+  }
 
   function browseRoots() {
     return $.ajax({
@@ -30,7 +30,7 @@ define([
         type: 'GET',
         dataType: 'json'
     });
-  };
+  }
 
   // File model...
   function File(config) {
@@ -42,12 +42,12 @@ define([
     self.isFile = !config.isDirectory;
     self.highlighted = ko.observable(false);
     self.cancelable = config.cancelable || false;
-  };
+  }
 
   // Function for filtering...
   function fileIsHighlighted(file) {
     return file.highlighted();
-  };
+  }
   function noop() {}
 
   var FileSelection = utils.Class({

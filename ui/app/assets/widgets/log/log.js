@@ -21,7 +21,7 @@ define(['services/log','text!./log.html', 'commons/widget', 'commons/utils'], fu
       this.log.scrollFreeze.subscribe(function(newCount) {
         if (newCount == 1) {
           self.savedScrollState = self.findScrollState();
-        } else if (newCount == 0 && self.savedScrollState !== null) {
+        } else if (newCount === 0 && self.savedScrollState !== null) {
           self.applyScrollState(self.savedScrollState);
           self.savedScrollState = null;
         }

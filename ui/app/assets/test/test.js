@@ -55,12 +55,12 @@ require([
       failedCount += 1;
     }
     results.push(r);
-    var node = $('.results')[0];
+    var node = $('.results')[0], elem;
     if (r.passed) {
-      var elem = $('<div class="passed"></div>').text(r.desc + ": OK");
+      elem = $('<div class="passed"></div>').text(r.desc + ": OK");
       $(node).append(elem);
     } else {
-      var elem = $('<div class="failed"></div>').text(r.desc + ": FAILED: " + r.error)
+      elem = $('<div class="failed"></div>').text(r.desc + ": FAILED: " + r.error)
       $(node).append(elem);
     }
 
@@ -69,7 +69,7 @@ require([
 
   function afterTests() {
     var overall;
-    if (failedCount == 0)
+    if (failedCount === 0)
       overall = "All tests passed!";
     else
       overall = "YOU HAVE FAILED";

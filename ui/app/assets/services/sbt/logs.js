@@ -35,7 +35,7 @@ define([
 
   function filterDebug(m) {
     if (m.event.entry && m.event.entry.level)
-      return m.event.entry.level != "debug" || (app.settings.showLogDebug() || debug);
+      return m.event.entry.level !== "debug" || (app.settings.showLogDebug() || debug);
     else
       return true;
   }
@@ -54,13 +54,6 @@ define([
         bucket.splice(0,100); // Remove the first 100 items
       }
     }
-  }
-
-  function filterDebug(m) {
-    if (m.event.entry && m.event.entry.level)
-      return !(m.event.entry.level == "debug" && !(app.settings.showLogDebug() || debug));
-    else
-      return true;
   }
 
   return {

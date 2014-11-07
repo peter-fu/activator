@@ -59,7 +59,7 @@ define(['./types'], function(Types) {
   EventStream.prototype.matchOnAttribute = function(attribute, attributeValue) {
     var forked = new EventStream();
     var _call = function(value, next) {
-      if (value != undefined && value[attribute] === attributeValue){
+      if (value !== undefined && value[attribute] === attributeValue){
         forked.push(value)
       } else {
         next(value);

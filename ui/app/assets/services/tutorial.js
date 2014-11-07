@@ -24,13 +24,13 @@ define([
       if(!noPrevPage()) gotoPage(index()-1);
     }
     var gotoNextPage = function(){
-      if(!noNextPage()) gotoPage(index()!=null?index()+1:0);
+      if(!noNextPage()) gotoPage(index()!==null?index()+1:0);
     }
     var noPrevPage  = ko.computed(function(){
-      return index() == 0;
+      return index() === 0;
     });
     var noNextPage  = ko.computed(function(){
-      return index() == table().length-1;
+      return index() === table().length-1;
     });
 
   // TODO = provide JSON route, for meta-datas
@@ -59,10 +59,10 @@ define([
       });
       $("a", el).each(function(j, link) {
         // Open external links in new window.
-        if (link.getAttribute('href').indexOf("http://") == 0 && !link.target){
+        if (link.getAttribute('href').indexOf("http://") === 0 && !link.target){
           link.target = "_blank";
         // Force shorcut class on links to code
-        } else if (link.getAttribute('href').indexOf("#code/") == 0){
+        } else if (link.getAttribute('href').indexOf("#code/") === 0){
           $(link).addClass("shorcut");
         }
       });

@@ -5,8 +5,9 @@ define(function() {
 
   var cache = {};
   function route(plugin, url, breadcrumb) {
+    var p;
     if (plugin.route && url.parameters[1]){
-      var p = {
+      p = {
         path: url,
         plugin: url.parameters[0],
         pluginUrl: "plugins/" + url.parameters[0] + "/" + url.parameters[0],
@@ -14,7 +15,7 @@ define(function() {
       }
       plugin.route(p, breadcrumb);
     } else if (plugin.route){
-      var p = {
+      p = {
         path: url,
         plugin: url.parameters[0],
         pluginUrl: "plugins/" + url.parameters[0] + "/" + url.parameters[0]

@@ -1,6 +1,7 @@
 /*
  Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
  */
+/*jslint proto: true */
 define([], function() {
 
   // does the browser have __proto__ ?
@@ -8,7 +9,7 @@ define([], function() {
   var __proto__Works = (function() {
     function F() {}
     F.prototype = { foo: 42 };
-    var anF = new F;
+    var anF = new F();
     return ('__proto__' in anF && anF.__proto__ === F.prototype &&
         ({ __proto__ : F.prototype }).foo === 42);
   })();
@@ -127,7 +128,6 @@ define([], function() {
 
   var Singleton = function(base, o) {
     var baseclass;
-    var o;
     if (arguments.length == 2) {
       baseclass = arguments[0];
       o = arguments[1];
@@ -144,7 +144,7 @@ define([], function() {
 
   function arrayGTZero(obs) {
     return ko.computed(function() {
-      if (obs().length == undefined) {
+      if (obs().length === undefined) {
         return false;
       }
 

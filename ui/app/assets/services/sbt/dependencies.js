@@ -3,7 +3,7 @@
  */
 define(function() {
 
-  return dependencies = {
+  return {
     all:      ko.observableArray([]),
     search:   function() {},
     install:  function() {},

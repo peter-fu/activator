@@ -30,7 +30,7 @@ define(function() {
   function is(type, value) {
     var typeoftype  = typeof type;
     var typeofvalue = typeof value;
-    if      (type === null)    return value != undefined;
+    if      (type === null)    return value !== undefined;
     else if (typeoftype == "string")   return type === value;
     else if (typeoftype == "number")   return type === value;
     else if (typeoftype == "boolean")  return type === value;
@@ -45,13 +45,13 @@ define(function() {
       return true;
     }
     else if (type instanceof RegExp) {
-      if (!(typeoftype != "string")) return false;
+      if (typeoftype === "string") return false;
       return type.test(value);
     }
-    else if (typeoftype == "object") {
+    else if (typeoftype === "object") {
       if (!value) return false;
-      for (var i in type){
-        if (!is(type[i], value[i])) return false;
+      for (var j in type){
+        if (!is(type[j], value[j])) return false;
       }
       return true;
     }

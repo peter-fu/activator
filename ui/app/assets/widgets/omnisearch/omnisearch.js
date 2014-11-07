@@ -18,12 +18,12 @@ define([
       options = ko.observable([]).extend({ notify: 'always' }),
       selected = ko.observable(null),
       empty = ko.computed(function() {
-        return searchString().length >= 2 && options().length == 0;
+        return searchString().length >= 2 && options().length === 0;
       });
 
   options.subscribe(function(opts) {
     pendingQueries(pendingQueries()-1);
-    if (!selected() || opts.filter(function(a){ return a.subtitle && a.subtitle == selected().subtitle; }).length == 0) {
+    if (!selected() || opts.filter(function(a){ return a.subtitle && a.subtitle == selected().subtitle; }).length === 0) {
       selected(opts[1] || null);
     }
   });
@@ -100,7 +100,6 @@ define([
         case 38:
         case 40:
           return;
-          break;
         // Escape
         case 27:
           e.target.blur();

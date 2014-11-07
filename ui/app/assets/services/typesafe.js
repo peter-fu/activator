@@ -8,9 +8,9 @@ define(function() {
     if (event.origin === "https://typesafe.com") { // TODO change to typesafe.com
       var obj = JSON.parse(event.data);
       debug && console.log("received message:", obj);
-      for (eventType in register){
+      for (var eventType in register){
         if (eventType in obj) {
-          for (i in register[eventType]) {
+          for (var i in register[eventType]) {
             register[eventType][i](obj[eventType]);
           }
         }

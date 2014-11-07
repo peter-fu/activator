@@ -154,7 +154,7 @@ define([
     function refreshNode(node) {
       node.load().complete(function() {
         node.children().forEach(function(child) {
-          if (child.children && child.children().length != 0){
+          if (child.children && child.children().length !== 0){
             refreshNode(child);
           }
         });
@@ -166,7 +166,7 @@ define([
   function revealInSideBar(path){
     function revealNode(node) {
       node.children().forEach(function(child) {
-        if (path.indexOf(child.location) == 0){
+        if (path.indexOf(child.location) === 0){
           child.isOpened(true);
           if (!child.children().length) {
             child.load().complete(function() {

@@ -88,9 +88,7 @@ define([
         if (openedDocuments().length > 1){
           makeActive(openedDocuments()[
             // Activate the closest document
-            docIndex == openedDocuments().length -1
-              ? docIndex-1
-              : docIndex+1
+            docIndex == openedDocuments().length -1 ? docIndex-1 : docIndex+1
           ]);
         } else {
           // It was the only document, nothing to activate
@@ -196,6 +194,7 @@ define([
     },
 
     keyboard: function(key, meta, e) {
+      var all, index;
       var focus = $("#wrapper .browser span.focus");
       if (meta){
         if (key == "S"){
@@ -210,13 +209,13 @@ define([
           e.stopPropagation();
           return false;
       } else if (key == "BOTTOM"){
-        var all = $("#wrapper .browser span:visible");
-        var index = all.index(focus);
+        all = $("#wrapper .browser span:visible");
+        index = all.index(focus);
         focus.removeClass("focus");
         all.eq( index<all.length?index+1:0 ).addClass("focus");
       } else if (key == "TOP"){
-        var all = $("#wrapper .browser span:visible");
-        var index = all.index(focus);
+        all = $("#wrapper .browser span:visible");
+        index = all.index(focus);
         focus.removeClass("focus");
         all.eq( index>0?index-1:all.length ).addClass("focus");
       } else if (key == "RIGHT"){

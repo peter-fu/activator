@@ -25,7 +25,7 @@ define([
       }
     });
     return o;
-  };
+  }
 
   // App Model
   var State = function(){

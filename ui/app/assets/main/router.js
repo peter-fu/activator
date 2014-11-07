@@ -49,7 +49,7 @@ define(function() {
 
   // This will redirect without adding a new state in browser history
   var redirect = function(hash) {
-    if (history.replaceState != null) {
+    if (history.replaceState !== null) {
       return history.replaceState(null, null, '#' + hash);
     }
   }

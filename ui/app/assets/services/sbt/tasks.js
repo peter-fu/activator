@@ -419,7 +419,7 @@ define([
       return "";
     else if (inspectHasPlayVersion())
       return inspectPlayVersionReport();
-    else if (inspectAkkaVersionReport() != "")
+    else if (inspectAkkaVersionReport() !== "")
       return inspectAkkaVersionReport();
     else
       return "The sbt-echo plugin may not be present on this project or may not be enabled.";
@@ -453,7 +453,7 @@ define([
   });
 
   valueChanged.matchOnAttribute('key', 'echoTracePlayVersion').each(function(message) {
-    if (message.value.value && message.value.value != '')
+    if (message.value.value && message.value.value !== '')
       inspectHasPlayVersion(true);
     else
       inspectHasPlayVersion(false);

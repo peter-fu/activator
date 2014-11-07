@@ -101,7 +101,7 @@ define(function() {
     init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
       var url = valueAccessor();
       var isActive = ko.computed(function() {
-        return (urlChange()+"/").indexOf(url+"/") == 0;
+        return (urlChange()+"/").indexOf(url+"/") === 0;
       });
       ko.applyBindingsToNode(element, { css: {'active': isActive} });
     },
@@ -122,13 +122,13 @@ define(function() {
   }
 
   // Just pass a function in the template, to call it
-  ko.bindingHandlers['exec'] = {
+  ko.bindingHandlers.exec = {
     init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
       valueAccessor()(element, allBindings, viewModel, bindingContext);
     }
   };
   // Log
-  ko.bindingHandlers['log'] = {
+  ko.bindingHandlers.log = {
       init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
           debug && console.log("LOG FROM HTML:",valueAccessor());
       }
@@ -269,7 +269,7 @@ define(function() {
   ko.bindingHandlers.formatTime = {
     update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
       var value = valueAccessor();
-      if      (value == 0) element.innerText = "0–"
+      if      (value === 0) element.innerText = "0–"
       else if (value > 60e6) element.innerText = roundDecimal(value/60e6)+" min"
       else if (value > 10e5) element.innerText = roundDecimal(value/10e5)+" s"
       else if (value > 10e2) element.innerText = roundDecimal(value/10e2)+" ms"

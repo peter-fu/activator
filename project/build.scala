@@ -225,7 +225,7 @@ object TheActivatorBuild extends Build {
         "org.fusesource.jansi" % "jansi" % "1.11",
         "org.scalatest" % "scalatest_2.11" % "2.1.6",
 
-        Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-jshint" % "1.0.1", "0.13", "2.10"),
+        Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-jshint" % "1.0.2", "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-rjs" % "1.0.1", "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-digest" % "1.0.0", "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-mocha" % "1.0.0", "0.13", "2.10"),
@@ -238,6 +238,7 @@ object TheActivatorBuild extends Build {
         Defaults.sbtPluginExtra("com.typesafe.play" % "sbt-plugin" % Dependencies.playVersion, "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-coffeescript" % "1.0.0", "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-less" % "1.0.0", "0.13", "2.10"),
+        Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-jshint" % "1.0.2", "0.13", "2.10"),
         "org.scalaz" % "scalaz-core_2.10" % "7.0.2",
         "org.scalaz" % "scalaz-effect_2.10" % "7.0.2",
         "com.typesafe.play" % "play-java_2.11" % Dependencies.playVersion,
