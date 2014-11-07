@@ -14,13 +14,13 @@ define(['./types'], function(Types) {
       } else {
         callbacks[0].call(noop, value, noop);
       }
-    }
+    };
   }
 
   EventStream.prototype.push = function(value) {
     EventStreamExecution(this.callbacks)(value);
     return this;
-  }
+  };
 
   EventStream.prototype.clone = function(value) {
     var clone = new EventStream(this.callbacks.slice(0));
@@ -28,52 +28,52 @@ define(['./types'], function(Types) {
       clone.onFail = this.onFail;
     }
     return clone;
-  }
+  };
 
   EventStream.prototype.fork = function() {
     var forked = new EventStream();
     var _call = function(value, next) {
       forked.push(value);
       next(value);
-    }
+    };
     this.callbacks.push(_call);
     return forked;
-  }
+  };
 
   // A mix between fork and filter,
   // Do no call next if it matches
   EventStream.prototype.match = function(process) {
     var forked = new EventStream();
     var _call = function(value, next) {
-      if ( (typeof process == "function" && process(value)) || (typeof process == "object" && Types.check(process, value)) ){
-        forked.push(value)
+      if ( (typeof process === "function" && process(value)) || (typeof process === "object" && Types.check(process, value)) ){
+        forked.push(value);
       } else {
         next(value);
       }
     }
     this.callbacks.push(_call);
     return forked;
-  }
+  };
 
   // A faster match, that check strick equality for an attribute
   EventStream.prototype.matchOnAttribute = function(attribute, attributeValue) {
     var forked = new EventStream();
     var _call = function(value, next) {
       if (value !== undefined && value[attribute] === attributeValue){
-        forked.push(value)
+        forked.push(value);
       } else {
         next(value);
       }
     }
     this.callbacks.push(_call);
     return forked;
-  }
+  };
 
   EventStream.prototype.log = function(debug) {
     return this.each(function(e) {
       debug && console.debug(debug, e);
     });
-  }
+  };
 
   // ----------------------------
   // Manage the FLOW of functions
@@ -87,7 +87,7 @@ define(['./types'], function(Types) {
   EventStream.prototype.async = function(asyncCall) {
     this.callbacks.push(asyncCall);
     return this;
-  }
+  };
 
   // -------------------------
   // Manage the FLOW of values
@@ -99,7 +99,7 @@ define(['./types'], function(Types) {
     }
     this.callbacks.push(_call);
     return this;
-  }
+  };
 
   EventStream.prototype.map = function(process) {
     var _call = function(value, next) {
@@ -107,27 +107,27 @@ define(['./types'], function(Types) {
     }
     this.callbacks.push(_call);
     return this;
-  }
+  };
 
   EventStream.prototype.filter = function(process) {
     var _call = function(value, next) {
-      if ( (typeof process == "function" && process(value)) || (typeof process == "object" && Types.check(process, value)) ) {
+      if ( (typeof process === "function" && process(value)) || (typeof process === "object" && Types.check(process, value)) ) {
         next(value);
       }
     }
     this.callbacks.push(_call);
     return this;
-  }
+  };
 
   EventStream.prototype.filterNot = function(process) {
     var _call = function(value, next) {
-      if ( (typeof process == "function" && !process(value)) || (typeof process == "object" && !Types.check(process, value)) ) {
+      if ( (typeof process === "function" && !process(value)) || (typeof process === "object" && !Types.check(process, value)) ) {
         next(value);
       }
     }
     this.callbacks.push(_call);
     return this;
-  }
+  };
 
   EventStream.prototype.eachVal = function(process) {
     var _call = function(value, next) {
@@ -136,7 +136,7 @@ define(['./types'], function(Types) {
     }
     this.callbacks.push(_call);
     return this;
-  }
+  };
 
   EventStream.prototype.mapVal = function(process) {
     var _call = function(value, next) {
@@ -144,7 +144,7 @@ define(['./types'], function(Types) {
     }
     this.callbacks.push(_call);
     return this;
-  }
+  };
 
   EventStream.prototype.filterVal = function(process) {
     var _call = function(value, next) {
@@ -152,7 +152,7 @@ define(['./types'], function(Types) {
     }
     this.callbacks.push(_call);
     return this;
-  }
+  };
 
   return function() {
     return new EventStream()

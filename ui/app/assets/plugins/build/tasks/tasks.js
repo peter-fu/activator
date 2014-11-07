@@ -39,7 +39,7 @@ define([
   function reloadLogsIfOutdated() {
     // if currentExecution is 0, we show all logs
     var currentId = currentExecution();
-    if (logsExecutionId != currentId) {
+    if (logsExecutionId !== currentId) {
       sbt.app.settings.showLogDebug();
       // This is super-expensive, so it's vital NOT to do it
       // every time there's a new log message (or we get

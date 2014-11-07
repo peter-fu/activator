@@ -32,7 +32,7 @@ define(function() {
           window.location.hash = def;
           return;
         }
-        pPath = 'plugins/'+root+'/'+url.parameters[0]+'/'+url.parameters[0];
+        var pPath = 'plugins/'+root+'/'+url.parameters[0]+'/'+url.parameters[0];
         if (cache[pPath]){
           callback(url, breadcrumb, cache[pPath]);
           route(cache[pPath], url, breadcrumb);

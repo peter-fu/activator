@@ -91,7 +91,7 @@ define([
       // bind the document
       ko.doOnChange(selectedDocument, function(doc) {
         if (doc && doc.isText) {
-          if (doc.session != editor.getSession()){
+          if (doc.session !== editor.getSession()){
             editor.setSession(doc.session);
           }
           if (doc.lineNumber) {

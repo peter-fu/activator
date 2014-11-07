@@ -79,7 +79,7 @@ require([
   /* TESTS FOLLOW */
 
   test("Class utilities", function() {
-    Class = utils.Class;
+    var Class = utils.Class;
 
     var B = Class({
       init: function(a,b) {
@@ -127,25 +127,25 @@ require([
     var s1 = new S1(3,4);
     var s2 = new S2(5,6);
 
-    assert(b.name == "B");
-    assert(b.a == 1);
-    assert(b.b == 2);
-    assert(b.foo() == "B");
-    assert(b.count == 1);
+    assert(b.name === "B");
+    assert(b.a === 1);
+    assert(b.b === 2);
+    assert(b.foo() === "B");
+    assert(b.count === 1);
 
-    assert(s1.name == "S1");
-    assert(s1.a1 == 3);
-    assert(s1.b1 == 4);
-    assert(s1.foo() == "S1");
-    assert(s1.count == 2);
-    assert(s1.classValue == 42);
+    assert(s1.name === "S1");
+    assert(s1.a1 === 3);
+    assert(s1.b1 === 4);
+    assert(s1.foo() === "S1");
+    assert(s1.count === 2);
+    assert(s1.classValue === 42);
 
-    assert(s2.name == "S2");
-    assert(s2.a2 == 5);
-    assert(s2.b2 == 6);
-    assert(s2.foo() == "S2");
-    assert(s2.count == 3);
-    assert(s2.classValue == 43);
+    assert(s2.name === "S2");
+    assert(s2.a2 === 5);
+    assert(s2.b2 === 6);
+    assert(s2.foo() === "S2");
+    assert(s2.count === 3);
+    assert(s2.classValue === 43);
   });
 
   /* END OF TESTS */

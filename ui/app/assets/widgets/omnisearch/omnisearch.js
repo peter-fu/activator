@@ -10,9 +10,7 @@ define([
   tpl
 ) {
 
-  var defaultSuggestions = [],
-      searchString = ko.observable("").extend({ throttle: 200 }),
-      searchStringLast = "",
+  var searchString = ko.observable("").extend({ throttle: 200 }),
       pendingQueries = ko.observable(0),
       active = ko.observable(false),
       options = ko.observable([]).extend({ notify: 'always' }),
@@ -23,7 +21,7 @@ define([
 
   options.subscribe(function(opts) {
     pendingQueries(pendingQueries()-1);
-    if (!selected() || opts.filter(function(a){ return a.subtitle && a.subtitle == selected().subtitle; }).length === 0) {
+    if (!selected() || opts.filter(function(a){ return a.subtitle && a.subtitle === selected().subtitle; }).length === 0) {
       selected(opts[1] || null);
     }
   });
@@ -63,31 +61,31 @@ define([
     keyDown: function repeat(state,e) {
       var index = options().indexOf(selected());
       // Up
-      if (e.keyCode == 38) {
-          e.preventDefault();
-          if (index > 0) {
-            selected(options()[index - 1]);
-          } else {
-            selected(options()[options().length - 1]);
-          }
-          if (!selected().subtitle) repeat(state,e)
-          scrollToSelected();
-          return false;
+      if (e.keyCode === 38) {
+        e.preventDefault();
+        if (index > 0) {
+          selected(options()[index - 1]);
+        } else {
+          selected(options()[options().length - 1]);
+        }
+        if (!selected().subtitle) repeat(state,e)
+        scrollToSelected();
+        return false;
       }
       // Down
-      else if (e.keyCode == 40) {
-          e.preventDefault();
-          if (index < options().length - 1) {
-            selected(options()[index + 1]);
-          } else {
-            selected(options()[0]);
-          }
-          if (!selected().subtitle) repeat(state,e)
-          scrollToSelected();
-          return false;
+      else if (e.keyCode === 40) {
+        e.preventDefault();
+        if (index < options().length - 1) {
+          selected(options()[index + 1]);
+        } else {
+          selected(options()[0]);
+        }
+        if (!selected().subtitle) repeat(state,e)
+        scrollToSelected();
+        return false;
       }
       // autocomplete on TAB
-      else if (e.keyCode == 9) {
+      else if (e.keyCode === 9) {
         e.target.value = selected().execute;
         return false;
       }
@@ -125,13 +123,6 @@ define([
       setTimeout(function(){
         active(false);
       }, 100);
-    },
-
-    onOptionSelected: function(data){
-      var self = this;
-      if (data) {
-        activate(data);
-      }
     },
 
     exec: function(option) {

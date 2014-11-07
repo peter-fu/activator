@@ -36,15 +36,15 @@ define(['./router'], function(router) {
 
   function notEditing(e){
     // if we're editing something we cancel
-    return !(!activeKeyboard || e.target.tagName == 'INPUT' || e.target.tagName == 'TEXTAREA');
+    return !(!activeKeyboard || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA');
   }
 
   // Careful, order matters here
   $(document)
     .keydown(function(e){
       // ESCAPE blurs
-      if(e.keyCode == 27) {
-        if (e.target.tagName == 'INPUT' || e.target.tagName == 'TEXTAREA') {
+      if(e.keyCode === 27) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
           e.target.blur();
           $(document.body).scrollReveal();
           return false;
@@ -62,7 +62,7 @@ define(['./router'], function(router) {
       // ALL shortcuts
       var key = keyCodes[e.keyCode];
       if (notEditing(e)){
-        if (key == "T"){
+        if (key === "T"){
           e.preventDefault();
           e.stopPropagation();
           $("#omnisearch input").focus();
@@ -70,8 +70,8 @@ define(['./router'], function(router) {
       }
     });
 
-    return {
-      activeKeyboard: activeKeyboard
-    }
+  return {
+    activeKeyboard: activeKeyboard
+  }
 
 });

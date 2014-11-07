@@ -26,9 +26,9 @@ define([
 
   function browseRoots() {
     return $.ajax({
-        url: '/api/local/browseRoots',
-        type: 'GET',
-        dataType: 'json'
+      url: '/api/local/browseRoots',
+      type: 'GET',
+      dataType: 'json'
     });
   }
 
@@ -107,18 +107,18 @@ define([
     },
     gotoParent: function() {
       var self = this;
-      if (separator == "/") {
+      if (window.separator === "/") {
         // Unix
         self.load("/" + self.shownDirectory().split("/").slice(1,-1).join("/"));
       }
       else {
         // Windows
         // assumes single char drive letters
-        if (self.shownDirectory().length == 3) {
+        if (self.shownDirectory().length === 3) {
           // C:\ -> Drive listing
           self.loadRoots();
         }
-        else if (self.shownDirectory().split("\\").length == 2) {
+        else if (self.shownDirectory().split("\\").length === 2) {
           // C:\Users -> C:\
           self.load(self.shownDirectory().substr(0, 3))
         }
@@ -137,11 +137,11 @@ define([
     loadRoots: function(dir) {
       var self = this;
       browseRoots().done(function(values) {
-          self.currentFiles($.map(values, function(config) {
-              return new File(config);
-          }));
+        self.currentFiles($.map(values, function(config) {
+          return new File(config);
+        }));
       }).error(function() {
-        alert('Failed to load file system roots.');
+        window.alert('Failed to load file system roots.');
       });
     },
     load: function(dir) {
@@ -161,7 +161,7 @@ define([
           return new File(config);
         }));
       }).error(function(e) {
-        alert(e.responseText);
+        window.alert(e.responseText);
       });
     },
     select: function() {

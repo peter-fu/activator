@@ -38,29 +38,28 @@ define([
     self.extractActorPath     = extractActorPath(data);
 
     // Parse all the children, until finding an event with the same type as the deviation
-    extractData(data);
     function extractData(trace){
-      if (self.deviationType == data.traceEvent.type) {
+      if (self.deviationType === data.traceEvent.type) {
         trace.highlight = true;
         trace = trace.traceEvent;
         // Ok, this is the child we're looking for...
-        if (trace && trace.type && trace.type == "Error") // ???? Not sure
+        if (trace && trace.type && trace.type === "Error") // ???? Not sure
           $.extend(self, {
             reason: trace.annotation.reason,
             actorPath: trace.annotation.actorInfo && trace.annotation.actorInfo.actorPath // Maybe(actorPath)
           });
-        else if (trace && trace.type && (trace.type == "EventStreamDeadLetter" || trace.type == "EventStreamUnhandledMessage"))
+        else if (trace && trace.type && (trace.type === "EventStreamDeadLetter" || trace.type === "EventStreamUnhandledMessage"))
           $.extend(self, {
             deviationTime : format.formatTime(new Date(trace.timestamp)),
             errorMessage  : trace.annotation.message,
             messageFrom   : trace.annotation.sender.actorPath,
             messageTo     : trace.annotation.recipient.actorPath
           });
-        else if (trace && trace.type && (trace.type == "EventStreamWarning" || trace.type == "EventStreamError"))
+        else if (trace && trace.type && (trace.type === "EventStreamWarning" || trace.type === "EventStreamError"))
           $.extend(self, {
             deviationReason: trace.annotation.message
           });
-        else if (trace && trace.type && trace.type == "DeadlockedThreads")
+        else if (trace && trace.type && trace.type === "DeadlockedThreads")
           $.extend(self, {
             deviationReason: trace.annotation.message
             // deadlocks      : trace.annotation.join("\n") // This must be some kind of mistake, copied from original
@@ -70,14 +69,14 @@ define([
       } else {
         if (trace.children && trace.children.length > 0) {
           var r;
-          for(var i = 0; i < json.children.length; i++) {
+          for(var i = 0; i < trace.children.length; i++) {
             r = extractData(self, trace.children[i]);
             if (r) return r;
           }
         }
       }
     }
-
+    extractData(data);
     self.traceTree = trace(data);
   }
 
@@ -111,7 +110,7 @@ define([
 
   // -- EXTRACT INFOS
   function extractTrace(trace) {
-    return (trace === undefined) ? "N/A" : result = trace.substring(trace.lastIndexOf("/") + 1);
+    return (trace === undefined) ? "N/A" : trace.substring(trace.lastIndexOf("/") + 1);
   }
 
   function extractActorInfo(info) {
@@ -123,42 +122,6 @@ define([
   function extractActorPath(annotation) {
     var result = "N/A";
     if (annotation !== undefined) result = extractActorInfo(annotation.actorInfo);
-    return result;
-  }
-
-  function recreateMessage(message,prefix) { return prefix+"("+message+")"; }
-
-  function extractMessage(message, sysMsgType) {
-    var msgPrefix = sysMsgType || "[Unknown]";
-
-    var result;
-    if (message !== undefined) {
-      if (typeof message == "string"){
-        result = message;
-      }
-      else if (message.cause   !== undefined) {
-        result = recreateMessage(message.cause,msgPrefix);
-      }
-      else if (message.child   !== undefined && message.cause !== undefined) {
-        result = recreateMessage(extractActorInfo(message.child)+", "+message.cause,msgPrefix);
-      }
-      else if (message.child   !== undefined) {
-        result = recreateMessage(extractActorInfo(message.child),msgPrefix);
-      }
-      else if (message.subject !== undefined) {
-        result = recreateMessage(extractActorInfo(message.subject),msgPrefix);
-      }
-      else if (message.watchee !== undefined && message.watcher !== undefined) {
-        result = recreateMessage(extractActorInfo(message.watchee)+", "+extractActorInfo(message.watcher),msgPrefix);
-      }
-      else if (message.watched !== undefined && message.existenceConfirmed !== undefined && message.addressTerminated !== undefined) {
-        result = recreateMessage(extractActorInfo(message.watched)+", "+message.existenceConfirmed+", "+message.addressTerminated,msgPrefix);
-      }
-      else {
-        result = "[unknown message]";
-      }
-    } else result = "";
-
     return result;
   }
 

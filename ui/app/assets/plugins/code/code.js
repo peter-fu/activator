@@ -46,7 +46,7 @@ define([
     // Is it loaded already?
     for (var index in openedDocuments()){
       doc = openedDocuments()[index];
-      if (doc.location == e.data.scope.location){
+      if (doc.location === e.data.scope.location){
         foundDocIndex = parseInt(index);
         if(e.data.scope.lineNumber) doc.lineNumber = e.data.scope.lineNumber;
         break;
@@ -80,15 +80,15 @@ define([
       event.preventDefault();
       event.stopPropagation();
     }
-    if (doc && doc.edited() && !confirm("This file has unsaved changes, do you confirm closing without saving?")) return;
+    if (doc && doc.edited() && !window.confirm("This file has unsaved changes, do you confirm closing without saving?")) return;
     var docIndex = openedDocuments.indexOf(doc);
     if (docIndex >= 0){
       var sel = selectedDocument();
-      if (doc.location == sel.location){
+      if (doc.location === sel.location){
         if (openedDocuments().length > 1){
           makeActive(openedDocuments()[
             // Activate the closest document
-            docIndex == openedDocuments().length -1 ? docIndex-1 : docIndex+1
+            docIndex === openedDocuments().length -1 ? docIndex-1 : docIndex+1
           ]);
         } else {
           // It was the only document, nothing to activate
@@ -197,31 +197,31 @@ define([
       var all, index;
       var focus = $("#wrapper .browser span.focus");
       if (meta){
-        if (key == "S"){
+        if (key === "S"){
           selectedDocument().save();
           e.preventDefault();
           e.stopPropagation();
           return false;
         }
-      } else if (key == "W"){
+      } else if (key === "W"){
         closeFile(selectedDocument());
-          e.preventDefault();
-          e.stopPropagation();
-          return false;
-      } else if (key == "BOTTOM"){
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      } else if (key === "BOTTOM"){
         all = $("#wrapper .browser span:visible");
         index = all.index(focus);
         focus.removeClass("focus");
         all.eq( index<all.length?index+1:0 ).addClass("focus");
-      } else if (key == "TOP"){
+      } else if (key === "TOP"){
         all = $("#wrapper .browser span:visible");
         index = all.index(focus);
         focus.removeClass("focus");
         all.eq( index>0?index-1:all.length ).addClass("focus");
-      } else if (key == "RIGHT"){
+      } else if (key === "RIGHT"){
         if (!focus.parent().hasClass("open"))
           focus.trigger("click");
-      } else if (key == "LEFT"){
+      } else if (key === "LEFT"){
         if(focus.parent().is(".directory.open")) focus.trigger("click");
         else {
           if (focus.parents(".directory.open:first").find("span:first").addClass("focus").length)

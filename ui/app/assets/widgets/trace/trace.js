@@ -10,11 +10,11 @@ define([
   function _n(name){
     return function(a,b,c) {
       var cls, attrs = {}, children;
-      if (typeof a == "string" && c){
+      if (typeof a === "string" && c){
         cls = a;
         attrs = b;
         children = c;
-      } else if (typeof a == "string" && b) {
+      } else if (typeof a === "string" && b) {
         cls = a;
         children = b;
       } else if (a && b) {
@@ -37,7 +37,7 @@ define([
     function renderEventTrace(data) {
       var children = data.children;
       data = data.event;
-      var highlight = root.traceEvent.type == data.type;
+      var highlight = root.traceEvent.type === data.type;
       var show = ko.computed(function() {
         return (highlight || !isSystemEvent(data) || app.deviationPrefs.showSystemMessages());
       })
@@ -95,7 +95,7 @@ define([
 
     var result;
     if (message !== undefined) {
-      if (typeof message == "string"){
+      if (typeof message === "string"){
         result = message;
       }
       else if (message.cause   !== undefined) {
@@ -145,7 +145,7 @@ define([
   }
 
   function extractTrace(trace) {
-    return (trace === undefined) ? "N/A" : result = trace.substring(trace.lastIndexOf("/") + 1);
+    return (trace === undefined) ? "N/A" : trace.substring(trace.lastIndexOf("/") + 1);
   }
 
   // -- ERRORS

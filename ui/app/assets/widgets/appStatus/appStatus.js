@@ -13,6 +13,25 @@ define([
 
   var off = sbt.tasks.applicationNotReady;
 
+  function StatusButton(opts){
+    var self = this;
+    self.pending = opts.pending || ko.observable(false);
+    self.working = opts.working || ko.observable(false);
+    self.disabled = opts.disabled || ko.observable(false);
+    self.click = function(e) {
+      opts.click.call(self);
+    }
+    self.text = ko.computed(function() {
+      if (self.pending()) {
+        return opts.labels.working;
+      } else if (self.working()) {
+        return opts.labels.pending;
+      } else {
+        return opts.labels.inactive;
+      }
+    });
+  }
+
   var onoff = new StatusButton({
     labels: {
       working: "Kill all tasks",
@@ -77,25 +96,6 @@ define([
     pending: sbt.tasks.pendingTasks.test,
     disabled: off
   });
-
-  function StatusButton(opts){
-    var self = this;
-    self.pending = opts.pending || ko.observable(false);
-    self.working = opts.working || ko.observable(false);
-    self.disabled = opts.disabled || ko.observable(false);
-    self.click = function(e) {
-      opts.click.call(self);
-    }
-    self.text = ko.computed(function() {
-      if (self.pending()) {
-        return opts.labels.working;
-      } else if (self.working()) {
-        return opts.labels.pending;
-      } else {
-        return opts.labels.inactive;
-      }
-    });
-  }
 
   ko.bindingHandlers.appStatusButton = {
     init: function(element, valueAccessor) {

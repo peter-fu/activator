@@ -21,15 +21,15 @@ define([
 
     self.loadNews = function() {
       var areq = {
-          url: "http://downloads.typesafe.com/typesafe-activator/" + window.serverAppVersion + "/news.js",
-          type: 'GET',
-          // this is hardcoded for now since our server is just static files
-          // so can't respect a ?callback= query param.
-          jsonpCallback: 'setNewsJson',
-          dataType: 'jsonp' // return type
-        };
-        debug && console.log("sending ajax news request ", areq)
-        return $.ajax(areq);
+        url: "http://downloads.typesafe.com/typesafe-activator/" + window.serverAppVersion + "/news.js",
+        type: 'GET',
+        // this is hardcoded for now since our server is just static files
+        // so can't respect a ?callback= query param.
+        jsonpCallback: 'setNewsJson',
+        dataType: 'jsonp' // return type
+      };
+      debug && console.log("sending ajax news request ", areq)
+      return $.ajax(areq);
     }
     self.setNewsJson = function(json) {
       debug && console.log("setting news json to ", json);

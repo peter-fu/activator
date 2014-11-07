@@ -66,7 +66,7 @@ define([
   var testResults = ko.observableArray([]);
   var testErrors = ko.computed(function() {
     return testResults().filter(function(t) {
-      return t.outcome == "failed";
+      return t.outcome === "failed";
     });
   });
   var compilationErrors = ko.observableArray([]);
@@ -149,12 +149,12 @@ define([
    * Use only when the caller must get the result back in "this" call.
    * Default should be to use "cancelExecution" as this has better overall performance.
    */
-  function cancelDeferredExecution(id) {
-    var serialId = cancelExecution(id);
-    var result = $.Deferred();
-    deferredRequests[serialId] = result;
-    return result;
-  }
+  // function cancelDeferredExecution(id) {
+  //   var serialId = cancelExecution(id);
+  //   var result = $.Deferred();
+  //   deferredRequests[serialId] = result;
+  //   return result;
+  // }
 
   /**
    * Uses a deferred object to "wait" for the result to come back from the server.
@@ -217,11 +217,11 @@ define([
   subTypeEventStream("BackgroundJobEvent").each(function(message) {
     var execution = executionsById[message.event.serialized.executionId];
     var jobId = message.event.jobId;
-    if (message.event.name == "BackgroundJobStarted"){
+    if (message.event.name === "BackgroundJobStarted"){
       debug && console.log("BackgroundJobStarted: ", message);
       executionsByJobId[jobId] = execution;
       execution.jobIds.push(jobId);
-    } else if (message.event.name == "BackgroundJobFinished") {
+    } else if (message.event.name === "BackgroundJobFinished") {
       debug && console.log("BackgroundJobFinished: ", message);
       postExecutionProcess(execution, true);
       delete executionsByJobId[jobId];
@@ -275,17 +275,17 @@ define([
     }
   });
 
-  subTypeEventStream("ExecutionFailure").each(handleSuccessOrFailure);
-  subTypeEventStream("ExecutionSuccess").each(handleSuccessOrFailure);
   function handleSuccessOrFailure(message){
     var id = message.event.id;
-    var succeeded = message.subType == "ExecutionSuccess";
+    var succeeded = message.subType === "ExecutionSuccess";
     var execution = executionsById[id];
 
     if (execution && !execution.jobIds().length) {
       postExecutionProcess(execution, succeeded);
     }
   }
+  subTypeEventStream("ExecutionFailure").each(handleSuccessOrFailure);
+  subTypeEventStream("ExecutionSuccess").each(handleSuccessOrFailure);
 
   // As a separate function to handle both execution and background jobs
   function postExecutionProcess(execution, succeeded) {
@@ -485,7 +485,7 @@ define([
 
   // Killing an execution
   function stopJob(message) {
-    if (message.event && message.event.command && message.event.command.slice(0, 7) == "jobStop") {
+    if (message.event && message.event.command && message.event.command.slice(0, 7) === "jobStop") {
       var id = message.event.command.slice(8);
       if (executionsById[id]) executionsById[id].stopping(true);
       return true;
@@ -499,7 +499,7 @@ define([
   */
   function Execution(message) {
     var self = this;
-    if (message.event.command[0] == "{"){
+    if (message.event.command[0] === "{"){
       // Get rid of {file://path/to/project} in task names
       message.event.command = message.event.command.replace(/\{.*\}/ig, "");
     }
@@ -515,7 +515,7 @@ define([
     self.read        = ko.observable(false);
     self.jobIds      = ko.observableArray([]);
 
-    if (self.commandId == "runMain" || self.commandId == "echo" || self.commandId == "backgroundRunMain" || self.commandId == "backgroundRun") self.commandId = "run";
+    if (self.commandId === "runMain" || self.commandId === "echo" || self.commandId === "backgroundRunMain" || self.commandId === "backgroundRun") self.commandId = "run";
 
     // Data produced:
     self.tasks          = {};
@@ -569,7 +569,7 @@ define([
   */
   function killTask(task) {
     executions().filter(function(execution) {
-      return !execution.finished() && (execution.jobIds().length || (!task || execution.command == task));
+      return !execution.finished() && (execution.jobIds().length || (!task || execution.command === task));
     }).forEach(killExecution);
   }
   function killExecution(execution) {
@@ -582,18 +582,9 @@ define([
     }
   }
 
-  /**
-  Check if a task is pending
-  */
-  function pendingTask(task) {
-    return !!executions().filter(function(execution) {
-      return !task || execution.command == task;
-    }).length;
-  }
-
   $("body").on("click","button[data-exec]",function() {
     var command = $(this).attr('data-exec');
-    if (command == "run"){
+    if (command === "run"){
       command = runCommand();
     }
     if (command) {

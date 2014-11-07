@@ -6,7 +6,7 @@ define([], function() {
 
   // does the browser have __proto__ ?
   // IE adds it in 11, others should have it.
-  var __proto__Works = (function() {
+  var _protoWorks = (function() {
     function F() {}
     F.prototype = { foo: 42 };
     var anF = new F();
@@ -32,10 +32,10 @@ define([], function() {
   var Class = function() {
     var baseclass;
     var o;
-    if (arguments.length == 2) {
+    if (arguments.length === 2) {
       baseclass = arguments[0];
       o = arguments[1];
-    } else if (arguments.length == 1) {
+    } else if (arguments.length === 1) {
       baseclass = Object;
       o = arguments[0];
     } else {
@@ -64,7 +64,7 @@ define([], function() {
 
     // proto is our eventual M.prototype
     var proto;
-    if (__proto__Works) // IE < 11 is the problem here
+    if (_protoWorks) // IE < 11 is the problem here
       proto = { __proto__ : baseclass.prototype };
     else
       proto = $.extend({}, baseclass.prototype);
@@ -128,10 +128,10 @@ define([], function() {
 
   var Singleton = function(base, o) {
     var baseclass;
-    if (arguments.length == 2) {
+    if (arguments.length === 2) {
       baseclass = arguments[0];
       o = arguments[1];
-    } else if (arguments.length == 1) {
+    } else if (arguments.length === 1) {
       baseclass = Object;
       o = arguments[0];
     } else {

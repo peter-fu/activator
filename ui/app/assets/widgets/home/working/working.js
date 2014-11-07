@@ -28,8 +28,7 @@ define([
             break;
           case 'BadRequest':
             // TODO - Do better than an alert!
-            alert('Unable to perform request: ' + message.errors.join(' \n'));
-            toggleWorking();
+            window.alert('Unable to perform request: ' + message.errors.join(' \n'));
             break;
           case 'RedirectToApplication':
             // NOTE - Comment this out if you want to debug showing logs!

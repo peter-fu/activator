@@ -14,7 +14,7 @@ define([
     debug && console.log("starting search on " + keywords);
     return $.when(fs.search(keywords), sbt.tasks.deferredPossibleAutoCompletions(keywords))
       .then(function(searchValues, sbtCompletions) {
-        var filtered = sbtCompletions.filter(function (el) { 
+        var filtered = sbtCompletions.filter(function (el) {
           return !endsWith(el.title, ":");
         }).filter(function (el) {
           return !endsWith(el.title, "*");
@@ -36,7 +36,7 @@ define([
         if (searchValues.length)
           result = result.concat([{"heading": "Files (select to open)"}],searchValues);
         options(result);
-    });
+      });
   }
 
   var endsWith = function(str, suffix) {

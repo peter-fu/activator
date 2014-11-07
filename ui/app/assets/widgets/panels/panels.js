@@ -18,7 +18,7 @@ define([
   // }, []);
   var panels = ['plugins/tutorial/tutorialPanel'];
 
-  currentPanel = ko.observable();
+  var currentPanel = ko.observable();
 
   var panelOpened = settings.observable("app.panelOpened", true);
   var panelShape = settings.observable("app.panelShape", "right1");

@@ -25,9 +25,9 @@ require([
   })
 });
 
-var seeds = templates.filter(function(t){
+window.seeds = templates.filter(function(t){
   return t.tags.indexOf('seed') >= 0;
 });
-templates = templates.filter(function(t){
+window.tutorials = templates.filter(function(t){
   return t.tags.indexOf('seed') < 0;
 });

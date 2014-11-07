@@ -20,7 +20,7 @@ define([
       selectText: 'Open this Project',
       initialDir: window.baseFolder,
       onCancel: function() {
-        toggleAppBrowser();
+        self.toggleAppBrowser();
       },
       onSelect: function(file) {
         // TODO - Grey out the app while we wait for response.
@@ -43,9 +43,9 @@ define([
     self.deleteApp = function(app,e) {
       e.preventDefault();
       e.stopPropagation();
-      if (confirm("Remove project from list?")){
+      if (window.confirm("Remove project from list?")){
         fs.deleteApp(app).success(function() {
-          if (confirm("Do you want to permanently delete all files in "+app.location+"?")){
+          if (window.confirm("Do you want to permanently delete all files in "+app.location+"?")){
             fs.delete(app.location, true).success(function() {
               $(e.target).parent("li.recentApp").remove();
             });

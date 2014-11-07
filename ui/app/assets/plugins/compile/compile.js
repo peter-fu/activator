@@ -5,8 +5,8 @@ define(['text!./compile.html', 'main/plugins', 'services/build', 'css!./compile.
   function(template, plugins, build, LogView) {
 
     var STATUS_DEFAULT = 'default';
-    var STATUS_BUSY = 'busy';
-    var STATUS_ERROR = 'error;'
+    // var STATUS_BUSY = 'busy';
+    // var STATUS_ERROR = 'error;'
 
     var CompileState = (function(){
       var self = {};
