@@ -56,6 +56,6 @@ define([
     },50);
   })
 
-  return dom = ko.bindhtml(tpl, State);
+  return ko.bindhtml(tpl, State);
 
 });

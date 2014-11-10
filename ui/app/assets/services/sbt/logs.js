@@ -17,6 +17,25 @@ define([
   // Websocket Handlers
   var logEvent = websocket.subscribe("type", "sbt");
 
+  function filterDebug(m) {
+    if (m.event.entry && m.event.entry.level)
+      return m.event.entry.level !== "debug" || (app.settings.showLogDebug() || debug);
+    else
+      return true;
+  }
+
+  function pushTo(bucket){
+    var buffer = ko.buffer();
+    return function(message) {
+      buffer(message, function(messages) {
+        bucket.push.apply(bucket, messages);
+      });
+      if(bucket().length > 1000) {
+        bucket.splice(0,100); // Remove the first 100 items
+      }
+    }
+  }
+
   /**
   Logs, by execution/task
   */
@@ -33,35 +52,9 @@ define([
     logs.push(m);
   });
 
-  function filterDebug(m) {
-    if (m.event.entry && m.event.entry.level)
-      return m.event.entry.level != "debug" || (app.settings.showLogDebug() || debug);
-    else
-      return true;
-  }
-
   logEvent
     .matchOnAttribute("subType", "BackgroundJobLogEvent")
     .each(pushTo(stdout));
-
-  function pushTo(bucket){
-    var buffer = ko.buffer();
-    return function(message) {
-      buffer(message, function(messages) {
-        bucket.push.apply(bucket, messages);
-      });
-      if(bucket().length > 1000) {
-        bucket.splice(0,100); // Remove the first 100 items
-      }
-    }
-  }
-
-  function filterDebug(m) {
-    if (m.event.entry && m.event.entry.level)
-      return !(m.event.entry.level == "debug" && !(app.settings.showLogDebug() || debug));
-    else
-      return true;
-  }
 
   return {
     logs: logs,

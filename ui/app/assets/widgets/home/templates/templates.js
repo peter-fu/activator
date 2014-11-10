@@ -25,14 +25,14 @@ define([
       }
     });
     return o;
-  };
+  }
 
   // App Model
   var State = function(){
     var self = this;
 
-    self.filteredTemplates = ko.observableArray(window.templates);
-    self.seeds = seeds;
+    self.filteredTemplates = ko.observableArray(window.tutorials);
+    self.seeds = window.seeds;
     self.currentApp = ko.observable();
     self.currentAppId = ko.computed(function(){
       return !!self.currentApp()?self.currentApp().id:"";
@@ -66,7 +66,7 @@ define([
       if (e){
         self.filterValue(e.currentTarget.value.toLowerCase());
       }
-      value = self.filterValue().toLowerCase();
+      var value = self.filterValue().toLowerCase();
       self.filteredTemplates(templates.filter(function(o){
         return JSON.stringify(o).indexOf(value) >= 0
       }));
@@ -91,10 +91,10 @@ define([
       onSelect: function(file) {
         // Update our store...
         $("#newAppLocationBrowser .close").trigger("click");
-        $("#newappLocation").val(file + separator + $("#appName").val());
+        $("#newappLocation").val(file + window.separator + $("#appName").val());
       },
       onCancel: function() {
-        toggleDirectoryBrowser();
+        self.toggleDirectoryBrowser();
       }
     });
 
@@ -126,10 +126,6 @@ define([
 
     // Register fancy radio button controls.
     self.clickTemplate = function(event) {
-      var template = {
-          name: $('input', this).attr('data-snap-name-ref'),
-          id: $('input', this).attr('value')
-      }
       // TODO - Remove this bit here
       $('input:radio', this).prop('checked',true);
     }

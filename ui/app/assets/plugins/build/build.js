@@ -66,7 +66,7 @@ define([
       sbt.events.unreadBuildErrors().forEach(function(execution){
         execution.read(true);
       });
-      if (currentPlugin != plugin.id){
+      if (currentPlugin !== plugin.id){
         currentPlugin = plugin.id;
         subPlugin(plugin.render());
       }

@@ -15,7 +15,6 @@ define([
   };
 
   var mainClasses = ko.observable([]);
-  var currentMainClass = ko.observable();
 
   return {
     name:               "",

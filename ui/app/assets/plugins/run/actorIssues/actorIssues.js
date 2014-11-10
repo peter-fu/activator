@@ -55,7 +55,7 @@ define([
       }
     },
     keyboard: function(key, meta, e) {
-      if (key == "ESC"){
+      if (key === "ESC"){
         closeDeviation();
       }
     }

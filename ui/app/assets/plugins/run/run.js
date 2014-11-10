@@ -43,7 +43,7 @@ define([
   });
 
   sbt.app.inspectActivated.subscribe(function(active) {
-    if (!active && window.location.hash.indexOf("#run/system") != 0) {
+    if (!active && window.location.hash.indexOf("#run/system") !== 0) {
       window.location.hash = "run/system";
     } else if(active) {
       sbt.tasks.actions.kill();
@@ -89,7 +89,7 @@ define([
     keyboard: function(key, meta, e) {
       if (currentPlugin.keyboard) {
         currentPlugin.keyboard(key, meta, e);
-      };
+      }
     }
   }
 });

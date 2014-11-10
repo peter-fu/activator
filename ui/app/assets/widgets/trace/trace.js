@@ -10,11 +10,11 @@ define([
   function _n(name){
     return function(a,b,c) {
       var cls, attrs = {}, children;
-      if (typeof a == "string" && c){
+      if (typeof a === "string" && c){
         cls = a;
         attrs = b;
         children = c;
-      } else if (typeof a == "string" && b) {
+      } else if (typeof a === "string" && b) {
         cls = a;
         children = b;
       } else if (a && b) {
@@ -24,8 +24,8 @@ define([
         children = a;
       }
       if (cls){
-        attrs['css'] = attrs['css'] || {};
-        attrs['css'][cls] = true;
+        attrs.css = attrs.css || {};
+        attrs.css[cls] = true;
       }
       return ko.tpl(name, attrs, children);
     }
@@ -37,7 +37,7 @@ define([
     function renderEventTrace(data) {
       var children = data.children;
       data = data.event;
-      var highlight = root.traceEvent.type == data.type;
+      var highlight = root.traceEvent.type === data.type;
       var show = ko.computed(function() {
         return (highlight || !isSystemEvent(data) || app.deviationPrefs.showSystemMessages());
       })
@@ -71,11 +71,11 @@ define([
             _span("label","Actor"),
             _span("value", extractActorPath(data.annotation))
           ]),
-          (data.annotation && data.annotation.message != undefined) && _div([
+          (data.annotation && data.annotation.message !== undefined) && _div([
             _span("label","Message"),
             _span("value", extractMessage(data.annotation.message,data.annotation.sysMsgType))
           ]),
-          (data.annotation && data.annotation.reason != undefined) && _div([
+          (data.annotation && data.annotation.reason !== undefined) && _div([
             _span("label","Reason"),
             _span("value", data.annotation.reason)
           ])
@@ -94,26 +94,26 @@ define([
     var msgPrefix = sysMsgType || "[Unknown]";
 
     var result;
-    if (message != undefined) {
-      if (typeof message == "string"){
+    if (message !== undefined) {
+      if (typeof message === "string"){
         result = message;
       }
-      else if (message.cause   != undefined) {
+      else if (message.cause   !== undefined) {
         result = recreateMessage(message.cause,msgPrefix);
       }
-      else if (message.child   != undefined && message.cause != undefined) {
+      else if (message.child   !== undefined && message.cause !== undefined) {
         result = recreateMessage(extractActorInfo(message.child)+", "+message.cause,msgPrefix);
       }
-      else if (message.child   != undefined) {
+      else if (message.child   !== undefined) {
         result = recreateMessage(extractActorInfo(message.child),msgPrefix);
       }
-      else if (message.subject != undefined) {
+      else if (message.subject !== undefined) {
         result = recreateMessage(extractActorInfo(message.subject),msgPrefix);
       }
-      else if (message.watchee != undefined && message.watcher != undefined) {
+      else if (message.watchee !== undefined && message.watcher !== undefined) {
         result = recreateMessage(extractActorInfo(message.watchee)+", "+extractActorInfo(message.watcher),msgPrefix);
       }
-      else if (message.watched != undefined && message.existenceConfirmed != undefined && message.addressTerminated != undefined) {
+      else if (message.watched !== undefined && message.existenceConfirmed !== undefined && message.addressTerminated !== undefined) {
         result = recreateMessage(extractActorInfo(message.watched)+", "+message.existenceConfirmed+", "+message.addressTerminated,msgPrefix);
       }
       else {
@@ -145,7 +145,7 @@ define([
   }
 
   function extractTrace(trace) {
-    return (trace == undefined) ? "N/A" : result = trace.substring(trace.lastIndexOf("/") + 1);
+    return (trace === undefined) ? "N/A" : trace.substring(trace.lastIndexOf("/") + 1);
   }
 
   // -- ERRORS
@@ -158,13 +158,13 @@ define([
 
   function extractActorInfo(info) {
     var result = "N/A";
-    if (info != undefined) result = info.actorPath;
+    if (info !== undefined) result = info.actorPath;
     return result;
   }
 
   function extractActorPath(annotation) {
     var result = "N/A";
-    if (annotation != undefined) result = extractActorInfo(annotation.actorInfo);
+    if (annotation !== undefined) result = extractActorInfo(annotation.actorInfo);
     return result;
   }
 

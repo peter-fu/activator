@@ -30,14 +30,14 @@ define(function() {
   function is(type, value) {
     var typeoftype  = typeof type;
     var typeofvalue = typeof value;
-    if      (type === null)    return value != undefined;
-    else if (typeoftype == "string")   return type === value;
-    else if (typeoftype == "number")   return type === value;
-    else if (typeoftype == "boolean")  return type === value;
-    else if (typeoftype == "function") return (typeofvalue === typeof type() || value instanceof type);
+    if      (type === null)    return value !== undefined;
+    else if (typeoftype === "string")   return type === value;
+    else if (typeoftype === "number")   return type === value;
+    else if (typeoftype === "boolean")  return type === value;
+    else if (typeoftype === "function") return (typeofvalue === typeof type() || value instanceof type);
     else if (type instanceof Array) {
       if (!(value instanceof Array)) return false;
-      if (type.length == 1 && value.length >= 0) {
+      if (type.length === 1 && value.length >= 0) {
         for (var i in value){
           if (!is(type[0], value[i])) return false;
         }
@@ -45,13 +45,13 @@ define(function() {
       return true;
     }
     else if (type instanceof RegExp) {
-      if (!(typeoftype != "string")) return false;
+      if (typeoftype === "string") return false;
       return type.test(value);
     }
-    else if (typeoftype == "object") {
+    else if (typeoftype === "object") {
       if (!value) return false;
-      for (var i in type){
-        if (!is(type[i], value[i])) return false;
+      for (var j in type){
+        if (!is(type[j], value[j])) return false;
       }
       return true;
     }
@@ -60,11 +60,14 @@ define(function() {
   return {
     check: is,
     curry: function(pattern, value) {
-      if (!pattern) return true;
-      else if (value !== undefined) return is(pattern, value);
-      else return function(value) {
-        return is(pattern, value)
-      }
+      if (!pattern)
+        return true;
+      else if (value !== undefined)
+        return is(pattern, value);
+      else
+        return function(value) {
+          return is(pattern, value);
+        }
     }
   }
 

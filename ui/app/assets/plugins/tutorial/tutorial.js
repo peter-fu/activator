@@ -41,9 +41,9 @@ define([
     },
 
     keyboard: function(key) {
-      if (key == "TOP") {
+      if (key === "TOP") {
         TutorialState.gotoPrevPage();
-      } else if (key == "BOTTOM") {
+      } else if (key === "BOTTOM") {
         TutorialState.gotoNextPage();
       }
     }

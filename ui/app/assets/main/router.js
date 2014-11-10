@@ -21,9 +21,9 @@ define(function() {
       // if the current plugin is different from the new then we render the new plugin
       if (current().id !== metaInfo.plugin){
         // call the after lifecycle function, if any, on the plugin being switched out
-        if (typeof current().afterRender == 'function') current().afterRender();
+        if (typeof current().afterRender === 'function') current().afterRender();
         // call the before lifecycle function, if any, on the plugin begin switched in
-        if (typeof plugin.beforeRender == 'function') plugin.beforeRender();
+        if (typeof plugin.beforeRender === 'function') plugin.beforeRender();
         // render the new plugin
         $("#main").empty().append(plugin.render(metaInfo));
         current(plugin);
@@ -49,7 +49,7 @@ define(function() {
 
   // This will redirect without adding a new state in browser history
   var redirect = function(hash) {
-    if (history.replaceState != null) {
+    if (history.replaceState !== null) {
       return history.replaceState(null, null, '#' + hash);
     }
   }

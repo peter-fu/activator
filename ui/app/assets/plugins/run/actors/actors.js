@@ -59,14 +59,6 @@ define([
     return actor;
   }
 
-  function filterActorList(actor) {
-    return true; // TODO
-  }
-
-  function sortActorList(actorA, actorB) {
-    return actorA.path > actorB.path;
-  }
-
   // Search
   function resetSearch(state, event) {
     fullTextSearch("");
@@ -86,8 +78,8 @@ define([
 
   function toggleOrdering(name){
     return function() {
-      if (orderBy() == name)
-        orderByDesc(orderByDesc()=="asc"?"desc":"asc")
+      if (orderBy() === name)
+        orderByDesc(orderByDesc()==="asc"?"desc":"asc")
       else
         orderBy(name)
     }
@@ -95,7 +87,7 @@ define([
 
   function isOrdering(name) {
     return ko.computed(function() {
-      return orderBy() == name?orderByDesc():false;
+      return orderBy() === name?orderByDesc():false;
     });
   }
 
@@ -139,12 +131,12 @@ define([
     },
 
     keyboard: function(key, meta, e) {
-      if (key == "/"){
+      if (key === "/"){
         $("input.fullTextSearch").focus();
         e.preventDefault();
         e.stopPropagation();
         return false;
-      } else if (key == "ESC"){
+      } else if (key === "ESC"){
         closeActor();
       }
     }

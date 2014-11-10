@@ -37,16 +37,16 @@ define([
     //   self.session.setValue(value);
     // });
     self.session.on("change", function(e){
-      self.edited(self.session.getValue() != self.body());
+      self.edited(self.session.getValue() !== self.body());
     });
 
     // Annotation (error, warning...)
     self.showAnnotations = function(_) {
       var annotations = _.filter(function(m) {
-        return m.position.sourcePath == self.location;
+        return m.position.sourcePath === self.location;
       }).map(function(m) {
         // Translate sbt error kinds, to ace annotations types
-        var aceLevel = m.severity == 'Error' ? 'error': m.kind == 'Warn' ? 'warning': 'info';
+        var aceLevel = m.severity === 'Error' ? 'error': m.kind === 'Warn' ? 'warning': 'info';
         return {
           row: m.position.line - 1, // Ace count from zero
           column: m.position.offset,
@@ -103,34 +103,34 @@ define([
 
   function highlightModeFor(filename) {
     var ext = filename.split('.').pop().toLowerCase();
-    if (ext == "scala" || ext == "sbt") return "scala";
-    if (ext == "java") return "java";
-    if (ext == "js") return "javascript";
-    if (ext == "html") return "html";
-    if (ext == "css") return "css";
-    if (ext == "json") return "json";
-    if (ext == "xml") return "xml";
-    if (ext == "clj") return "clojure";
-    if (ext == "dart") return "dart";
-    if (ext == "erl") return "erlang";
-    if (ext == "groovy") return "groovy";
-    if (ext == "haml") return "haml";
-    if (ext == "hs") return "haskell";
-    if (ext == "latex") return "latex";
-    if (ext == "less") return "less";
-    if (ext == "ls") return "livescript";
-    if (ext == "md") return "markdown";
-    if (ext == "py") return "python";
-    if (ext == "rb") return "ruby";
-    if (ext == "rs") return "rust";
-    if (ext == "sass") return "sass";
-    if (ext == "scss") return "scss";
-    if (ext == "sql") return "sql";
-    if (ext == "styl") return "stylus";
-    if (ext == "svg") return "svg";
-    if (ext == "textile") return "textile";
-    if (ext == "ts") return "typescript";
-    if (ext == "yaml") return "yaml";
+    if (ext === "scala" || ext === "sbt") return "scala";
+    if (ext === "java") return "java";
+    if (ext === "js") return "javascript";
+    if (ext === "html") return "html";
+    if (ext === "css") return "css";
+    if (ext === "json") return "json";
+    if (ext === "xml") return "xml";
+    if (ext === "clj") return "clojure";
+    if (ext === "dart") return "dart";
+    if (ext === "erl") return "erlang";
+    if (ext === "groovy") return "groovy";
+    if (ext === "haml") return "haml";
+    if (ext === "hs") return "haskell";
+    if (ext === "latex") return "latex";
+    if (ext === "less") return "less";
+    if (ext === "ls") return "livescript";
+    if (ext === "md") return "markdown";
+    if (ext === "py") return "python";
+    if (ext === "rb") return "ruby";
+    if (ext === "rs") return "rust";
+    if (ext === "sass") return "sass";
+    if (ext === "scss") return "scss";
+    if (ext === "sql") return "sql";
+    if (ext === "styl") return "stylus";
+    if (ext === "svg") return "svg";
+    if (ext === "textile") return "textile";
+    if (ext === "ts") return "typescript";
+    if (ext === "yaml") return "yaml";
     return "text";
   }
 

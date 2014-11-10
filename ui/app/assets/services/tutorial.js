@@ -17,21 +17,21 @@ define([
     // NOTE:
     // Enclosing the state in the service, to use it in both Plugin and Panel
 
-    var gotoPage = function(id){
-      window.location.hash = "#tutorial/"+id
-    }
-    var gotoPrevPage = function(){
-      if(!noPrevPage()) gotoPage(index()-1);
-    }
-    var gotoNextPage = function(){
-      if(!noNextPage()) gotoPage(index()!=null?index()+1:0);
-    }
-    var noPrevPage  = ko.computed(function(){
-      return index() == 0;
-    });
-    var noNextPage  = ko.computed(function(){
-      return index() == table().length-1;
-    });
+  var gotoPage = function(id){
+    window.location.hash = "#tutorial/"+id;
+  }
+  var gotoPrevPage = function(){
+    if(!noPrevPage()) gotoPage(index()-1);
+  }
+  var gotoNextPage = function(){
+    if(!noNextPage()) gotoPage(index()!==null?index()+1:0);
+  }
+  var noPrevPage  = ko.computed(function(){
+    return index() === 0;
+  });
+  var noNextPage  = ko.computed(function(){
+    return index() === table().length-1;
+  });
 
   // TODO = provide JSON route, for meta-datas
   $.getJSON("/api/templates/"+serverAppModel.name+"/meta", function(data){
@@ -49,8 +49,8 @@ define([
       $("button[data-exec]", el).each(function() {
         var title = $(this).text();
         var command = $(this).attr('data-exec');
-        if (command == 'run' || command == 'compile' || command == 'start') return;
-        if (!app.customCommands().filter(function(i) { return i.command == command }).length){
+        if (command === 'run' || command === 'compile' || command === 'start') return;
+        if (!app.customCommands().filter(function(i) { return i.command === command }).length){
           app.customCommands.push({
             command: command,
             title: title
@@ -59,10 +59,10 @@ define([
       });
       $("a", el).each(function(j, link) {
         // Open external links in new window.
-        if (link.getAttribute('href').indexOf("http://") == 0 && !link.target){
+        if (link.getAttribute('href').indexOf("http://") === 0 && !link.target){
           link.target = "_blank";
         // Force shorcut class on links to code
-        } else if (link.getAttribute('href').indexOf("#code/") == 0){
+        } else if (link.getAttribute('href').indexOf("#code/") === 0){
           $(link).addClass("shorcut");
         }
       });

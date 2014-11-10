@@ -17,7 +17,7 @@ define([
     this.url           = fs.relative(node.humanLocation);
     this.isOpened      = false;
     this.isDirectory   = false;
-    this.isHidden      = (node.name[0] == ".");
+    this.isHidden      = (node.name[0] === ".");
     this.parent        = parent;
 
     this.contextmenu = {
@@ -33,10 +33,10 @@ define([
     fs.open(this.location);
   }
   FileNode.prototype.delete = function() {
-    if(confirm("You are about to delete "+this.name)) fs.delete(this.location).success(this.parent.load.bind(this.parent));
+    if(window.confirm("You are about to delete "+this.name)) fs.delete(this.location).success(this.parent.load.bind(this.parent));
   }
   FileNode.prototype.rename = function() {
-    var name = prompt("File's new name?");
+    var name = window.prompt("File's new name?");
     if (!name) return;
     fs.newName(this.location, name).success(this.parent.load.bind(this.parent));
   }
@@ -53,7 +53,7 @@ define([
     this.isDirectory   = node.isDirectory;
     this.children      = ko.observableArray([]);
     this.isOpened      = ko.observable(false);
-    this.isHidden      = (node.name == "target" || node.name == "project" || node.name[0] == "." );
+    this.isHidden      = (node.name === "target" || node.name === "project" || node.name[0] === "." );
     this.parent        = parent;
 
     this.contextmenu = {
@@ -92,7 +92,7 @@ define([
       }
       // Finally, clean everything with a sort.
       container.sort(function(left, right) {
-        if (right.isDirectory == left.isDirectory) return right.name.toLowerCase() < left.name.toLowerCase();
+        if (right.isDirectory === left.isDirectory) return right.name.toLowerCase() < left.name.toLowerCase();
         else return right.isDirectory;
       });
     });
@@ -115,13 +115,13 @@ define([
   }
 
   TreeNode.prototype.createDir = function() {
-    var name = prompt("New folder's name?");
+    var name = window.prompt("New folder's name?");
     if (!name) return;
     this.isOpened(true);
     fs.create(this.location+window.separator+name,true).success(this.load.bind(this));
   }
   TreeNode.prototype.createFile = function() {
-    var name = prompt("New file's name?");
+    var name = window.prompt("New file's name?");
     if (!name) return;
     this.isOpened(true);
     fs.create(this.location+window.separator+name,false).success(this.load.bind(this));
@@ -130,10 +130,10 @@ define([
     fs.open(this.location);
   }
   TreeNode.prototype.delete = function() {
-    if(confirm("You are about to delete "+this.name)) fs.delete(this.location).success(this.parent.load.bind(this.parent));
+    if(window.confirm("You are about to delete "+this.name)) fs.delete(this.location).success(this.parent.load.bind(this.parent));
   }
   TreeNode.prototype.rename = function() {
-    var name = prompt("Folder's new name?");
+    var name = window.prompt("Folder's new name?");
     if (!name) return;
     fs.newName(this.location, name).success(this.load.bind(this));
   }
@@ -154,7 +154,7 @@ define([
     function refreshNode(node) {
       node.load().complete(function() {
         node.children().forEach(function(child) {
-          if (child.children && child.children().length != 0){
+          if (child.children && child.children().length !== 0){
             refreshNode(child);
           }
         });
@@ -166,7 +166,7 @@ define([
   function revealInSideBar(path){
     function revealNode(node) {
       node.children().forEach(function(child) {
-        if (path.indexOf(child.location) == 0){
+        if (path.indexOf(child.location) === 0){
           child.isOpened(true);
           if (!child.children().length) {
             child.load().complete(function() {
@@ -191,7 +191,7 @@ define([
     tree.createFile();
   }
 
-  State = {
+  var State = {
     tree: tree,
     revealProject: revealProject,
     newDirAtRoot: newDirAtRoot,

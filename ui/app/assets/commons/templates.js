@@ -21,10 +21,10 @@ define(function() {
       context = context || this;
       var _this = this;
       // SetTimeout to prevent evt propagation conflicts
-      setTimeout(function(){
+      setTimeout(function f(){
         $(document).click(function(e){
           if (!$(_this).has(e.target).length){
-            $(document).unbind("click", arguments.callee);
+            $(document).unbind("click", f);
             callback.call(context, e);
           }
         });
@@ -67,7 +67,7 @@ define(function() {
     },
     update: function(elem, valueAccessor) {
       ko.virtualElements.emptyNode(elem);
-      if (typeof valueAccessor() == 'string'){
+      if (typeof valueAccessor() === 'string'){
         elem.parentNode.innerHtml = valueAccessor();
       } else {
         elem.parentNode.insertBefore(valueAccessor(), elem.nextSibling);
@@ -101,7 +101,7 @@ define(function() {
     init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
       var url = valueAccessor();
       var isActive = ko.computed(function() {
-        return (urlChange()+"/").indexOf(url+"/") == 0;
+        return (urlChange()+"/").indexOf(url+"/") === 0;
       });
       ko.applyBindingsToNode(element, { css: {'active': isActive} });
     },
@@ -113,7 +113,7 @@ define(function() {
     init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
       var url = valueAccessor();
       var isActive = ko.computed(function() {
-        return urlChange() == url;
+        return urlChange() === url;
       });
       ko.applyBindingsToNode(element, { css: {'active': isActive} });
     },
@@ -122,16 +122,16 @@ define(function() {
   }
 
   // Just pass a function in the template, to call it
-  ko.bindingHandlers['exec'] = {
+  ko.bindingHandlers.exec = {
     init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
       valueAccessor()(element, allBindings, viewModel, bindingContext);
     }
   };
   // Log
-  ko.bindingHandlers['log'] = {
-      init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-          debug && console.log("LOG FROM HTML:",valueAccessor());
-      }
+  ko.bindingHandlers.log = {
+    init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+      debug && console.log("LOG FROM HTML:",valueAccessor());
+    }
   };
 
   ko.bindingHandlers.href = {
@@ -182,14 +182,6 @@ define(function() {
     }
   }());
 
-  function throttle(f){
-    var timer;
-    return function(){
-      if (timer) clearTimeout(timer);
-      timer = setTimeout(f, 1);
-    }
-  }
-
   ko.bindingHandlers.logScroll = {
     init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
       var memo = valueAccessor();
@@ -197,7 +189,7 @@ define(function() {
         memo('stick');
       }
       setTimeout(function() {
-        if (memo() == 'stick'){
+        if (memo() === 'stick'){
           element.scrollTop = 9e9;
         } else {
           element.scrollTop = memo();
@@ -208,7 +200,7 @@ define(function() {
       // This is more efficient than anything else since this callback is
       // removed when the element is gone.
       element.addEventListener("DOMNodeInserted", function() {
-        if (memo() == 'stick'){
+        if (memo() === 'stick'){
           element.scrollTop = 9e9;
         }
       }, true);
@@ -269,7 +261,7 @@ define(function() {
   ko.bindingHandlers.formatTime = {
     update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
       var value = valueAccessor();
-      if      (value == 0) element.innerText = "0–"
+      if      (value === 0) element.innerText = "0–"
       else if (value > 60e6) element.innerText = roundDecimal(value/60e6)+" min"
       else if (value > 10e5) element.innerText = roundDecimal(value/10e5)+" s"
       else if (value > 10e2) element.innerText = roundDecimal(value/10e2)+" ms"
@@ -318,7 +310,7 @@ define(function() {
 
   ko.tpl = function(tag, attrs, children){
     var element = document.createElement(tag);
-    if (typeof children == "string") {
+    if (typeof children === "string") {
       element.appendChild(document.createTextNode(children));
     } else {
       children.forEach(function(child){

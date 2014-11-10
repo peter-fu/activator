@@ -5,12 +5,13 @@ define([
   'commons/utils',
   'commons/websocket',
   'services/sbt',
-  'services/ajax'],
-  function (
-    utils,
-    websocket,
-    sbt,
-    ajax) {
+  'services/ajax'
+], function (
+  utils,
+  websocket,
+  sbt,
+  ajax
+) {
 
   // available states
   var idle = 1;

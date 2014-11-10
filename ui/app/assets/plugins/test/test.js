@@ -19,12 +19,6 @@ define([
   layout
 ){
 
-  var enabled = function(e){
-    var o = ko.observable(!e());
-    e.on("change", function(v){ return o(!v) });
-    o.on("change", function(v){ return e(!v) });
-    return o;
-  }
   var mainTestAction = function() {
     if (sbt.tasks.pendingTasks.test()){
       sbt.tasks.actions.kill("test");

@@ -28,6 +28,6 @@ define(function() {
         throw "Settings observable should be declared only once.";
       }
     }
-  }
+  };
 
 });
