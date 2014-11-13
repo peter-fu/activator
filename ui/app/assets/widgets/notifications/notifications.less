@@ -24,10 +24,9 @@
     line-height: 50px;
     color: @grey;
     .ellipsis();
-    max-width: 0;
     .transition();
-    padding-left: 0;
-
+    max-width: 200px;
+    padding-left: 10px;
   }
   dt {
     .order(2);
@@ -59,21 +58,15 @@
   }
 
   &[data-status=ok] {
+    dd {
+      max-width: 0;
+      padding-left: 0;
+    }
     &:hover dd {
       max-width: 200px;
       padding-left: 10px;
     }
   }
-
-  &[data-status=buildFailed] dd,
-  &[data-status=testFailed] dd,
-  &[data-status=loading] dd,
-  &[data-status=compilationError] dd,
-  &[data-status=disconnected]  dd {
-    max-width: 200px;
-    padding-left: 10px;
-  }
-
 
   &[data-status=buildFailed] {
     background: @red;

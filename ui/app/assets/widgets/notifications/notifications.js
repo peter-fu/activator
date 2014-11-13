@@ -30,6 +30,12 @@ define([
       return { id: "testFailed", label: sbt.tasks.testErrors().length+" test(s) failed", url: "#test" }
     } else if(!websocket.isOpened()){
       return { id: "disconnected", label: "Connection lost", url: "#build/tasks" }
+    } else if (sbt.tasks.workingTasks.compile()) {
+      return { id: "action", label: "Compiling...", url: "#build" }
+    } else if (sbt.tasks.workingTasks.run()) {
+      return { id: "action", label: "Running...", url: "#run" }
+    } else if (sbt.tasks.workingTasks.test()) {
+      return { id: "action", label: "Testing...", url: "#test" }
     } else {
       return { id: "ok", label: "Activator is running smoothly", url: "#build/tasks" }
     }
