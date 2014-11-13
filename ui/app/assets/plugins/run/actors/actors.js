@@ -2,6 +2,7 @@
  Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
  */
 define([
+  "services/sbt/tasks",
   "services/inspect/connection",
   "services/inspect/actors",
   "main/plugins",
@@ -10,6 +11,7 @@ define([
   "css!./actors",
   "css!widgets/modules/modules"
 ], function(
+  tasks,
   connection,
   actors,
   plugins,
@@ -111,7 +113,8 @@ define([
     },
     formatTime: format.formatTime,
     formatUnits: format.units,
-    shorten: format.shortenNumber
+    shorten: format.shortenNumber,
+    inspect: tasks.inspect
   }
 
   return {

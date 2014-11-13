@@ -29,12 +29,14 @@
           </div>
           Run on build
         </li>
+        <!-- ko if: inspectSupported -->
         <li>
           <div class="switch" data-bind="switchButton: inspectActivated">
             <div class="inner"></div>
           </div>
           Activate inspector
         </li>
+        <!-- /ko -->
         <li>
           <div class="switch" data-bind="switchButton: automaticResetInspect">
             <div class="inner"></div>
@@ -59,17 +61,12 @@
         <!-- /ko -->
       </ul>
     </div>
-    <footer>
-      <!-- ko if: inspectActivated -->
+    <!-- ko if: inspectActivated -->
+      <footer>
         <span class="expand">Data collected for</span>
         <span class="cache counter" data-bind="formatTime: stats().data.currentStorageTime * 1000">0&ndash;</span>
-      <!-- /ko -->
-      <!-- ko ifnot: inspectActivated -->
-        <p class="locked"> 
-          The inspector is disabled.
-        </p>
-      <!-- /ko -->
-    </footer>
+      </footer>
+    <!-- /ko -->
     <ul class="list links">
       <li class="system" data-bind="isActiveUrl: '#run/system'">
         <a href="#run/system">System</a>

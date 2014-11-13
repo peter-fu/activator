@@ -380,7 +380,7 @@ define([
   var valueChanged = subTypeEventStream("ValueChanged").map(function(message) {
     var valueOrNull = null;
     if (message.event.value.success)
-      valueOrNull = message.event.value;
+      valueOrNull = message.event.value.serialized;
     debug && console.log("ValueChanged for ", message.event.key.key.name, valueOrNull, message.event);
     return {
       key: message.event.key.key.name,
@@ -393,70 +393,13 @@ define([
 
   // discoveredMainClasses
   valueChanged.matchOnAttribute('key', 'discoveredMainClasses').each(function(message) {
-    var discovered = message.value && message.value.serialized || [];
+    var discovered = message.value || [];
     if (discovered) {
       app.mainClasses(discovered); // All main classes
       if (!app.currentMainClass() && discovered[0]){
         app.currentMainClass(discovered[0]); // Selected main class, if empty
       }
     }
-  });
-
-  // Inspect-related (sbt-echo) observables.
-  //
-  // FIXME these need to be tracked separately for each project.
-  // FIXME logically these go in run.js, but they can't go there
-  // because it loads lazily so would miss ValueChanged events.
-
-  // Note: this is whether inspect WORKS on the project;
-  // It may not be enabled by the user.
-  var inspectSupported = ko.observable(false);
-  var inspectAkkaVersionReport = ko.observable("");
-  var inspectPlayVersionReport = ko.observable("");
-  var inspectHasPlayVersion = ko.observable(false);
-  var whyInspectIsNotSupported = ko.computed(function() {
-    if (inspectSupported())
-      return "";
-    else if (inspectHasPlayVersion())
-      return inspectPlayVersionReport();
-    else if (inspectAkkaVersionReport() !== "")
-      return inspectAkkaVersionReport();
-    else
-      return "The sbt-echo plugin may not be present on this project or may not be enabled.";
-  });
-
-  whyInspectIsNotSupported.subscribe(function(why) {
-    if (debug) {
-      if (inspectSupported())
-        console.log("Inspect is supported");
-      else
-        console.log("Inspect is not supported because ", why);
-    }
-  });
-
-  valueChanged.matchOnAttribute('key', 'echoTraceSupported').each(function(message) {
-    inspectSupported(message.value.value === true);
-  });
-
-  valueChanged.matchOnAttribute('key', 'echoAkkaVersionReport').each(function(message) {
-    var report = "";
-    if (message.value.value)
-      report = message.value.value;
-    inspectAkkaVersionReport(report);
-  });
-
-  valueChanged.matchOnAttribute('key', 'echoPlayVersionReport').each(function(message) {
-    var report = "";
-    if (message.value.value)
-      report = message.value.value;
-    inspectPlayVersionReport(report);
-  });
-
-  valueChanged.matchOnAttribute('key', 'echoTracePlayVersion').each(function(message) {
-    if (message.value.value && message.value.value !== '')
-      inspectHasPlayVersion(true);
-    else
-      inspectHasPlayVersion(false);
   });
 
   // Application ready
@@ -482,6 +425,60 @@ define([
     buildReady(false);
   });
 
+
+  // Inspect-related (sbt-echo) observables.
+  //
+  // FIXME these need to be tracked separately for each project.
+  // FIXME logically these go in run.js, but they can't go there
+  // because it loads lazily so would miss ValueChanged events.
+
+  // Note: this is whether inspect WORKS on the project;
+  // It may not be enabled by the user.
+  var inspectSupported = ko.observable(false);
+  var inspectAkkaVersionReport = ko.observable("");
+  var inspectPlayVersionReport = ko.observable("");
+  var inspectHasPlayVersion = ko.observable(false);
+  var whyInspectIsNotSupported = ko.computed(function() {
+    if (!applicationReady())
+      return "sbt is still loading";
+    else if (inspectSupported())
+      return "";
+    else if (inspectHasPlayVersion())
+      return inspectPlayVersionReport();
+    else if (inspectAkkaVersionReport() !== "")
+      return inspectAkkaVersionReport();
+    else
+      return "The sbt-echo plugin may not be present on this project or may not be enabled.";
+  });
+
+  valueChanged.matchOnAttribute('key', 'echoTraceSupported').each(function(message) {
+    console.log("echoTraceSupported", message.value)
+    inspectSupported(message.value === true);
+  });
+
+  valueChanged.matchOnAttribute('key', 'echoAkkaVersionReport').each(function(message) {
+    console.log("echoAkkaVersionReport", message.value)
+    var report = "";
+    if (message.value)
+      report = message.value;
+    inspectAkkaVersionReport(report);
+  });
+
+  valueChanged.matchOnAttribute('key', 'echoPlayVersionReport').each(function(message) {
+    console.log("echoPlayVersionReport", message.value)
+    var report = "";
+    if (message.value)
+      report = message.value;
+    inspectPlayVersionReport(report);
+  });
+
+  valueChanged.matchOnAttribute('key', 'echoTracePlayVersion').each(function(message) {
+    console.log("echoTracePlayVersion", message.value)
+    if (message.value && message.value !== '')
+      inspectHasPlayVersion(true);
+    else
+      inspectHasPlayVersion(false);
+  });
 
   // Killing an execution
   function stopJob(message) {
@@ -617,6 +614,13 @@ define([
       compiling:    "",
       running:      "",
       testing:      ""
+    },
+    inspect: {
+      inspectSupported:         inspectSupported,
+      inspectAkkaVersionReport: inspectAkkaVersionReport,
+      inspectPlayVersionReport: inspectPlayVersionReport,
+      inspectHasPlayVersion:    inspectHasPlayVersion,
+      whyInspectIsNotSupported: whyInspectIsNotSupported
     },
     actions: {
       kill:         killTask,

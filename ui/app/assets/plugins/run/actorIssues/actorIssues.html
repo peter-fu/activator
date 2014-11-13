@@ -196,11 +196,18 @@
 
 
   <!-- ko ifnot: hasDeviations() -->
-  <div class="hint fine">
-    <p>You rock!</p>
-    <span>There has been no actor errors found in your application</span>
-  </div>
+    <!-- ko if: inspect.inspectAkkaVersionReport() -->
+    <div class="hint fine">
+      <p>You Rock!</p>
+      <span data-bind="text: $root.inspect.inspectAkkaVersionReport"></span>
+    </div>
+    <!-- /ko -->
+    <!-- ko ifnot: inspect.inspectAkkaVersionReport() -->
+    <div class="hint error">
+      <p>No inpector</p>
+      <span data-bind="text: $root.inspect.whyInspectIsNotSupported"></span>
+    </div>
+    <!-- /ko -->
   <!-- /ko -->
-
 
 </article>

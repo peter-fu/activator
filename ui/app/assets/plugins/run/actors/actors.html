@@ -115,11 +115,20 @@
     <!-- /ko -->
   </section>
   <!-- /ko -->
-  <!-- ko ifnot: actors().length -->
-  <div class="hint actors">
-    <p>You can see actor information here</p>
-    <span>So far there has been no activity in your application or you're running an unsupported version of Akka (&gt;2.3.4)</span>
-  </div>
-  <!-- /ko -->
 
+
+  <!-- ko ifnot: actors().length -->
+    <!-- ko if: inspect.inspectAkkaVersionReport() -->
+    <div class="hint fine">
+      <p>You can see actor information here</p>
+      <span data-bind="text: $root.inspect.inspectAkkaVersionReport"></span>
+    </div>
+    <!-- /ko -->
+    <!-- ko ifnot: inspect.inspectAkkaVersionReport() -->
+    <div class="hint error">
+      <p>No inpector</p>
+      <span data-bind="text: $root.inspect.whyInspectIsNotSupported"></span>
+    </div>
+    <!-- /ko -->
+  <!-- /ko -->
 </article>

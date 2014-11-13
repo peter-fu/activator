@@ -17,7 +17,9 @@ define([
 ){
 
   var appStatus = ko.computed(function() {
-    if(!sbt.tasks.buildReady()){
+    if (sbt.tasks.applicationNotReady()){
+      return { id: "loading", label: "sbt is loading", url: "#build/tasks" };
+    } else if(!sbt.tasks.buildReady()){
       return { id: "buildFailed", label: "Build loading has failed", url: "#build/tasks" }
     } else if(sbt.tasks.compilationErrors().length){
       var ers = sbt.tasks.compilationErrors();

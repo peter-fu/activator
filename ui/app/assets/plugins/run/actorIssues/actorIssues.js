@@ -3,6 +3,7 @@
  */
 define([
   'services/sbt/app',
+  'services/sbt/tasks',
   "services/inspect/connection",
   "services/inspect/deviations",
   "main/plugins",
@@ -12,6 +13,7 @@ define([
   "css!widgets/modules/modules"
 ], function(
   app,
+  tasks,
   connection,
   deviations,
   plugins,
@@ -37,7 +39,8 @@ define([
     currentDeviation: deviations.currentDeviation,
     errorDeviation: deviations.errorDeviation,
     openDeviation: openDeviation,
-    prefs: app.deviationPrefs
+    prefs: app.deviationPrefs,
+    inspect: tasks.inspect
   }
 
   return {
