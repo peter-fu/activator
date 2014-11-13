@@ -27,22 +27,6 @@
           </div>
           Compile on file change
         </li>
-        <!-- ko if: sbt.app.projects().length -->
-        <li>
-          <h4>Current Project</h4>
-          <dl class="select dropdown">
-            <dt>
-              <span data-bind="text: sbt.app.currentProject"></span>
-              <span class="arrows">
-                <svg data-bind="svg: '/assets/icons/arrows.svg'"/>
-              </span>
-            </dt>
-            <dd data-bind="foreach: sbt.app.projects">
-              <a data-bind="text: $data, click: function(){ $parent.setProject($data); }"></a>
-            </dd>
-          </dl>
-        </li>
-        <!-- /ko -->
       </ul>
     </div>
     <ul class="list links">
