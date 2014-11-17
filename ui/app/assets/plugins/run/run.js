@@ -53,10 +53,6 @@ define([
     }
   });
 
-  var inspectActivated = ko.computed(function() {
-    return sbt.tasks.inspect.inspectSupported() && sbt.app.inspectActivated();
-  });
-
   var State = {
     subPlugin: subPlugin,
     sbtExecCommand: sbtExecCommand,
@@ -66,7 +62,7 @@ define([
     rerunOnBuild: sbt.app.settings.rerunOnBuild,
     automaticResetInspect: sbt.app.settings.automaticResetInspect,
     showLogDebug: sbt.app.settings.showLogDebug,
-    inspectActivated: inspectActivated,
+    inspectActivated: sbt.app.inspectActivated,
     inspectSupported: sbt.tasks.inspect.inspectSupported,
     mainRunAction: mainRunAction,
     mainRunName: mainRunName,

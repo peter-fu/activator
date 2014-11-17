@@ -452,7 +452,6 @@ define([
   });
 
   valueChanged.matchOnAttribute('key', 'echoTraceSupported').each(function(message) {
-    console.log("echoTraceSupported", message.value)
     inspectSupported(message.value === true);
   });
 
@@ -465,7 +464,7 @@ define([
   });
 
   valueChanged.matchOnAttribute('key', 'echoPlayVersionReport').each(function(message) {
-    console.log("echoPlayVersionReport", message.value)
+    debug && console.log("echoPlayVersionReport", message.value)
     var report = "";
     if (message.value)
       report = message.value;
@@ -473,7 +472,7 @@ define([
   });
 
   valueChanged.matchOnAttribute('key', 'echoTracePlayVersion').each(function(message) {
-    console.log("echoTracePlayVersion", message.value)
+    debug && console.log("echoTracePlayVersion", message.value)
     if (message.value && message.value !== '')
       inspectHasPlayVersion(true);
     else
