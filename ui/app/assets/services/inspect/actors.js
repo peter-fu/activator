@@ -13,9 +13,19 @@ define([
     connection.filters.actors($.extend(connection.filters.actors(), filters));
   }
   var actorsList = ko.observable([]);
+  var stats = ko.observable({
+    total: 0,
+    offset: 0,
+    limit: 0
+  });
 
   connection.streams.actors
     .map(function(message) {
+      stats({
+        total: message.data.actors.total,
+        offset: message.data.actors.offset,
+        limit: message.data.actors.limit
+      });
       return message.data.actors.actors;
     })
     .filterVal(function(actor) {
@@ -85,6 +95,7 @@ define([
 
 
   return {
+    stats: stats,
     list: actorsList,
     currentActor: currentActor,
     setListFilters: setListFilters,

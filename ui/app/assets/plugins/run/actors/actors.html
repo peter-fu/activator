@@ -26,12 +26,9 @@
             <p>
               <label><input type="checkbox" data-bind="checked: filters.hideAnonymous"> Hide anonymous actors</label>
             </p>
-            <p>
-              <label><input type="checkbox" zdata-bind="checked: fullActorPath"> Show full actor paths</label>
-            </p>
           </dd>
         </dl>
-        <span>Showing 50 of 277</span>
+        <span data-bind="text: showing"></span>
         <p>
           <label>Order by</label>
           <select data-bind="options: filters.orderByValues, optionsText: 'text', optionsValue: 'value', value: filters.orderBy"></select>

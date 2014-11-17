@@ -38,8 +38,8 @@ define([
       // fullTextSearch: fullTextSearch(),
       // limitSize:      limitSize(),
       sortDirection:  orderByDesc(),
-      sortCommand:    orderBy()
-      // hideAnonymous:  hideAnonymous()
+      sortCommand:    orderBy(),
+      hideAnonymous:  hideAnonymous()
     }
   });
   listFilters.subscribe(function(v) {
@@ -91,6 +91,14 @@ define([
     });
   }
 
+  var showing = ko.computed(function() {
+    var stats = actors.stats();
+    if (stats.total > stats.limit)
+      return "Showing " + stats.limit + " of " + stats.total;
+    else
+      return "Showing all " + stats.total + " actors";
+  });
+
   var State = {
     actors: filteredActorsList,
     fullTextSearch: fullTextSearch,
@@ -99,6 +107,7 @@ define([
     currentActor: actors.currentActor,
     openActor: openActor,
     closeActor: closeActor,
+    showing: showing,
     filters: {
       isOrdering:      isOrdering,
       toggleOrdering:  toggleOrdering,
