@@ -27,6 +27,7 @@ define([
 
   var licenseKeySaved = newrelic.licenseKeySaved();
   var available = newrelic.available();
+  var isProjectEnabled = newrelic.isProjectEnabled();
   var downloadEnabled = ko.observable(false);
   var developerKeyEnabled = ko.observable(false);
   var licenseKey = ko.observable(newrelic.licenseKey());
@@ -36,7 +37,6 @@ define([
   var needProvision = ko.computed(function() {
     return !available || !licenseKeySaved;
   });
-
 
   var enabled = ko.computed(function() {
     return !available;
@@ -108,6 +108,10 @@ define([
     newrelic.licenseKey("");
   };
 
+  var enableNewRelic = function () {
+    newrelic.enableProject();
+  };
+
   var State = {
     needProvision: needProvision,
     provisionNewRelic: provisionNewRelic,
@@ -116,7 +120,9 @@ define([
     saveLicenseKey: saveLicenseKey,
     resetLicenseKey: resetLicenseKey,
     error: error,
-    selectedTab: selectedTab
+    selectedTab: selectedTab,
+    enableNewRelic: enableNewRelic,
+    isProjectEnabled: isProjectEnabled
   };
 
   return {

@@ -19,27 +19,27 @@ define([
 
   var send = function (msg){
     websocket.send(msg);
-  }
+  };
 
   function nrMessage(type) {
     return { request: 'NewRelicRequest', type: type };
-  }
-
-  function nrMessageWith(type,attributes) {
-    return jQuery.extend(nrMessage(type), attributes);
-  }
+  };
 
   function checkIsProjectEnabled() {
     send(nrMessage("isProjectEnabled"));
-  }
+  };
 
   function checkIsSupportedJavaVersion() {
     send(nrMessage("isSupportedJavaVersion"));
-  }
+  };
 
   function checkAvailable() {
     send(nrMessage("available"));
-  }
+  };
+
+  function enableProject() {
+    send({ request: 'NewRelicRequest', type: "enable", key: licenseKey(), name: serverAppModel.name});
+  };
 
   var setObserveProvision = function(obs) {
     observable = obs;
@@ -61,6 +61,7 @@ define([
 
   stream.map(function (response) {
     if (response.subtype === 'newrelic') {
+      var event = response.event;
       if (event.type === "availableResponse") {
         debug && console.log("setting available to: " + event.result);
         available(event.result);
@@ -80,11 +81,16 @@ define([
       if (event.type === "projectEnabled") {
         debug && console.log("Project enabled for New Relic");
         checkIsProjectEnabled();
+        generateFiles();
       }
     } else if (response.subtype === 'ProvisioningStatus' && observeProvision) {
       observable(response.event);
     }
   });
+
+  var generateFiles = function () {
+    send({ request: 'NewRelicRequest', type: "generateFiles", location: serverAppModel.location, info: ""});
+  };
 
   // Initial request
   var init = function () {
@@ -96,24 +102,14 @@ define([
 
   init();
 
-  // TODO - needed?
-  /*
-   function onStreamOpen(handler) {
-   streams.subscribe(function (event) {
-   if (event.type == 'SourcesMayHaveChanged') {
-   handler(event);
-   }
-   });
-   }
-  */
-
   return {
     licenseKeySaved: licenseKeySaved,
     available: available,
     licenseKey: licenseKey,
     validKey: validKey,
     setObserveProvision: setObserveProvision,
-    unsetObserveProvision: unsetObserveProvision
-    // TODO - expose more functions (if the are needed? or else remove them)
+    unsetObserveProvision: unsetObserveProvision,
+    enableProject: enableProject,
+    isProjectEnabled: isProjectEnabled
   };
 });

@@ -52,6 +52,10 @@ object NewRelic {
     def response(result: Boolean, version: String): Response = IsSupportedJavaVersionResult(result, version, this)
   }
 
+  case class InternalGenerateFiles(location: String, appConfig: File) extends Request {
+    def response = InternalGenerateFilesResult(this)
+  }
+
   sealed trait Response {
     def request: Request
   }
@@ -64,6 +68,7 @@ object NewRelic {
   case class ProjectEnabled(request: Request) extends Response
   case class IsProjectEnabledResult(result: Boolean, request: Request) extends Response
   case class IsSupportedJavaVersionResult(result: Boolean, version: String, request: Request) extends Response
+  case class InternalGenerateFilesResult(request: Request) extends Response
 
   class Underlying(config: NR.Config)(log: LoggingAdapter)(implicit ec: ExecutionContext) {
     import monitor.Provisioning._
@@ -122,6 +127,14 @@ object NewRelic {
         case e: Exception =>
           log.error(e, "Failure checking for supported Java version for New Relic")
           sender ! r.error(s"Failure checking for supported Java version for New Relic: ${e.getMessage}")
+      }
+      case r @ InternalGenerateFiles(location, root) => try {
+        NR.generateFiles(location, config, context.system.settings.config, root)
+        sender ! r.response
+      } catch {
+        case e: Exception =>
+          log.error(e, "Failure creating sbt files required for New Relic support")
+          sender ! r.error(s"Failure creating sbt files required for New Relic support: ${e.getMessage}")
       }
     }
   }

@@ -135,8 +135,6 @@ object AppDynamics {
               ns.notify(ProvisioningError(s"Failure during provisioning: ${error.getMessage}", error))
           }
       case r @ Deprovision => try {
-        println("*** deprovisioning...")
-
         AD.deprovision(config.extractRoot())
         sender ! r.response
       } catch {

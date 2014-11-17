@@ -146,6 +146,9 @@ class AppWebSocketActor(val config: AppConfig) extends WebSocketActor[JsValue] w
       case x @ NewRelicRequest.IsSupportedJavaVersion =>
         askNewRelic[IsSupportedJavaVersionResult](monitor.NewRelic.IsSupportedJavaVersion, x,
           f => s"Failed checking for supported Java version: ${f.getMessage}")(r => produce(toJson(x.response(r.result, r.version))))
+      case x @ NewRelicRequest.GenerateFiles(location, info) =>
+        askNewRelic[InternalGenerateFilesResult](InternalGenerateFiles(location, config.location), x,
+          f => s"Failed generating NewRelic monitoring files: ${f.getMessage}")(r => produce(toJson(x.response)))
     }
   }
 

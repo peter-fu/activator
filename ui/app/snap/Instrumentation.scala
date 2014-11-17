@@ -10,6 +10,8 @@ import java.util.regex.Pattern
 import activator.properties.ActivatorProperties
 import akka.util.Timeout
 import com.typesafe.config.{ Config => TSConfig }
+import play.api.Play
+import sbt.IO
 
 import scala.concurrent.duration._
 
@@ -156,14 +158,48 @@ object NewRelic {
 
   def deprovision(target: File): Unit = FileHelper.deleteAll(target)
 
-  def isProjectEnabled(root: File): Boolean = {
+  def generateFiles(location: String, config: Config, systemConfig: com.typesafe.config.Config, root: File) = {
+    createNewRelicConfigFile(location, root)
+    createNewRelicPluginFile(location, systemConfig)
+  }
+
+  private def createNewRelicPluginFile(location: String, systemConfig: com.typesafe.config.Config) = {
+    val loc = Platform.fromClientFriendlyFilename(location + "/project/sbt-nr.sbt")
+    val content =
+      "addSbtPlugin(\"" + systemConfig.getString("activator.monitoring.new-relic.sbt-plugin-organization") + "\" % \"" +
+        systemConfig.getString("activator.monitoring.new-relic.sbt-plugin-name") + "\" % \"" +
+        systemConfig.getString("activator.monitoring.new-relic.sbt-plugin-version") + "\")\n"
+
+    IO.withTemporaryFile("activator", "create-plugin-file") { file =>
+      IO.write(file, content)
+      IO.move(file, loc)
+    }
+  }
+
+  private def createNewRelicConfigFile(location: String, root: File): Unit = {
+    val loc = Platform.fromClientFriendlyFilename(location + "/newrelic.sbt")
+    val (jar, yml) = projectFiles(root)
+    val content = "// This is an generated file for NewRelic configuration.\n\n" +
+      "newRelicAgentJar in NewRelic := \"" + jar.getPath + "\"\n\n" +
+      "newRelicConfigFile in NewRelic := \"" + yml.getPath + "\""
+    IO.withTemporaryFile("activator", "create-config-file") { file =>
+      IO.write(file, content)
+      IO.move(file, loc)
+    }
+  }
+
+  def projectFiles(root: File): (File, File) = {
     val nrRoot = FileHelper.relativeTo(root)_
     val lib = nrRoot("lib")
     val conf = nrRoot("conf")
     val libRelative = FileHelper.relativeTo(lib)_
     val confRelative = FileHelper.relativeTo(conf)_
-    def hasFile(file: String): Boolean = nrRoot(file).exists()
-    libRelative("newrelic.jar").exists() && confRelative("newrelic.yml").exists()
+    (libRelative("newrelic.jar"), confRelative("newrelic.yml"))
+  }
+
+  def isProjectEnabled(root: File): Boolean = {
+    val (jar, yml) = projectFiles(root)
+    jar.exists() && yml.exists()
   }
 
   trait SourceProcessor {

@@ -3,6 +3,8 @@
  */
 package snap
 
+import java.io.File
+
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import play.api.libs.json.Json._
@@ -37,6 +39,9 @@ object NewRelicRequest {
   case object IsSupportedJavaVersion extends Request {
     def response(result: Boolean, version: String): Response = IsSupportedJavaVersionResult(result, version, this)
   }
+  case class GenerateFiles(location: String, root: File) extends Request {
+    def response: Response = GeneratedFiles(this)
+  }
 
   sealed trait Response {
     def request: Request
@@ -52,6 +57,7 @@ object NewRelicRequest {
   case class ProjectEnabled(request: Request) extends Response
   case class IsProjectEnabledResponse(result: Boolean, request: Request) extends Response
   case class IsSupportedJavaVersionResult(result: Boolean, version: String, request: Request) extends Response
+  case class GeneratedFiles(request: Request) extends Response
 
   implicit val newRelicProvisionReads: Reads[Provision.type] =
     extractRequest[Provision.type](requestTag)(extractTypeOnly("provision", Provision))
@@ -92,6 +98,13 @@ object NewRelicRequest {
       "key" -> in.key,
       "name" -> in.appName))
 
+  implicit val newRelicGenerateFilesReads: Reads[GenerateFiles] =
+    extractRequest[GenerateFiles](requestTag)(extractType("generateFiles")(((__ \ "location").read[String] and
+      (__ \ "info").read[File])(GenerateFiles.apply _)))
+
+  implicit val newRelicGenerateFilesWrites: Writes[GenerateFiles] =
+    emitRequest(requestTag)(in => Json.obj("type" -> "generateFiles", "location" -> in.location))
+
   implicit val newRelicRequestReads: Reads[Request] = {
     val pr = newRelicProvisionReads.asInstanceOf[Reads[Request]]
     val ar = newRelicAvailableReads.asInstanceOf[Reads[Request]]
@@ -99,7 +112,8 @@ object NewRelicRequest {
     val iper = newRelicIsProjectEnabledReads.asInstanceOf[Reads[Request]]
     val de = newRelicDeprovisionReads.asInstanceOf[Reads[Request]]
     val ijs = newRelicIsSupportedJavaVersionReads.asInstanceOf[Reads[Request]]
-    extractRequest[Request](requestTag)(pr.orElse(ar).orElse(epr).orElse(iper).orElse(de).orElse(ijs))
+    val gf = newRelicGenerateFilesReads.asInstanceOf[Reads[Request]]
+    extractRequest[Request](requestTag)(pr.orElse(ar).orElse(epr).orElse(iper).orElse(de).orElse(ijs).orElse(gf))
   }
 
   implicit val newRelicProvisionedWrites: Writes[Provisioned.type] =
@@ -149,6 +163,12 @@ object NewRelicRequest {
         "message" -> in.message,
         "request" -> in.request)))
 
+  implicit val newRelicGeneratedFilesWrites: Writes[GeneratedFiles] =
+    emitResponse(responseTag, responseSubTag)(in => Json.obj("event" ->
+      Json.obj(
+        "type" -> "generatedFiles",
+        "request" -> in.request)))
+
   implicit val newRelicRequestWrites: Writes[Request] =
     Writes {
       case x: EnableProject => newRelicEnableProjectWrites.writes(x)
@@ -157,6 +177,7 @@ object NewRelicRequest {
       case x @ Available => newRelicAvailableWrites.writes(x)
       case x @ Deprovision => newRelicDeprovisionWrites.writes(x)
       case x @ IsSupportedJavaVersion => newRelicIsSupportedJavaVersionWrites.writes(x)
+      case x: GenerateFiles => newRelicGenerateFilesWrites.writes(x)
     }
 
   implicit val newRelicResponseWrites: Writes[Response] =
@@ -168,6 +189,7 @@ object NewRelicRequest {
       case x: ErrorResponse => newRelicErrorResponseWrites.writes(x)
       case x: IsSupportedJavaVersionResult => newRelicIsSupportedJavaVersionResultWrites.writes(x)
       case x @ Deprovisioned => newRelicDeprovisionedWrites.writes(x)
+      case x: GeneratedFiles => newRelicGeneratedFilesWrites.writes(x)
     }
 
   def unapply(in: JsValue): Option[Request] = Json.fromJson[Request](in).asOpt
