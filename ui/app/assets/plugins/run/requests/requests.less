@@ -4,5 +4,19 @@
 @import "../../../commons/_base";
 
 .plugin.requests {
+  .method {
+    color: @grey-ltr;
+    font-size: 11px;
+    width: 40px !important;
+  }
+  .path {
+    color: @blue-text;
+  }
 
+  tr[data-response-code^="4"] td {
+    color: @orange;
+  }
+  tr[data-response-code^="5"] td {
+    color: @red;
+  }
 }

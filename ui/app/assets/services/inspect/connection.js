@@ -12,8 +12,8 @@ define([
     actors:     websocket.subscribe('type', 'actors'),
     deviation:  websocket.subscribe('type', 'deviation'),
     deviations: websocket.subscribe('type', 'deviations'),
-    request:    websocket.subscribe('type', 'request'),
-    requests:   websocket.subscribe('type', 'requests')
+    request:    websocket.subscribe('type', 'playrequest'),
+    requests:   websocket.subscribe('type', 'playrequests')
   }
 
   var filters = {

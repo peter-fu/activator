@@ -396,7 +396,7 @@ define([
   var valueChanged = subTypeEventStream("ValueChanged").map(function(message) {
     var valueOrNull = null;
     if (message.event.value.success)
-      valueOrNull = message.event.value;
+      valueOrNull = message.event.value.serialized;
     debug && console.log("ValueChanged for ", message.event.key.key.name, valueOrNull, message.event);
     return {
       key: message.event.key.key.name,
@@ -443,30 +443,30 @@ define([
       return "The sbt-echo plugin may not be present on this project or may not be enabled.";
   });
 
-  whyInspectIsNotSupported.subscribe(function(why) {
-    if (debug) {
+  // if (debug) {
+    whyInspectIsNotSupported.subscribe(function(why) {
       if (inspectSupported())
         console.log("Inspect is supported");
       else
         console.log("Inspect is not supported because ", why);
-    }
-  });
+    });
+  // }
 
   valueChanged.matchOnAttribute('key', 'echoTraceSupported').each(function(message) {
-    inspectSupported(message.value.value === true);
+    inspectSupported(message.value === true);
   });
 
   valueChanged.matchOnAttribute('key', 'echoAkkaVersionReport').each(function(message) {
     var report = "";
-    if (message.value.value)
-      report = message.value.value;
+    if (message.value)
+      report = message.value;
     inspectAkkaVersionReport(report);
   });
 
   valueChanged.matchOnAttribute('key', 'echoPlayVersionReport').each(function(message) {
     var report = "";
-    if (message.value.value)
-      report = message.value.value;
+    if (message.value)
+      report = message.value;
     inspectPlayVersionReport(report);
   });
 
@@ -653,6 +653,13 @@ define([
       compiling:    "",
       running:      "",
       testing:      ""
+    },
+    inspect: {
+      inspectSupported:         inspectSupported,
+      inspectAkkaVersionReport: inspectAkkaVersionReport,
+      inspectPlayVersionReport: inspectPlayVersionReport,
+      inspectHasPlayVersion:    inspectHasPlayVersion,
+      whyInspectIsNotSupported: whyInspectIsNotSupported
     },
     actions: {
       kill:         killTask,
