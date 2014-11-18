@@ -76,15 +76,11 @@
     </div>
     <div class="tabs-step enable" data-bind="css: { opened: selectedTab() == 'enable' }">
       <h2>Enable</h2>
-      <div class="options">
-        <ul>
-          <li>
-            <div class="switch" data-bind="css: { 'active': isProjectEnabled }, click: enableNewRelic">
+      <div class="enable-switch" data-bind="click: enableNewRelic">
+            <div class="switch" data-bind="css: { 'active': isProjectEnabled }">
               <div class="inner"></div>
             </div>
             Enable NewRelic Monitoring
-          </li>
-        </ul>
       </div>
       <p>Please note that by enabling New Relic monitoring there will be two local files generated:</p>
       <p><b>./project/sbt-nr.sbt</b> : this file includes a sbt plugin specific for running New Relic monitoring</p>

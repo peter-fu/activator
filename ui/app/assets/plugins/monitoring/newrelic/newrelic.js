@@ -93,6 +93,7 @@ define([
     } else if (developerKeyEnabled()) {
       error("");
       newrelic.licenseKey(licenseKey());
+      // TODO: do this step after NR is enabled
       monitoringSolutions.addNewRelicToSolutions();
     } else {
       monitoringSolutions.removeNewRelicFromSolutions();
