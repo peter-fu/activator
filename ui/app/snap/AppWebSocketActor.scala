@@ -7,7 +7,6 @@ import console.ClientController.HandleRequest
 import play.api.Play
 import play.api.libs.json.Json._
 import play.api.libs.json._
-import snap.AppDynamicsRequest.{ Deprovisioned, AvailableResponse, Provisioned }
 import snap.JsonHelper._
 import scala.reflect.ClassTag
 import scala.util.{ Failure, Success }
@@ -17,7 +16,7 @@ class AppWebSocketActor(val config: AppConfig) extends WebSocketActor[JsValue] w
   implicit val timeout = WebSocketActor.timeout
 
   lazy val appDynamicsConfig = AppDynamics.fromConfig(Play.current.configuration.underlying)
-  lazy val appDynamicsActor: ActorRef = context.actorOf(monitor.AppDynamics.props(appDynamicsConfig, defaultContext))
+  lazy val appDynamicsActor: ActorRef = context.actorOf(monitor.AppDynamicsActor.props(appDynamicsConfig, defaultContext))
   lazy val newRelicActor: ActorRef = context.actorOf(monitor.NewRelic.props(NewRelic.fromConfig(Play.current.configuration.underlying), defaultContext))
 
   override def onMessage(json: JsValue): Unit = {
@@ -100,22 +99,34 @@ class AppWebSocketActor(val config: AppConfig) extends WebSocketActor[JsValue] w
     in match {
       case x @ AppDynamicsRequest.Provision(username, password) =>
         val sink = context.actorOf(Props(new ProvisioningSink(ProvisioningSinkState(), log => new ProvisioningSinkUnderlying(log, produce))))
-        askAppDynamics[monitor.AppDynamics.Provisioned](monitor.AppDynamics.Provision(sink, username, password), x,
+        askAppDynamics[monitor.AppDynamicsActor.Provisioned](monitor.AppDynamicsActor.InternalProvision(sink, username, password), x,
           f => s"Failed to provision AppDynamics: ${f.getMessage}")(_ => produce(toJson(x.response)))
       case x @ AppDynamicsRequest.Available =>
-        askAppDynamics[monitor.AppDynamics.AvailableResponse](monitor.AppDynamics.Available, x,
+        askAppDynamics[monitor.AppDynamicsActor.InternalAvailableResponse](monitor.AppDynamicsActor.InternalAvailable, x,
           f => s"Failed AppDynamics availability check: ${f.getMessage}")(r => produce(toJson(x.response(r.result))))
       case x @ AppDynamicsRequest.Deprovision =>
-        askAppDynamics[monitor.AppDynamics.Deprovisioned.type](monitor.AppDynamics.Deprovision, x,
+        askAppDynamics[monitor.AppDynamicsActor.Deprovisioned.type](monitor.AppDynamicsActor.InternalDeprovision, x,
           f => s"Failed AppDynamics deprovisioning: ${f.getMessage}")(r => produce(toJson(x.response)))
+      case x @ AppDynamicsRequest.GenerateFiles(location, applicationName, nodeName, tierName, accountName, accessKey, hostName, port, sslEnabled) =>
+        askAppDynamics[monitor.AppDynamicsActor.InternalGenerateFilesResult](monitor.AppDynamicsActor.InternalGenerateFiles(
+          location, InstrumentationRequestTypes.AppDynamics(
+            applicationName = applicationName,
+            nodeName = nodeName,
+            tierName = tierName,
+            accountName = accountName,
+            accessKey = accessKey,
+            hostName = hostName,
+            port = port.toInt,
+            sslEnabled = sslEnabled)), x,
+          f => s"Failed generating AppDynamics monitoring files: ${f.getMessage}")(r => produce(toJson(x.response)))
     }
   }
 
-  def askAppDynamics[T <: monitor.AppDynamics.Response](msg: monitor.AppDynamics.Request, omsg: AppDynamicsRequest.Request, onFailure: Throwable => String)(body: T => Unit)(implicit tag: ClassTag[T]): Unit = {
-    appDynamicsActor.ask(msg).mapTo[monitor.AppDynamics.Response].onComplete {
-      case Success(r: monitor.AppDynamics.ErrorResponse) => produce(toJson(omsg.error(r.message)))
+  def askAppDynamics[T <: monitor.AppDynamicsActor.Response](msg: monitor.AppDynamicsActor.Request, omsg: AppDynamicsRequest.Request, onFailure: Throwable => String)(body: T => Unit)(implicit tag: ClassTag[T]): Unit = {
+    appDynamicsActor.ask(msg).mapTo[monitor.AppDynamicsActor.Response].onComplete {
+      case Success(r: monitor.AppDynamicsActor.InternalErrorResponse) => produce(toJson(omsg.error(r.message)))
       case Success(`tag`(r)) => body(r)
-      case Success(r: monitor.AppDynamics.Response) =>
+      case Success(r: monitor.AppDynamicsActor.Response) =>
         log.error(s"Unexpected response from request: $msg got: $r expected: ${tag.toString()}")
       case Failure(f) =>
         val errorMsg = onFailure(f)
@@ -147,7 +158,7 @@ class AppWebSocketActor(val config: AppConfig) extends WebSocketActor[JsValue] w
         askNewRelic[IsSupportedJavaVersionResult](monitor.NewRelic.IsSupportedJavaVersion, x,
           f => s"Failed checking for supported Java version: ${f.getMessage}")(r => produce(toJson(x.response(r.result, r.version))))
       case x @ NewRelicRequest.GenerateFiles(location, info) =>
-        askNewRelic[InternalGenerateFilesResult](InternalGenerateFiles(location, config.location), x,
+        askNewRelic[monitor.NewRelic.InternalGenerateFilesResult](monitor.NewRelic.InternalGenerateFiles(location, config.location), x,
           f => s"Failed generating NewRelic monitoring files: ${f.getMessage}")(r => produce(toJson(x.response)))
     }
   }

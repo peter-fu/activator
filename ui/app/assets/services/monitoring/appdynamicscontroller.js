@@ -100,6 +100,20 @@ define(['commons/utils',
     return validTierName.test(name);
   });
 
+  var enableProject = function () {
+    send(adMessageWith("generateFiles", {
+      location: serverAppModel.location,
+      applicationName: "n/a",
+      nodeName: nodeName(),
+      tierName: tierName(),
+      accountName: accountName(),
+      accessKey: accessKey(),
+      hostName: hostName(),
+      port: port(),
+      sslEnabled: sslEnabled()
+    }));
+  };
+
   debug && console.log("Making initial request to check AD availability");
   send(adMessage("available"));
 
@@ -126,6 +140,7 @@ define(['commons/utils',
     setObserveProvision: setObserveProvision,
     unsetObserveProvision: unsetObserveProvision,
     nodeNameSaved: nodeNameSaved,
-    tierNameSaved: tierNameSaved
+    tierNameSaved: tierNameSaved,
+    enableProject: enableProject
   };
 });

@@ -70,7 +70,7 @@
         The New Relic Agent has been downloaded and your key configured.  You may enable New Relic for <a href="http://www.playframework.com/" target="_blank">Play</a>-based templates
         from the <a href="#run">run</a> tab.
       </p>
-      <p><button data-bind="click: resetKey">Reset key</button></p>
+      <p><button data-bind="click: resetLicenseKey">Reset key</button></p>
       <!-- /ko -->
       <p class="error" data-bind="visible: error, text: error"></p>
     </div>
@@ -82,9 +82,9 @@
             </div>
             Enable NewRelic Monitoring
       </div>
-      <p>Please note that by enabling New Relic monitoring there will be two local files generated:</p>
-      <p><b>./project/sbt-nr.sbt</b> : this file includes a sbt plugin specific for running New Relic monitoring</p>
-      <p><b>./newrelic.sbt</b> : contains the configuration parameters used when running New Relic</p>
+      <p>Please note that by enabling NewRelic monitoring there will be two local files generated:</p>
+      <p><b>./project/sbt-nr.sbt</b> : this file includes a sbt plugin specific for running NewRelic monitoring</p>
+      <p><b>./newrelic.sbt</b> : contains the configuration parameters used when running NewRelic</p>
       <p>Once enabled Activator will automatically restart to load the NewRelic sbt plugin definition.</p>
       <p>See <a href="#" data-bind="click: function(){selectedTab('run')} ">Run</a> for information about how to proceed.</p>
     </div>

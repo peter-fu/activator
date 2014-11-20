@@ -52,6 +52,8 @@ define([
     var nodeName = ko.observable(appdynamics.nodeName());
     var tierName = ko.observable(appdynamics.tierName());
 
+    var isProjectEnabled = ko.observable(false);
+
     var hostNameInvalid = ko.computed(function() {
       return !appdynamics.validHostName.test(hostName());
     });
@@ -188,6 +190,11 @@ define([
 
     var error = ko.observable();
 
+    var enableAppDynamics = function () {
+      appdynamics.enableProject();
+      isProjectEnabled(true);
+    };
+
     var State = {
       needProvision: needProvision,
       provisionAppDynamics: provisionAppDynamics,
@@ -216,7 +223,9 @@ define([
       saveConfig: saveConfig,
       cancelSave: cancelSave,
       error: error,
-      selectedTab: selectedTab
+      selectedTab: selectedTab,
+      isProjectEnabled: isProjectEnabled,
+      enableAppDynamics: enableAppDynamics
     };
 
     return {

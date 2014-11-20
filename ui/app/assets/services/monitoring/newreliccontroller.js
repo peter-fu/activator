@@ -21,24 +21,28 @@ define([
     websocket.send(msg);
   };
 
-  function nrMessage(type) {
+  var nrMessage = function (type) {
     return { request: 'NewRelicRequest', type: type };
   };
 
-  function checkIsProjectEnabled() {
+  var nrMessageWith = function (type,attributes) {
+    return jQuery.extend(nrMessage(type), attributes);
+  };
+
+  var checkIsProjectEnabled = function () {
     send(nrMessage("isProjectEnabled"));
   };
 
-  function checkIsSupportedJavaVersion() {
+  var checkIsSupportedJavaVersion = function () {
     send(nrMessage("isSupportedJavaVersion"));
   };
 
-  function checkAvailable() {
+  var checkAvailable = function () {
     send(nrMessage("available"));
   };
 
-  function enableProject() {
-    send({ request: 'NewRelicRequest', type: "enable", key: licenseKey(), name: serverAppModel.name});
+  var enableProject = function () {
+    send(nrMessageWith("enable", {key: licenseKey(), name: serverAppModel.name}));
   };
 
   var setObserveProvision = function(obs) {
@@ -89,7 +93,7 @@ define([
   });
 
   var generateFiles = function () {
-    send({ request: 'NewRelicRequest', type: "generateFiles", location: serverAppModel.location, info: ""});
+    send(nrMessageWith("generateFiles", { location: serverAppModel.location, info: "" }));
   };
 
   // Initial request

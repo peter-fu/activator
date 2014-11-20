@@ -10,7 +10,6 @@ import java.util.regex.Pattern
 import activator.properties.ActivatorProperties
 import akka.util.Timeout
 import com.typesafe.config.{ Config => TSConfig }
-import play.api.Play
 import sbt.IO
 
 import scala.concurrent.duration._
@@ -166,7 +165,9 @@ object NewRelic {
   private def createNewRelicPluginFile(location: String, systemConfig: com.typesafe.config.Config) = {
     val loc = Platform.fromClientFriendlyFilename(location + "/project/sbt-nr.sbt")
     val content =
-      "addSbtPlugin(\"" + systemConfig.getString("activator.monitoring.new-relic.sbt-plugin-organization") + "\" % \"" +
+      "// This is a generated file that enables NewRelic monitoring.\n\n" +
+        "resolvers += Resolver.typesafeIvyRepo(\"snapshots\")\n\n" +
+        "addSbtPlugin(\"" + systemConfig.getString("activator.monitoring.new-relic.sbt-plugin-organization") + "\" % \"" +
         systemConfig.getString("activator.monitoring.new-relic.sbt-plugin-name") + "\" % \"" +
         systemConfig.getString("activator.monitoring.new-relic.sbt-plugin-version") + "\")\n"
 
@@ -179,7 +180,7 @@ object NewRelic {
   private def createNewRelicConfigFile(location: String, root: File): Unit = {
     val loc = Platform.fromClientFriendlyFilename(location + "/newrelic.sbt")
     val (jar, yml) = projectFiles(root)
-    val content = "// This is an generated file for NewRelic configuration.\n\n" +
+    val content = "// This is a generated files that enables NewRelic monitoring.\n\n" +
       "newRelicAgentJar in NewRelic := \"" + jar.getPath + "\"\n\n" +
       "newRelicConfigFile in NewRelic := \"" + yml.getPath + "\""
     IO.withTemporaryFile("activator", "create-config-file") { file =>
@@ -359,6 +360,61 @@ object AppDynamics {
 
   def hasAppDynamics(source: File): Boolean =
     source.exists() && source.isDirectory && source.listFiles().nonEmpty
+
+  def generateFiles(location: String, settings: InstrumentationRequestTypes.AppDynamics, systemConfig: com.typesafe.config.Config, config: Config) = {
+    createAppDynamicsConfigFile(location, settings, config)
+    createAppDynamicsPluginFile(location, systemConfig)
+  }
+
+  private def createAppDynamicsPluginFile(location: String, systemConfig: com.typesafe.config.Config) = {
+    val loc = Platform.fromClientFriendlyFilename(location + "/project/sbt-ad.sbt")
+    val content =
+      "// This is a generated file that enables AppDynamics monitoring.\n\n" +
+        "resolvers += Resolver.typesafeIvyRepo(\"snapshots\")\n\n" +
+        "addSbtPlugin(\"" + systemConfig.getString("activator.monitoring.appdynamics.sbt-plugin-organization") + "\" % \"" +
+        systemConfig.getString("activator.monitoring.appdynamics.sbt-plugin-name") + "\" % \"" +
+        systemConfig.getString("activator.monitoring.appdynamics.sbt-plugin-version") + "\")\n"
+
+    IO.withTemporaryFile("activator", "create-plugin-file") { file =>
+      IO.write(file, content)
+      IO.move(file, loc)
+    }
+  }
+
+  private def createAppDynamicsConfigFile(location: String, settings: InstrumentationRequestTypes.AppDynamics, config: Config): Unit = {
+    val loc = Platform.fromClientFriendlyFilename(location + "/appdynamics.sbt")
+    val agentJar = Platform.fromClientFriendlyFilename(config.extractRoot().getPath + "/javaagent.jar")
+    val content =
+      s"""
+        |// This is a generated file that enables AppDynamics monitoring." +
+        |
+        |appDynamicsAgentJar in AppDynamics := "${agentJar.getPath}"
+        |
+        |appDynamicsAgentTierName in AppDynamics := "development"
+        |
+        |appDynamicsAgentNodeName in AppDynamics := "${settings.nodeName}"
+        |
+        |appDynamicsAgentApplicationName in AppDynamics := "${settings.applicationName}"
+        |
+        |appDynamicsAgentRuntimeDir in AppDynamics := "${agentJar.getParentFile.getPath}"
+        |
+        |appDynamicsAgentAccountName in AppDynamics := "${settings.accountName}"
+        |
+        |appDynamicsAgentAccountAccessKey in AppDynamics := "${settings.accessKey}"
+        |
+        |appDynamicsControllerHostName in AppDynamics := "${settings.hostName}"
+        |
+        |appDynamicsControllerPort in AppDynamics := "${settings.port}"
+        |
+        |appDynamicsControllerSslEnabled in AppDynamics := "${settings.sslEnabled}"
+        |
+      """.stripMargin
+
+    IO.withTemporaryFile("activator", "create-config-file") { file =>
+      IO.write(file, content)
+      IO.move(file, loc)
+    }
+  }
 
   def deprovision(target: File): Unit = FileHelper.deleteAll(target)
 

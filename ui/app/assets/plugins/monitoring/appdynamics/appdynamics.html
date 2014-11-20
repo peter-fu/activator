@@ -12,6 +12,9 @@
                 <li data-bind="css: { active: selectedTab() == 'configure' }, click: function(){selectedTab('configure')} ">
                     Configure
                 </li>
+                <li data-bind="css: { active: selectedTab() == 'enable' }, click: function(){selectedTab('enable')} ">
+                    Enable
+                </li>
                 <li data-bind="css: { active: selectedTab() == 'run' }, click: function(){selectedTab('run')} ">
                     Run
                 </li>
@@ -104,6 +107,20 @@
             </p>
             <!-- /ko -->
             <p class="error" data-bind="visible: error, text: error"></p>
+        </div>
+        <div class="tabs-step enable" data-bind="css: { opened: selectedTab() == 'enable' }">
+            <h2>Enable</h2>
+            <div class="enable-switch" data-bind="click: enableAppDynamics">
+                <div class="switch" data-bind="css: { 'active': isProjectEnabled }">
+                    <div class="inner"></div>
+                </div>
+                Enable AppDynamics Monitoring
+            </div>
+            <p>Please note that by enabling AppDynamics monitoring there will be two local files generated:</p>
+            <p><b>./project/sbt-ad.sbt</b> : this file includes a sbt plugin specific for running AppDynamics monitoring</p>
+            <p><b>./appdynamics.sbt</b> : contains the configuration parameters used when running AppDynamics</p>
+            <p>Once enabled Activator will automatically restart to load the AppDynamics sbt plugin definition.</p>
+            <p>See <a href="#" data-bind="click: function(){selectedTab('run')} ">Run</a> for information about how to proceed.</p>
         </div>
         <div class="tabs-step run" data-bind="css: { opened: selectedTab() == 'run' }">
             <h2>Steps to set up and run with AppDynamics Monitoring</h2>

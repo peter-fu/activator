@@ -11,23 +11,23 @@ import snap.HttpHelper._
 import scala.concurrent.duration._
 import monitor.Provisioning.{ StatusNotifier, DownloadPrepExecutor }
 import play.api.libs.ws.{ WSClient, WSResponse, WSRequestHolder, WSCookie }
-import snap.{ AppDynamics => AD }
+import snap.{ InstrumentationRequestTypes, AppDynamics }
 import scala.util.{ Success, Failure }
 import scala.concurrent.{ Future, ExecutionContext }
 import akka.event.LoggingAdapter
 
-object AppDynamics {
-  def props(config: AD.Config,
+object AppDynamicsActor {
+  def props(config: AppDynamics.Config,
     executionContext: ExecutionContext): Props =
-    Props(new AppDynamics(new Underlying(config)(_)(executionContext)))
+    Props(new AppDynamicsActor(new Underlying(config)(_)(executionContext)))
 
   def unapply(in: Any): Option[Request] = in match {
     case r: Request => Some(r)
     case _ => None
   }
 
-  sealed class Username private[AppDynamics] (val value: String)
-  sealed class Password private[AppDynamics] (val value: String)
+  sealed class Username private[AppDynamicsActor] (val value: String)
+  sealed class Password private[AppDynamicsActor] (val value: String)
 
   object Username {
     def apply(in: String): Username = {
@@ -46,30 +46,34 @@ object AppDynamics {
   }
   sealed trait Request {
     def error(message: String): Response =
-      ErrorResponse(message, this)
+      InternalErrorResponse(message, this)
   }
 
-  case class Provision(notificationSink: ActorRef, username: Username, password: Password) extends Request {
+  case class InternalProvision(notificationSink: ActorRef, username: Username, password: Password) extends Request {
     def response: Response = Provisioned(this)
   }
 
-  case object Deprovision extends Request {
+  case object InternalDeprovision extends Request {
     def response: Response = Deprovisioned
   }
 
-  case object Available extends Request {
-    def response(result: Boolean): Response = AvailableResponse(result, this)
+  case object InternalAvailable extends Request {
+    def response(result: Boolean): Response = InternalAvailableResponse(result, this)
   }
 
   sealed trait Response {
     def request: Request
   }
-  case class Provisioned(request: Provision) extends Response
+  case class Provisioned(request: InternalProvision) extends Response
   case object Deprovisioned extends Response {
-    val request: Request = Deprovision
+    val request: Request = InternalDeprovision
   }
-  case class ErrorResponse(message: String, request: Request) extends Response
-  case class AvailableResponse(result: Boolean, request: Request) extends Response
+  case class InternalErrorResponse(message: String, request: Request) extends Response
+  case class InternalAvailableResponse(result: Boolean, request: Request) extends Response
+  case class InternalGenerateFilesResult(request: Request) extends Response
+  case class InternalGenerateFiles(location: String, appDynamicSettings: InstrumentationRequestTypes.AppDynamics) extends Request {
+    def response = InternalGenerateFilesResult(this)
+  }
 
   private def serializeCookie(in: WSCookie): String = {
     (in.name, in.value) match {
@@ -118,11 +122,11 @@ object AppDynamics {
     def failureDiagnostics: String = credentials.failureDiagnostics
   }
 
-  class Underlying(config: AD.Config)(log: LoggingAdapter)(implicit ec: ExecutionContext) {
+  class Underlying(config: AppDynamics.Config)(log: LoggingAdapter)(implicit ec: ExecutionContext) {
     import Provisioning._
 
     def onMessage(request: Request, sender: ActorRef, self: ActorRef, context: ActorContext): Unit = request match {
-      case r @ Provision(sink, username, password) =>
+      case r @ InternalProvision(sink, username, password) =>
         val ns = actorWrapper(sink)
         prepareDownload(defaultWSClient,
           UsernamePasswordCredentials(username.value, password.value),
@@ -134,30 +138,38 @@ object AppDynamics {
             case Failure(error) =>
               ns.notify(ProvisioningError(s"Failure during provisioning: ${error.getMessage}", error))
           }
-      case r @ Deprovision => try {
-        AD.deprovision(config.extractRoot())
+      case r @ InternalDeprovision => try {
+        AppDynamics.deprovision(config.extractRoot())
         sender ! r.response
       } catch {
         case e: Exception =>
           log.error(e, "Failure deprovisioning AppDynamics")
           sender ! r.error(s"Failure deprovisioning AppDynamics: ${e.getMessage}")
       }
-      case r @ Available => try {
-        val v = AD.hasAppDynamics(config.extractRoot())
+      case r @ InternalAvailable => try {
+        val v = AppDynamics.hasAppDynamics(config.extractRoot())
         sender ! r.response(v)
       } catch {
         case e: Exception =>
           log.error(e, "Failure during AppDynamics availability check")
           sender ! r.error(s"Failure during AppDynamics availability check: ${e.getMessage}")
       }
+      case r @ InternalGenerateFiles(location, appDynamicsSettings) => try {
+        AppDynamics.generateFiles(location, appDynamicsSettings, context.system.settings.config, config)
+        sender ! r.response
+      } catch {
+        case e: Exception =>
+          log.error(e, "Failure creating sbt files required for New Relic support")
+          sender ! r.error(s"Failure creating sbt files required for New Relic support: ${e.getMessage}")
+      }
     }
   }
 }
 
-class AppDynamics(appDynamicsBuilder: LoggingAdapter => AppDynamics.Underlying) extends Actor with ActorLogging {
+class AppDynamicsActor(appDynamicsBuilder: LoggingAdapter => AppDynamicsActor.Underlying) extends Actor with ActorLogging {
   val appDynamics = appDynamicsBuilder(log)
 
   def receive: Receive = {
-    case r: AppDynamics.Request => appDynamics.onMessage(r, sender, self, context)
+    case r: AppDynamicsActor.Request => appDynamics.onMessage(r, sender, self, context)
   }
 }
