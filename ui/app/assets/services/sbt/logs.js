@@ -39,18 +39,17 @@ define([
   /**
   Logs, by execution/task
   */
-  logEvent.matchOnAttribute("subType", "TaskLogEvent").filter(filterDebug).map(function(m) {
-    if (m.event.taskId) {
-      m.executionId = tasks.findExecutionIdByTaskId(m.event.taskId);
-    }
-    return m;
-  }).each(function(m) {
-    logs.push(m);
-  });
+  logEvent.matchOnAttribute("subType", "TaskLogEvent")
+    .filter(filterDebug)
+    .each(function(m) {
+      logs.push(m);
+    });
 
-  logEvent.matchOnAttribute("subType", "CoreLogEvent").filter(filterDebug).each(function(m) {
-    logs.push(m);
-  });
+  logEvent.matchOnAttribute("subType", "CoreLogEvent")
+    .filter(filterDebug)
+    .each(function(m) {
+      logs.push(m);
+    });
 
   logEvent
     .matchOnAttribute("subType", "BackgroundJobLogEvent")
