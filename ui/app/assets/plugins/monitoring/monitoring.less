@@ -207,3 +207,21 @@ Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
     float: right;
   }
 }
+
+.monitoring-installer {
+  li {
+    padding: 4px 15px;
+  }
+  li:after {
+    content: "[PENDING]";
+    margin-left: 20px;
+  }
+  li.success:after {
+    content: "[OK]";
+    color: @green;
+  }
+  ul {
+    padding-bottom: 15px;
+  }
+
+}

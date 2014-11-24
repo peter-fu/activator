@@ -3,7 +3,7 @@
  */
 define([
   'commons/websocket',
-  'commons/settings'
+  'commons/settings',
 ], function(
   websocket,
   settings

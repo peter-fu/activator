@@ -5,6 +5,8 @@ define([
   "main/plugins",
   "services/monitoring/newreliccontroller",
   "services/monitoring/monitoringSolutions",
+  "services/sbt",
+  "../monitoringInstaller",
   "text!./newrelic.html",
   "css!./newrelic",
   "css!widgets/modules/modules",
@@ -13,6 +15,8 @@ define([
   plugins,
   newrelic,
   monitoringSolutions,
+  sbt,
+  monitoringInstaller,
   tpl
   ) {
 
@@ -110,7 +114,14 @@ define([
   };
 
   var enableNewRelic = function () {
+    sbt.tasks.actions.kill();
     newrelic.enableProject();
+    monitoringInstaller({
+      provider: "New Relic",
+      addingFile: "project/sbt-nr.sbt",
+      addedFile: newrelic.available,
+      echoReady: sbt.tasks.echoReady
+    });
   };
 
   var State = {
