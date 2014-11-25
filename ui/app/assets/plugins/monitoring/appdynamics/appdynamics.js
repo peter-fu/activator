@@ -194,6 +194,7 @@ define([
     var error = ko.observable();
 
     var enableAppDynamics = function () {
+      sbt.tasks.actions.kill();
       appdynamics.enableProject();
 
       monitoringInstaller({
