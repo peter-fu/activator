@@ -35,27 +35,6 @@ object InstrumentationRequestTypes {
     sslEnabled: Boolean) extends InstrumentationRequestType(Instrumentations.appDynamicsName) {
     final val tag: InstrumentationTag = snap.AppDynamics.Tag(applicationName, nodeName, tierName, accountName, accessKey, hostName, port, sslEnabled)
   }
-
-  def fromParams(params: Map[String, Any]): InstrumentationRequestType =
-    params.get("instrumentation").asInstanceOf[Option[String]].getOrElse(Instrumentations.inspectName) match {
-      case Instrumentations.inspectName => InstrumentationRequestTypes.Inspect
-      case Instrumentations.newRelicName => InstrumentationRequestTypes.NewRelic
-      case Instrumentations.appDynamicsName =>
-        (for {
-          applicationName <- params.get("applicationName").asInstanceOf[Option[String]]
-          nodeName <- params.get("nodeName").asInstanceOf[Option[String]]
-          tierName <- params.get("tierName").asInstanceOf[Option[String]]
-          accountName <- params.get("accountName").asInstanceOf[Option[String]]
-          accessKey <- params.get("accessKey").asInstanceOf[Option[String]]
-          hostName <- params.get("hostName").asInstanceOf[Option[String]]
-          port <- params.get("port").asInstanceOf[Option[BigDecimal]].map(_.intValue())
-          sslEnabled <- params.get("sslEnabled").asInstanceOf[Option[Boolean]]
-        } yield {
-          InstrumentationRequestTypes.AppDynamics(applicationName, nodeName, tierName, accountName, accessKey, hostName, port, sslEnabled)
-        }).getOrElse {
-          throw new InstrumentationRequestException(s"Invalid request for AppDynamics instrumentation.  Request must include: 'applicationName', 'nodeName', 'tierName', 'accountName', 'accessKey', 'hostName', 'port', and 'sslEnabled'.  Got: $params")
-        }
-    }
 }
 
 sealed trait InstrumentationTag {
@@ -63,7 +42,6 @@ sealed trait InstrumentationTag {
 }
 
 sealed abstract class Instrumentation(val name: String) {
-  def jvmArgs: Seq[String]
   def tag: InstrumentationTag
 }
 
@@ -75,16 +53,10 @@ case object Inspect extends Instrumentation(Instrumentations.inspectName) { self
   case object Tag extends InstrumentationTag {
     final val name: String = self.name
   }
-  def jvmArgs: Seq[String] = Seq.empty[String]
   val tag: InstrumentationTag = Tag
 }
 
 case class NewRelic(configFile: File, agentJar: File, environment: String = "development") extends Instrumentation(Instrumentations.newRelicName) {
-  def jvmArgs: Seq[String] = Seq(
-    s"-javaagent:${agentJar.getPath}",
-    s"-Dnewrelic.config.file=${configFile.getPath}",
-    s"-Dnewrelic.environment=$environment",
-    "-Dnewrelic.enable.java.8") // needed to enable experimental Java 8 support
   val tag: InstrumentationTag = NewRelic.Tag
 }
 
@@ -97,17 +69,6 @@ case class AppDynamics(agentJar: File,
   hostName: String,
   port: Int,
   sslEnabled: Boolean) extends Instrumentation(Instrumentations.appDynamicsName) {
-  def jvmArgs: Seq[String] = Seq(
-    s"-javaagent:${agentJar.getPath}",
-    s"-Dappdynamics.agent.tierName=${tierName}",
-    s"-Dappdynamics.agent.nodeName=${nodeName}",
-    s"-Dappdynamics.agent.applicationName=${applicationName}",
-    s"-Dappdynamics.agent.runtime.dir=${agentJar.getParentFile.getPath}",
-    s"-Dappdynamics.agent.accountName=$accountName",
-    s"-Dappdynamics.agent.accountAccessKey=$accessKey",
-    s"-Dappdynamics.controller.hostName=$hostName",
-    s"-Dappdynamics.controller.port=$port",
-    s"-Dappdynamics.controller.ssl.enabled=$sslEnabled")
   def tag: InstrumentationTag = AppDynamics.Tag(applicationName, nodeName, tierName, accountName, accessKey, hostName, port, sslEnabled)
 }
 

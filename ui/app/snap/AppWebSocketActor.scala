@@ -17,7 +17,7 @@ class AppWebSocketActor(val config: AppConfig) extends WebSocketActor[JsValue] w
 
   lazy val appDynamicsConfig = AppDynamics.fromConfig(Play.current.configuration.underlying)
   lazy val appDynamicsActor: ActorRef = context.actorOf(monitor.AppDynamicsActor.props(appDynamicsConfig, defaultContext))
-  lazy val newRelicActor: ActorRef = context.actorOf(monitor.NewRelic.props(NewRelic.fromConfig(Play.current.configuration.underlying), defaultContext))
+  lazy val newRelicActor: ActorRef = context.actorOf(monitor.NewRelicActor.props(NewRelic.fromConfig(Play.current.configuration.underlying), defaultContext))
 
   override def onMessage(json: JsValue): Unit = {
     json match {
@@ -122,11 +122,11 @@ class AppWebSocketActor(val config: AppConfig) extends WebSocketActor[JsValue] w
     }
   }
 
-  def askAppDynamics[T <: monitor.AppDynamicsActor.Response](msg: monitor.AppDynamicsActor.Request, omsg: AppDynamicsRequest.Request, onFailure: Throwable => String)(body: T => Unit)(implicit tag: ClassTag[T]): Unit = {
-    appDynamicsActor.ask(msg).mapTo[monitor.AppDynamicsActor.Response].onComplete {
+  def askAppDynamics[T <: monitor.AppDynamicsActor.InternalResponse](msg: monitor.AppDynamicsActor.InternalRequest, omsg: AppDynamicsRequest.Request, onFailure: Throwable => String)(body: T => Unit)(implicit tag: ClassTag[T]): Unit = {
+    appDynamicsActor.ask(msg).mapTo[monitor.AppDynamicsActor.InternalResponse].onComplete {
       case Success(r: monitor.AppDynamicsActor.InternalErrorResponse) => produce(toJson(omsg.error(r.message)))
       case Success(`tag`(r)) => body(r)
-      case Success(r: monitor.AppDynamicsActor.Response) =>
+      case Success(r: monitor.AppDynamicsActor.InternalResponse) =>
         log.error(s"Unexpected response from request: $msg got: $r expected: ${tag.toString()}")
       case Failure(f) =>
         val errorMsg = onFailure(f)
@@ -136,38 +136,38 @@ class AppWebSocketActor(val config: AppConfig) extends WebSocketActor[JsValue] w
   }
 
   def handleNewRelicRequest(in: NewRelicRequest.Request): Unit = {
-    import monitor.NewRelic._
+    import monitor.NewRelicActor._
     in match {
       case x @ NewRelicRequest.Provision =>
         val sink = context.actorOf(Props(new ProvisioningSink(ProvisioningSinkState(), log => new ProvisioningSinkUnderlying(log, produce))))
-        askNewRelic[monitor.NewRelic.Provisioned](monitor.NewRelic.Provision(sink), x,
+        askNewRelic[monitor.NewRelicActor.InternalProvisioned](monitor.NewRelicActor.InternalProvision(sink), x,
           f => s"Failed to provision New Relic: ${f.getMessage}")(_ => produce(toJson(x.response)))
       case x @ NewRelicRequest.Available =>
-        askNewRelic[monitor.NewRelic.AvailableResponse](monitor.NewRelic.Available, x,
+        askNewRelic[monitor.NewRelicActor.InternalAvailableResponse](monitor.NewRelicActor.InternalAvailable, x,
           f => s"Failed New Relic availability check: ${f.getMessage}")(r => produce(toJson(x.response(r.result))))
       case x @ NewRelicRequest.EnableProject(key, name) =>
-        askNewRelic[ProjectEnabled](monitor.NewRelic.EnableProject(config.location, key, name), x,
+        askNewRelic[InternalProjectEnabled](monitor.NewRelicActor.InternalEnableProject(config.location, key, name), x,
           f => s"Failed to enable project[${config.location}] for New Relic: ${f.getMessage}")(_ => produce(toJson(x.response)))
       case x @ NewRelicRequest.IsProjectEnabled =>
-        askNewRelic[IsProjectEnabledResult](monitor.NewRelic.IsProjectEnabled(config.location), x,
+        askNewRelic[InternalIsProjectEnabledResult](monitor.NewRelicActor.InternalIsProjectEnabled(config.location), x,
           f => s"Failed check if New Relic enabled: ${f.getMessage}")(r => produce(toJson(x.response(r.result))))
       case x @ NewRelicRequest.Deprovision =>
-        askNewRelic[monitor.NewRelic.Deprovisioned.type](monitor.NewRelic.Deprovision, x,
+        askNewRelic[monitor.NewRelicActor.Deprovisioned.type](monitor.NewRelicActor.InternalDeprovision, x,
           f => s"Failed New Relic deprovisioning: ${f.getMessage}")(r => produce(toJson(x.response)))
       case x @ NewRelicRequest.IsSupportedJavaVersion =>
-        askNewRelic[IsSupportedJavaVersionResult](monitor.NewRelic.IsSupportedJavaVersion, x,
+        askNewRelic[InternalIsSupportedJavaVersionResult](monitor.NewRelicActor.InternalIsSupportedJavaVersion, x,
           f => s"Failed checking for supported Java version: ${f.getMessage}")(r => produce(toJson(x.response(r.result, r.version))))
       case x @ NewRelicRequest.GenerateFiles(location, info) =>
-        askNewRelic[monitor.NewRelic.InternalGenerateFilesResult](monitor.NewRelic.InternalGenerateFiles(location, config.location), x,
+        askNewRelic[monitor.NewRelicActor.InternalGenerateFilesResult](monitor.NewRelicActor.InternalGenerateFiles(location, config.location), x,
           f => s"Failed generating NewRelic monitoring files: ${f.getMessage}")(r => produce(toJson(x.response)))
     }
   }
 
-  def askNewRelic[T <: monitor.NewRelic.Response](msg: monitor.NewRelic.Request, originalMsg: NewRelicRequest.Request, onFailure: Throwable => String)(body: T => Unit)(implicit tag: ClassTag[T]): Unit = {
-    newRelicActor.ask(msg).mapTo[monitor.NewRelic.Response].onComplete {
-      case Success(r: monitor.NewRelic.ErrorResponse) => produce(toJson(originalMsg.error(r.message)))
+  def askNewRelic[T <: monitor.NewRelicActor.InternalResponse](msg: monitor.NewRelicActor.InternalRequest, originalMsg: NewRelicRequest.Request, onFailure: Throwable => String)(body: T => Unit)(implicit tag: ClassTag[T]): Unit = {
+    newRelicActor.ask(msg).mapTo[monitor.NewRelicActor.InternalResponse].onComplete {
+      case Success(r: monitor.NewRelicActor.InternalErrorResponse) => produce(toJson(originalMsg.error(r.message)))
       case Success(`tag`(r)) => body(r)
-      case Success(r: monitor.NewRelic.Response) =>
+      case Success(r: monitor.NewRelicActor.InternalResponse) =>
         log.error(s"Unexpected response from request: $msg got: $r expected: ${tag.toString()}")
       case Failure(f) =>
         val errorMsg = onFailure(f)

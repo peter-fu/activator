@@ -21,8 +21,8 @@ object AppDynamicsActor {
     executionContext: ExecutionContext): Props =
     Props(new AppDynamicsActor(new Underlying(config)(_)(executionContext)))
 
-  def unapply(in: Any): Option[Request] = in match {
-    case r: Request => Some(r)
+  def unapply(in: Any): Option[InternalRequest] = in match {
+    case r: InternalRequest => Some(r)
     case _ => None
   }
 
@@ -44,34 +44,34 @@ object AppDynamicsActor {
       new Password(v)
     }
   }
-  sealed trait Request {
-    def error(message: String): Response =
+  sealed trait InternalRequest {
+    def error(message: String): InternalResponse =
       InternalErrorResponse(message, this)
   }
 
-  case class InternalProvision(notificationSink: ActorRef, username: Username, password: Password) extends Request {
-    def response: Response = Provisioned(this)
+  case class InternalProvision(notificationSink: ActorRef, username: Username, password: Password) extends InternalRequest {
+    def response: InternalResponse = Provisioned(this)
   }
 
-  case object InternalDeprovision extends Request {
-    def response: Response = Deprovisioned
+  case object InternalDeprovision extends InternalRequest {
+    def response: InternalResponse = Deprovisioned
   }
 
-  case object InternalAvailable extends Request {
-    def response(result: Boolean): Response = InternalAvailableResponse(result, this)
+  case object InternalAvailable extends InternalRequest {
+    def response(result: Boolean): InternalResponse = InternalAvailableResponse(result, this)
   }
 
-  sealed trait Response {
-    def request: Request
+  sealed trait InternalResponse {
+    def request: InternalRequest
   }
-  case class Provisioned(request: InternalProvision) extends Response
-  case object Deprovisioned extends Response {
-    val request: Request = InternalDeprovision
+  case class Provisioned(request: InternalProvision) extends InternalResponse
+  case object Deprovisioned extends InternalResponse {
+    val request: InternalRequest = InternalDeprovision
   }
-  case class InternalErrorResponse(message: String, request: Request) extends Response
-  case class InternalAvailableResponse(result: Boolean, request: Request) extends Response
-  case class InternalGenerateFilesResult(request: Request) extends Response
-  case class InternalGenerateFiles(location: String, appDynamicSettings: InstrumentationRequestTypes.AppDynamics) extends Request {
+  case class InternalErrorResponse(message: String, request: InternalRequest) extends InternalResponse
+  case class InternalAvailableResponse(result: Boolean, request: InternalRequest) extends InternalResponse
+  case class InternalGenerateFilesResult(request: InternalRequest) extends InternalResponse
+  case class InternalGenerateFiles(location: String, appDynamicSettings: InstrumentationRequestTypes.AppDynamics) extends InternalRequest {
     def response = InternalGenerateFilesResult(this)
   }
 
@@ -125,7 +125,7 @@ object AppDynamicsActor {
   class Underlying(config: AppDynamics.Config)(log: LoggingAdapter)(implicit ec: ExecutionContext) {
     import Provisioning._
 
-    def onMessage(request: Request, sender: ActorRef, self: ActorRef, context: ActorContext): Unit = request match {
+    def onMessage(request: InternalRequest, sender: ActorRef, self: ActorRef, context: ActorContext): Unit = request match {
       case r @ InternalProvision(sink, username, password) =>
         val ns = actorWrapper(sink)
         prepareDownload(defaultWSClient,
@@ -170,6 +170,6 @@ class AppDynamicsActor(appDynamicsBuilder: LoggingAdapter => AppDynamicsActor.Un
   val appDynamics = appDynamicsBuilder(log)
 
   def receive: Receive = {
-    case r: AppDynamicsActor.Request => appDynamics.onMessage(r, sender, self, context)
+    case r: AppDynamicsActor.InternalRequest => appDynamics.onMessage(r, sender, self, context)
   }
 }
