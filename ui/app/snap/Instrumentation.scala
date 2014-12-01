@@ -98,6 +98,8 @@ object NewRelic {
 
   val libFiles = Seq("newrelic.jar")
   val newRelicConfigFile = "newrelic.yml"
+  val newRelicSbtFileName = "sbt-nr.sbt"
+  val newRelicSbtConfigFileName = "newrelic.sbt"
 
   def provisionNewRelic(source: File, destination: File, key: String, appName: String): Unit = {
     val destRelative = FileHelper.relativeTo(destination)_
@@ -124,7 +126,7 @@ object NewRelic {
   }
 
   private def createNewRelicPluginFile(location: String, systemConfig: com.typesafe.config.Config) = {
-    val loc = Platform.fromClientFriendlyFilename(location + "/project/sbt-nr.sbt")
+    val loc = Platform.fromClientFriendlyFilename(location + "/project/" + newRelicSbtFileName)
     val content =
       "// This is a generated file that enables NewRelic monitoring.\n\n" +
         "resolvers += Resolver.typesafeIvyRepo(\"snapshots\")\n\n" +
@@ -139,7 +141,7 @@ object NewRelic {
   }
 
   private def createNewRelicConfigFile(location: String, root: File): Unit = {
-    val loc = Platform.fromClientFriendlyFilename(location + "/newrelic.sbt")
+    val loc = Platform.fromClientFriendlyFilename(location + "/" + newRelicSbtConfigFileName)
     val (jar, yml) = projectFiles(root)
     val content = "// This is a generated files that enables NewRelic monitoring.\n\n" +
       "newRelicAgentJar in NewRelic := \"" + jar.getPath + "\"\n\n" +
@@ -156,7 +158,7 @@ object NewRelic {
     val conf = nrRoot("conf")
     val libRelative = FileHelper.relativeTo(lib)_
     val confRelative = FileHelper.relativeTo(conf)_
-    (libRelative("newrelic.jar"), confRelative("newrelic.yml"))
+    (libRelative("newrelic.jar"), confRelative(newRelicConfigFile))
   }
 
   def isProjectEnabled(root: File): Boolean = {
@@ -304,6 +306,9 @@ object AppDynamics {
   sealed abstract class CheckResult(val message: String)
   case object IncompleteProvisioning extends CheckResult("AppDynamics provisioning incomplete")
 
+  val appDynamicsSbtFileName = "sbt-ad.sbt"
+  val appDynamicsSbtConfigFileName = "appdynamics.sbt"
+
   final val versionRegex = "\\{version\\}".r
 
   def fromConfig(in: TSConfig): Config = {
@@ -322,13 +327,25 @@ object AppDynamics {
   def hasAppDynamics(source: File): Boolean =
     source.exists() && source.isDirectory && source.listFiles().nonEmpty
 
+  def projectFiles(file: File): (File, File) = {
+    val root = FileHelper.relativeTo(file)_
+    val proj = root("project")
+    val projRelative = FileHelper.relativeTo(proj)_
+    (projRelative(appDynamicsSbtFileName), root(appDynamicsSbtConfigFileName))
+  }
+
+  def isProjectEnabled(file: File): Boolean = {
+    val (jar, yml) = projectFiles(file)
+    jar.exists() && yml.exists()
+  }
+
   def generateFiles(location: String, settings: InstrumentationRequestTypes.AppDynamics, systemConfig: com.typesafe.config.Config, config: Config) = {
     createAppDynamicsConfigFile(location, settings, config)
     createAppDynamicsPluginFile(location, systemConfig)
   }
 
   private def createAppDynamicsPluginFile(location: String, systemConfig: com.typesafe.config.Config) = {
-    val loc = Platform.fromClientFriendlyFilename(location + "/project/sbt-ad.sbt")
+    val loc = Platform.fromClientFriendlyFilename(location + "/project/" + appDynamicsSbtFileName)
     val content =
       "// This is a generated file that enables AppDynamics monitoring.\n\n" +
         "resolvers += Resolver.typesafeIvyRepo(\"snapshots\")\n\n" +
@@ -343,7 +360,7 @@ object AppDynamics {
   }
 
   private def createAppDynamicsConfigFile(location: String, settings: InstrumentationRequestTypes.AppDynamics, config: Config): Unit = {
-    val loc = Platform.fromClientFriendlyFilename(location + "/appdynamics.sbt")
+    val loc = Platform.fromClientFriendlyFilename(location + "/" + appDynamicsSbtConfigFileName)
     val agentJar = Platform.fromClientFriendlyFilename(config.extractRoot().getPath + "/javaagent.jar")
     val content =
       s"""

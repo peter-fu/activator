@@ -48,17 +48,17 @@ object AppDynamicsActor {
     def error(message: String): InternalResponse =
       InternalErrorResponse(message, this)
   }
-
   case class InternalProvision(notificationSink: ActorRef, username: Username, password: Password) extends InternalRequest {
     def response: InternalResponse = Provisioned(this)
   }
-
   case object InternalDeprovision extends InternalRequest {
     def response: InternalResponse = Deprovisioned
   }
-
   case object InternalAvailable extends InternalRequest {
     def response(result: Boolean): InternalResponse = InternalAvailableResponse(result, this)
+  }
+  case class InternalProjectEnabled(destination: File) extends InternalRequest {
+    def response(result: Boolean): InternalResponse = InternalProjectEnabledResponse(result, this)
   }
 
   sealed trait InternalResponse {
@@ -70,6 +70,7 @@ object AppDynamicsActor {
   }
   case class InternalErrorResponse(message: String, request: InternalRequest) extends InternalResponse
   case class InternalAvailableResponse(result: Boolean, request: InternalRequest) extends InternalResponse
+  case class InternalProjectEnabledResponse(result: Boolean, request: InternalRequest) extends InternalResponse
   case class InternalGenerateFilesResult(request: InternalRequest) extends InternalResponse
   case class InternalGenerateFiles(location: String, appDynamicSettings: InstrumentationRequestTypes.AppDynamics) extends InternalRequest {
     def response = InternalGenerateFilesResult(this)
@@ -153,6 +154,13 @@ object AppDynamicsActor {
         case e: Exception =>
           log.error(e, "Failure during AppDynamics availability check")
           sender ! r.error(s"Failure during AppDynamics availability check: ${e.getMessage}")
+      }
+      case r @ InternalProjectEnabled(destination) => try {
+        sender ! r.response(AppDynamics.isProjectEnabled(destination))
+      } catch {
+        case e: Exception =>
+          log.error(e, "Failure during AppDynamics enabled check")
+          sender ! r.error(s"Failure during AppDynamics enabled check: ${e.getMessage}")
       }
       case r @ InternalGenerateFiles(location, appDynamicsSettings) => try {
         AppDynamics.generateFiles(location, appDynamicsSettings, context.system.settings.config, config)

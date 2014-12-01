@@ -13,7 +13,8 @@ define(['commons/utils',
   var sslEnabled = settings.observable("appDynamics.sslEnabled", true);
   var accountName = settings.observable("appDynamics.accountName", "");
   var accessKey = settings.observable("appDynamics.accessKey", "");
-  var available = ko.observable("checking");
+  var available = ko.observable(false);
+  var projectEnabled = ko.observable(false);
 
   function adMessage(type) {
     return { request: 'AppDynamicsRequest', type: type };
@@ -50,15 +51,19 @@ define(['commons/utils',
 
   stream.map(function (response) {
     if (response.subtype === 'appdynamics') {
-      if (response.event.type === "availableResponse") {
-        debug && console.log("setting available to: ",response.event.result);
-        available(response.event.result);
-      } else if (response.event.type === "provisioned") {
+      var event = response.event;
+      if (event.type === "availableResponse") {
+        debug && console.log("setting available to: ",event.result);
+        available(event.result);
+      } else if (event.type === "provisioned") {
         debug && console.log("AppDynamics provisioned");
         send(adMessage("available"));
-      } else if (response.event.type === "deprovisioned") {
+      } else if (event.type === "deprovisioned") {
         debug && console.log("AppDynamics de-provisioned");
         send(adMessage("available"));
+      } else if (event.type === "projectEnabledResponse") {
+        debug && console.log("Setting projectEnabled to: " + event.result);
+        projectEnabled(event.result);
       }
     } else if (response.subtype === "ProvisioningStatus" && observeProvision() === true) {
       observable(response.event);
@@ -101,6 +106,8 @@ define(['commons/utils',
   });
 
   var enableProject = function () {
+    projectEnabled(true);
+
     send(adMessageWith("generateFiles", {
       location: serverAppModel.location,
       applicationName: "n/a",
@@ -114,8 +121,13 @@ define(['commons/utils',
     }));
   };
 
-  debug && console.log("Making initial request to check AD availability");
-  send(adMessage("available"));
+  var init = function() {
+    debug && console.log("Making initial request to check AD availability");
+    send(adMessage("isAvailable"));
+    send(adMessage("isProjectEnabled"))
+  };
+
+  init();
 
   return {
     validNodeName: validNodeName,
@@ -141,6 +153,7 @@ define(['commons/utils',
     unsetObserveProvision: unsetObserveProvision,
     nodeNameSaved: nodeNameSaved,
     tierNameSaved: tierNameSaved,
-    enableProject: enableProject
+    enableProject: enableProject,
+    projectEnabled: projectEnabled
   };
 });

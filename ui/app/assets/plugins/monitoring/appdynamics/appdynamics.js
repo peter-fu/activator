@@ -51,8 +51,9 @@ define([
     var accessKey = ko.observable(appdynamics.accessKey());
     var nodeName = ko.observable(appdynamics.nodeName());
     var tierName = ko.observable(appdynamics.tierName());
-
-    var isProjectEnabled = ko.observable(false);
+    var isProjectEnabled = ko.computed(function () {
+      return appdynamics.projectEnabled();
+    });
 
     var hostNameInvalid = ko.computed(function() {
       return !appdynamics.validHostName.test(hostName());
@@ -192,7 +193,6 @@ define([
 
     var enableAppDynamics = function () {
       appdynamics.enableProject();
-      isProjectEnabled(true);
     };
 
     var State = {

@@ -104,6 +104,9 @@ class AppWebSocketActor(val config: AppConfig) extends WebSocketActor[JsValue] w
       case x @ AppDynamicsRequest.Available =>
         askAppDynamics[monitor.AppDynamicsActor.InternalAvailableResponse](monitor.AppDynamicsActor.InternalAvailable, x,
           f => s"Failed AppDynamics availability check: ${f.getMessage}")(r => produce(toJson(x.response(r.result))))
+      case x @ AppDynamicsRequest.ProjectEnabled =>
+        askAppDynamics[monitor.AppDynamicsActor.InternalProjectEnabledResponse](monitor.AppDynamicsActor.InternalProjectEnabled(config.location), x,
+          f => s"Failed AppDynamics enabled check: ${f.getMessage}")(r => produce(toJson(x.response(r.result))))
       case x @ AppDynamicsRequest.Deprovision =>
         askAppDynamics[monitor.AppDynamicsActor.Deprovisioned.type](monitor.AppDynamicsActor.InternalDeprovision, x,
           f => s"Failed AppDynamics deprovisioning: ${f.getMessage}")(r => produce(toJson(x.response)))

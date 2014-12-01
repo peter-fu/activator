@@ -31,7 +31,9 @@ define([
 
   var licenseKeySaved = newrelic.licenseKeySaved();
   var available = newrelic.available();
-  var isProjectEnabled = newrelic.isProjectEnabled();
+  var isProjectEnabled = ko.computed(function () {
+    return newrelic.isProjectEnabled();
+  });
   var downloadEnabled = ko.observable(false);
   var developerKeyEnabled = ko.observable(false);
   var licenseKey = ko.observable(newrelic.licenseKey());
