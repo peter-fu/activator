@@ -65,10 +65,10 @@ object AppDynamicsRequest {
     emitRequest(requestTag)(p => Json.obj("type" -> "provision", "username" -> p.username.value, "password" -> p.password.value))
 
   implicit val appDynamicsAvailableReads: Reads[Available.type] =
-    extractRequest[Available.type](requestTag)(extractTypeOnly("available", Available))
+    extractRequest[Available.type](requestTag)(extractTypeOnly("isAvailable", Available))
 
   implicit val appDynamicsAvailableWrites: Writes[Available.type] =
-    emitRequest(requestTag)(_ => Json.obj("type" -> "available"))
+    emitRequest(requestTag)(_ => Json.obj("type" -> "isAvailable"))
 
   implicit val appDynamicsProjectEnabledReads: Reads[ProjectEnabled.type] =
     extractRequest[ProjectEnabled.type](requestTag)(extractTypeOnly("isProjectEnabled", ProjectEnabled))

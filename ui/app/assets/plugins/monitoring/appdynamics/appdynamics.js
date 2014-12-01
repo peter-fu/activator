@@ -5,12 +5,16 @@ define([
   "main/plugins",
   "services/monitoring/appdynamicscontroller",
   "services/monitoring/monitoringSolutions",
+  "services/sbt",
+  "../monitoringInstaller",
   "text!./appdynamics.html",
-  "css!./appdynamics"
+
 ], function(
   plugins,
   appdynamics,
   monitoringSolutions,
+  sbt,
+  monitoringInstaller,
   tpl
   ) {
 
@@ -23,12 +27,12 @@ define([
     };
 
     var selectedTab = ko.observable("notice");
-
-    var available = appdynamics.available;
+    var available = ko.computed(function() {
+      return appdynamics.available();
+    });
     var needProvision = ko.computed(function () {
       return !available();
     });
-
     var downloadEnabled = ko.observable(false);
     var downloadClass = ko.computed(function() {
       var enabled = (available() == false);
@@ -163,11 +167,9 @@ define([
         appdynamics.accountName(accountName());
         appdynamics.accessKey(accessKey());
         appdynamics.sslEnabled(sslEnabled());
-
-        monitoringSolutions.addAppDynamicsToSolutions();
         return true;
       } else {
-        monitoringSolutions.removeAppDynamicsFromSolutions();
+        monitoringSolutions.removeAppDynamics();
         return false;
       }
     };
@@ -193,6 +195,14 @@ define([
 
     var enableAppDynamics = function () {
       appdynamics.enableProject();
+
+      monitoringInstaller({
+        provider: "AppDynamics",
+        addingFile: "project/sbt-ad.sbt",
+        addedFile: appdynamics.available,
+        echoReady: sbt.tasks.echoReady
+      });
+
     };
 
     var State = {

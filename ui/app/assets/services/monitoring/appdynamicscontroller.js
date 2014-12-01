@@ -3,8 +3,9 @@
  */
 define(['commons/utils',
   'commons/websocket',
-  'commons/settings'
-], function(utils, websocket, settings) {
+  'commons/settings',
+  './monitoringSolutions'
+], function(utils, websocket, settings, monitoringSolutions) {
 
   var nodeName = settings.observable("appDynamics.nodeName", "activator-"+new Date().getTime());
   var tierName = settings.observable("appDynamics.tierName", "development");
@@ -57,16 +58,24 @@ define(['commons/utils',
         available(event.result);
       } else if (event.type === "provisioned") {
         debug && console.log("AppDynamics provisioned");
-        send(adMessage("available"));
+        send(adMessage("isAvailable"));
       } else if (event.type === "deprovisioned") {
         debug && console.log("AppDynamics de-provisioned");
-        send(adMessage("available"));
+        send(adMessage("isAvailable"));
       } else if (event.type === "projectEnabledResponse") {
         debug && console.log("Setting projectEnabled to: " + event.result);
         projectEnabled(event.result);
       }
     } else if (response.subtype === "ProvisioningStatus" && observeProvision() === true) {
       observable(response.event);
+    }
+  });
+
+  var enableAppDynamicsMonitoring = ko.computed(function() {
+    if (available() && projectEnabled()) {
+      monitoringSolutions.addAppDynamics();
+    } else {
+      monitoringSolutions.removeAppDynamics();
     }
   });
 

@@ -4,9 +4,11 @@
 define([
   'commons/websocket',
   'commons/settings',
+  './monitoringSolutions'
 ], function(
   websocket,
-  settings
+  settings,
+  monitoringSolutions
 ){
 
   var licenseKey = settings.observable("newrelic.licenseKey", "");
@@ -77,6 +79,9 @@ define([
       if (event.type === "isProjectEnabledResponse") {
         debug && console.log("Setting isProjectEnabled to: " + event.result);
         isProjectEnabled(event.result);
+        if (event.result) {
+          monitoringSolutions.addNewRelic();
+        }
       }
       if (event.type === "isSupportedJavaVersionResult") {
         debug && console.log("Setting isSupportedJavaVersionResult to: " + event.result);

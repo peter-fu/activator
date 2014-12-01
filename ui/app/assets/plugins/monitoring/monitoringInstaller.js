@@ -18,9 +18,10 @@ define([
       body: ko.bindhtml(tpl, state),
       cancel: "close"
     });
+
+    // FIXME : this does not work for AD/NR (we cannot check against "echo" - must use "newrelic"/"appdynamics" instead)
     configuration.echoInstalledAndReady(function() {
       modals.hideModal();
     });
   };
-
 });

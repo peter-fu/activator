@@ -29,33 +29,29 @@ define([
 
   var selectedTab = ko.observable("notice");
 
-  var licenseKeySaved = newrelic.licenseKeySaved();
-  var available = newrelic.available();
+  var licenseKeySaved = ko.computed(function() {
+    return newrelic.licenseKeySaved();
+  });
+  var available = ko.computed(function() {
+    return newrelic.available();
+  });
   var isProjectEnabled = ko.computed(function () {
     return newrelic.isProjectEnabled();
   });
   var downloadEnabled = ko.observable(false);
   var developerKeyEnabled = ko.observable(false);
-  var licenseKey = ko.observable(newrelic.licenseKey());
+  var licenseKey = ko.computed(function() {
+    return newrelic.licenseKey();
+  });
   var downloading = ko.observable("");
   var error = ko.observable();
 
   var needProvision = ko.computed(function() {
-    return !available || !licenseKeySaved;
+    return !available() || !licenseKeySaved();
   });
 
   var enabled = ko.computed(function() {
-    return !available;
-  });
-
-  var downloadClass = ko.computed(function() {
-    downloadEnabled(enabled());
-    return enabled ? "enabled" : "disabled";
-  });
-
-  var developerKeyClass = ko.computed(function() {
-    developerKeyEnabled(enabled());
-    return enabled ? "enabled" : "disabled";
+    return !available();
   });
 
   var provisionObserver = function(event) {
@@ -99,10 +95,6 @@ define([
     } else if (developerKeyEnabled()) {
       error("");
       newrelic.licenseKey(licenseKey());
-      // TODO: do this step after NR is enabled
-      monitoringSolutions.addNewRelicToSolutions();
-    } else {
-      monitoringSolutions.removeNewRelicFromSolutions();
     }
   };
 

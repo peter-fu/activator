@@ -54,6 +54,10 @@
       <p data-bind="visible: downloading"><span data-bind="text: downloading"></span></p>
       <p class="error" data-bind="visible: error, text: error"></p>
       <!-- /ko -->
+      <!-- ko: ifnot: needProvision -->
+      <h2>The NewRelic tracing agent has been downloaded</h2>
+      <p>The next step is to <a href="#" data-bind="click: function(){selectedTab('configure')} ">Configure</a> the agent.</p>
+      <!-- /ko -->
     </div>
     <div class="tabs-step configure" data-bind="css: { opened: selectedTab() == 'configure' }">
       <h2>Enter Licence Key</h2>
@@ -65,16 +69,16 @@
         <button class="button light" data-bind="click: resetLicenseKey">Reset</button>
       </p>
       <!-- ko ifnot: needProvision-->
-      <h2>You're ready to go!</h2>
-      <p>
-        The New Relic Agent has been downloaded and your key configured.  You may enable New Relic for <a href="http://www.playframework.com/" target="_blank">Play</a>-based templates
-        from the <a href="#run">run</a> tab.
-      </p>
-      <p><button data-bind="click: resetLicenseKey">Reset key</button></p>
+      <h2>Configuration done</h2>
+      <p>Make sure to <a href="#" data-bind="click: function(){selectedTab('enable')} ">Enable</a> the agent.</p>
       <!-- /ko -->
       <p class="error" data-bind="visible: error, text: error"></p>
     </div>
     <div class="tabs-step enable" data-bind="css: { opened: selectedTab() == 'enable' }">
+      <!-- ko if: needProvision -->
+      You must <a href="#" data-bind="click: function(){selectedTab('download')} ">Download</a> the NewRelic agent to enable monitoring.
+      <!-- /ko -->
+      <!-- ko ifnot: needProvision -->
       <h2>Enable</h2>
       <div class="enable-switch" data-bind="click: enableNewRelic">
             <div class="switch" data-bind="css: { 'active': isProjectEnabled }">
@@ -87,6 +91,7 @@
       <p><b>./newrelic.sbt</b> : contains the configuration parameters used when running NewRelic</p>
       <p>Once enabled Activator will automatically restart to load the NewRelic sbt plugin definition.</p>
       <p>See <a href="#" data-bind="click: function(){selectedTab('run')} ">Run</a> for information about how to proceed.</p>
+      <!-- /ko -->
     </div>
     <div class="tabs-step run" data-bind="css: { opened: selectedTab() == 'run' }">
       <h2>Steps to set up and run with New Relic Monitoring</h2>

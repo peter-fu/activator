@@ -65,8 +65,8 @@
             </form>
             <!-- /ko -->
             <!-- ko ifnot: needProvision-->
-            <h2>The AppDynamics tracing agent has been downloaded!</h2>
-            <p>You may enable AppDynamics from the <a href="#run">run</a> tab.</p>
+            <h2>The AppDynamics tracing agent has been downloaded</h2>
+            <p>The next step is to <a href="#" data-bind="click: function(){selectedTab('configure')} ">Configure</a> the agent.</p>
             <p><button class="button" data-bind="click: deprovisionAppDynamics">Re-download agent</button></p>
             <!-- /ko -->
             <p class="error" data-bind="visible: error, text: error"></p>
@@ -109,6 +109,13 @@
             <p class="error" data-bind="visible: error, text: error"></p>
         </div>
         <div class="tabs-step enable" data-bind="css: { opened: selectedTab() == 'enable' }">
+            <!-- ko if: needProvision -->
+            <p>You must <a href="#" data-bind="click: function(){selectedTab('download')} ">Download</a> the AppDynamics agent to enable monitoring.</p>
+            <!-- /ko -->
+            <!-- ko ifnot: canSave -->
+            <p>You must <a href="#" data-bind="click: function(){selectedTab('configure')} ">Configure</a> the AppDynamics agent to enable monitoring.</p>
+            <!-- /ko -->
+            <!-- ko ifnot: needProvision -->
             <h2>Enable</h2>
             <div class="enable-switch" data-bind="click: enableAppDynamics">
                 <div class="switch" data-bind="css: { 'active': isProjectEnabled }">
@@ -121,6 +128,7 @@
             <p><b>./appdynamics.sbt</b> : contains the configuration parameters used when running AppDynamics</p>
             <p>Once enabled Activator will automatically restart to load the AppDynamics sbt plugin definition.</p>
             <p>See <a href="#" data-bind="click: function(){selectedTab('run')} ">Run</a> for information about how to proceed.</p>
+            <!-- /ko -->
         </div>
         <div class="tabs-step run" data-bind="css: { opened: selectedTab() == 'run' }">
             <h2>Steps to set up and run with AppDynamics Monitoring</h2>
