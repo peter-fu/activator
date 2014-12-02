@@ -5,7 +5,8 @@ define([
   'commons/websocket',
   'services/ajax',
   'widgets/fileselection/fileselection',
-  'text!./open.html'
+  'text!./open.html',
+  'css!./open'
 ], function(
   websocket,
   fs,

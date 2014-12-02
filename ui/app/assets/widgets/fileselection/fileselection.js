@@ -2,15 +2,13 @@
  Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
  */
 define([
-  'css!./fileselection.css',
+  'commons/utils',
   'text!./fileselection.html',
-  'lib/knockout/knockout',
-  'commons/utils'
+  'css!./fileselection.css'
 ], function(
-  css,
+  utils,
   tpl,
-  ko,
-  utils
+  css
 ) {
 
   function browse(location) {
