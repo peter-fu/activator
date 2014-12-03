@@ -119,7 +119,8 @@ define([
     error: error,
     selectedTab: selectedTab,
     enableNewRelic: enableNewRelic,
-    isProjectEnabled: isProjectEnabled
+    isProjectEnabled: isProjectEnabled,
+    available: available
   };
 
   return {

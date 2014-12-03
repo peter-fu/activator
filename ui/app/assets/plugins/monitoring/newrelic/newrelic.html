@@ -45,7 +45,11 @@
         </p>
     </div>
     <div class="tabs-step download"  data-bind="css: { opened: selectedTab() == 'download' }">
-      <!-- ko if: needProvision -->
+      <!-- ko if: available -->
+      <h2>The NewRelic tracing agent has been downloaded</h2>
+      <p>The next step is to <a href="#" data-bind="click: function(){selectedTab('configure')} ">Configure</a> the agent.</p>
+      <!-- /ko -->
+      <!-- ko ifnot: available -->
       <h2>Get the New Relic Agent</h2>
       <p>The New Relic Agent collects data about your application. Let us install it for you.</p>
       <p>
@@ -54,10 +58,7 @@
       <p data-bind="visible: downloading"><span data-bind="text: downloading"></span></p>
       <p class="error" data-bind="visible: error, text: error"></p>
       <!-- /ko -->
-      <!-- ko: ifnot: needProvision -->
-      <h2>The NewRelic tracing agent has been downloaded</h2>
-      <p>The next step is to <a href="#" data-bind="click: function(){selectedTab('configure')} ">Configure</a> the agent.</p>
-      <!-- /ko -->
+
     </div>
     <div class="tabs-step configure" data-bind="css: { opened: selectedTab() == 'configure' }">
       <h2>Enter Licence Key</h2>
