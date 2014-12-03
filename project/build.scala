@@ -248,7 +248,7 @@ object TheActivatorBuild extends Build {
         "org.scalatest" % "scalatest_2.11" % "2.1.6",
 
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-jshint" % "1.0.1", "0.13", "2.10"),
-        Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-rjs" % "1.0.1", "0.13", "2.10"),
+        Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-rjs" % "1.0.5", "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-digest" % "1.0.0", "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-mocha" % "1.0.0", "0.13", "2.10"),
         // reactive maps using an older sbt-gzip, later we should go back to one copy
@@ -270,6 +270,7 @@ object TheActivatorBuild extends Build {
         "com.typesafe.play" % "play-docs_2.11" % Dependencies.playVersion,
         "com.typesafe.play" % "anorm_2.11" % Dependencies.playVersion,
         "com.typesafe.play" % "play-ws_2.11" % Dependencies.playVersion,
+        "com.typesafe.play" % "play-test_2.11" % Dependencies.playVersion,
 
         "org.webjars" % "bootstrap" % "2.3.1",
         "org.webjars" % "flot" % "0.8.0",
@@ -281,6 +282,7 @@ object TheActivatorBuild extends Build {
 
         "com.typesafe.play.extras" % "play-geojson_2.11" % "1.1.0",
         "com.typesafe.akka" % "akka-contrib_2.11" % Dependencies.akkaVersion,
+        "com.typesafe.akka" % "akka-testkit_2.11" % Dependencies.akkaVersion,
         "org.codehaus.plexus" % "plexus-interactivity-api" % "1.0-alpha-6",
         "org.codehaus.plexus" % "plexus-component-api" % "1.0-alpha-16",
         "org.jcraft" % "jsch" % "0.1.38"
