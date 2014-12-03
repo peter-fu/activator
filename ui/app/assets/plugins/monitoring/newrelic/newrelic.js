@@ -49,10 +49,6 @@ define([
     return !available() || !licenseKeySaved();
   });
 
-  var enabled = ko.computed(function() {
-    return !available();
-  });
-
   var provisionObserver = function(event) {
     var message = "";
     if (event.type === "provisioningError") {
@@ -74,7 +70,7 @@ define([
 
     downloading(message);
 
-    if (event.type == "complete" || event.type == "provisioningError") {
+    if (event.type === "complete" || event.type === "provisioningError") {
       newrelic.unsetObserveProvision();
     }
   };

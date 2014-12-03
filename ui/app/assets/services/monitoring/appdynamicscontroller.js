@@ -71,13 +71,13 @@ define(['commons/utils',
     }
   });
 
-  var enableAppDynamicsMonitoring = ko.computed(function() {
-    if (available() && projectEnabled()) {
-      monitoringSolutions.addAppDynamics();
-    } else {
-      monitoringSolutions.removeAppDynamics();
-    }
-  });
+  // var enableAppDynamicsMonitoring = ko.computed(function() {
+  //   if (available() && projectEnabled()) {
+  //     monitoringSolutions.addAppDynamics();
+  //   } else {
+  //     monitoringSolutions.removeAppDynamics();
+  //   }
+  // });
 
   var send = function (msg){
     websocket.send(msg);
