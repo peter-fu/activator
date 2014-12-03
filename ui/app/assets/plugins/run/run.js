@@ -9,6 +9,8 @@ define([
   'widgets/echoInstaller/echoInstaller',
   "widgets/layout/layout",
   "text!./run.html",
+  'services/monitoring/appdynamicscontroller',
+  'services/monitoring/newreliccontroller',
   "css!./run",
   "css!widgets/buttons/switch",
   "css!widgets/buttons/button",

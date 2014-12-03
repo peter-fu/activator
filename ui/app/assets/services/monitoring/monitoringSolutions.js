@@ -33,7 +33,7 @@ define([
   });
 
   var runMainCommand = ko.computed(function() {
-    return runCommand + "Main";
+    return runCommand() + "Main";
   });
 
   var appDynamicsActivated = ko.computed(function() {

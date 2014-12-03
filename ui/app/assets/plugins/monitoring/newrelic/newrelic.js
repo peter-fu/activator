@@ -38,7 +38,6 @@ define([
   var isProjectEnabled = ko.computed(function () {
     return newrelic.isProjectEnabled();
   });
-  var downloadEnabled = ko.observable(false);
   var developerKeyEnabled = ko.observable(false);
   var licenseKey = ko.computed(function() {
     return newrelic.licenseKey();
@@ -81,12 +80,8 @@ define([
   };
 
   var provisionNewRelic = function () {
-    if (downloadEnabled()) {
-      error("");
-      newrelic.setObserveProvision(provisionObserver);
-    } else {
-      error("Download is not enabled. Please fix all warnings and retry.");
-    }
+    error("");
+    newrelic.setObserveProvision(provisionObserver);
   };
 
   var saveLicenseKey = function () {

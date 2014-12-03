@@ -522,7 +522,8 @@ define([
     self.read        = ko.observable(false);
     self.jobIds      = ko.observableArray([]);
 
-    if (self.commandId === "runMain" || self.commandId === "echo" || self.commandId === "backgroundRunMain" || self.commandId === "backgroundRun") self.commandId = "run";
+    var isRun = /^([a-z]+:)?(run|runMain\ .+|backgroundRunMain\ .+|backgroundRun)$/ig;
+    if (isRun.test(self.command)) self.commandId = "run";
 
     // Data produced:
     self.tasks          = {};
