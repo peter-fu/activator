@@ -33,7 +33,7 @@ define([
   var needProvision = ko.computed(function () {
     return !available();
   });
-  var downloadEnabled = ko.observable(false);
+  // var downloadEnabled = ko.observable(false);
   // var downloadClass = ko.computed(function() {
   //   var enabled = (available() === false);
   //   downloadEnabled(enabled);
@@ -84,20 +84,14 @@ define([
   });
 
   var provisionAppDynamics = function() {
-    if (downloadEnabled()) {
-      error("");
-      provisionDownloadSubscription(appdynamics.setObserveProvision(provisionObserver));
-      appdynamics.provision(username(), password());
-    } else {
-      error("Download is not enabled. Please fix all warnings and retry.");
-    }
+    error("");
+    provisionDownloadSubscription(appdynamics.setObserveProvision(provisionObserver));
+    appdynamics.provision(username(), password());
   };
 
   var deprovisionAppDynamics = function () {
-    if (!downloadEnabled()) {
-      error("");
-      appdynamics.deprovision();
-    }
+    error("");
+    appdynamics.deprovision();
   };
 
   var provisionObserver = function(event) {
