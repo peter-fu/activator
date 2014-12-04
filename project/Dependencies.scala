@@ -9,12 +9,12 @@ object Dependencies {
   val scalaVersion = "2.11.1"
   val luceneVersion = "4.2.1"
   val templateCacheVersion = "1.0-6830c15252733edf977c869af798d113ad5ac80d"
-  val sbtRcVersion = "1.0-c50ddab5e1332398049a2a649261e1ca24577479"
+  val sbtRcVersion = "1.0-1a8f7afd5ba98b45834ff53dd349130c3ade22f1"
 
   val playVersion = "2.3.6"
   val akkaVersion = "2.3.6"
   val slickVersion = "2.1.0"
-  val echoPluginVersion = "0.1.5"
+  val echoPluginVersion = "0.1.6.2"
   val activatorAnalyticsVersion = "0.1.6"
   val aspectJVersion = "1.7.3"
 
