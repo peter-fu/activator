@@ -27,13 +27,16 @@ define([
     route: function(url, breadcrumb) {
       breadcrumb([['tutorial/', "Tutorial"]]);
       if (TutorialState.hasTutorial()){
-        if (url.parameters[0] === undefined || url.parameters[0] === "") {
+        if (url.parameters[0] === undefined && TutorialState.index()) {
+          window.location.hash = "#tutorial/"+TutorialState.index();
+        } else if (url.parameters[0] === undefined || url.parameters[0] === "") {
           TutorialState.page(null);
           TutorialState.index(null);
         } else {
           var id = parseInt(url.parameters[0]);
           var p = TutorialState.pages()[id];
           TutorialState.page(p);
+          TutorialState.gotoPage(id);
           TutorialState.index(id);
           breadcrumb([['tutorial/', "Tutorial"], ["tutorial/"+id, p.title]]);
         }
