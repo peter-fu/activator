@@ -384,18 +384,32 @@ define([
       delete deferredRequests[message.serialId];
       pac.resolve(
         $.map(message.result, function(completion) {
-        return {
-          title: completion.display,
-          subtitle: "run sbt task " + completion.display,
-          type: "Sbt",
-          url: false,
-          execute: message.partialCommand + completion.append,
-          callback: function () {
-            requestExecution(message.partialCommand + completion.append);
-            window.location.hash = "#build";
+
+          var command = message.partialCommand + completion.append;
+          var redirected;
+          // Hard-coded replacement of run -> backgroundRun
+          if (command === "run") {
+            redirected = "run";
+            command = "backgroundRun";
+          } else if (command === "runMain") {
+            redirected = "runMain";
+            command = "backgroundRunMain";
           }
-        }
-      }));
+
+          return {
+            title: completion.display,
+            subtitle: "run sbt task " + completion.display,
+            type: "Sbt",
+            url: false,
+            execute: command,
+            redirected: redirected,
+            callback: function () {
+              requestExecution(command);
+              window.location.hash = "#build";
+            }
+          }
+        })
+      );
     }
   });
 
