@@ -81,6 +81,15 @@
         margin: 1px 0 0;
       }
     }
+    .redirected {
+      opacity: .6;
+      &:before {
+        content: " -> ";
+      }
+      &:after {
+        content: " (redirected) ";
+      }
+    }
     .option {
       &:nth-child(odd) {
         background-color: rgba(0,0,0,.05);
