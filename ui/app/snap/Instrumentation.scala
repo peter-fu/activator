@@ -143,9 +143,15 @@ object NewRelic {
   private def createNewRelicConfigFile(location: String, root: File): Unit = {
     val loc = Platform.fromClientFriendlyFilename(location + "/" + newRelicSbtConfigFileName)
     val (jar, yml) = projectFiles(root)
-    val content = "// This is a generated files that enables NewRelic monitoring.\n\n" +
-      "newRelicAgentJar in NewRelic := \"" + jar.getPath + "\"\n\n" +
-      "newRelicConfigFile in NewRelic := \"" + yml.getPath + "\""
+    val content =
+      s"""
+        |// This is a generated files that enables NewRelic monitoring.
+        |
+        |newRelicAgentJar in NewRelic := "${jar.getPath}"
+        |
+        |newRelicConfigFile in NewRelic := "${yml.getPath}"
+      """.stripMargin
+
     IO.withTemporaryFile("activator", "create-config-file") { file =>
       IO.write(file, content)
       IO.move(file, loc)
@@ -364,7 +370,7 @@ object AppDynamics {
     val agentJar = Platform.fromClientFriendlyFilename(config.extractRoot().getPath + "/javaagent.jar")
     val content =
       s"""
-        |// This is a generated file that enables AppDynamics monitoring." +
+        |// This is a generated file that enables AppDynamics monitoring."
         |
         |appDynamicsAgentJar in AppDynamics := "${agentJar.getPath}"
         |
@@ -385,7 +391,6 @@ object AppDynamics {
         |appDynamicsControllerPort in AppDynamics := "${settings.port}"
         |
         |appDynamicsControllerSslEnabled in AppDynamics := "${settings.sslEnabled}"
-        |
       """.stripMargin
 
     IO.withTemporaryFile("activator", "create-config-file") { file =>
