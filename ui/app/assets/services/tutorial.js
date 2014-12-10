@@ -23,7 +23,7 @@ define([
     if(router.current().id === "tutorial"){
       window.location.hash = "#tutorial/"+id;
     } else {
-      var id = parseInt(id);
+      id = parseInt(id);
       var p = pages()[id];
       page(p);
       index(id);
