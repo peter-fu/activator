@@ -65,20 +65,11 @@ define(['commons/utils',
       } else if (event.type === "projectEnabledResponse") {
         debug && console.log("Setting projectEnabled to: " + event.result);
         projectEnabled(event.result);
-        monitoringSolutions.addAppDynamics();
       }
     } else if (response.subtype === "ProvisioningStatus" && observeProvision() === true) {
       observable(response.event);
     }
   });
-
-  // var enableAppDynamicsMonitoring = ko.computed(function() {
-  //   if (available() && projectEnabled()) {
-  //     monitoringSolutions.addAppDynamics();
-  //   } else {
-  //     monitoringSolutions.removeAppDynamics();
-  //   }
-  // });
 
   var send = function (msg){
     websocket.send(msg);
