@@ -150,6 +150,12 @@ object NewRelic {
         |newRelicAgentJar in NewRelic := "${jar.getPath}"
         |
         |newRelicConfigFile in NewRelic := "${yml.getPath}"
+        |
+        |// Sets same keys in NewRelicPlay config
+        |
+        |newRelicAgentJar in NewRelicPlay := "${jar.getPath}"
+        |
+        |newRelicConfigFile in NewRelicPlay := "${yml.getPath}"
       """.stripMargin
 
     IO.withTemporaryFile("activator", "create-config-file") { file =>
@@ -391,6 +397,28 @@ object AppDynamics {
         |appDynamicsControllerPort in AppDynamics := "${settings.port}"
         |
         |appDynamicsControllerSslEnabled in AppDynamics := "${settings.sslEnabled}"
+        |
+        |// Sets same keys in AppDynamicsPlay config
+        |
+        |appDynamicsAgentJar in AppDynamicsPlay := "${agentJar.getPath}"
+        |
+        |appDynamicsAgentTierName in AppDynamicsPlay := "development"
+        |
+        |appDynamicsAgentNodeName in AppDynamicsPlay := "${settings.nodeName}"
+        |
+        |appDynamicsAgentApplicationName in AppDynamicsPlay := "${settings.applicationName}"
+        |
+        |appDynamicsAgentRuntimeDir in AppDynamicsPlay := "${agentJar.getParentFile.getPath}"
+        |
+        |appDynamicsAgentAccountName in AppDynamicsPlay := "${settings.accountName}"
+        |
+        |appDynamicsAgentAccountAccessKey in AppDynamicsPlay := "${settings.accessKey}"
+        |
+        |appDynamicsControllerHostName in AppDynamicsPlay := "${settings.hostName}"
+        |
+        |appDynamicsControllerPort in AppDynamicsPlay := "${settings.port}"
+        |
+        |appDynamicsControllerSslEnabled in AppDynamicsPlay := "${settings.sslEnabled}"
       """.stripMargin
 
     IO.withTemporaryFile("activator", "create-config-file") { file =>
