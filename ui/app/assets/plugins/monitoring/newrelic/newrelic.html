@@ -65,7 +65,7 @@
       <p>To get your licence key, you must <a href="https://www.newrelic.com/typesafe" target="_blank">Sign Up</a> or <a href="https://rpm.newrelic.com/" target="_blank">Login</a> to a New Relic account.</p>
       <p>Thereafter your licence key is available in the application setup screen (<a href="/public/plugins/monitoring/newrelic/LicenseKey.png" target="_blank">see this screenshot</a>)</p>
       <p>
-        <input type="text" id="licenseKey" data-bind="value: licenseKey, valueUpdate: 'input'"/>
+        <input type="text" id="licenseKey" data-bind="value: tempLicenseKey, valueUpdate: 'input'"/>
         <button class="button" data-bind="click: saveLicenseKey">Save</button>
         <button class="button light" data-bind="click: resetLicenseKey">Reset</button>
       </p>

@@ -15,7 +15,7 @@ define([
   var isProjectEnabled = ko.observable(false);
   var available = ko.observable(false);
   var supportedJavaVersion = ko.observable({result:true, version:"Unknown"});
-  var validKey = /^[0-9A-Z]{40}$/i;
+  var validKey = /^([0-9a-z]{40})$/i;
   var observable = null;
   var observeProvision = ko.observable(false);
 

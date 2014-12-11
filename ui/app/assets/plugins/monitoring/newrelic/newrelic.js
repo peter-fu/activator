@@ -28,25 +28,17 @@ define([
   };
 
   var selectedTab = ko.observable("notice");
+  var tempLicenseKey = ko.observable(newrelic.licenseKey() || "");
 
-  var licenseKeySaved = ko.computed(function() {
-    return newrelic.licenseKeySaved();
-  });
-  var available = ko.computed(function() {
-    return newrelic.available();
-  });
   var isProjectEnabled = ko.computed(function () {
     return newrelic.isProjectEnabled();
   });
-  var developerKeyEnabled = ko.observable(false);
-  var licenseKey = ko.computed(function() {
-    return newrelic.licenseKey();
-  });
+
   var downloading = ko.observable("");
   var error = ko.observable();
 
   var needProvision = ko.computed(function() {
-    return !available() || !licenseKeySaved();
+    return !newrelic.available() || !newrelic.licenseKey();
   });
 
   var provisionObserver = function(event) {
@@ -81,21 +73,17 @@ define([
   };
 
   var saveLicenseKey = function () {
-    if (licenseKeyInvalid()) {
+    if (!newrelic.validKey.test(tempLicenseKey())) {
       error("Invalid license key (must be 40 characters long and can only contain A-Z and 0-9).");
-    } else if (developerKeyEnabled()) {
+    } else {
       error("");
-      newrelic.licenseKey(licenseKey());
+      newrelic.licenseKey(tempLicenseKey());
     }
   };
 
-  var licenseKeyInvalid = ko.computed(function() {
-    return !newrelic.validKey.test(licenseKey());
-  });
-
   var resetLicenseKey = function () {
-    licenseKey("");
-    newrelic.licenseKey("");
+    tempLicenseKey("");
+    newrelic.licenseKey(null);
   };
 
   var enableNewRelic = function () {
@@ -113,14 +101,15 @@ define([
     needProvision: needProvision,
     provisionNewRelic: provisionNewRelic,
     downloading: downloading,
-    licenseKey: licenseKey,
+    tempLicenseKey: tempLicenseKey,
     saveLicenseKey: saveLicenseKey,
     resetLicenseKey: resetLicenseKey,
     error: error,
     selectedTab: selectedTab,
     enableNewRelic: enableNewRelic,
     isProjectEnabled: isProjectEnabled,
-    available: available
+    available: newrelic.available,
+    licenseKey: newrelic.licenseKey
   };
 
   return {
