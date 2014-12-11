@@ -2,10 +2,14 @@
  Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
  */
 define([
+  "commons/websocket",
   "commons/settings"
 ], function(
+  websocket,
   settings
 ) {
+
+  var stream = websocket.subscribe('type', 'monitoring');
 
   var NO_MONITORING = 'Disabled';
   var INSPECT       = 'Activator Inspect';
@@ -64,7 +68,31 @@ define([
   var removeAppDynamics = removeFromSolutions(APP_DYNAMICS);
   var removeNewRelic = removeFromSolutions(NEW_RELIC);
 
+  // Weird thing about provisioning (downloading the agents):
+  // AD and NR are using the exact same event from the websocket.
+  // So we redirect the events to who's asking last
+  var provisioningProgress = (function() {
+    var currentProvisioningCallback = null;
+    stream.matchOnAttribute("subtype", "ProvisioningStatus")
+      .map(function(evt) {
+        if (currentProvisioningCallback) {
+          currentProvisioningCallback(evt);
+        } else {
+          throw "Can't forward provisioning event: no callback setted";
+        }
+      });
+    return {
+      set: function(callback) {
+        currentProvisioningCallback = callback;
+      },
+      reset: function() {
+        currentProvisioningCallback = null;
+      }
+    }
+  }());
+
   return {
+    stream                : stream,
     NO_MONITORING         : NO_MONITORING,
     INSPECT               : INSPECT,
     NEW_RELIC             : NEW_RELIC,
@@ -79,6 +107,7 @@ define([
     removeAppDynamics     : removeAppDynamics,
     removeNewRelic        : removeNewRelic,
     runCommand            : runCommand,
-    runMainCommand        : runMainCommand
+    runMainCommand        : runMainCommand,
+    provisioningProgress  : provisioningProgress
   }
 });

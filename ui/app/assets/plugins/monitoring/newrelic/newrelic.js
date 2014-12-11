@@ -4,7 +4,6 @@
 define([
   "main/plugins",
   "services/monitoring/newreliccontroller",
-  "services/monitoring/monitoringSolutions",
   "services/sbt",
   "../monitoringInstaller",
   "text!./newrelic.html",
@@ -14,7 +13,6 @@ define([
 ], function(
   plugins,
   newrelic,
-  monitoringSolutions,
   sbt,
   monitoringInstaller,
   tpl
@@ -41,7 +39,8 @@ define([
     return !newrelic.available() || !newrelic.licenseKey();
   });
 
-  var provisionObserver = function(event) {
+  var provisionObserver = function(m) {
+    var event = m.event;
     var message = "";
     if (event.type === "provisioningError") {
       message = "Error provisioning New Relic: " + event.message

@@ -48,26 +48,25 @@ define(['commons/utils',
       validHostName.test(hostName()));
   });
 
-  var stream = websocket.subscribe('type', 'monitoring');
+  var stream = monitoringSolutions.stream.matchOnAttribute('subtype', 'appdynamics');
 
   stream.map(function (response) {
-    if (response.subtype === 'appdynamics') {
-      var event = response.event;
-      if (event.type === "availableResponse") {
-        debug && console.log("setting available to: ",event.result);
-        available(event.result);
-      } else if (event.type === "provisioned") {
-        debug && console.log("AppDynamics provisioned");
-        send(adMessage("isAvailable"));
-      } else if (event.type === "deprovisioned") {
-        debug && console.log("AppDynamics de-provisioned");
-        send(adMessage("isAvailable"));
-      } else if (event.type === "projectEnabledResponse") {
-        debug && console.log("Setting projectEnabled to: " + event.result);
-        projectEnabled(event.result);
+    var event = response.event;
+    if (event.type === "availableResponse") {
+      debug && console.log("setting available to: ",event.result);
+      available(event.result);
+    } else if (event.type === "provisioned") {
+      debug && console.log("AppDynamics provisioned");
+      send(adMessage("isAvailable"));
+    } else if (event.type === "deprovisioned") {
+      debug && console.log("AppDynamics de-provisioned");
+      send(adMessage("isAvailable"));
+    } else if (event.type === "projectEnabledResponse") {
+      debug && console.log("Setting projectEnabled to: " + event.result);
+      projectEnabled(event.result);
+      if (event.result) {
+        monitoringSolutions.addAppDynamics();
       }
-    } else if (response.subtype === "ProvisioningStatus" && observeProvision() === true) {
-      observable(response.event);
     }
   });
 
@@ -83,17 +82,12 @@ define(['commons/utils',
     send(adMessage("deprovision"));
   };
 
-  var observable = null;
-  var observeProvision = ko.observable(false);
-
-  var setObserveProvision = function (obs) {
-    observeProvision(true);
-    observable = obs;
+  var setObserveProvision = function (callback) {
+    monitoringSolutions.provisioningProgress.set(callback);
   };
 
   var unsetObserveProvision = function () {
-    observeProvision(false);
-    observable = null;
+    monitoringSolutions.provisioningProgress.reset();
   }
 
   var nodeNameSaved = ko.computed(function() {

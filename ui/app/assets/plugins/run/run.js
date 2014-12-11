@@ -4,10 +4,10 @@
 define([
   "main/plugins",
   "services/sbt",
-  "services/monitoring/monitoringSolutions",
   "services/inspect/connection",
   'widgets/echoInstaller/echoInstaller',
   "widgets/layout/layout",
+  "services/monitoring/monitoringSolutions",
   "text!./run.html",
   'services/monitoring/appdynamicscontroller',
   'services/monitoring/newreliccontroller',
@@ -19,10 +19,10 @@ define([
 ], function(
   plugins,
   sbt,
-  monitoringSolutions,
   connection,
   echoInstaller,
   layout,
+  monitoringSolutions,
   tpl
 ) {
 

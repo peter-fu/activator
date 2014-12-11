@@ -4,15 +4,12 @@
 define([
   "main/plugins",
   "services/monitoring/appdynamicscontroller",
-  "services/monitoring/monitoringSolutions",
   "services/sbt",
   "../monitoringInstaller",
-  "text!./appdynamics.html",
-
+  "text!./appdynamics.html"
 ], function(
   plugins,
   appdynamics,
-  monitoringSolutions,
   sbt,
   monitoringInstaller,
   tpl
@@ -33,14 +30,6 @@ define([
   var needProvision = ko.computed(function () {
     return !available();
   });
-  // var downloadEnabled = ko.observable(false);
-  // var downloadClass = ko.computed(function() {
-  //   var enabled = (available() === false);
-  //   downloadEnabled(enabled);
-  //   return enabled ? "enabled" : "disabled";
-  // });
-
-  var provisionDownloadSubscription = ko.observable(null);
 
   var username = ko.observable();
   var password = ko.observable();
@@ -85,7 +74,7 @@ define([
 
   var provisionAppDynamics = function() {
     error("");
-    provisionDownloadSubscription(appdynamics.setObserveProvision(provisionObserver));
+    appdynamics.setObserveProvision(provisionObserver);
     appdynamics.provision(username(), password());
   };
 
@@ -94,7 +83,8 @@ define([
     appdynamics.deprovision();
   };
 
-  var provisionObserver = function(event) {
+  var provisionObserver = function(m) {
+    var event = m.event;
     var message = "";
     if (event.type === "provisioningError") {
       message = "Error provisioning AppDynamics: " + event.message;
@@ -120,7 +110,6 @@ define([
 
     if (event.type === "complete" || event.type === "provisioningError") {
       appdynamics.unsetObserveProvision();
-      provisionDownloadSubscription(null); // TODO: is this observable needed anymore?
     }
   };
 
@@ -163,7 +152,7 @@ define([
       appdynamics.sslEnabled(sslEnabled());
       return true;
     } else {
-      monitoringSolutions.removeAppDynamics();
+      // appdynamics.removeAppDynamics();
       return false;
     }
   };

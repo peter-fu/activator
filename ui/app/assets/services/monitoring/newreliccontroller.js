@@ -16,8 +16,6 @@ define([
   var available = ko.observable(false);
   var supportedJavaVersion = ko.observable({result:true, version:"Unknown"});
   var validKey = /^([0-9a-z]{40})$/i;
-  var observable = null;
-  var observeProvision = ko.observable(false);
 
   var send = function (msg){
     websocket.send(msg);
@@ -47,15 +45,13 @@ define([
     send(nrMessageWith("enable", {key: licenseKey(), name: serverAppModel.name}));
   };
 
-  var setObserveProvision = function(obs) {
-    observable = obs;
-    observeProvision = true;
+  var setObserveProvision = function(callback) {
+    monitoringSolutions.provisioningProgress.set(callback);
     send(nrMessage("provision"))
   };
 
   var unsetObserveProvision = function() {
-    observeProvision = false;
-    observable = null;
+    monitoringSolutions.provisioningProgress.reset();
   };
 
   var licenseKeySaved = ko.computed(function() {
@@ -63,37 +59,33 @@ define([
     return validKey.test(key);
   });
 
-  var stream = websocket.subscribe('type', 'monitoring');
+  var stream = monitoringSolutions.stream.matchOnAttribute('subtype', 'newrelic');
 
   stream.map(function (response) {
-    if (response.subtype === 'newrelic') {
-      var event = response.event;
-      if (event.type === "availableResponse") {
-        debug && console.log("setting available to: " + event.result);
-        available(event.result);
+    var event = response.event;
+    if (event.type === "availableResponse") {
+      debug && console.log("setting available to: " + event.result);
+      available(event.result);
+    }
+    if (event.type === "provisioned") {
+      debug && console.log("New Relic provisioned");
+      send(nrMessage("available"));
+    }
+    if (event.type === "isProjectEnabledResponse") {
+      debug && console.log("Setting isProjectEnabled to: " + event.result);
+      isProjectEnabled(event.result);
+      if (event.result) {
+        monitoringSolutions.addNewRelic();
       }
-      if (event.type === "provisioned") {
-        debug && console.log("New Relic provisioned");
-        send(nrMessage("available"));
-      }
-      if (event.type === "isProjectEnabledResponse") {
-        debug && console.log("Setting isProjectEnabled to: " + event.result);
-        isProjectEnabled(event.result);
-        if (event.result) {
-          monitoringSolutions.addNewRelic();
-        }
-      }
-      if (event.type === "isSupportedJavaVersionResult") {
-        debug && console.log("Setting isSupportedJavaVersionResult to: " + event.result);
-        supportedJavaVersion({result: event.result, version: event.version});
-      }
-      if (event.type === "projectEnabled") {
-        debug && console.log("Project enabled for New Relic");
-        checkIsProjectEnabled();
-        generateFiles();
-      }
-    } else if (response.subtype === 'ProvisioningStatus' && observeProvision) {
-      observable(response.event);
+    }
+    if (event.type === "isSupportedJavaVersionResult") {
+      debug && console.log("Setting isSupportedJavaVersionResult to: " + event.result);
+      supportedJavaVersion({result: event.result, version: event.version});
+    }
+    if (event.type === "projectEnabled") {
+      debug && console.log("Project enabled for New Relic");
+      checkIsProjectEnabled();
+      generateFiles();
     }
   });
 
