@@ -52,6 +52,7 @@ define(['commons/utils',
 
   stream.map(function (response) {
     var event = response.event;
+    console.log(response);
     if (event.type === "availableResponse") {
       debug && console.log("setting available to: ",event.result);
       available(event.result);
@@ -110,16 +111,17 @@ define(['commons/utils',
       tierName: tierName(),
       accountName: accountName(),
       accessKey: accessKey(),
-      hostName: hostName(),
+      hostName: hostName()+"",// Force string
       port: port(),
       sslEnabled: sslEnabled()
     }));
+    send(adMessage("isProjectEnabled"));
   };
 
   var init = function() {
     debug && console.log("Making initial request to check AD availability");
     send(adMessage("isAvailable"));
-    send(adMessage("isProjectEnabled"))
+    send(adMessage("isProjectEnabled"));
   };
 
   init();
