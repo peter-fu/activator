@@ -7,7 +7,10 @@ define([
   "services/inspect/connection",
   'widgets/echoInstaller/echoInstaller',
   "widgets/layout/layout",
+  "services/monitoring/monitoringSolutions",
   "text!./run.html",
+  'services/monitoring/appdynamicscontroller',
+  'services/monitoring/newreliccontroller',
   "css!./run",
   "css!widgets/buttons/switch",
   "css!widgets/buttons/button",
@@ -19,6 +22,7 @@ define([
   connection,
   echoInstaller,
   layout,
+  monitoringSolutions,
   tpl
 ) {
 
@@ -42,14 +46,20 @@ define([
     return sbt.tasks.pendingTasks.run()?"Stop":"Run";
   });
 
-  sbt.app.inspectActivated.subscribe(function(active) {
-    if (!active && window.location.hash.indexOf("#run/system") !== 0) {
+  var toggleInspect = function() {
+    var toActivate = monitoringSolutions.inspectActivated() ? monitoringSolutions.NO_MONITORING : monitoringSolutions.INSPECT;
+    monitoringSolutions.monitoringSolution(toActivate);
+  }
+
+  monitoringSolutions.monitoringSolution.subscribe(function(solution) {
+    if (!monitoringSolutions.inspectActivated() && window.location.hash.indexOf("#run/system") !== 0) {
       window.location.hash = "run/system";
-    } else if(active) {
+    }
+    if(monitoringSolutions.inspectActivated()) {
       sbt.tasks.actions.kill();
-      echoInstaller(function() {
-        sbt.tasks.actions.run();
-      });
+      echoInstaller(function() {});
+    } else {
+      sbt.tasks.actions.kill();
     }
   });
 
@@ -62,7 +72,9 @@ define([
     rerunOnBuild: sbt.app.settings.rerunOnBuild,
     automaticResetInspect: sbt.app.settings.automaticResetInspect,
     showLogDebug: sbt.app.settings.showLogDebug,
-    inspectActivated: sbt.app.inspectActivated,
+    monitoringSolutions: monitoringSolutions,
+    inspectActivated: monitoringSolutions.inspectActivated,
+    toggleInspect: toggleInspect,
     mainRunAction: mainRunAction,
     mainRunName: mainRunName,
     customCommands: sbt.app.customCommands

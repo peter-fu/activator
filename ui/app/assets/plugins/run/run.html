@@ -29,18 +29,6 @@
           </div>
           Run on build
         </li>
-        <li>
-          <div class="switch" data-bind="switchButton: inspectActivated">
-            <div class="inner"></div>
-          </div>
-          Activate inspector
-        </li>
-        <li>
-          <div class="switch" data-bind="switchButton: automaticResetInspect">
-            <div class="inner"></div>
-          </div>
-          Reset data on run
-        </li>
         <!-- ko if: sbt.app.currentMainClass() -->
         <li>
           <h4>Main file</h4>
@@ -57,38 +45,79 @@
           </dl>
         </li>
         <!-- /ko -->
+        <!-- ko if: monitoringSolutions.monitoringSolutions().length == 2 -->
+        <li>
+          <h4>Inspect</h4>
+          <div class="switch" data-bind="css: { 'active': inspectActivated }, click: toggleInspect">
+            <div class="inner"></div>
+          </div>
+          Activator Inspect
+        </li>
+        <!-- /ko -->
+        <!-- ko if: monitoringSolutions.monitoringSolutions().length > 2 -->
+        <li>
+          <h4>Monitoring</h4>
+          <dl class="select dropdown">
+            <dt>
+              <span data-bind="text: monitoringSolutions.monitoringSolution()"></span>
+              <span class="arrows">
+                <svg data-bind="svg: '/assets/icons/arrows.svg'"/>
+              </span>
+            </dt>
+            <dd data-bind="foreach: monitoringSolutions.monitoringSolutions">
+              <a data-bind="text: $data, click: function(){ $root.monitoringSolutions.monitoringSolution($data) }"></a>
+            </dd>
+          </dl>
+        </li>
+        <!-- /ko -->
+        <li data-bind="visible: inspectActivated">
+          <div class="switch" data-bind="switchButton: automaticResetInspect">
+            <div class="inner"></div>
+          </div>
+          Reset data on run
+        </li>
       </ul>
     </div>
-    <footer>
-      <!-- ko if: inspectActivated -->
-        <span class="expand">Data collected for</span>
-        <span class="cache counter" data-bind="formatTime: stats().data.currentStorageTime * 1000">0&ndash;</span>
-      <!-- /ko -->
-      <!-- ko ifnot: inspectActivated -->
-        <p class="locked"> 
-          The inspector is disabled.
-        </p>
-      <!-- /ko -->
-    </footer>
     <ul class="list links">
       <li class="system" data-bind="isActiveUrl: '#run/system'">
-        <a href="#run/system">System</a>
+        <a href="#run/system">Standard out</a>
       </li>
-      <li class="actors" data-bind="visible: inspectActivated, isActiveUrl: '#run/actors'">
+      <!-- ko if: inspectActivated -->
+      <li class="actors" data-bind="isActiveUrl: '#run/actors'">
         <a href="#run/actors">Actors</a>
         <span class="counter" data-bind="text: stats().data.metadata.actorPathCount, visible: stats().data.metadata.actorPathCount"></span>
       </li>
-      <li class="actorIssues" data-bind="visible: inspectActivated, isActiveUrl: '#run/actorIssues'">
+      <li class="actorIssues" data-bind="isActiveUrl: '#run/actorIssues'">
         <a href="#run/actorIssues">Actor Issues</a>
         <span class="counter error" data-bind="text: stats().data.deviations.deviationCount, visible: stats().data.deviations.deviationCount"></span>
       </li>
       <!--
-      <li class="requests" data-bind="visible: inspectActivated, isActiveUrl: '#run/requests'">
+      <li class="requests" data-bind="isActiveUrl: '#run/requests'">
         <a href="#run/requests">Requests</a>
         <span class="counter" data-bind="text: stats().data.metadata.playPatternCount, visible: stats().data.metadata.playPatternCount"></span>
       </li>
        -->
+      <!-- /ko -->
+      <!-- ko if: monitoringSolutions.newRelicActivated() -->
+      <li class="actors" data-bind="isActiveUrl: '#monitoring/newrelic'">
+        <a href="#monitoring/newrelic">Configure NewRelic</a>
+      </li>
+      <!-- /ko -->
+      <!-- ko if: monitoringSolutions.appDynamicsActivated() -->
+      <li class="actors" data-bind="isActiveUrl: '#monitoring/appdynamics'">
+        <a href="#monitoring/appdynamics">Configure AppDynamics</a>
+      </li>
+      <!-- /ko -->
+
     </ul>
+
+    <!-- ko if: inspectActivated -->
+    <footer>
+        <span class="expand">Data collected for</span>
+        <span class="cache counter" data-bind="formatTime: stats().data.currentStorageTime * 1000">0&ndash;</span>
+    </footer>
+    <!-- /ko -->
+
   </nav>
   <!-- ko if: subPlugin() -->
     <!-- ko include: subPlugin --><!-- /ko -->

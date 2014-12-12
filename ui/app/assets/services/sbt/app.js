@@ -14,6 +14,7 @@ define([
     this.projects([]);
   };
 
+  var mainClass = ko.observable(null);
   var mainClasses = ko.observable([]);
 
   return {
@@ -23,9 +24,9 @@ define([
     projects:           projects,
     currentProject:     currentProject,
     removeExistingProjects: removeExistingProjects,
+    mainClass:          mainClass,
     mainClasses:        mainClasses,
     currentMainClass:   settings.observable("build.mainClass-"+serverAppModel.id, false), //currentMainClass,
-    inspectActivated:   settings.observable("build.activateInspect-"+serverAppModel.id, false),
     versions: {
       scala:            ko.observable(false),
       akka:             ko.observable(false),

@@ -75,7 +75,7 @@ define([
     sbt: sbt,
     openLogs: openLogs,
     closeLogs: closeLogs,
-    logs: logs,
+    logs: sbt.logs.logs,
     currentExecution: currentExecution,
     scrollToBottom: scrollToBottom,
     clear: function() {

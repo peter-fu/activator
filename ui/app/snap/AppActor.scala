@@ -37,6 +37,8 @@ case class SbtClientResponse(serialId: Long, result: Any, command: Option[String
 case object WebSocketAlreadyUsed extends AppReply
 case class WebSocketCreatedReply(created: Boolean) extends AppReply
 
+class InstrumentationRequestException(message: String) extends Exception(message)
+
 class AppActor(val config: AppConfig) extends Actor with ActorLogging {
 
   AppManager.registerKeepAlive(self)
@@ -49,7 +51,7 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
 
   // TODO configName/humanReadableName are cut-and-pasted into AppManager, fix
   val connector = SbtConnector(configName = "activator", humanReadableName = "Activator", location)
-  val socket = context.actorOf(Props[AppWebSocketActor], name = "socket")
+  val socket = context.actorOf(Props(new AppWebSocketActor(config)), name = "socket")
   val projectWatcher = context.actorOf(Props(new ProjectWatcher(location, newSourcesSocket = socket, appActor = self)),
     name = "projectWatcher")
   var sbtClientActor: Option[ActorRef] = None

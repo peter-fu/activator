@@ -5,12 +5,14 @@ define([
   'commons/websocket',
   'commons/stream',
   'commons/types',
-  './app'
+  './app',
+  'services/monitoring/monitoringSolutions'
 ], function(
   websocket,
   Stream,
   types,
-  app
+  app,
+  monitoringSolutions
 ) {
 
   /**
@@ -104,7 +106,7 @@ define([
    * Reset inspect data
    */
   function resetInspect() {
-    debug && console.log("Reset Inspect datas")
+    debug && console.log("Resetting Inspect data")
     websocket.send({
       "commands": [{
         "module": "lifecycle",
@@ -118,10 +120,9 @@ define([
   */
   var runCommand = ko.computed(function() {
     if (app.currentMainClass()){
-      return (app.inspectActivated()?"echo:":"")+"backgroundRunMain "+ app.currentMainClass();
-    }
-    else {
-      return (app.inspectActivated()?"echo:":"")+"backgroundRun";
+      return (monitoringSolutions.runMainCommand() + " " + app.currentMainClass());
+    } else {
+      return (monitoringSolutions.runCommand());
     }
   });
 
@@ -393,12 +394,14 @@ define([
 
   // discoveredMainClasses
   valueChanged.matchOnAttribute('key', 'discoveredMainClasses').each(function(message) {
-    var discovered = message.value && message.value.serialized || [];
-    if (discovered) {
-      app.mainClasses(discovered); // All main classes
-      if (!app.currentMainClass() && discovered[0]){
-        app.currentMainClass(discovered[0]); // Selected main class, if empty
-      }
+    var discovered = [];
+    if (message.value && message.value.length)
+      discovered = message.value;
+    // TODO this is broken, if there are two projects with main classes we'll just
+    // pick "last one wins," we need to separately track main classes per-project.
+    app.mainClasses(discovered); // All main classes
+    if (!app.currentMainClass() && discovered[0]){
+      app.currentMainClass(discovered[0]); // Selected main class, if empty
     }
   });
 
@@ -459,10 +462,15 @@ define([
       inspectHasPlayVersion(false);
   });
 
+  // mainClass
+  valueChanged.matchOnAttribute('key', 'mainClass').each(function(message) {
+    app.mainClass(message.value);
+  });
+
   // Application ready
   var clientReady = ko.observable(false);
   var applicationReady = ko.computed(function() {
-    return app.mainClasses() && app.mainClasses().length && clientReady();
+    return (app.mainClasses().length || app.mainClass() !== null) && clientReady();
   });
   var applicationNotReady = ko.computed(function() { return !applicationReady(); });
   subTypeEventStream('ClientOpened').each(function (msg) {
@@ -470,6 +478,7 @@ define([
   });
   subTypeEventStream('ClientClosed').each(function (msg) {
     app.mainClasses([]);
+    app.mainClass(null);
     clientReady(false);
   });
 
@@ -515,7 +524,8 @@ define([
     self.read        = ko.observable(false);
     self.jobIds      = ko.observableArray([]);
 
-    if (self.commandId === "runMain" || self.commandId === "echo" || self.commandId === "backgroundRunMain" || self.commandId === "backgroundRun") self.commandId = "run";
+    var isRun = /^([a-z]+:)?(run|runMain\ .+|backgroundRunMain\ .+|backgroundRun)$/ig;
+    if (isRun.test(self.command)) self.commandId = "run";
 
     // Data produced:
     self.tasks          = {};

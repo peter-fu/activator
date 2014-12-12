@@ -15,7 +15,19 @@ object JsonHelper {
   import play.api.libs.functional.syntax._
   import play.api.libs.json.Reads._
   import play.api.libs.json.Writes._
-  import play.api.libs.functional.FunctionalBuilder
+  import java.io._
+  import play.api.data.validation.ValidationError
+
+  implicit object FileWrites extends Writes[File] {
+    def writes(file: File) = JsString(file.getPath)
+  }
+
+  implicit object FileReads extends Reads[File] {
+    def reads(json: JsValue) = json match {
+      case JsString(path) => JsSuccess(new File(path))
+      case _ => JsError(Seq(JsPath() -> Seq(ValidationError("validate.error.expected.jsstring"))))
+    }
+  }
 
   def extractTagged[T](key: String, tag: String)(reads: Reads[T]): Reads[T] =
     (__ \ key).read[String](pattern(tag.r)) ~> reads
@@ -31,11 +43,16 @@ object JsonHelper {
       Json.obj(key -> tag) ++ bodyFunc(in)
   }
 
+  def emitTagged[T](tagKey: String, tag: String, subTagKey: String, subTag: String)(bodyFunc: T => JsObject): Writes[T] = new Writes[T] {
+    def writes(in: T): JsValue =
+      Json.obj(tagKey -> tag) ++ Json.obj(subTagKey -> subTag) ++ bodyFunc(in)
+  }
+
   def emitRequest[T](tag: String)(bodyFunc: T => JsObject): Writes[T] =
     emitTagged("request", tag)(bodyFunc)
 
-  def emitResponse[T](tag: String)(bodyFunc: T => JsObject): Writes[T] =
-    emitTagged("response", tag)(bodyFunc)
+  def emitResponse[T](tag: String, subTag: String)(bodyFunc: T => JsObject): Writes[T] =
+    emitTagged("type", tag, "subtype", subTag)(bodyFunc)
 
   def playJsonToScalaJson(playJson: JsValue): JSONType = {
     def playJsonToScalaJsonValue(playJson: JsValue): Any = {
