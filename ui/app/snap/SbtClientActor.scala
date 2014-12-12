@@ -2,10 +2,9 @@ package snap
 
 import akka.actor._
 import akka.pattern._
+import play.api.libs.json._
 
-import play.api.libs.json.Writes
-
-import sbt.client.{ TaskKey, Subscription, SbtClient }
+import sbt.client._
 import sbt.protocol._
 
 import scala.concurrent.Future
@@ -16,53 +15,15 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class SbtClientActor(val client: SbtClient) extends Actor with ActorLogging {
   log.debug(s"Creating SbtClientActor ${self.path.name}")
 
+  import SbtClientActor._
+
   override val supervisorStrategy = SupervisorStrategy.stoppingStrategy
 
-  val eventsSub = client.handleEvents { event =>
-    self ! event
-  }
-  val buildSub = client.watchBuild { structure =>
-    self ! structure
-  }
+  // Initialize the life cycle handler for the sbt client actor
+  val lifeCycleHandler = context.actorOf(SbtClientLifeCycleHandlerActor.props(client), "lifeCycleHandler-" + self.path.name)
+  lifeCycleHandler ! SbtClientLifeCycleHandlerActor.Initialize
 
-  // this is a hardcoded hack... we need to control the list of things
-  // to watch from JS, and we should handle build structure changes
-  // by redoing this
-  val valueSub = new Subscription() {
-    val futureValueSubs: Seq[Future[Seq[Subscription]]] =
-      Seq("discoveredMainClasses",
-        "mainClasses",
-        "mainClass",
-        "libraryDependencies",
-        "echo:echoTraceSupported",
-        "echo:echoPlayVersionReport",
-        "echo:echoAkkaVersionReport",
-        "echo:echoTracePlayVersion") map { name =>
-          client.lookupScopedKey(name) map { scopeds =>
-            scopeds map { scoped =>
-              log.debug(s"Subscribing to key ${scoped}")
-              client.rawWatch(TaskKey[Seq[String]](scoped)) { (key, result) =>
-                self ! ValueChanged(key, result)
-              }
-            }
-          }
-        }
-    override def cancel(): Unit = {
-      futureValueSubs map { futureSubs => futureSubs map { subs => subs map { sub => sub.cancel() } } }
-    }
-  }
-
-  override def postStop(): Unit = {
-    log.debug("postStop")
-    eventsSub.cancel()
-    buildSub.cancel()
-    valueSub.cancel()
-    // we were probably stopped because the client closed already,
-    // but if not, close here.
-    client.close()
-  }
-
-  private def forwardOverSocket[T <: Event: Writes: ClassTag](event: T): Unit = {
+  def forwardOverSocket[T <: Event: Writes: ClassTag](event: T): Unit = {
     context.parent ! NotifyWebSocket(SbtProtocol.wrapEvent(event))
   }
 
@@ -98,6 +59,11 @@ class SbtClientActor(val client: SbtClient) extends Actor with ActorLogging {
     }
     case structure: MinimalBuildStructure =>
       forwardOverSocket(BuildStructureChanged(structure))
+    case PlayAvailable(available) =>
+      context.parent ! NotifyWebSocket(SbtProtocol.wrapEvent(
+        JsObject(Seq(
+          "backgroundRunnerAvailable" -> JsBoolean(available))),
+        "PlayStatus"))
     case req: ClientAppRequest => {
       req match {
         case re: RequestExecution =>
@@ -125,4 +91,93 @@ class SbtClientActor(val client: SbtClient) extends Actor with ActorLogging {
       SbtClientResponse(req.serialId, result, req.command)
     } pipeTo sender
   }
+}
+
+object SbtClientActor {
+  def props(client: SbtClient) = Props(new SbtClientActor(client))
+  case class PlayAvailable(available: Boolean)
+}
+
+/**
+ * Sets up all subscriptions to the sbt client required.
+ * Forwards all messages to its parent.
+ * Takes care of resources during life cycle changes.
+ */
+class SbtClientLifeCycleHandlerActor(val client: SbtClient) extends Actor with ActorLogging {
+  import SbtClientLifeCycleHandlerActor._
+  var eventsSub: Option[Subscription] = None
+  var buildSub: Option[Subscription] = None
+  var valueSub: Option[Subscription] = None
+
+  def receive = {
+    case Initialize =>
+      handleEvents
+      watchBuild
+      setupSubscription
+      checkPlayAvailable
+  }
+
+  override def postStop(): Unit = {
+    log.debug("postStop")
+    eventsSub map { _.cancel() }
+    buildSub map { _.cancel() }
+    valueSub map { _.cancel() }
+    // we were probably stopped because the client closed already,
+    // but if not, close here.
+    client.close()
+  }
+
+  def handleEvents = {
+    eventsSub = Some(client.handleEvents { event =>
+      context.parent ! event
+    })
+  }
+
+  def watchBuild = {
+    buildSub = Some(client.watchBuild { structure =>
+      context.parent ! structure
+    })
+  }
+
+  def checkPlayAvailable = {
+    client.lookupScopedKey("playBackgroundRunTaskBuilder") map { keys: Seq[ScopedKey] =>
+      if (keys.length > 0) {
+        context.parent ! SbtClientActor.PlayAvailable(true)
+      }
+    }
+  }
+
+  // this is a hardcoded hack... we need to control the list of things
+  // to watch from JS, and we should handle build structure changes
+  // by redoing this
+  def setupSubscription = {
+    valueSub = Some(new Subscription() {
+      val futureValueSubs: Seq[Future[Seq[Subscription]]] =
+        Seq("discoveredMainClasses",
+          "mainClasses",
+          "mainClass",
+          "libraryDependencies",
+          "echo:echoTraceSupported",
+          "echo:echoPlayVersionReport",
+          "echo:echoAkkaVersionReport",
+          "echo:echoTracePlayVersion") map { name =>
+            client.lookupScopedKey(name) map { scopeds =>
+              scopeds map { scoped =>
+                log.debug(s"Subscribing to key ${scoped}")
+                client.rawWatch(TaskKey[Seq[String]](scoped)) { (key, result) =>
+                  context.parent ! ValueChanged(key, result)
+                }
+              }
+            }
+          }
+      override def cancel(): Unit = {
+        futureValueSubs map { futureSubs => futureSubs map { subs => subs map { sub => sub.cancel() } } }
+      }
+    })
+  }
+}
+
+object SbtClientLifeCycleHandlerActor {
+  def props(client: SbtClient) = Props(new SbtClientLifeCycleHandlerActor(client))
+  case object Initialize
 }
