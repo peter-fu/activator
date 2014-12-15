@@ -52,7 +52,7 @@ define(['commons/utils',
 
   stream.map(function (response) {
     var event = response.event;
-    console.log(response);
+
     if (event.type === "availableResponse") {
       debug && console.log("setting available to: ",event.result);
       available(event.result);
