@@ -482,6 +482,16 @@ define([
     clientReady(false);
   });
 
+  // Play related observable: if the correct Play runner exists for the current project
+  var playRunnerAvailable = ko.observable(false);
+
+  subTypeEventStream("PlayStatus").each(function(message) {
+    if (message.event.backgroundRunnerAvailable) {
+      debug && console.log("Setting playRunnerAvailable to: ", message.event.backgroundRunnerAvailable);
+      playRunnerAvailable(message.event.backgroundRunnerAvailable);
+    }
+  });
+
   // Build status
   var buildReady = ko.observable(true);
   subTypeEventStream("BuildLoaded").each(function(message) {

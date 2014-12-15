@@ -148,7 +148,7 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
         log.debug(s"Opening new client actor for sbt client ${client}")
         clientCount += 1
         self ! NotifyWebSocket(AppActor.clientOpenedJsonEvent)
-        sbtClientActor = Some(context.actorOf(Props(new SbtClientActor(client)), name = s"client-$clientCount"))
+        sbtClientActor = Some(context.actorOf(SbtClientActor.props(client), name = s"client-$clientCount"))
         sbtClientActor.foreach(context.watch(_))
         flushPending()
       case CloseClient =>
