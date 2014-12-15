@@ -19,6 +19,7 @@ define([
   // Set up default solutions
   var monitoringSolutions = ko.observableArray([NO_MONITORING,INSPECT]);
   var monitoringSolution = settings.observable("build.monitoringSolution-"+serverAppModel.id, NO_MONITORING);
+  var isPlayApplication = ko.observable(false); // used to determine what runner to execute (see runCommand below)
 
   var inspectActivated = ko.computed(function() {
     return monitoringSolution() === INSPECT;
@@ -27,10 +28,14 @@ define([
   var runCommand = ko.computed(function() {
     if (monitoringSolution() === INSPECT) {
       return "echo:backgroundRun";
-    } else if (monitoringSolution() === NEW_RELIC) {
+    } else if (monitoringSolution() === NEW_RELIC && !isPlayApplication()) {
       return "newrelic:backgroundRun";
-    } else if (monitoringSolution() === APP_DYNAMICS) {
+    } else if (monitoringSolution() === NEW_RELIC && isPlayApplication()) {
+      return "newrelicplay:backgroundRun";
+    } else if (monitoringSolution() === APP_DYNAMICS && !isPlayApplication()) {
       return "appdynamics:backgroundRun";
+    } else if (monitoringSolution() === APP_DYNAMICS && isPlayApplication()) {
+      return "appdynamicsplay:backgroundRun";
     } else {
       return "backgroundRun";
     }
@@ -108,6 +113,7 @@ define([
     removeNewRelic        : removeNewRelic,
     runCommand            : runCommand,
     runMainCommand        : runMainCommand,
-    provisioningProgress  : provisioningProgress
+    provisioningProgress  : provisioningProgress,
+    isPlayApplication     : isPlayApplication
   }
 });

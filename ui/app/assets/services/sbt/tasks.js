@@ -131,6 +131,7 @@ define([
     if (isPlayApplication()) {
       debug && console.log("Using 'run' rather than 'run-main' for Play's server class");
       forceRunCommand = true;
+      monitoringSolutions.isPlayApplication(true);
     }
 
     if (app.currentMainClass() && !forceRunCommand){
@@ -646,6 +647,7 @@ define([
     buildReady:              buildReady,
     applicationReady:        applicationReady,
     applicationNotReady:     applicationNotReady,
+    isPlayApplication:       isPlayApplication,
     active: {
       turnedOn:     "",
       compiling:    "",
