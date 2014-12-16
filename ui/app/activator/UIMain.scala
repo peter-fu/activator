@@ -6,7 +6,7 @@ package activator
 import xsbti.{ AppMain, AppConfiguration }
 import java.awt._
 import javax.swing._
-import java.net.URL
+import java.net.{ URI, URL }
 import sbt.IO
 import activator.properties.ActivatorProperties._
 import xsbti.GlobalLock
@@ -98,8 +98,11 @@ class UIMain extends AppMain {
       val optRepositories: Seq[(String, java.io.File, Option[String])] =
         configuration.provider.scalaProvider.launcher.appRepositories collect {
           case x: xsbti.IvyRepository if (x.id == "activator-local") && (x.url.getProtocol == "file") =>
-            System.err.println("FOUND REPO = " + x.id + " @ " + x.url)
-            (x.id, new java.io.File(x.url.toURI), Some(x.ivyPattern))
+            // Fix UNC path problem on Windows http://www.tomergabel.com/JavaMishandlesUNCPathsOnWindows.aspx
+            var uri: URI = x.url.toURI
+            if (uri.getAuthority != null) uri = new URI(uri.toString.replace("file://", "file:/"))
+            System.err.println("FOUND REPO = " + x.id + " @ " + uri)
+            (x.id, new java.io.File(uri), Some(x.ivyPattern))
         }
 
       // Start the Play app... (TODO - how do we know when we're done?)
