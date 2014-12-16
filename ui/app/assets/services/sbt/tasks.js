@@ -115,11 +115,26 @@ define([
     });
   }
 
+  var isPlayApplication = function() {
+    if (app.mainClass() && app.mainClass().serialized === "play.core.server.NettyServer") {
+      return true;
+    }
+
+    return false;
+  }
+
   /**
   Run command
   */
   var runCommand = ko.computed(function() {
-    if (app.currentMainClass()){
+    var forceRunCommand = false;
+    if (isPlayApplication()) {
+      debug && console.log("Using 'run' rather than 'run-main' for Play's server class");
+      forceRunCommand = true;
+      monitoringSolutions.isPlayApplication(true);
+    }
+
+    if (app.currentMainClass() && !forceRunCommand){
       return (monitoringSolutions.runMainCommand() + " " + app.currentMainClass());
     } else {
       return (monitoringSolutions.runCommand());
@@ -632,6 +647,7 @@ define([
     buildReady:              buildReady,
     applicationReady:        applicationReady,
     applicationNotReady:     applicationNotReady,
+    isPlayApplication:       isPlayApplication,
     active: {
       turnedOn:     "",
       compiling:    "",
