@@ -52,8 +52,8 @@ define([
 
   function toggleOrdering(name){
     return function() {
-      if (orderBy() == name)
-        orderByDesc(orderByDesc()=="asc"?"desc":"asc")
+      if (orderBy() === name)
+        orderByDesc(orderByDesc()==="asc"?"desc":"asc")
       else
         orderBy(name)
     }
@@ -61,7 +61,7 @@ define([
 
   function isOrdering(name) {
     return ko.computed(function() {
-      return orderBy() == name?orderByDesc():false;
+      return orderBy() === name?orderByDesc():false;
     });
   }
 
@@ -73,6 +73,12 @@ define([
 
   function openRequest(req){
     window.location.hash = req.requestLink;
+  }
+
+  function closeRequest(){
+    window.location.hash = "#run/requests";
+    requests.setCurrentRequestId(null);
+    requests.currentRequest(null);
   }
 
   var State = {
@@ -93,12 +99,6 @@ define([
     }
   }
 
-  function closeRequest(){
-    window.location.hash = "#run/requests";
-    requests.setCurrentRequestId(null);
-    requests.currentRequest(null);
-  }
-
   return {
     route: function(url, breadcrumb) {
       if (url.parameters){
@@ -116,7 +116,7 @@ define([
     },
 
     keyboard: function(key, meta, e) {
-      if (key == "ESC"){
+      if (key === "ESC"){
         closeRequest();
       }
     }
