@@ -483,9 +483,12 @@ define([
   });
 
   // Application ready
+  var playHasRunCommand = ko.computed(function() {
+    return !app.mainClass() || !isPlayApplication() || playRunnerAvailable();
+  });
   var clientReady = ko.observable(false);
   var applicationReady = ko.computed(function() {
-    return (app.mainClasses().length || app.mainClass() !== null) && clientReady();
+    return (app.mainClasses().length || app.mainClass() !== null) && playHasRunCommand() && clientReady();
   });
   var applicationNotReady = ko.computed(function() { return !applicationReady(); });
   subTypeEventStream('ClientOpened').each(function (msg) {
@@ -648,6 +651,8 @@ define([
     applicationReady:        applicationReady,
     applicationNotReady:     applicationNotReady,
     isPlayApplication:       isPlayApplication,
+    playRunnerAvailable:     playRunnerAvailable,
+    playHasRunCommand:       playHasRunCommand,
     active: {
       turnedOn:     "",
       compiling:    "",
