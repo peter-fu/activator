@@ -14,7 +14,7 @@ define([
   tpl
 ) {
 
-  var trpAccepted = settings.observable("reactive-platform.accepted-licence", false);
+  var trpInfoSeen = settings.observable("reactive-platform.accepted-licence", false);
 
   // Memorise last used directory
   var lastFolder = settings.observable("last-folder", window.homeFolder);
@@ -50,10 +50,10 @@ define([
     self.filterValue = ko.observable("");
     self.tags = window.tags;
     self.lastFolder = lastFolder;
-    self.trpAccepted = trpAccepted;
+    self.trpInfoSeen = trpInfoSeen;
 
     self.acceptTrp = function(){
-      self.trpAccepted(true);
+      self.trpInfoSeen(true);
     }
     self.cancelTrp = function(){
       self.openedTab("templates");
