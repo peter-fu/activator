@@ -1,16 +1,21 @@
 <section id="new">
 
+  <nav class="tabs">
+    <h2>Templates</h2>
+    <a data-bind="click: showTemplates, css: {active: openedTab() == 'templates'}">Tutorials</a>
+    <a data-bind="click: showSeeds, css: {active: openedTab() == 'seed'}">Seeds</a>
+    <a data-bind="click: showTrp, css: {active: openedTab() == 'trp'}">Reactive Platform</a>
+  </nav>
+
   <div id="templatesList" class="half">
-    <header class="tabs">
-      <h2 data-bind="click: showTemplates, css: {active: openedTab() == 'templates'}">Tutorials</h2>
-      <h2 data-bind="click: showSeeds, css: {active: openedTab() == 'seed'}">Seeds</h2>
-    </header>
-    <article id="templateList" data-bind="visible: openedTab() == 'templates'">
+
+    <article id="templateList">
+      <h2>Create a new app</h2>
       <aside id="filter">
         <span class="clear" data-bind="click: clearSearch">×</span>
         <input type="text" placeholder="Filter templates" data-bind="value: filterValue, event: {  keyup: search, change: search }" />
       </aside>
-      <ul class="list" data-bind="foreach: filteredTemplates">
+      <ul class="list" data-bind="foreach: filteredTemplates, visible: openedTab() == 'templates'">
         <li class="template" data-bind="css: {featured: featured, active: $root.currentAppId() == id}, click: $root.chooseTemplate">
           <input type="radio" name="template" data-bind="value: id">
           <span data-bind="text: title"></span>
@@ -19,10 +24,9 @@
           </ul>
         </li>
       </ul>
-    </article>
-    <article id="seedList" data-bind="visible: openedTab() == 'seed'">
-      <ul class="list" data-bind="foreach: seeds">
-        <li class="template" data-bind="css: {featured: featured, active: $root.currentAppId() == id}, click: $root.chooseSeed">
+
+      <ul class="list" data-bind="foreach: filteredSeeds, visible: openedTab() == 'seed'">
+        <li class="template" data-bind="css: {featured: featured, active: $root.currentAppId() == id}, click: $root.chooseTemplate">
           <input type="radio" name="template" data-bind="value: id">
           <span data-bind="text: title"></span>
           <ul class="tags" data-bind="foreach: tags">
@@ -30,7 +34,38 @@
           </ul>
         </li>
       </ul>
+
+      <ul class="list" data-bind="foreach: filteredTrp, visible: openedTab() == 'trp'">
+        <li class="template certified" data-bind="css: {active: $root.currentAppId() == id}, click: $root.chooseTemplate">
+          <input type="radio" name="template" data-bind="value: id">
+          <span data-bind="text: title"></span>
+          <ul class="tags" data-bind="foreach: tags">
+            <li data-bind="text: $data"></li>
+          </ul>
+        </li>
+      </ul>
+
+      <!-- ko if: !trpInfoSeen() && openedTab() == 'trp' -->
+        <div id="trpLicense"><div>
+          <h1>Typesafe Reactive Platform</h1>
+          <p><a href="http://typesafe.com/products/typesafe-reactive-platform" target="_blank">Typesafe Reactive Platform</a> is:</p>
+          <ul>
+            <li>Free for development</li>
+            <li>Requires a <a href="http://typesafe.com/subscription" target="_blank">Subscription</a> when used in production deployment</li>
+            <li>Accesses to <a href="http://typesafe.com" target="_blank">Typesafe.com</a> for license verification</li>
+          </ul>
+          <p>
+            <a href="#" target="_blank">Read the Typesafe Reactive Platform License Agreement</a>
+          </p>
+          <p style="text-align: center">
+            <button class="button" data-bind="click: acceptTrp">Accept</button>
+            <span data-bind="click: cancelTrp">Cancel</span>
+          </p>
+        </div></div>
+      <!-- /ko -->
+
     </article>
+
   </div>
 
   <!-- ko if:currentApp -->
@@ -50,11 +85,13 @@
           </cite></p>
         <p><a target="_blank" data-bind="attr: { href: sourceLink }, text: sourceLink" class="source"></a></p>
       </div>
+      <!-- ko if: authorName && authorBio && authorLogo -->
       <div class="promote partner">
         <img data-bind="attr: { src: authorLogo }">
         <h4 data-bind="text: authorName"></h4>
         <p data-bind="text: authorBio"></p>
       </div>
+      <!-- /ko -->
     </div>
     <form id="newApp" data-bind="submit: $root.newAppFormSubmit">
       <h4>Create an app from this template</h4>
@@ -63,28 +100,56 @@
       <input type="hidden" id="appName" name="name" data-bind="value: name">
       <p>
         <a id="browseAppLocation" data-bind="click: $root.clickBrowseAppLocation"></a>
-      <input type="text" id="newappLocation" name="location" data-bind="value: baseFolder + separator + name">
+      <input type="text" id="newappLocation" name="location" data-bind="value: $root.lastFolder() + separator + name">
       </p>
       <div class="select">
-        <input type="submit" class="button" value="Create" id="newButton">
+        <input type="submit" class="button" value="Create app" id="newButton">
       </div>
     </form>
   </div>
   <!-- /ko -->
 
   <!-- ko ifnot:currentApp -->
-  <div id="welcome" class="half right">
-    <h3>Create a new app</h3>
-    <p>You will be learning and writing code in seconds...</p>
-    <ol class="steps">
-      <li>Choose a template</li>
-      <li>Specify a location</li>
-      <li>Activate it!</li>
-    </ol>
-    <h4>Filter templates by a tag:</h4>
-    <ul class="inspiration tags" data-bind="foreach: tags">
-      <li data-bind="click: $root.searchTag, text: $data"></li>
-    </ul>
+  <div class="welcome half right">
+    <!-- ko if: openedTab() == 'templates' -->
+      <h3>Activator tutorials</h3>
+      <p>You will be learning and writing code in seconds...</p>
+      <ol class="steps">
+        <li>Choose a template</li>
+        <li>Specify a location</li>
+        <li>Activate it!</li>
+      </ol>
+      <h4>Filter tutorials by tags:</h4>
+      <ul class="inspiration tags" data-bind="foreach: tags">
+        <li data-bind="click: $root.searchTag, text: $data"></li>
+      </ul>
+    <!-- /ko -->
+    <!-- ko if: openedTab() == 'seed' -->
+      <h3>Activator seeds</h3>
+      <p>Seeds are boilerplates projects.</p>
+      <ol class="steps">
+        <li>Choose a seed</li>
+        <li>Specify a location</li>
+        <li>Activate it!</li>
+      </ol>
+      <h4>Filter seeds templates by tags:</h4>
+      <ul class="inspiration tags" data-bind="foreach: tags">
+        <li data-bind="click: $root.searchSeedTag, text: $data"></li>
+      </ul>
+    <!-- /ko -->
+    <!-- ko if: openedTab() == 'trp' -->
+      <h3>Typesafe Reactive Platform</h3>
+      <p>Use certified builds from Typesafe.</p>
+      <ol class="steps">
+        <li>Choose a project</li>
+        <li>Specify a location</li>
+        <li>Activate it!</li>
+      </ol>
+      <h4>Filter Reactive Platform templates by tags:</h4>
+      <ul class="inspiration tags" data-bind="foreach: tags">
+        <li data-bind="click: $root.searchTrpTag, text: $data"></li>
+      </ul>
+    <!-- /ko -->
   </div>
   <!-- /ko -->
 

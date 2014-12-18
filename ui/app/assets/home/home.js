@@ -26,8 +26,11 @@ require([
 });
 
 window.seeds = templates.filter(function(t){
-  return t.tags.indexOf('seed') >= 0;
+  return t.tags.indexOf('seed') >= 0 && t.tags.indexOf('reactive-platform') < 0;
 });
 window.tutorials = templates.filter(function(t){
-  return t.tags.indexOf('seed') < 0;
+  return t.tags.indexOf('seed') < 0 && t.tags.indexOf('reactive-platform') < 0;
+});
+window.trp = templates.filter(function(t){
+  return t.tags.indexOf('reactive-platform') >= 0;
 });
