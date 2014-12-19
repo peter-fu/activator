@@ -30,6 +30,9 @@ class AppWebSocketActor(val config: AppConfig) extends WebSocketActor[JsValue] w
     }
   }
 
+  import sbt.protocol.Completion
+  implicit val completionWrites = Json.writes[Completion]
+
   /**
    * Parses incoming sbt payload into an sbt command to execute.
    * Send result of execution asynchronously via web socket.
