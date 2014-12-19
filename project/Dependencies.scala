@@ -6,8 +6,8 @@ object Dependencies {
   val sbtLibraryVersion = "0.13.6" // for sbtIO on scala 2.11
 
   val sbtPluginVersion = "0.13"
-  val sbtPluginScalaVersion = "2.11.1"
-  val scalaVersion = "2.11.1"
+  val sbtPluginScalaVersion = "2.11.4"
+  val scalaVersion = "2.11.4"
   val luceneVersion = "4.2.1"
 
   val templateCacheVersion = "1.0-6830c15252733edf977c869af798d113ad5ac80d"
@@ -120,4 +120,41 @@ object Dependencies {
       _.classpath
     }
   }
+
+  // *** ECHO DEPENDENCIES ***
+
+  // TODO : put common version numbers in one place
+
+  val akkaSlf4j22 = "com.typesafe.akka"   %% "akka-slf4j"   % "2.2.4"
+  val akkaSlf4j23 = "com.typesafe.akka"   %% "akka-slf4j"   % "2.3.8"
+  val config      = "com.typesafe"        % "config"        % "1.2.1"
+  val play22      = "com.typesafe.play"   %% "play"         % "2.2.6"
+  val play23      = "com.typesafe.play"   %% "play"         % "2.3.7"
+  val play23ws    = "com.typesafe.play"   %% "play-ws"      % "2.3.7"
+  val protobuf24  = "com.google.protobuf" % "protobuf-java" % "2.4.1"
+  val protobuf25  = "com.google.protobuf" % "protobuf-java" % "2.5.0"
+  val sigar       = "org.fusesource"      % "sigar"         % "1.6.4"
+  val slf4j       = "org.slf4j"           % "slf4j-api"     % "1.7.5"
+
+  val akkaTestKit22 = "com.typesafe.akka" %% "akka-testkit" % "2.2.4"   % "test"
+  val akkaTestKit23 = "com.typesafe.akka" %% "akka-testkit" % "2.3.8"   % "test"
+  val junit       = "junit"               % "junit"         % "4.5"     % "test"
+  val logback     = "ch.qos.logback"      % "logback-classic" % "1.0.13" % "test"
+  val playTest23  = "com.typesafe.play"   %% "play-test"    % "2.3.7"   % "test"
+  val playTest22  = "com.typesafe.play"   %% "play-test"    % "2.2.6"   % "test"
+  val scalaTest   = "org.scalatest"       %% "scalatest"    % "2.2.1"   % "test"
+
+  def traceAkka(version: String, crossVersion: CrossVersion) = Seq(
+    "com.typesafe.akka" % "akka-actor"  % version cross crossVersion,
+    "com.typesafe.akka" % "akka-remote" % version cross crossVersion,
+    "com.typesafe.akka" % "akka-slf4j"  % version cross crossVersion,
+    sigar
+  )
+
+  val traceAkkaExcludes = {
+    <dependencies>
+      <exclude module="slf4j-simple"/>
+    </dependencies>
+  }
+  // *** END ECHO DEPENDENCIES ***
 }

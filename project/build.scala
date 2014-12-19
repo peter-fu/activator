@@ -1,5 +1,6 @@
 import sbt._
 import ActivatorBuild._
+import EchoBuild._
 import Dependencies._
 import Packaging.localRepoArtifacts
 import com.typesafe.sbt.S3Plugin._
