@@ -9,7 +9,6 @@
           </dt>
           <dd>
             <a data-bind="click: sbt.tasks.actions.run">Run</a>
-            <a data-bind="click: function(){ sbtExecCommand('start') }">Start</a>
             <!-- ko foreach: customCommands() -->
             <a data-bind="click: function(){ sbtExecCommand(command) }, text: title"></a>
             <!-- /ko -->
