@@ -76,6 +76,11 @@
           </div>
           Reset data on run
         </li>
+        <!-- ko if: sbt.tasks.playApplicationUrl() -->
+        <li class="play-url">
+          <a target="_blank" data-bind="href: sbt.tasks.playApplicationUrl, text: sbt.tasks.playApplicationUrl"></a>
+        </li>
+        <!-- /ko -->
       </ul>
     </div>
     <ul class="list links">
