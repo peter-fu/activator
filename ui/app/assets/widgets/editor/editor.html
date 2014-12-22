@@ -1,19 +1,7 @@
 <div class="documentWrapper">
   <!-- ko if: selectedDocument -->
   <footer>
-    <span data-bnd="text: location"></span>
-    <span>Theme:
-      <select data-bind="options: themes, value: chosenTheme"></select>
-    </span>
-    <span>Font size
-      <select data-bind="options: fontSizes, value: chosenFontSize"></select>
-    </span>
-    <span>
-      <label><input type="checkbox" data-bind="checked: selectedDocument().chosenSoftTabs">Use soft tabs</label>
-    </span>
-    <span>Tab size
-      <select data-bind="options: selectedDocument().tabSizes, value: selectedDocument().chosenTabSize"></select>
-    </span>
+    <span data-bind="text: selectedDocument().location"></span>
   </footer>
   <div class="editor">
     <!-- ko include: editorContainer --><!-- /ko -->
