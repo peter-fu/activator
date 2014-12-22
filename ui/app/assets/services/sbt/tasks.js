@@ -410,8 +410,8 @@ define([
   // discoveredMainClasses
   valueChanged.matchOnAttribute('key', 'discoveredMainClasses').each(function(message) {
     var discovered = [];
-    if (message.value && message.value.length)
-      discovered = message.value;
+    if (message.value && message.value.serialized && message.value.serialized.length)
+      discovered = message.value.serialized;
     // TODO this is broken, if there are two projects with main classes we'll just
     // pick "last one wins," we need to separately track main classes per-project.
     app.mainClasses(discovered); // All main classes
