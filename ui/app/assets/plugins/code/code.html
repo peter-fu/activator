@@ -33,22 +33,6 @@
               <select data-bind="options: editor.fontSizes, value: editor.chosenFontSize"></select>
               </label>
             </p>
-
-            <!-- ko if: selectedDocument -->
-            <p>
-              <label>
-                <input type="checkbox" data-bind="checked: selectedDocument().chosenSoftTabs">
-                Use soft tabs
-              </label>
-            </p>
-            <p>
-              <label>
-                Tab size
-                <select data-bind="options: selectedDocument().tabSizes, value: selectedDocument().chosenTabSize"></select>
-              </label>
-            </p>
-            <!-- /ko -->
-
           </dd>
         </dl>
         <ul class="tabs" data-bind="foreach: openedDocuments">
