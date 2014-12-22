@@ -78,7 +78,7 @@
         </li>
         <!-- ko if: sbt.tasks.playApplicationUrl() -->
         <li class="play-url">
-          <a target="_blank" data-bind="href: sbt.tasks.playApplicationUrl, text: sbt.tasks.playApplicationUrl"></a>
+          <a target="_blank" data-bind="href: sbt.tasks.playApplicationUrl, text: sbt.tasks.playApplicationUrl, css: {'disabled': !sbt.tasks.workingTasks.run()}"></a>
         </li>
         <!-- /ko -->
       </ul>

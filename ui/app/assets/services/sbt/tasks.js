@@ -227,7 +227,7 @@ define([
       debug && console.log("TestEvent: ", event);
       execution.testResults.push(event.serialized);
     } else if (event.name === "PlayServerStarted") {
-      playApplicationUrl(event.serialized && event.serialized.url);
+      if (event.serialized) playApplicationUrl(event.serialized.url);
     }
   });
 

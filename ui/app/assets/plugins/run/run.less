@@ -94,7 +94,7 @@
 
 
 
-.play-url a{
+.play-url a {
   display: block;
   padding: 3px;
   border: 1px solid @white-dkr;
@@ -104,5 +104,11 @@
   &:hover {
     background: @white-dkr;
     color: @grey-dkr;
+  }
+  &.disabled {
+    pointer-events: none;
+    border-color: @grey-text;
+    color: @grey-text;
+    background: none;
   }
 }
