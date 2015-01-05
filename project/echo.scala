@@ -32,6 +32,7 @@ object EchoBuild extends Build {
 
   lazy val trace = (
     Project("echo-trace", file("echo/trace"))
+      .doNotPublish
       aggregate(
       protocolProtobuf24, protocolProtobuf25,
       event210Protobuf24, event210Protobuf25,
@@ -408,6 +409,7 @@ object CollectProjects extends Build {
 
   lazy val collect = (
     Project("echo-collect", file("echo/collect"))
+      .doNotPublish
       dependsOn (event210Protobuf24)
       settings(
       sbt.Keys.scalaVersion := EchoBuild.ScalaVersion210,
