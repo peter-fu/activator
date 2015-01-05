@@ -56,17 +56,6 @@ object EchoBuild extends Build {
       )
       )
 
-  // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SBT ECHO SETTINGS
-
-  lazy val sbtEcho = (
-    Project("sbt-echo", file("sbt-echo"))
-      .noAutoPgp
-      .doNotPublish
-      settings (LocalTemplateRepo.settings: _*)
-      settings (Keys.resolvers += typesafeIvyReleases)
-      dependsOn (echo)
-    )
-
   lazy val buildSettings = SbtGit.versionWithGit ++ Seq(
     organization := "com.typesafe.trace",
     scalaVersion := "2.10.4",
@@ -272,7 +261,7 @@ object EchoBuild extends Build {
     )
 
   lazy val cotestsTracePlay22 = (
-    Project("echo-cotests-trace-play22", file("echo-cotests/trace/play/2.2.x"))
+    Project("echo-cotests-trace-play22", file("echo/cotests/trace/play/2.2.x"))
       dependsOn (cotestsTraceAkka22 % "test->test")
       dependsOn (tracePlay22 % "test->test")
       dependsOn (cotestsTracePlayCommon22 % "test->test")

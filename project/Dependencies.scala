@@ -122,9 +122,7 @@ object Dependencies {
   }
 
   // *** ECHO DEPENDENCIES ***
-
   // TODO : put common version numbers in one place
-
   val akkaSlf4j22 = "com.typesafe.akka"   %% "akka-slf4j"   % "2.2.4"
   val akkaSlf4j23 = "com.typesafe.akka"   %% "akka-slf4j"   % "2.3.8"
   val config      = "com.typesafe"        % "config"        % "1.2.1"
@@ -157,4 +155,28 @@ object Dependencies {
     </dependencies>
   }
   // *** END ECHO DEPENDENCIES ***
+
+  // *** SBT-ECHO DEPENDENCIES ***
+  // TODO : put common version numbers in one place
+
+  val aspectjTools = "org.aspectj" % "aspectjtools" % "1.8.4"
+
+  val sbtBackgroundRun = Defaults.sbtPluginExtra("com.typesafe.sbtrc" % "ui-interface-0-13" % sbtRcVersion, "0.13", "2.10")
+
+  def playPlugin: Seq[Setting[_]] = Seq(
+    resolvers += Classpaths.typesafeSnapshots,
+    resolvers += "Typesafe Maven Snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",
+    resolvers += "Typesafe Maven Releases" at "http://repo.typesafe.com/typesafe/releases/",
+    libraryDependencies <+= (sbt.Keys.sbtVersion in sbtPlugin, scalaBinaryVersion in update) { (sbtV, scalaV) =>
+      val dependency = sbtV match {
+        case "0.12" => "play" % "sbt-plugin" % "2.1.5" exclude("com.github.scala-incubator.io", "scala-io-core_2.9.1") exclude("com.github.scala-incubator.io", "scala-io-file_2.9.1")
+        case "0.13" => "com.typesafe.play" % "sbt-plugin" % playVersion
+        case _ => sys.error("Unsupported sbt version: " + sbtV)
+      }
+      Defaults.sbtPluginExtra(dependency, sbtV, scalaV)
+    }
+  )
+  // *** END SBT-ECHO DEPENDENCIES ***
+
+
 }
