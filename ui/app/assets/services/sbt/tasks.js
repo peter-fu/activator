@@ -123,6 +123,8 @@ define([
     return false;
   }
 
+  var playApplicationUrl = ko.observable();
+
   /**
   Run command
   */
@@ -224,6 +226,8 @@ define([
     } else if (event.name === "TestEvent") {
       debug && console.log("TestEvent: ", event);
       execution.testResults.push(event.serialized);
+    } else if (event.name === "PlayServerStarted") {
+      if (event.serialized) playApplicationUrl(event.serialized.url);
     }
   });
 
@@ -653,6 +657,7 @@ define([
     isPlayApplication:       isPlayApplication,
     playRunnerAvailable:     playRunnerAvailable,
     playHasRunCommand:       playHasRunCommand,
+    playApplicationUrl:      playApplicationUrl,
     active: {
       turnedOn:     "",
       compiling:    "",
