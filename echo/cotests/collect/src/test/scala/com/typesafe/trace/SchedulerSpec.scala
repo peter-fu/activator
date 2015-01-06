@@ -6,20 +6,6 @@ package com.typesafe.trace
 
 import com.typesafe.trace.test.EchoCollectSpec
 
-class Akka20SchedulerSpec extends SchedulerSpec {
-  val setupCount = 54
-  val mainCount = 18
-  val scheduledCount = 2
-  val runnableCount = 1
-}
-
-class Akka21SchedulerSpec extends SchedulerSpec {
-  val setupCount = 20
-  val mainCount = 21
-  val scheduledCount = 2
-  val runnableCount = 2
-}
-
 class Akka22SchedulerSpec extends SchedulerSpec {
   val setupCount = 20
   val mainCount = 17

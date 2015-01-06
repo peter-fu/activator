@@ -6,28 +6,6 @@ package com.typesafe.trace
 
 import com.typesafe.trace.test.EchoCollectSpec
 
-class Akka20FutureTraceSpec extends FutureTraceSpec {
-  val createCount = 54
-  val awaitedEventCount = 20
-  val awaitedFutureCallbackAddedCount = 1
-  val awaitedFutureCallbackStartedCount = 1
-  val awaitedFutureCallbackCompletedCount = 1
-  val outsideActorsFutureEventCount = 6
-  val insideActorsFutureEventCount = 12
-  val scheduledWrapperEvents = true
-}
-
-class Akka21FutureTraceSpec extends FutureTraceSpec {
-  val createCount = 20
-  val awaitedEventCount = 23
-  val awaitedFutureCallbackAddedCount = 2
-  val awaitedFutureCallbackStartedCount = 2
-  val awaitedFutureCallbackCompletedCount = 2
-  val outsideActorsFutureEventCount = 9
-  val insideActorsFutureEventCount = 15
-  val scheduledWrapperEvents = true
-}
-
 class Akka22FutureTraceSpec extends FutureTraceSpec {
   val createCount = 20
   val scheduledWrapperEvents = false

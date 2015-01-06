@@ -7,14 +7,6 @@ package com.typesafe.trace
 import com.typesafe.trace.test.EchoCollectSpec
 import scala.concurrent.duration._
 
-class Akka20TraceableSpec extends TraceableSpec {
-  val createCount = 27
-}
-
-class Akka21TraceableSpec extends TraceableSpec {
-  val createCount = 10
-}
-
 class Akka22TraceableSpec extends TraceableSpec {
   val createCount = 10
 }

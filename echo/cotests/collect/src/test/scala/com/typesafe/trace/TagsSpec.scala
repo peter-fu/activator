@@ -6,13 +6,6 @@ package com.typesafe.trace
 
 import com.typesafe.trace.test.EchoCollectSpec
 
-class Akka20TagsSpec extends TagsSpec {
-  val eventCount = 81
-}
-
-class Akka21TagsSpec extends TagsSpec {
-  val eventCount = 47
-}
 
 class Akka22TagsSpec extends TagsSpec {
   val eventCount = 47

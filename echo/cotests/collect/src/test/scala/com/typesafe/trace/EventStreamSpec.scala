@@ -6,8 +6,6 @@ package com.typesafe.trace
 
 import com.typesafe.trace.test.EchoCollectSpec
 
-class Akka20EventStreamSpec extends EventStreamSpec
-class Akka21EventStreamSpec extends EventStreamSpec
 class Akka22EventStreamSpec extends EventStreamSpec
 class Akka23Scala210EventStreamSpec extends EventStreamSpec
 class Akka23Scala211EventStreamSpec extends EventStreamSpec

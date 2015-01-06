@@ -6,14 +6,6 @@ package com.typesafe.trace
 
 import com.typesafe.trace.test.EchoCollectSpec
 
-class Akka20TraceTreeSpec extends TraceTreeSpec {
-  val createCount = 27
-}
-
-class Akka21TraceTreeSpec extends TraceTreeSpec {
-  val createCount = 10
-}
-
 class Akka22TraceTreeSpec extends TraceTreeSpec {
   val createCount = 10
 }

@@ -6,14 +6,6 @@ package com.typesafe.trace
 
 import com.typesafe.trace.test.EchoCollectSpec
 
-class Akka20UnhandledMessageSpec extends UnhandledMessageSpec {
-  val createCount = 27
-}
-
-class Akka21UnhandledMessageSpec extends UnhandledMessageSpec {
-  val createCount = 10
-}
-
 class Akka22UnhandledMessageSpec extends UnhandledMessageSpec {
   val createCount = 10
 }

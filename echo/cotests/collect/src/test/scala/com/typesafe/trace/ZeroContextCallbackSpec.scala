@@ -6,14 +6,6 @@ package com.typesafe.trace
 
 import com.typesafe.trace.test.EchoCollectSpec
 
-class Akka20ZeroContextCallbackSpec extends ZeroContextCallbackSpec {
-  val createCount = 27
-}
-
-class Akka21ZeroContextCallbackSpec extends ZeroContextCallbackSpec {
-  val createCount = 10
-}
-
 class Akka22ZeroContextCallbackSpec extends ZeroContextCallbackSpec {
   val createCount = 10
 }

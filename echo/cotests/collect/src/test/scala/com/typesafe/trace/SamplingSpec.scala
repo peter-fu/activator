@@ -7,16 +7,6 @@ package com.typesafe.trace
 import com.typesafe.trace.test.EchoCollectSpec
 import scala.concurrent.duration._
 
-class Akka20SamplingSpec extends AkkaSamplingSpec {
-  val totalCount = 84
-  val sampled1Count = 66
-}
-
-class Akka21SamplingSpec extends AkkaSamplingSpec {
-  val totalCount = 50
-  val sampled1Count = 32
-}
-
 class Akka22SamplingSpec extends AkkaSamplingSpec {
   val totalCount = 50
   val sampled1Count = 32
