@@ -86,6 +86,12 @@ define([
   }
 
   return {
+    themes: Object.keys(themes),
+    chosenTheme: chosenTheme,
+    fontSizes: Object.keys(fontSizes),
+    chosenFontSize: chosenFontSize,
+    editorContainer: editor.container,
+
     setDocument: function(selectedDocument) {
       State.selectedDocument = selectedDocument;
       // bind the document

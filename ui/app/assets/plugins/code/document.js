@@ -82,18 +82,6 @@ define([
     }
     self.revert(); // Getting the server version right away
 
-    // Formatting:
-    self.chosenSoftTabs = ko.observable(true);
-    ko.doOnChange(self.chosenSoftTabs, function(t) {
-      self.session.setUseSoftTabs(t);
-    });
-
-    self.tabSizes = [1,2,3,4,8];
-    self.chosenTabSize = ko.observable(2);
-    ko.doOnChange(self.chosenTabSize, function(t) {
-      self.session.setTabSize(t);
-    });
-
     // Right click on the tab
     self.contextmenu = {
       'Save':     self.save.bind(self),
