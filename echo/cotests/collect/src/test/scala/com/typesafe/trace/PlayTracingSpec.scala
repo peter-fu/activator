@@ -589,7 +589,7 @@ class Play23Scala210NettyPostTracingSpec extends EchoCollectSpec {
       }
     }
     "POST /post (BIG - should be converted by Netty to a chunked POST)" in {
-      eventCheck(expected = 769, timeout = timeoutHandler.finiteTimeoutify(10.seconds)) {
+      eventCheck(expected = 771, timeout = timeoutHandler.finiteTimeoutify(10.seconds)) {
         // printTraces
         countTraces should be(1)
         countEventsOf[NettyHttpReceivedStart.type] should be(1)
@@ -944,7 +944,7 @@ class Play23Scala211NettyPostTracingSpec extends EchoCollectSpec {
       }
     }
     "POST /post (BIG - should be converted by Netty to a chunked POST)" in {
-      eventCheck(expected = 769, timeout = timeoutHandler.finiteTimeoutify(10.seconds)) {
+      eventCheck(expected = 771, timeout = timeoutHandler.finiteTimeoutify(10.seconds)) {
         // printTraces
         countTraces should be(1)
         countEventsOf[NettyHttpReceivedStart.type] should be(1)

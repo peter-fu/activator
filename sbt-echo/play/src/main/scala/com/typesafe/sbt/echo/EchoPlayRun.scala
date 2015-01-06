@@ -14,9 +14,8 @@ object EchoPlayRun {
   import SbtEcho.Echo
   import SbtEcho.EchoKeys._
 
-  val Play21Version = "2.1.5"
-  val Play22Version = "2.2.3"
-  val Play23Version = "2.3.3"
+  val Play22Version = "2.2.6"
+  val Play23Version = "2.3.7"
   val supportedPlayVersions = Seq(Play21Version, Play22Version, Play23Version)
 
   def echoPlayRunSettings(): Seq[Setting[_]] = Seq(
@@ -35,8 +34,7 @@ object EchoPlayRun {
     else "com.typesafe.trace" % ("trace-play-" + playVersion) % echoVersion % EchoTraceCompile.name cross CrossVersion.Disabled
 
   def supportedPlayVersion(playVersion: String): Option[String] = {
-    if (playVersion startsWith "2.1.") Some(Play21Version)
-    else if (playVersion startsWith "2.2.") Some(Play22Version)
+    if (playVersion startsWith "2.2.") Some(Play22Version)
     else if (playVersion startsWith "2.3.") Some(Play23Version)
     else None
   }

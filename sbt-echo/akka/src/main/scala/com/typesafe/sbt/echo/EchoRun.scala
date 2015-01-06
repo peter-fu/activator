@@ -15,10 +15,8 @@ object EchoRun {
   import SbtEcho.Echo
   import SbtEcho.EchoKeys._
 
-  val Akka20Version = "2.0.5"
-  val Akka21Version = "2.1.4"
   val Akka22Version = "2.2.4"
-  val Akka23Version = "2.3.4"
+  val Akka23Version = "2.3.8"
   val supportedAkkaVersions = Seq(Akka20Version, Akka21Version, Akka22Version, Akka23Version)
 
   val EchoTraceCompile = config("echo-trace-compile").extend(Configurations.RuntimeInternal).hide
@@ -45,9 +43,7 @@ object EchoRun {
   }
 
   def supportedAkkaVersion(akkaVersion: String): Option[String] = {
-    if (akkaVersion startsWith "2.0.") Some(Akka20Version)
-    else if (akkaVersion startsWith "2.1.") Some(Akka21Version)
-    else if (akkaVersion startsWith "2.2.") Some(Akka22Version)
+    if (akkaVersion startsWith "2.2.") Some(Akka22Version)
     else if (akkaVersion startsWith "2.3.") Some(Akka23Version)
     else None
   }
