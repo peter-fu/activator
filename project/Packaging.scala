@@ -96,7 +96,7 @@ object Packaging {
     },
     rpmRelease := "1",
     rpmVendor := "typesafe",
-    rpmUrl := Some("http://github.com/scala/scala-dist"),
+    rpmUrl := Some("https://github.com/scala/scala-dist"),
     rpmLicense := Some("BSD"),
 
     repackagedLaunchJar <<= (target, sbtLaunchJar, repackagedLaunchMappings) map repackageJar,
@@ -200,8 +200,8 @@ object Packaging {
   local
   activator-local: file://${activator.local.repository-${activator.home-${user.home}/.activator}/repository}, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]
   maven-central
-  typesafe-releases: http://repo.typesafe.com/typesafe/releases
-  typesafe-ivy-releasez: http://repo.typesafe.com/typesafe/ivy-releases, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]
+  typesafe-releases: https://repo.typesafe.com/typesafe/releases
+  typesafe-ivy-releasez: https://repo.typesafe.com/typesafe/ivy-releases, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]
 
 [boot]
  directory: ${sbt.boot.directory-${sbt.global.base-${user.home}/.sbt}/boot/}
