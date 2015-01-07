@@ -12,7 +12,6 @@ script:
 env:
   - TASKS=test
   - TASKS=integrationTestsWithoutOffline
-  - TASKS=offlineTests
 
 notifications:
   flowdock: 2eb8fdbb08ad2e595a21edea64252a22
