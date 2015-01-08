@@ -17,7 +17,7 @@ object EchoRun {
 
   val Akka22Version = "2.2.4"
   val Akka23Version = "2.3.8"
-  val supportedAkkaVersions = Seq(Akka20Version, Akka21Version, Akka22Version, Akka23Version)
+  val supportedAkkaVersions = Seq(Akka22Version, Akka23Version)
 
   val EchoTraceCompile = config("echo-trace-compile").extend(Configurations.RuntimeInternal).hide
   val EchoTraceTest = config("echo-trace-test").extend(EchoTraceCompile, Configurations.TestInternal).hide
