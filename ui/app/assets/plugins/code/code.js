@@ -137,6 +137,9 @@ define([
     idea.generate(true); // boolean flag decides whether or not to override any existing project files
   }
 
+  var eclipseReady = ko.observable(false);
+  var ideaReady = ko.observable(false);
+
   var autoSave = settings.observable("code.autoSave", false);
   document.addEventListener("visibilitychange", function() {
     if (autoSave() && document.hidden){
@@ -163,8 +166,10 @@ define([
     closeAll: closeAll,
     saveAll: saveAll,
     autoSave: autoSave,
-    generateEclipseFiles: generateEclipseFiles,
-    generateIdeaFiles: generateIdeaFiles
+    openInEclipse: generateEclipseFiles,
+    openInIdea: generateIdeaFiles,
+    eclipseReady: eclipseReady,
+    ideaReady: ideaReady
   }
 
   return {

@@ -5,10 +5,12 @@ define([
   "services/ajax",
   "text!./item.html",
   "text!./browser.html",
+  "plugins/code/eclipseGenerator",
+  "plugins/code/ideaGenerator",
   "widgets/buttons/contextmenu",
   "css!./browser",
   "css!widgets/menu/menu"
-], function(fs, item, tpl){
+], function(fs, item, tpl, eclipseGenerator, ideaGenerator){
 
   function FileNode(node, parent) {
     this.name          = node.name;
@@ -191,12 +193,23 @@ define([
     tree.createFile();
   }
 
+  function openInEclipse(){
+    eclipseGenerator.generate(false);
+  }
+
+  function openInIdea(){
+    ideaGenerator.generate(false);
+  }
+
+
   var State = {
     tree: tree,
     revealProject: revealProject,
     newDirAtRoot: newDirAtRoot,
     newFileAtRoot: newFileAtRoot,
-    refreshProject: refreshProject
+    refreshProject: refreshProject,
+    openInEclipse: openInEclipse,
+    openInIdea: openInIdea
   }
 
   return {

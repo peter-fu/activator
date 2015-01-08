@@ -16,6 +16,7 @@ define([
     modals.show({
       title: "Generating Eclipse Files",
       body: ko.bindhtml(openInEclipse, state),
+      okEnabled: state.isInstalled,
       callback: callback,
       ok: "OK"
     });
@@ -25,6 +26,7 @@ define([
     modals.show({
       title: "Generating IntelliJ IDEA Files",
       body: ko.bindhtml(openInIdea, state),
+      okEnabled: state.isInstalled,
       callback: callback,
       ok: "OK"
     });
