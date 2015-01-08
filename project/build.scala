@@ -1,5 +1,7 @@
+import org.apache.tools.ant.taskdefs.Echo
 import sbt._
 import ActivatorBuild._
+import EchoBuild._
 import Dependencies._
 import Packaging.localRepoArtifacts
 import com.typesafe.sbt.S3Plugin._
@@ -55,7 +57,7 @@ object TheActivatorBuild extends Build {
   )
 
   // These are the projects we want in the local repository we deploy.
-  lazy val publishedProjects: Seq[Project] = Seq(ui, uiCommon, launcher, props)
+  lazy val publishedProjects: Seq[Project] = Seq(ui, uiCommon, launcher, props, EchoBuild.echo, SbtEchoBuild.sbtEcho)
 
   // basic project that gives us properties to use in other projects.
   lazy val props = (
