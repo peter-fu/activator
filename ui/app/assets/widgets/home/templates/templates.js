@@ -14,7 +14,7 @@ define([
   tpl
 ) {
 
-  var trpInfoSeen = settings.observable("reactive-platform.accepted-licence", false);
+  var trpInfoSeen = settings.observable("reactive-platform.accepted-license", false);
 
   // Memorise last used directory
   var lastFolder = settings.observable("last-folder", window.homeFolder);
