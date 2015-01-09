@@ -300,12 +300,14 @@ object AppManager {
 
           val eventsSub = client.handleEvents({ event =>
             import sbt.protocol._
+
             val json = event match {
               case log: LogEvent => log match {
                 case e: TaskLogEvent => SbtProtocol.wrapEvent(e)
                 case e: CoreLogEvent => SbtProtocol.wrapEvent(e)
                 case e: BackgroundJobLogEvent => SbtProtocol.wrapEvent(e)
               }
+              case e: BuildFailedToLoad => SbtProtocol.wrapEvent(e)
               case _ =>
                 SbtProtocol.synthesizeLogEvent(LogMessage.DEBUG, event.toString)
             }
