@@ -29,6 +29,7 @@ define([
           case 'BadRequest':
             // TODO - Do better than an alert!
             window.alert('Unable to perform request: ' + message.errors.join(' \n'));
+            $('#working, #open, #new').toggle();
             break;
           case 'RedirectToApplication':
             // NOTE - Comment this out if you want to debug showing logs!
