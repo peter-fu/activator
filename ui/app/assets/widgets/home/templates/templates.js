@@ -91,7 +91,7 @@ define([
         self.filterValue(e.currentTarget.value.toLowerCase());
       }
       var value = self.filterValue().toLowerCase();
-      self.filteredTemplates(window.templates.filter(function(o){
+      self.filteredTemplates(window.tutorials.filter(function(o){
         return JSON.stringify(o).indexOf(value) >= 0
       }));
       self.filteredSeeds(window.seeds.filter(function(o){
