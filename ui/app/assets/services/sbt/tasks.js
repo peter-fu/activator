@@ -457,10 +457,11 @@ define([
   });
 
   valueChanged.matchOnAttribute('key', 'echoTraceSupported').each(function(message) {
-    inspectSupported(message.value.value === true);
+    inspectSupported(message.value.serialized === true);
   });
 
   valueChanged.matchOnAttribute('key', 'echoAkkaVersionReport').each(function(message) {
+    debug && console.log('echoAkkaVersionReport',message)
     var report = "";
     if (message.value.value)
       report = message.value.value;
@@ -468,6 +469,7 @@ define([
   });
 
   valueChanged.matchOnAttribute('key', 'echoPlayVersionReport').each(function(message) {
+    debug && console.log('echoPlayVersionReport',message)
     var report = "";
     if (message.value.value)
       report = message.value.value;
@@ -475,6 +477,7 @@ define([
   });
 
   valueChanged.matchOnAttribute('key', 'echoTracePlayVersion').each(function(message) {
+    debug && console.log('echoTracePlayVersion',message)
     if (message.value.value && message.value.value !== '')
       inspectHasPlayVersion(true);
     else
@@ -658,6 +661,8 @@ define([
     playRunnerAvailable:     playRunnerAvailable,
     playHasRunCommand:       playHasRunCommand,
     playApplicationUrl:      playApplicationUrl,
+    inspectSupported:        inspectSupported,
+    whyInspectIsNotSupported: whyInspectIsNotSupported,
     active: {
       turnedOn:     "",
       compiling:    "",
