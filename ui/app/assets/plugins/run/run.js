@@ -9,6 +9,7 @@ define([
   "widgets/layout/layout",
   "services/monitoring/monitoringSolutions",
   "text!./run.html",
+  'widgets/modals/modals',
   'services/monitoring/appdynamicscontroller',
   'services/monitoring/newreliccontroller',
   "css!./run",
@@ -23,7 +24,8 @@ define([
   echoInstaller,
   layout,
   monitoringSolutions,
-  tpl
+  tpl,
+  modals
 ) {
 
   var subPlugin = ko.observable();
@@ -63,6 +65,21 @@ define([
     }
   });
 
+  var inspectActivatedAndAvailable = ko.computed(function() {
+    return monitoringSolutions.inspectActivated() && sbt.tasks.inspectSupported();
+  });
+
+  inspectActivatedAndAvailable.subscribe(function(value) {
+    if (monitoringSolutions.inspectActivated() && !sbt.tasks.inspectSupported()){
+      monitoringSolutions.inspectActivated(false); // Disactivating
+      modals.show({
+        title: "Inspect is not available",
+        text: sbt.tasks.whyInspectIsNotSupported(),
+        cancel: "close"
+      });
+    }
+  });
+
   var State = {
     subPlugin: subPlugin,
     sbtExecCommand: sbtExecCommand,
@@ -75,6 +92,7 @@ define([
     monitoringSolutions: monitoringSolutions,
     inspectActivated: monitoringSolutions.inspectActivated,
     toggleInspect: toggleInspect,
+    inspectActivatedAndAvailable: inspectActivatedAndAvailable,
     mainRunAction: mainRunAction,
     mainRunName: mainRunName,
     customCommands: sbt.app.customCommands
