@@ -111,8 +111,8 @@ define(['commons/utils',
       tierName: tierName(),
       accountName: accountName(),
       accessKey: accessKey(),
-      hostName: hostName()+"",// Force string
-      port: port(),
+      hostName: hostName(),
+      port: port()+"",// Force string
       sslEnabled: sslEnabled()
     }));
     send(adMessage("isProjectEnabled"));
