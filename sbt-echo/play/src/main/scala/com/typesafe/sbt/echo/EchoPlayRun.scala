@@ -16,7 +16,7 @@ object EchoPlayRun {
 
   val Play22Version = "2.2.6"
   val Play23Version = "2.3.7"
-  val supportedPlayVersions = Seq(Play21Version, Play22Version, Play23Version)
+  val supportedPlayVersions = Seq(Play22Version, Play23Version)
 
   def echoPlayRunSettings(): Seq[Setting[_]] = Seq(
     weavingClassLoader in Echo <<= (sigar in Echo) map createWeavingClassLoader) ++ EchoPlaySpecific.echoPlaySpecificSettings

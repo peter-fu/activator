@@ -66,18 +66,7 @@ define([
   });
 
   var inspectActivatedAndAvailable = ko.computed(function() {
-    return monitoringSolutions.inspectActivated() && sbt.tasks.inspectSupported();
-  });
-
-  inspectActivatedAndAvailable.subscribe(function(value) {
-    if (monitoringSolutions.inspectActivated() && !sbt.tasks.inspectSupported()){
-      monitoringSolutions.inspectActivated(false); // Disactivating
-      modals.show({
-        title: "Inspect is not available",
-        text: sbt.tasks.whyInspectIsNotSupported(),
-        cancel: "close"
-      });
-    }
+    return monitoringSolutions.inspectActivated() && sbt.tasks.applicationReady() && sbt.tasks.inspectSupported();
   });
 
   var State = {
