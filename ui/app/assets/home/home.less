@@ -28,36 +28,47 @@ body {
   display: none;
 }
 
-h2 {
-  font-size: 16px;
-  line-height: 50px;
-  padding: 0 15px;
-  font-weight: 500;
+a, button {
+  cursor: pointer;
+  text-decoration: none;
 }
 
-h3 {
-  font-size: 22px;
-  color: #28353F;
+a {
+  color: @blue-dkr;
 }
 
-h4 {
-  font-size: 15px;
-  color: #28353F;
-}
+section {
+  h2 {
+    font-size: 16px;
+    line-height: 50px;
+    padding: 0 15px;
+    font-weight: 500;
+  }
 
-.button {
-  display: block;
-  margin: 20px auto;
-  padding: 7px 10px;
-  width: 220px;
-  background: #e25758;
-  color: #fff;
-  text-align: center;
-  font-size: 18px;
-  font-weight: 500;
-  border-radius: 3px;
-  border: 0;
-    cursor: pointer;
+  h3 {
+    font-size: 22px;
+    color: #28353F;
+  }
+
+  h4 {
+    font-size: 15px;
+    color: #28353F;
+  }
+
+  .button {
+    display: block;
+    margin: 20px auto;
+    padding: 7px 10px;
+    width: 220px;
+    background: #e25758;
+    color: #fff;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 500;
+    border-radius: 3px;
+    border: 0;
+      cursor: pointer;
+  }
 }
 
 p.path {
@@ -100,6 +111,10 @@ section {
   right: 40px;
   display: none;
   article {
+    position: absolute;
+    top: 50px;
+    right: 0; bottom: 0; left: 0;
+    height: auto;
     padding: 0 15px;
   }
   .logs {

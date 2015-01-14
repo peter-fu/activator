@@ -69,6 +69,7 @@ define([
       bodies.cancel = bodies.onCancel ? bodies.cancel || "Cancel" : bodies.cancel || false;
       bodies.okEnabled = bodies.okEnabled || true;
       bodies.cancelEnabled = bodies.cancelEnabled || true;
+      bodies.shape = bodies.shape || "normal";
 
       bodies.clickOk = function() {
         hide();
