@@ -147,15 +147,15 @@ object NewRelic {
       s"""
         |// This is a generated files that enables NewRelic monitoring.
         |
-        |newRelicAgentJar in NewRelic := "${jar.getPath}"
+        |newRelicAgentJar in NewRelic := "${Platform.mungeWindows(jar.getPath)}"
         |
-        |newRelicConfigFile in NewRelic := "${yml.getPath}"
+        |newRelicConfigFile in NewRelic := "${Platform.mungeWindows(yml.getPath)}"
         |
         |// Sets same keys in NewRelicPlay config
         |
-        |newRelicAgentJar in NewRelicPlay := "${jar.getPath}"
+        |newRelicAgentJar in NewRelicPlay := "${Platform.mungeWindows(jar.getPath)}"
         |
-        |newRelicConfigFile in NewRelicPlay := "${yml.getPath}"
+        |newRelicConfigFile in NewRelicPlay := "${Platform.mungeWindows(yml.getPath)}"
       """.stripMargin
 
     IO.withTemporaryFile("activator", "create-config-file") { file =>
@@ -378,7 +378,7 @@ object AppDynamics {
       s"""
         |// This is a generated file that enables AppDynamics monitoring."
         |
-        |appDynamicsAgentJar in AppDynamics := "${agentJar.getPath}"
+        |appDynamicsAgentJar in AppDynamics := "${Platform.mungeWindows(agentJar.getPath)}"
         |
         |appDynamicsAgentTierName in AppDynamics := "development"
         |
@@ -386,7 +386,7 @@ object AppDynamics {
         |
         |appDynamicsAgentApplicationName in AppDynamics := "${settings.applicationName}"
         |
-        |appDynamicsAgentRuntimeDir in AppDynamics := "${agentJar.getParentFile.getPath}"
+        |appDynamicsAgentRuntimeDir in AppDynamics := "${Platform.mungeWindows(agentJar.getParentFile.getPath)}"
         |
         |appDynamicsAgentAccountName in AppDynamics := "${settings.accountName}"
         |
@@ -400,7 +400,7 @@ object AppDynamics {
         |
         |// Sets same keys in AppDynamicsPlay config
         |
-        |appDynamicsAgentJar in AppDynamicsPlay := "${agentJar.getPath}"
+        |appDynamicsAgentJar in AppDynamicsPlay := "${Platform.mungeWindows(agentJar.getPath)}"
         |
         |appDynamicsAgentTierName in AppDynamicsPlay := "development"
         |
@@ -408,7 +408,7 @@ object AppDynamics {
         |
         |appDynamicsAgentApplicationName in AppDynamicsPlay := "${settings.applicationName}"
         |
-        |appDynamicsAgentRuntimeDir in AppDynamicsPlay := "${agentJar.getParentFile.getPath}"
+        |appDynamicsAgentRuntimeDir in AppDynamicsPlay := "${Platform.mungeWindows(agentJar.getParentFile.getPath)}"
         |
         |appDynamicsAgentAccountName in AppDynamicsPlay := "${settings.accountName}"
         |
