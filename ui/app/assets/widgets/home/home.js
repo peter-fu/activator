@@ -26,8 +26,7 @@ define([
       shape: "large",
       title: "Could not load project",
       body: warning,
-      ok: "Try again",
-      cancel: "Cancel",
+      cancel: "Return",
       onCancel: function() {
         $('#working, #open, #new').toggle();
       }
