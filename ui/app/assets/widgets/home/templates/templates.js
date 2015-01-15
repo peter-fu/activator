@@ -88,12 +88,12 @@ define([
     }
 
     function searchRelevantFileds(o, value) {
-      return JSON.stringify([o.title, o.description, o.tags, o.authorName]).indexOf(value) >= 0;
+      return JSON.stringify([o.title, o.description, o.tags, o.authorName]).toLowerCase().indexOf(value) >= 0;
     }
 
     self.search = function(model,e){
       if (e){
-        self.filterValue(e.currentTarget.value.toLowerCase());
+        self.filterValue(e.currentTarget.value);
       }
       var value = self.filterValue().toLowerCase();
       self.filteredTemplates(window.tutorials.filter(function(o){
