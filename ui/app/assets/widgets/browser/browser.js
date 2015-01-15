@@ -36,9 +36,9 @@ define([
     if(window.confirm("You are about to delete "+this.name)) fs.delete(this.location).success(this.parent.load.bind(this.parent));
   }
   FileNode.prototype.rename = function() {
-    var name = window.prompt("File's new name?");
+    var name = window.prompt("File's new name?", this.name);
     if (!name) return;
-    fs.newName(this.location, name).success(this.parent.load.bind(this.parent));
+    fs.rename(this.location, name).success(this.parent.load.bind(this.parent));
   }
   FileNode.prototype.openFile = function() {
     window.location.hash = "#code"+fs.relative(this.location);
@@ -133,9 +133,9 @@ define([
     if(window.confirm("You are about to delete "+this.name)) fs.delete(this.location).success(this.parent.load.bind(this.parent));
   }
   TreeNode.prototype.rename = function() {
-    var name = window.prompt("Folder's new name?");
+    var name = window.prompt("Folder's new name?", this.name);
     if (!name) return;
-    fs.newName(this.location, name).success(this.load.bind(this));
+    fs.rename(this.location, name).success(this.parent.load.bind(this.parent));
   }
 
   // MAIN TreeNode INSTANCE IS PROJECT ROOT
