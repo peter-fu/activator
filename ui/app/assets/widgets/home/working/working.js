@@ -9,6 +9,8 @@ define([
   tpl
 ) {
 
+  var requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.msRequestAnimationFrame || window.oRequestAnimationFrame;
+
   return {
     render: function() {
       var dom = ko.bindhtml(tpl, {});
@@ -16,19 +18,24 @@ define([
       var wrapper = $("article", dom)[0];
 
       websocket.subscribe({type: "sbt", subType: "CoreLogEvent"}).fork().each(function(message) {
-        logs.append($("<li/>").html(message.event.entry.message).attr("data-type", message.event.entry.level));
-        wrapper.scrollTop = 9e9;
+        requestAnimationFrame(function() {
+          logs.append($("<li/>").html(message.event.entry.message).attr("data-type", message.event.entry.level));
+          wrapper.scrollTop = 9e9;
+        });
       });
 
       websocket.subscribe({ response: String }).fork().each(function(message) {
         switch(message.response) {
           case 'Status':
-            logs.append($("<li/>").html(message.info).attr("data-type", "info"));
-            logs[0].scrollTop = 9e9;
+            requestAnimationFrame(function() {
+              logs.append($("<li/>").html(message.info).attr("data-type", "info"));
+              logs[0].scrollTop = 9e9;
+            });
             break;
           case 'BadRequest':
             // TODO - Do better than an alert!
             window.alert('Unable to perform request: ' + message.errors.join(' \n'));
+            $('#working, #open, #new').toggle();
             break;
           case 'RedirectToApplication':
             // NOTE - Comment this out if you want to debug showing logs!

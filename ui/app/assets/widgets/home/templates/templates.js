@@ -86,19 +86,24 @@ define([
       self.search();
       // filterInput.val("").trigger("search")[0].focus();
     }
+
+    function searchRelevantFileds(o, value) {
+      return JSON.stringify([o.title, o.description, o.tags, o.authorName]).toLowerCase().indexOf(value) >= 0;
+    }
+
     self.search = function(model,e){
       if (e){
-        self.filterValue(e.currentTarget.value.toLowerCase());
+        self.filterValue(e.currentTarget.value);
       }
       var value = self.filterValue().toLowerCase();
-      self.filteredTemplates(window.templates.filter(function(o){
-        return JSON.stringify(o).indexOf(value) >= 0
+      self.filteredTemplates(window.tutorials.filter(function(o){
+        return searchRelevantFileds(o, value);
       }));
       self.filteredSeeds(window.seeds.filter(function(o){
-        return JSON.stringify(o).indexOf(value) >= 0
+        return searchRelevantFileds(o, value);
       }));
       self.filteredTrp(window.trp.filter(function(o){
-        return JSON.stringify(o).indexOf(value) >= 0
+        return searchRelevantFileds(o, value);
       }));
     }
 
