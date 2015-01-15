@@ -8,7 +8,3 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-jshint" % "1.0.2")
 
 // Required by Echo
 addSbtPlugin("com.typesafe.sbt" % "sbt-cotest" % "0.1.0")
-
-// Required by sbtEcho
-addSbtPlugin("net.virtual-void" % "sbt-cross-building" % "0.8.1")
-

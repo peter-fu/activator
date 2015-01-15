@@ -10,7 +10,7 @@ import java.net.URI
 object SbtEcho extends AutoPlugin {
   import echo.EchoRun._
 
-  val EchoVersion = "0.1.6"
+  val EchoVersion = "0.1.8"
   val AspectjVersion = "1.8.4"
 
   val Echo = config("echo").extend(Compile)
