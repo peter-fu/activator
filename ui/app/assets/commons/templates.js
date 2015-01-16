@@ -177,7 +177,7 @@ define(function() {
           debug && console.log(memo, memos[memo])
           element.scrollLeft = memos[memo][0];
           element.scrollTop  = memos[memo][1];
-        }, 1);// Wait for everything to be displayed
+        }, 10);// Wait for everything to be displayed
       }
     }
   }());
@@ -188,9 +188,10 @@ define(function() {
       if (!memo()) {
         memo('stick');
       }
+      console.log(element.scrollTop);
       setTimeout(function() {
         if (memo() === 'stick'){
-          element.scrollTop = 9e9;
+          element.scrollTop = 99999;
         } else {
           element.scrollTop = memo();
         }
@@ -201,7 +202,7 @@ define(function() {
       // removed when the element is gone.
       element.addEventListener("DOMNodeInserted", function() {
         if (memo() === 'stick'){
-          element.scrollTop = 9e9;
+          element.scrollTop = 99999;
         }
       }, true);
 

@@ -14,7 +14,7 @@ define([
 ) {
 
   function scrollToBottom() {
-    $(".logs")[0].scrollTop = 9e9;
+    $(".logs")[0].scrollTop = 99999;
     State.memoLogsScroll('stick');
   }
 
