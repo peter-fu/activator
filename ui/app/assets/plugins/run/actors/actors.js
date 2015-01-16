@@ -24,7 +24,7 @@ define([
     { value: "actorPath",        text: "Path" },
     { value: "maxMailboxSize",   text: "Max Mailbox Size" },
     { value: "maxTimeInMailbox", text: "Max time in Mailbox" },
-    { value: "deviation",        text: "Errors" }
+    { value: "deviations",       text: "Errors" }
   ]
 
   var fullTextSearch  = ko.observable("");
