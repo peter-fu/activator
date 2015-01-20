@@ -6,19 +6,19 @@ object Dependencies {
   val sbtLibraryVersion = "0.13.7" // for sbtIO on scala 2.11
 
   val sbtPluginVersion = "0.13"
-  val sbtPluginScalaVersion = "2.11.4"
-  val scalaVersion = "2.11.4"
+  val sbtPluginScalaVersion = "2.11.5"
+  val scalaVersion = "2.11.5"
   val luceneVersion = "4.2.1"
 
   val templateCacheVersion = "1.0-6830c15252733edf977c869af798d113ad5ac80d"
-  val sbtRcVersion = "1.0-951c90820f296b4eda7eb9759e8d80f148065cd6"
+  val sbtRcVersion = "1.0-4f04b935f4328833346698fd1d1a39841152b15c"
 
-  val playVersion = "2.3.3"
-  val akkaVersion = "2.3.4"
+  val playVersion = "2.3.7"
+  val akkaVersion = "2.3.8"
   val slickVersion = "2.1.0"
   val echoPluginVersion = "0.1.7"
   val activatorAnalyticsVersion = "0.1.6"
-  val aspectJVersion = "1.7.3"
+  val aspectJVersion = "1.8.4"
 
   val activatorCommon      = "com.typesafe.activator" % "activator-common" % templateCacheVersion
   val templateCache        = "com.typesafe.activator" % "activator-templates-cache" % templateCacheVersion
