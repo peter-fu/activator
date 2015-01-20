@@ -6,18 +6,49 @@ define([
   'commons/websocket',
   'widgets/fileselection/fileselection',
   'text!./templates.html',
+  'widgets/modals/modals',
   'css!./templates'
 ], function(
   settings,
   websocket,
   FileSelection,
-  tpl
+  tpl,
+  modals
 ) {
 
   var trpInfoSeen = settings.observable("reactive-platform.accepted-license", false);
 
+  var typesafeId = settings.observable("TypesafeID", "");
+  var activeOk = ko.observable(!!typesafeId());
+  function saveTypesafeID(e){
+    if (e.target.value.length === 36){
+      activeOk(true);
+      typesafeId(e.target.value);
+    } else {
+      activeOk(false);
+      typesafeId("");
+    }
+  }
+  function askForTypesafeId(callback){
+    var message = $("<article/>").html("<p>You are creating Typesafe Reactive Platform project, which require a Typesafe ID.</p><p>You can retreive you ID on the <a href='http://typesafe.com/subscription' target='_blanc'>typesafe.com/subscription</a> page.<p><p class='input'></p>")[0];
+    $("<input class='typesafeId-form' type='text' />").change(saveTypesafeID).keyup(saveTypesafeID).val(typesafeId()).appendTo($(".input", message));
+    modals.show({
+      shape: "large",
+      title: "Submit your Typesafe ID",
+      body: message,
+      ok: "Submit",
+      okEnabled: activeOk,
+      callback: function() {
+        callback(typesafeId);
+      },
+      cancel: "Cancel"
+    });
+  }
+  console.log(askForTypesafeId);
+
   // Memorise last used directory
   var lastFolder = settings.observable("last-folder", window.homeFolder);
+
 
   function formToJson(form) {
     var data = $(form).serializeArray();
@@ -136,7 +167,7 @@ define([
       }
     });
 
-    self.newAppFormSubmit = function(state, event) {
+    self.newAppFormSubmit = function(state) {
       // use the placeholder values, unless one was manually specified
       var appLocationInput = $("#newappLocation");
       var appNameInput = $("#appName");
@@ -151,9 +182,19 @@ define([
       // var template = appTemplateName.attr('data-template-id');
       var msg = formToJson("#newApp");
       msg.request = 'CreateNewApplication';
-      websocket.send(msg);
-      lastFolder(parentFolder); // memorise parent as default location
-      $('#working, #open, #new').toggle();
+
+      if (self.currentApp().tags.indexOf("reactive-platform") >= 0) {
+        askForTypesafeId(function(id) {
+          msg.typesafeId = id;
+          websocket.send(msg);
+          lastFolder(parentFolder); // memorise parent as default location
+          $('#working, #open, #new').toggle();
+        });
+      } else {
+        websocket.send(msg);
+        lastFolder(parentFolder); // memorise parent as default location
+        $('#working, #open, #new').toggle();
+      }
 
       return false;
     }

@@ -57,6 +57,12 @@
         background: @slate;
       }
     }
+    &[disabled] {
+      background: none;
+      border: 1px solid @grey;
+      color: @grey;
+      opacity: .5;
+    }
   }
   header, footer, article {
     padding: 10px 20px;
