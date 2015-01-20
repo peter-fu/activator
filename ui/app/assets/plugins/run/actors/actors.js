@@ -21,10 +21,11 @@ define([
   // var orderByValues   = ["Name", "Path", "Errors", "Throughput", "Max time in Mailbox", "Max Mailbox Size"];
   var orderByValues = [
     { value: "actorName",        text: "Name" },
+    { value: "throughput",       text: "Throughput" },
     { value: "actorPath",        text: "Path" },
     { value: "maxMailboxSize",   text: "Max Mailbox Size" },
     { value: "maxTimeInMailbox", text: "Max time in Mailbox" },
-    { value: "deviation",        text: "Errors" }
+    { value: "deviations",       text: "Errors" }
   ]
 
   var fullTextSearch  = ko.observable("");
