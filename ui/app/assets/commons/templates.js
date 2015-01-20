@@ -188,7 +188,6 @@ define(function() {
       if (!memo()) {
         memo('stick');
       }
-      console.log(element.scrollTop);
       setTimeout(function() {
         if (memo() === 'stick'){
           element.scrollTop = 99999;
