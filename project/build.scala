@@ -237,19 +237,19 @@ object TheActivatorBuild extends Build {
 
         // transient dependencies used in offline mode
         "org.scala-lang" % "jline" % "2.10.4",
-        Defaults.sbtPluginExtra("com.typesafe.play" % "sbt-plugin" % Dependencies.playVersion, "0.13", "2.10"),
+        Defaults.sbtPluginExtra("com.typesafe.play" % "sbt-plugin" % Dependencies.play23Version, "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-coffeescript" % "1.0.0", "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-less" % "1.0.0", "0.13", "2.10"),
         "org.scalaz" % "scalaz-core_2.10" % "7.0.2",
         "org.scalaz" % "scalaz-effect_2.10" % "7.0.2",
-        "com.typesafe.play" % "play-java_2.11" % Dependencies.playVersion,
-        "com.typesafe.play" % "play-java-jdbc_2.11" % Dependencies.playVersion,
-        "com.typesafe.play" % "play-java-ebean_2.11" % Dependencies.playVersion,
-        "com.typesafe.play" % "play-java-ws_2.11" % Dependencies.playVersion,
-        "com.typesafe.play" % "play-cache_2.11" % Dependencies.playVersion,
-        "com.typesafe.play" % "play-docs_2.11" % Dependencies.playVersion,
-        "com.typesafe.play" % "anorm_2.11" % Dependencies.playVersion,
-        "com.typesafe.play" % "play-ws_2.11" % Dependencies.playVersion,
+        "com.typesafe.play" % "play-java_2.11" % Dependencies.play23Version,
+        "com.typesafe.play" % "play-java-jdbc_2.11" % Dependencies.play23Version,
+        "com.typesafe.play" % "play-java-ebean_2.11" % Dependencies.play23Version,
+        "com.typesafe.play" % "play-java-ws_2.11" % Dependencies.play23Version,
+        "com.typesafe.play" % "play-cache_2.11" % Dependencies.play23Version,
+        "com.typesafe.play" % "play-docs_2.11" % Dependencies.play23Version,
+        "com.typesafe.play" % "anorm_2.11" % Dependencies.play23Version,
+        "com.typesafe.play" % "play-ws_2.11" % Dependencies.play23Version,
 
         "org.webjars" % "bootstrap" % "2.3.1",
         "org.webjars" % "flot" % "0.8.0",
@@ -260,7 +260,7 @@ object TheActivatorBuild extends Build {
         "org.webjars" % "squirejs" % "0.1.0",
 
         "com.typesafe.play.extras" % "play-geojson_2.11" % "1.1.0",
-        "com.typesafe.akka" % "akka-contrib_2.11" % Dependencies.akkaVersion,
+        "com.typesafe.akka" % "akka-contrib_2.11" % Dependencies.akka23Version,
         "org.codehaus.plexus" % "plexus-interactivity-api" % "1.0-alpha-6",
         "org.codehaus.plexus" % "plexus-component-api" % "1.0-alpha-16",
         "org.jcraft" % "jsch" % "0.1.38"

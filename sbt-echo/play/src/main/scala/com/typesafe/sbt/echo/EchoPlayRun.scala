@@ -14,9 +14,8 @@ object EchoPlayRun {
   import SbtEcho.Echo
   import SbtEcho.EchoKeys._
 
-  val Play22Version = "2.2.6"
   val Play23Version = "2.3.7"
-  val supportedPlayVersions = Seq(Play22Version, Play23Version)
+  val supportedPlayVersions = Seq(Play23Version)
 
   def echoPlayRunSettings(): Seq[Setting[_]] = Seq(
     weavingClassLoader in Echo <<= (sigar in Echo) map createWeavingClassLoader) ++ EchoPlaySpecific.echoPlaySpecificSettings
@@ -30,12 +29,10 @@ object EchoPlayRun {
   }
 
   def tracePlayDependency(playVersion: String, echoVersion: String): ModuleID =
-    if (playVersion startsWith "2.3.") "com.typesafe.trace" % ("trace-play-" + playVersion) % echoVersion % EchoTraceCompile.name cross CrossVersion.binary
-    else "com.typesafe.trace" % ("trace-play-" + playVersion) % echoVersion % EchoTraceCompile.name cross CrossVersion.Disabled
+    "com.typesafe.trace" % ("trace-play-" + playVersion) % echoVersion % EchoTraceCompile.name cross CrossVersion.binary
 
   def supportedPlayVersion(playVersion: String): Option[String] = {
-    if (playVersion startsWith "2.2.") Some(Play22Version)
-    else if (playVersion startsWith "2.3.") Some(Play23Version)
+    if (playVersion startsWith "2.3.") Some(Play23Version)
     else None
   }
 

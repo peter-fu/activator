@@ -12,13 +12,6 @@ object EchoBuild extends Build {
   import TraceProjects._
   import CollectProjects._
 
-  val ScalaVersion210 = "2.10.4"
-  val ScalaVersion211 = "2.11.4"
-  val Akka22 = "2.2.4"
-  val Akka23 = "2.3.8"
-  val Play22 = "2.2.6"
-  val Play23 = "2.3.7"
-
   lazy val echo = (
     Project("echo", file("echo"))
       .doNotPublish
@@ -41,7 +34,7 @@ object EchoBuild extends Build {
       traceScala210Protobuf24, traceScala210Protobuf25,
       traceScala211Protobuf24, traceScala211Protobuf25,
       traceAkka22, traceAkka23Scala210, traceAkka23Scala211,
-      tracePlayCommon, tracePlay22, tracePlay23Scala210, tracePlay23Scala211
+      tracePlayCommon, tracePlay23Scala210, tracePlay23Scala211
       )
     )
 
@@ -59,7 +52,7 @@ object EchoBuild extends Build {
 
   lazy val buildSettings = SbtGit.versionWithGit ++ Seq(
     organization := "com.typesafe.trace",
-    scalaVersion := "2.10.4",
+    scalaVersion := Dependencies.scala210Version,
     crossPaths := false,
     publishArtifact in packageSrc := false,
     publishArtifact in packageDoc := false,
@@ -101,7 +94,7 @@ object EchoBuild extends Build {
       settings (
       SbtCotest.cotestSettings(
         cotestsTraceAkka22, cotestsTraceAkka23Scala210, cotestsTraceAkka23Scala211,
-        cotestsTracePlay22, cotestsTracePlay23Scala210, cotestsTracePlay23Scala211,
+        cotestsTracePlay23Scala210, cotestsTracePlay23Scala211,
         cotestsTrace2Akka22, cotestsTrace2Akka23Scala210, cotestsTrace2Akka23Scala211,
         cotestsCollect
       ): _*)
@@ -152,7 +145,7 @@ object EchoBuild extends Build {
       settings (defaultSettings: _*)
       settings(
       name := "echo-cotests-common",
-      scalaVersion := ScalaVersion210,
+      scalaVersion := Dependencies.scala210Version,
       crossPaths := true,
       target <<= target / "210",
       scalaSource in Test := baseDirectory.value / "src" / "test" / "2.10" / "scala",
@@ -165,7 +158,7 @@ object EchoBuild extends Build {
       settings (defaultSettings: _*)
       settings(
       name := "echo-cotests-common",
-      scalaVersion := ScalaVersion211,
+      scalaVersion := Dependencies.scalaVersion,
       crossPaths := true,
       target <<= target / "211",
       scalaSource in Test := baseDirectory.value / "src" / "test" / "2.11" / "scala",
@@ -181,7 +174,7 @@ object EchoBuild extends Build {
       settings (tracedTestSettingsScala210Protobuf24: _*)
       settings(
       name := "echo-cotests-trace-akka-2.2",
-      scalaVersion := ScalaVersion210,
+      scalaVersion := Dependencies.scala210Version,
       cotestProjectName := "echo-trace",
       javaOptions in Test += "-Dactivator.trace.enabled=true"
       )
@@ -195,7 +188,7 @@ object EchoBuild extends Build {
       settings (tracedTestSettingsScala210Protobuf25: _*)
       settings(
       name := "echo-cotests-trace-akka-2.3-scala-2.10",
-      scalaVersion := ScalaVersion210,
+      scalaVersion := Dependencies.scala210Version,
       cotestProjectName := "echo-trace",
       javaOptions in Test += "-Dactivator.trace.enabled=true"
       )
@@ -209,24 +202,9 @@ object EchoBuild extends Build {
       settings (tracedTestSettingsScala211Protobuf25: _*)
       settings(
       name := "echo-cotests-trace-akka-2.3-scala-2.11",
-      scalaVersion := ScalaVersion211,
+      scalaVersion := Dependencies.scalaVersion,
       cotestProjectName := "echo-trace",
       javaOptions in Test += "-Dactivator.trace.enabled=true"
-      )
-    )
-
-  lazy val cotestsTracePlayCommon22 = (
-    Project("echo-cotests-trace-play-common22", file("echo/cotests/trace/play/common"))
-      dependsOn (cotestsCommon210 % "test->test")
-      dependsOn (tracePlay22 % "test->test")
-      settings (defaultSettings: _*)
-      settings (tracedTestSettingsScala210Protobuf24: _*)
-      settings(
-      name := "echo-cotests-trace-play-common22",
-      scalaVersion := ScalaVersion210,
-      scalaSource in Test := baseDirectory.value / "src" / "test" / "play-2.2" / "scala",
-      crossPaths := true,
-      target <<= target / "play-22"
       )
     )
 
@@ -237,7 +215,7 @@ object EchoBuild extends Build {
       settings (tracedTestSettingsScala210Protobuf25: _*)
       settings(
       name := "echo-cotests-trace-play-common23-scala210",
-      scalaVersion := ScalaVersion210,
+      scalaVersion := Dependencies.scala210Version,
       libraryDependencies += Dependencies.play23ws,
       scalaSource in Test := baseDirectory.value / "src" / "test" / "play-2.3" / "scala",
       crossPaths := true,
@@ -253,40 +231,11 @@ object EchoBuild extends Build {
       settings (tracedTestSettingsScala211Protobuf25: _*)
       settings(
       name := "echo-cotests-trace-play-common23-scala211",
-      scalaVersion := ScalaVersion211,
+      scalaVersion := Dependencies.scalaVersion,
       libraryDependencies += Dependencies.play23ws,
       scalaSource in Test := baseDirectory.value / "src" / "test" / "play-2.3" / "scala",
       crossPaths := true,
       target <<= target / "play-23/scala-2.11"
-      )
-    )
-
-  lazy val cotestsTracePlay22 = (
-    Project("echo-cotests-trace-play22", file("echo/cotests/trace/play/2.2.x"))
-      dependsOn (cotestsTraceAkka22 % "test->test")
-      dependsOn (tracePlay22 % "test->test")
-      dependsOn (cotestsTracePlayCommon22 % "test->test")
-      settings (defaultSettings: _*)
-      settings (tracedTestSettingsScala210Protobuf24: _*)
-      settings(
-      name := "echo-cotests-trace-play-2.2.x",
-      scalaVersion := ScalaVersion210,
-      cotestProjectName := "echo-trace",
-      javaOptions in Test ++= Seq(
-        "-Dactivator.trace.enabled=true",
-        "-Dactivator.trace.futures=off",
-        "-Dactivator.trace.iteratees=on",
-        "-Dactivator.trace.events.futures=off",
-        "-Dactivator.trace.events.iteratees=on",
-        "-Dactivator.trace.use-dispatcher-monitor=off",
-        "-Dactivator.trace.play.traceable./get/filtered/*=off",
-        "-Dactivator.trace.play.sampling./getSampled=3",
-        "-Dactivator.trace.use-system-metrics-monitor=off"
-      ),
-      // ignore deprecation warnings (intended usage of deprecated api)
-      scalacOptions ~= {
-        _ diff Seq("-deprecation")
-      }
       )
     )
 
@@ -299,7 +248,7 @@ object EchoBuild extends Build {
       settings (tracedTestSettingsScala210Protobuf25: _*)
       settings(
       name := "echo-cotests-trace-play-2.3.x-scala-2.10",
-      scalaVersion := ScalaVersion210,
+      scalaVersion := Dependencies.scala210Version,
       cotestProjectName := "echo-trace",
       javaOptions in Test ++= Seq(
         "-Dactivator.trace.enabled=true",
@@ -330,7 +279,7 @@ object EchoBuild extends Build {
       settings (tracedTestSettingsScala211Protobuf25: _*)
       settings(
       name := "echo-cotests-trace-play-2.3.x-scala-2.11",
-      scalaVersion := ScalaVersion211,
+      scalaVersion := Dependencies.scalaVersion,
       cotestProjectName := "echo-trace",
       javaOptions in Test ++= Seq(
         "-Dactivator.trace.enabled=true",
@@ -359,7 +308,7 @@ object EchoBuild extends Build {
       settings (tracedTestSettingsScala210Protobuf24: _*)
       settings(
       name := "echo-cotests-trace2-akka-2.2",
-      scalaVersion := ScalaVersion210,
+      scalaVersion := Dependencies.scala210Version,
       cotestProjectName := "echo-trace2",
       javaOptions in Test += "-Dactivator.trace.enabled=true"
       )
@@ -372,7 +321,7 @@ object EchoBuild extends Build {
       settings (tracedTestSettingsScala210Protobuf25: _*)
       settings(
       name := "echo-cotests-trace2-akka-2.3-scala-2.10",
-      scalaVersion := ScalaVersion210,
+      scalaVersion := Dependencies.scala210Version,
       cotestProjectName := "echo-trace2",
       javaOptions in Test += "-Dactivator.trace.enabled=true"
       )
@@ -385,7 +334,7 @@ object EchoBuild extends Build {
       settings (tracedTestSettingsScala211Protobuf25: _*)
       settings(
       name := "echo-cotests-trace2-akka-2.3-scala-2.11",
-      scalaVersion := ScalaVersion211,
+      scalaVersion := Dependencies.scalaVersion,
       cotestProjectName := "echo-trace2",
       javaOptions in Test += "-Dactivator.trace.enabled=true"
       )
@@ -412,7 +361,7 @@ object CollectProjects extends Build {
       .doNotPublish
       dependsOn (event210Protobuf24)
       settings(
-      sbt.Keys.scalaVersion := EchoBuild.ScalaVersion210,
+      sbt.Keys.scalaVersion := Dependencies.scala210Version,
       libraryDependencies ++= Seq(akkaSlf4j22, slf4j, logback, akkaTestKit22, scalaTest, junit)
       )
     )
@@ -427,7 +376,7 @@ object CollectProjects extends Build {
       dependsOn (event211Protobuf25)
       settings (defaultSettings: _*)
       settings(
-      sbt.Keys.scalaVersion := EchoBuild.ScalaVersion211,
+      sbt.Keys.scalaVersion := Dependencies.scalaVersion,
       libraryDependencies ++= Seq(akkaSlf4j23, slf4j, logback, akkaTestKit23, scalaTest, junit)
       )
     )
@@ -467,7 +416,7 @@ object TraceProjects extends Build {
       dependsOn (protocolProtobuf24)
       settings (defaultSettings: _*)
       settings(
-      scalaVersion := EchoBuild.ScalaVersion210,
+      scalaVersion := Dependencies.scala210Version,
       crossPaths := true,
       target <<= target / "210-protobuf24",
       libraryDependencies += Dependencies.config
@@ -479,7 +428,7 @@ object TraceProjects extends Build {
       dependsOn (protocolProtobuf25)
       settings (defaultSettings: _*)
       settings(
-      scalaVersion := EchoBuild.ScalaVersion210,
+      scalaVersion := Dependencies.scala210Version,
       crossPaths := true,
       target <<= target / "210-protobuf25",
       libraryDependencies += Dependencies.config
@@ -491,7 +440,7 @@ object TraceProjects extends Build {
       dependsOn (protocolProtobuf24)
       settings (defaultSettings: _*)
       settings(
-      scalaVersion := EchoBuild.ScalaVersion211,
+      scalaVersion := Dependencies.scalaVersion,
       crossPaths := true,
       target <<= target / "211-protobuf24",
       libraryDependencies += Dependencies.config
@@ -503,7 +452,7 @@ object TraceProjects extends Build {
       dependsOn (protocolProtobuf25)
       settings (defaultSettings: _*)
       settings(
-      scalaVersion := EchoBuild.ScalaVersion211,
+      scalaVersion := Dependencies.scalaVersion,
       crossPaths := true,
       target <<= target / "211-protobuf25",
       libraryDependencies += Dependencies.config
@@ -515,7 +464,7 @@ object TraceProjects extends Build {
       dependsOn (event210Protobuf24)
       settings (defaultSettings: _*)
       settings(
-      scalaVersion := EchoBuild.ScalaVersion210,
+      scalaVersion := Dependencies.scala210Version,
       crossPaths := true,
       target <<= target / "210-protobuf24",
       scalaSource in Test := baseDirectory.value / "src" / "test" / "2.10" / "scala",
@@ -528,7 +477,7 @@ object TraceProjects extends Build {
       dependsOn (event210Protobuf25)
       settings (defaultSettings: _*)
       settings(
-      scalaVersion := EchoBuild.ScalaVersion210,
+      scalaVersion := Dependencies.scala210Version,
       crossPaths := true,
       target <<= target / "210-protobuf25",
       scalaSource in Test := baseDirectory.value / "src" / "test" / "2.10" / "scala",
@@ -541,7 +490,7 @@ object TraceProjects extends Build {
       dependsOn (event211Protobuf24)
       settings (defaultSettings: _*)
       settings(
-      scalaVersion := EchoBuild.ScalaVersion211,
+      scalaVersion := Dependencies.scalaVersion,
       crossPaths := true,
       target <<= target / "211-protobuf24",
       scalaSource in Test := baseDirectory.value / "src" / "test" / "2.11" / "scala",
@@ -554,7 +503,7 @@ object TraceProjects extends Build {
       dependsOn (event211Protobuf25)
       settings (defaultSettings: _*)
       settings(
-      scalaVersion := EchoBuild.ScalaVersion211,
+      scalaVersion := Dependencies.scalaVersion,
       crossPaths := true,
       target <<= target / "211-protobuf25",
       scalaSource in Test := baseDirectory.value / "src" / "test" / "2.11" / "scala",
@@ -568,10 +517,10 @@ object TraceProjects extends Build {
       settings (defaultSettings: _*)
       settings (aspectjSettings: _*)
       settings(
-      name := "echo-trace-scala-protobuf24-" + EchoBuild.ScalaVersion210,
+      name := "echo-trace-scala-protobuf24-" + Dependencies.scala210Version,
       normalizedName <<= name,
       target <<= target / "210-protobuf24",
-      scalaVersion := EchoBuild.ScalaVersion210
+      scalaVersion := Dependencies.scala210Version
       )
     )
 
@@ -581,10 +530,10 @@ object TraceProjects extends Build {
       settings (defaultSettings: _*)
       settings (aspectjSettings: _*)
       settings(
-      name := "echo-trace-scala-protobuf25-" + EchoBuild.ScalaVersion210,
+      name := "echo-trace-scala-protobuf25-" + Dependencies.scala210Version,
       normalizedName <<= name,
       target <<= target / "210-protobuf25",
-      scalaVersion := EchoBuild.ScalaVersion210
+      scalaVersion := Dependencies.scala210Version
       )
     )
 
@@ -594,10 +543,10 @@ object TraceProjects extends Build {
       settings (defaultSettings: _*)
       settings (aspectjSettings: _*)
       settings(
-      name := "echo-trace-scala-protobuf24-" + EchoBuild.ScalaVersion211,
+      name := "echo-trace-scala-protobuf24-" + Dependencies.scalaVersion,
       normalizedName <<= name,
       target <<= target / "211-protobuf24",
-      scalaVersion := EchoBuild.ScalaVersion211
+      scalaVersion := Dependencies.scalaVersion
       )
     )
 
@@ -607,10 +556,10 @@ object TraceProjects extends Build {
       settings (defaultSettings: _*)
       settings (aspectjSettings: _*)
       settings(
-      name := "echo-trace-scala-protobuf25-" + EchoBuild.ScalaVersion211,
+      name := "echo-trace-scala-protobuf25-" + Dependencies.scalaVersion,
       normalizedName <<= name,
       target <<= target / "211-protobuf25",
-      scalaVersion := EchoBuild.ScalaVersion211
+      scalaVersion := Dependencies.scalaVersion
       )
     )
 
@@ -620,11 +569,11 @@ object TraceProjects extends Build {
       settings (defaultSettings: _*)
       settings (aspectjSettings: _*)
       settings(
-      name := "echo-trace-akka-" + EchoBuild.Akka22,
+      name := "echo-trace-akka-" + Dependencies.akka22Version,
       normalizedName <<= name,
-      scalaVersion := EchoBuild.ScalaVersion210,
+      scalaVersion := Dependencies.scala210Version,
       crossPaths := true,
-      libraryDependencies ++= Dependencies.traceAkka(EchoBuild.Akka22, CrossVersion.binary),
+      libraryDependencies ++= Dependencies.traceAkka(Dependencies.akka22Version, CrossVersion.binary),
       ivyXML := Dependencies.traceAkkaExcludes
       )
     )
@@ -635,12 +584,12 @@ object TraceProjects extends Build {
       settings (defaultSettings: _*)
       settings (aspectjSettings: _*)
       settings(
-      name := "echo-trace-akka-" + EchoBuild.Akka23,
+      name := "echo-trace-akka-" + Dependencies.akka23Version,
       normalizedName <<= name,
-      scalaVersion := EchoBuild.ScalaVersion210,
+      scalaVersion := Dependencies.scala210Version,
       crossPaths := true,
       target <<= target / "210",
-      libraryDependencies ++= Dependencies.traceAkka(EchoBuild.Akka23, CrossVersion.binary),
+      libraryDependencies ++= Dependencies.traceAkka(Dependencies.akka23Version, CrossVersion.binary),
       ivyXML := Dependencies.traceAkkaExcludes
       )
     )
@@ -651,12 +600,12 @@ object TraceProjects extends Build {
       settings (defaultSettings: _*)
       settings (aspectjSettings: _*)
       settings(
-      name := "echo-trace-akka-" + EchoBuild.Akka23,
+      name := "echo-trace-akka-" + Dependencies.akka23Version,
       normalizedName <<= name,
-      scalaVersion := EchoBuild.ScalaVersion211,
+      scalaVersion := Dependencies.scalaVersion,
       crossPaths := true,
       target <<= target / "211",
-      libraryDependencies ++= Dependencies.traceAkka(EchoBuild.Akka23, CrossVersion.binary),
+      libraryDependencies ++= Dependencies.traceAkka(Dependencies.akka23Version, CrossVersion.binary),
       ivyXML := Dependencies.traceAkkaExcludes
       )
     )
@@ -665,21 +614,7 @@ object TraceProjects extends Build {
     Project("echo-trace-play-common", file("echo/trace/play/common"))
       settings (defaultSettings: _*)
       settings (
-      scalaVersion := EchoBuild.ScalaVersion210
-      )
-    )
-
-  lazy val tracePlay22 = (
-    Project("echo-trace-play22", file("echo/trace/play/2.2.x"))
-      dependsOn(traceAkka22, tracePlayCommon)
-      settings (defaultSettings: _*)
-      settings (aspectjSettings: _*)
-      settings(
-      name := "echo-trace-play-" + EchoBuild.Play22,
-      normalizedName <<= name,
-      scalaVersion := EchoBuild.ScalaVersion210,
-      libraryDependencies ++= Seq(Dependencies.play22, Dependencies.playTest22),
-      ivyXML := Dependencies.traceAkkaExcludes
+      scalaVersion := Dependencies.scala210Version
       )
     )
 
@@ -689,9 +624,9 @@ object TraceProjects extends Build {
       settings (defaultSettings: _*)
       settings (aspectjSettings: _*)
       settings(
-      name := "echo-trace-play-" + EchoBuild.Play23,
+      name := "echo-trace-play-" + Dependencies.play23Version,
       normalizedName <<= name,
-      scalaVersion := EchoBuild.ScalaVersion210,
+      scalaVersion := Dependencies.scala210Version,
       crossPaths := true,
       target <<= target / "210",
       libraryDependencies ++= Seq(Dependencies.play23, Dependencies.playTest23),
@@ -705,9 +640,9 @@ object TraceProjects extends Build {
       settings (defaultSettings: _*)
       settings (aspectjSettings: _*)
       settings(
-      name := "echo-trace-play-" + EchoBuild.Play23,
+      name := "echo-trace-play-" + Dependencies.play23Version,
       normalizedName <<= name,
-      scalaVersion := EchoBuild.ScalaVersion211,
+      scalaVersion := Dependencies.scalaVersion,
       crossPaths := true,
       target <<= target / "211",
       libraryDependencies ++= Seq(Dependencies.play23, Dependencies.playTest23),
