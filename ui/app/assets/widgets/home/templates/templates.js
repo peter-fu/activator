@@ -21,16 +21,17 @@ define([
   var typesafeId = settings.observable("TypesafeID", "");
   var activeOk = ko.observable(!!typesafeId());
   function saveTypesafeID(e){
-    if (e.target.value.length === 36){
+    var id = e.target.value.trim();
+    if (id.length === 36){
       activeOk(true);
-      typesafeId(e.target.value);
+      typesafeId(id);
     } else {
       activeOk(false);
       typesafeId("");
     }
   }
   function askForTypesafeId(callback){
-    var message = $("<article/>").html("<p>You are creating Typesafe Reactive Platform project, which require a Typesafe ID.</p><p>You can retreive you ID on the <a href='http://typesafe.com/subscription' target='_blanc'>typesafe.com/subscription</a> page.<p><p class='input'></p>")[0];
+    var message = $("<article/>").html("<p>You are creating Typesafe Reactive Platform project, which requires a Typesafe ID.</p><p>You can retrieve your ID, or sign up for a free trial, on the <a href='http://typesafe.com/subscription' target='_blanc'>typesafe.com/subscription</a> page.<p><p class='input'></p>")[0];
     $("<input class='typesafeId-form' type='text' />").change(saveTypesafeID).keyup(saveTypesafeID).val(typesafeId()).appendTo($(".input", message));
     modals.show({
       shape: "large",
