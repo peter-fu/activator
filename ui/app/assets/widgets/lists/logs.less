@@ -29,6 +29,7 @@ article.logsPlugin {
 
   .logs-wrapper {
     .expand(5);
+    height: 300px;
   }
 
   .logs {
@@ -40,7 +41,8 @@ article.logsPlugin {
       .monospace();
       color: @grey;
       line-height: 16px;
-      white-space: pre;
+      word-break: break-all;
+      white-space: pre-wrap;
     }
 
     li[data-type='success'] { border-color: #6AB729; color: #D7F3AC; }
@@ -57,6 +59,7 @@ article.logsPlugin {
 
   .table-wrapper, .logs {
     .expand();
+    height: 400px; // Default value for IE11
     overflow: auto;
   }
 

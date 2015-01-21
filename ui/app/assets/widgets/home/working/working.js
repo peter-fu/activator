@@ -20,7 +20,7 @@ define([
       websocket.subscribe({type: "sbt", subType: "CoreLogEvent"}).fork().each(function(message) {
         requestAnimationFrame(function() {
           logs.append($("<li/>").html(message.event.entry.message).attr("data-type", message.event.entry.level));
-          wrapper.scrollTop = 9e9;
+          wrapper.scrollTop = 99999;
         });
       });
 
@@ -29,7 +29,7 @@ define([
           case 'Status':
             requestAnimationFrame(function() {
               logs.append($("<li/>").html(message.info).attr("data-type", "info"));
-              logs[0].scrollTop = 9e9;
+              logs[0].scrollTop = 99999;
             });
             break;
           case 'BadRequest':
