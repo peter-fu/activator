@@ -40,7 +40,7 @@ define([
       ok: "Submit",
       okEnabled: activeOk,
       callback: function() {
-        callback(typesafeId);
+        callback(typesafeId());
       },
       cancel: "Cancel"
     });
@@ -186,7 +186,7 @@ define([
 
       if (self.currentApp().tags.indexOf("reactive-platform") >= 0) {
         askForTypesafeId(function(id) {
-          msg.typesafeId = id;
+          msg.subscriptionId = id;
           websocket.send(msg);
           lastFolder(parentFolder); // memorise parent as default location
           $('#working, #open, #new').toggle();

@@ -30,20 +30,22 @@ object HomePageActor {
     def unapply(in: JsValue): Option[OpenExistingApplication] =
       Json.fromJson[OpenExistingApplication](in).asOpt
   }
-  case class CreateNewApplication(location: String, templateId: String, projectName: Option[String])
+  case class CreateNewApplication(location: String, templateId: String, projectName: Option[String], subscriptionId: Option[String])
   object CreateNewApplication {
     val tag = "CreateNewApplication"
     implicit val createNewApplicationReads: Reads[CreateNewApplication] =
       extractRequest(tag) {
         ((__ \ "location").read[String] and
           (__ \ "template").readNullable[String] and
-          (__ \ "name").readNullable[String])((l, t, n) => CreateNewApplication(l, t.getOrElse(""), n))
+          (__ \ "name").readNullable[String] and
+          (__ \ "subscriptionId").readNullable[String])((l, t, n, id) => CreateNewApplication(l, t.getOrElse(""), n, id))
       }
     implicit val createNewApplicationWrites: Writes[CreateNewApplication] =
       emitRequest(tag) { in =>
         obj("location" -> in.location,
           "template" -> in.templateId,
-          "name" -> in.projectName)
+          "name" -> in.projectName,
+          "subscriptionId" -> in.subscriptionId)
       }
 
     def unapply(in: JsValue): Option[CreateNewApplication] =
@@ -90,7 +92,7 @@ class HomePageActor extends WebSocketActor[JsValue] with ActorLogging {
   override def onMessage(json: JsValue): Unit = json match {
     case WebSocketActor.Ping(ping) => produce(WebSocketActor.Pong(ping.cookie))
     case OpenExistingApplication(msg) => openExistingApplication(msg.location)
-    case CreateNewApplication(msg) => createNewApplication(msg.location, msg.templateId, msg.projectName)
+    case CreateNewApplication(msg) => createNewApplication(msg.location, msg.templateId, msg.projectName, msg.subscriptionId)
     case _ =>
       log.debug(s"HomeActor: received unknown msg: $json")
       produce(BadRequest(json.toString, Seq("Could not parse JSON for request")))
@@ -101,7 +103,7 @@ class HomePageActor extends WebSocketActor[JsValue] with ActorLogging {
   }
 
   // Goes off and tries to create/load an application.
-  def createNewApplication(location: String, template: String, projectName: Option[String]): Unit = {
+  def createNewApplication(location: String, template: String, projectName: Option[String], subscriptionId: Option[String]): Unit = {
     import context.dispatcher
     val appLocation = new java.io.File(location)
     // a chance of knowing what the error is.
@@ -109,7 +111,8 @@ class HomePageActor extends WebSocketActor[JsValue] with ActorLogging {
       controllers.api.Templates.doCloneTemplate(
         template,
         appLocation,
-        projectName) map (result => result map (_ => appLocation))
+        projectName,
+        subscriptionId) map (result => result map (_ => appLocation))
 
     // Ensure feedback happens after clone-ing is done.
     for (result <- installed) {
