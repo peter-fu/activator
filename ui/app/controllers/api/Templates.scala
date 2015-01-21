@@ -87,6 +87,8 @@ object Templates extends Controller {
           val stream = new java.io.FileOutputStream(propertiesFile)
           props.store(stream, "Typesafe Reactive Platform subscription ID, see https://typesafe.com/subscription")
           stream.close()
+        } else {
+          System.out.println(s"Not writing project/typesafe.properties to $location ${if (location.exists) s"($location does not exist)"} ${if (propertiesFile.exists) s"($propertiesFile already exists)"}")
         }
       } catch {
         case NonFatal(e) =>
