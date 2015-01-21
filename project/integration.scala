@@ -128,7 +128,7 @@ case class IntegrationContext(launchJar: File,
     Process(Seq("java", 
         "-Dsbt.boot.properties=" + props.getAbsolutePath, 
         "-Dsbt.boot.directory=" + boot.getAbsolutePath,
-        "-Dactivator.integration.playVersion=" + Dependencies.playVersion,
+        "-Dactivator.integration.playVersion=" + Dependencies.play23Version,
         "-Dactivator.home=" +cleanUriFileString(integrationHome.getAbsolutePath),
         "-jar", 
         launchJar.getAbsolutePath), cwd)

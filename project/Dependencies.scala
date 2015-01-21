@@ -8,13 +8,15 @@ object Dependencies {
   val sbtPluginVersion = "0.13"
   val sbtPluginScalaVersion = "2.11.5"
   val scalaVersion = "2.11.5"
+  val scala210Version = "2.10.4"
   val luceneVersion = "4.2.1"
 
   val templateCacheVersion = "1.0-6830c15252733edf977c869af798d113ad5ac80d"
   val sbtRcVersion = "1.0-4f04b935f4328833346698fd1d1a39841152b15c"
 
-  val playVersion = "2.3.7"
-  val akkaVersion = "2.3.8"
+  val play23Version = "2.3.7"
+  val akka22Version = "2.2.4"
+  val akka23Version = "2.3.8"
   val slickVersion = "2.1.0"
   val echoPluginVersion = "0.1.7"
   val activatorAnalyticsVersion = "0.1.6"
@@ -36,9 +38,9 @@ object Dependencies {
   val sbtrcClient          = "com.typesafe.sbtrc" % "client-2-11" % sbtRcVersion
   val sbtrcIntegration     = "com.typesafe.sbtrc" % "integration-tests" % sbtRcVersion
 
-  val akkaActor            = "com.typesafe.akka" %% "akka-actor" % akkaVersion
-  val akkaSlf4j            = "com.typesafe.akka" %% "akka-slf4j" % akkaVersion
-  val akkaTestkit          = "com.typesafe.akka" %% "akka-testkit"% akkaVersion
+  val akkaActor            = "com.typesafe.akka" %% "akka-actor" % akka23Version
+  val akkaSlf4j            = "com.typesafe.akka" %% "akka-slf4j" % akka23Version
+  val akkaTestkit          = "com.typesafe.akka" %% "akka-testkit"% akka23Version
 
   val commonsIo            = "commons-io" % "commons-io" % "2.0.1"
 
@@ -48,7 +50,7 @@ object Dependencies {
   val specs2               = "org.specs2" % "specs2_2.11" % "2.3.11"
 
   // SBT 0.13 required plugins
-  val playSbt13Plugin        =  Defaults.sbtPluginExtra("com.typesafe.play" % "sbt-plugin" % playVersion, "0.13", "2.10")
+  val playSbt13Plugin        =  Defaults.sbtPluginExtra("com.typesafe.play" % "sbt-plugin" % play23Version, "0.13", "2.10")
   val eclipseSbt13Plugin     =  Defaults.sbtPluginExtra("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "2.2.0", "0.13", "2.10")
   val ideaSbt13Plugin        =  Defaults.sbtPluginExtra("com.github.mpeltonen" % "sbt-idea" % "1.5.2", "0.13", "2.10")
   val echoSbt13Plugin        =  Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-echo-play" % echoPluginVersion, "0.13", "2.10")
@@ -122,25 +124,22 @@ object Dependencies {
   }
 
   // *** ECHO DEPENDENCIES ***
-  // TODO : put common version numbers in one place
-  val akkaSlf4j22 = "com.typesafe.akka"   %% "akka-slf4j"   % "2.2.4"
-  val akkaSlf4j23 = "com.typesafe.akka"   %% "akka-slf4j"   % "2.3.8"
+  val akkaSlf4j22 = "com.typesafe.akka"   %% "akka-slf4j"   % akka22Version
+  val akkaSlf4j23 = "com.typesafe.akka"   %% "akka-slf4j"   % akka23Version
   val config      = "com.typesafe"        % "config"        % "1.2.1"
-  val play22      = "com.typesafe.play"   %% "play"         % "2.2.6"
-  val play23      = "com.typesafe.play"   %% "play"         % "2.3.7"
-  val play23ws    = "com.typesafe.play"   %% "play-ws"      % "2.3.7"
+  val play23      = "com.typesafe.play"   %% "play"         % play23Version
+  val play23ws    = "com.typesafe.play"   %% "play-ws"      % play23Version
   val protobuf24  = "com.google.protobuf" % "protobuf-java" % "2.4.1"
   val protobuf25  = "com.google.protobuf" % "protobuf-java" % "2.5.0"
   val sigar       = "org.fusesource"      % "sigar"         % "1.6.4"
   val slf4j       = "org.slf4j"           % "slf4j-api"     % "1.7.5"
 
-  val akkaTestKit22 = "com.typesafe.akka" %% "akka-testkit" % "2.2.4"   % "test"
-  val akkaTestKit23 = "com.typesafe.akka" %% "akka-testkit" % "2.3.8"   % "test"
-  val junit       = "junit"               % "junit"         % "4.5"     % "test"
-  val logback     = "ch.qos.logback"      % "logback-classic" % "1.0.13" % "test"
-  val playTest23  = "com.typesafe.play"   %% "play-test"    % "2.3.7"   % "test"
-  val playTest22  = "com.typesafe.play"   %% "play-test"    % "2.2.6"   % "test"
-  val scalaTest   = "org.scalatest"       %% "scalatest"    % "2.2.1"   % "test"
+  val akkaTestKit22 = "com.typesafe.akka" %% "akka-testkit" % akka22Version % "test"
+  val akkaTestKit23 = "com.typesafe.akka" %% "akka-testkit" % akka23Version   % "test"
+  val junit       = "junit"               % "junit"         % "4.5"         % "test"
+  val logback     = "ch.qos.logback"      % "logback-classic" % "1.0.13"    % "test"
+  val playTest23  = "com.typesafe.play"   %% "play-test"    % play23Version   % "test"
+  val scalaTest   = "org.scalatest"       %% "scalatest"    % "2.2.1"       % "test"
 
   def traceAkka(version: String, crossVersion: CrossVersion) = Seq(
     "com.typesafe.akka" % "akka-actor"  % version cross crossVersion,
@@ -157,9 +156,7 @@ object Dependencies {
   // *** END ECHO DEPENDENCIES ***
 
   // *** SBT-ECHO DEPENDENCIES ***
-  // TODO : put common version numbers in one place
-
-  val aspectjTools = "org.aspectj" % "aspectjtools" % "1.8.4"
+  val aspectjTools = "org.aspectj" % "aspectjtools" % aspectJVersion
 
   val sbtBackgroundRun = Defaults.sbtPluginExtra("com.typesafe.sbtrc" % "ui-interface-0-13" % sbtRcVersion, "0.13", "2.10")
 
@@ -169,14 +166,12 @@ object Dependencies {
     resolvers += "Typesafe Maven Releases" at "http://repo.typesafe.com/typesafe/releases/",
     libraryDependencies <+= (sbt.Keys.sbtVersion in sbtPlugin, scalaBinaryVersion in update) { (sbtV, scalaV) =>
       val dependency = sbtV match {
-        case "0.12" => "play" % "sbt-plugin" % "2.1.5" exclude("com.github.scala-incubator.io", "scala-io-core_2.9.1") exclude("com.github.scala-incubator.io", "scala-io-file_2.9.1")
-        case "0.13" => "com.typesafe.play" % "sbt-plugin" % playVersion
+        case "0.13" => "com.typesafe.play" % "sbt-plugin" % play23Version
         case _ => sys.error("Unsupported sbt version: " + sbtV)
       }
       Defaults.sbtPluginExtra(dependency, sbtV, scalaV)
     }
   )
   // *** END SBT-ECHO DEPENDENCIES ***
-
 
 }
