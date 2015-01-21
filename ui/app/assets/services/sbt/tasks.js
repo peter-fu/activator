@@ -6,12 +6,14 @@ define([
   'commons/stream',
   'commons/types',
   './app',
+  'widgets/modals/modals',
   'services/monitoring/monitoringSolutions'
 ], function(
   websocket,
   Stream,
   types,
   app,
+  modals,
   monitoringSolutions
 ) {
 
@@ -457,25 +459,28 @@ define([
   });
 
   valueChanged.matchOnAttribute('key', 'echoTraceSupported').each(function(message) {
-    inspectSupported(message.value.value === true);
+    inspectSupported(message.value.serialized === true);
   });
 
   valueChanged.matchOnAttribute('key', 'echoAkkaVersionReport').each(function(message) {
+    debug && console.log('echoAkkaVersionReport',message)
     var report = "";
-    if (message.value.value)
-      report = message.value.value;
+    if (message.value.serialized)
+      report = message.value.serialized;
     inspectAkkaVersionReport(report);
   });
 
   valueChanged.matchOnAttribute('key', 'echoPlayVersionReport').each(function(message) {
+    debug && console.log('echoPlayVersionReport',message)
     var report = "";
-    if (message.value.value)
-      report = message.value.value;
+    if (message.value.serialized)
+      report = message.value.serialized;
     inspectPlayVersionReport(report);
   });
 
   valueChanged.matchOnAttribute('key', 'echoTracePlayVersion').each(function(message) {
-    if (message.value.value && message.value.value !== '')
+    debug && console.log('echoTracePlayVersion',message)
+    if (message.value.serialized && message.value.serialized !== '')
       inspectHasPlayVersion(true);
     else
       inspectHasPlayVersion(false);
@@ -658,6 +663,8 @@ define([
     playRunnerAvailable:     playRunnerAvailable,
     playHasRunCommand:       playHasRunCommand,
     playApplicationUrl:      playApplicationUrl,
+    inspectSupported:        inspectSupported,
+    whyInspectIsNotSupported: whyInspectIsNotSupported,
     active: {
       turnedOn:     "",
       compiling:    "",
@@ -673,6 +680,16 @@ define([
       run:          function() {
         if (app.settings.automaticResetInspect()){
           resetInspect();
+        }
+        if (monitoringSolutions.inspectActivated() && !inspectSupported()) {
+          // Disactivating
+          monitoringSolutions.monitoringSolution(monitoringSolutions.NO_MONITORING);
+          // Show a popup
+          modals.show({
+            title: "Inspect has been disactivated",
+            text: whyInspectIsNotSupported(),
+            cancel: "close"
+          });
         }
         return requestExecution(runCommand());
       },
