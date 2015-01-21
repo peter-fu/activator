@@ -65,6 +65,7 @@
     }
   }
 
+  &[data-status=activity] dd,
   &[data-status=buildFailed] dd,
   &[data-status=testFailed] dd,
   &[data-status=compilationError] dd,
@@ -82,6 +83,11 @@
     }
     dd {
       color: #fff;
+    }
+  }
+  &[data-status=activity] {
+    .counter {
+      border-color: @blue;
     }
   }
   &[data-status=testFailed] {

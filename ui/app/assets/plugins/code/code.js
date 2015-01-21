@@ -17,6 +17,7 @@ define([
   "commons/settings",
   "css!./code",
   "css!widgets/buttons/button",
+  "css!widgets/modules/modules",
   "css!widgets/help/help"
 ], function(
   fs,
