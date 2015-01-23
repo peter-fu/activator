@@ -389,11 +389,11 @@ define([
           var redirected;
           // Hard-coded replacement of run -> backgroundRun
           if (command === "run") {
-            redirected = "run";
-            command = "backgroundRun";
+            redirected = runCommand();
+            command = "run";
           } else if (command === "runMain") {
-            redirected = "runMain";
-            command = "backgroundRunMain";
+            redirected = "bacgroundRunMain";
+            command = "runMain";
           }
 
           return {
@@ -404,7 +404,11 @@ define([
             execute: command,
             redirected: redirected,
             callback: function () {
-              requestExecution(command);
+              if (redirected) {
+                requestExecution(redirected);
+              } else {
+                requestExecution(command);
+              }
               window.location.hash = "#build";
             }
           }
