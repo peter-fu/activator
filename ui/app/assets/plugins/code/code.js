@@ -151,6 +151,28 @@ define([
     });
   });
 
+  // Rename / Delete events :
+  browser.browserEvent.subscribe(function(e) {
+    switch(e.type){
+      case "renameFolder":
+      case "deleteFolder":
+        openedDocuments().forEach(function(doc) {
+          if (doc.location.indexOf(e.folder.location) === 0){
+            doc.edited(true);
+          }
+        });
+        break;
+      case "renameFile":
+      case "deleteFile":
+        openedDocuments().forEach(function(doc) {
+          if (doc.location === e.file.location){
+            doc.edited(true);
+          }
+        });
+        break;
+    }
+  });
+
   var State = {
     browser: browser,
     editor: editor,

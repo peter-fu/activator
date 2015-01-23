@@ -10,6 +10,8 @@ define([
   "css!widgets/menu/menu"
 ], function(fs, item, tpl){
 
+  var browserEvent = ko.observable().extend({ notify: 'always' });
+
   function FileNode(node, parent) {
     this.name          = node.name;
     this.location      = node.location;
@@ -33,12 +35,22 @@ define([
     fs.open(this.location);
   }
   FileNode.prototype.delete = function() {
-    if(window.confirm("You are about to delete "+this.name)) fs.delete(this.location).success(this.parent.load.bind(this.parent));
+    var self = this;
+    if(window.confirm("You are about to delete "+this.name)) {
+      fs.delete(this.location).success(function(){
+        browserEvent({ type: "deleteFile", file: self });
+        self.parent.load();
+      });
+    }
   }
   FileNode.prototype.rename = function() {
     var name = window.prompt("File's new name?", this.name);
     if (!name) return;
-    fs.rename(this.location, name).success(this.parent.load.bind(this.parent));
+    var self = this;
+    fs.rename(this.location, name).success(function(){
+      browserEvent({ type: "renameFile", file: self, newName: name });
+      self.parent.load();
+    });
   }
   FileNode.prototype.openFile = function() {
     window.location.hash = "#code"+fs.relative(this.location);
@@ -130,12 +142,22 @@ define([
     fs.open(this.location);
   }
   TreeNode.prototype.delete = function() {
-    if(window.confirm("You are about to delete "+this.name)) fs.delete(this.location).success(this.parent.load.bind(this.parent));
+    if(window.confirm("You are about to delete "+this.name)) {
+      var self = this;
+      fs.delete(this.location).success(function(){
+        browserEvent({ type: "deleteFolder", folder: self });
+        self.parent.load();
+      });
+    }
   }
   TreeNode.prototype.rename = function() {
     var name = window.prompt("Folder's new name?", this.name);
     if (!name) return;
-    fs.rename(this.location, name).success(this.parent.load.bind(this.parent));
+    var self = this;
+    fs.rename(this.location, name).success(function() {
+      browserEvent({ type: "renameFolder", folder: self, newName: name });
+      self.parent.load();
+    });
   }
 
   // MAIN TreeNode INSTANCE IS PROJECT ROOT
@@ -202,6 +224,7 @@ define([
   return {
     tree: tree,
     reveal: revealInSideBar,
+    browserEvent: browserEvent,
     render: function(){
       return ko.bindhtml(tpl, State);
     }
