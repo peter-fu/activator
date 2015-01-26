@@ -392,7 +392,7 @@ define([
             redirected = runCommand();
             command = "run";
           } else if (command === "runMain") {
-            redirected = "bacgroundRunMain";
+            redirected = "backgroundRunMain";
             command = "runMain";
           }
 
