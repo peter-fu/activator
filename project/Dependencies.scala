@@ -19,7 +19,7 @@ object Dependencies {
   val akka23Version = "2.3.8"
   val slickVersion = "2.1.0"
   val echoPluginVersion = "0.1.7"
-  val activatorAnalyticsVersion = "0.1.6"
+  val activatorAnalyticsVersion = "0.1.7"
   val aspectJVersion = "1.8.4"
 
   val activatorCommon      = "com.typesafe.activator" % "activator-common" % templateCacheVersion
