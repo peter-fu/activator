@@ -1,5 +1,5 @@
 <div class="open-in-idea">
-  <ul class="logs" data-bind="scrollToBottom: true, foreach: logs, visible: !complete()">
+  <ul class="logs" data-bind="logScroll: scrollMemo, foreach: logs, visible: !complete()">
     <li data-bind="text: message"></li>
   </ul>
   <div class="howto" data-bind="visible: complete">
