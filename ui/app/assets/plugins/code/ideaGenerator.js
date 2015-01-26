@@ -26,7 +26,7 @@ define([
   checkInstalled();
 
   var generate = function(overrideExisting) {
-    if (isInstalled() && !window.confirm("Idea is already installed, do you want to re-grenerate the project?")) return;
+    if (isInstalled() && !window.confirm("IntelliJ project already exists. Do you want to regenerate the project?")) return;
     else isInstalled(false);
 
     generator.startProcess(

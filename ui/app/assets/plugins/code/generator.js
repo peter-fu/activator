@@ -77,7 +77,7 @@ define([
         // Look for a ".project" file in the home directory to see if there already is an existing Eclipse project
         ajax.exists(serverAppModel.location + "/" + generator.projectFile, function (status) {
           if (status === "success") {
-            resetState("Required file(s) exist. Open your IDE and import project.");
+            resetState("Required file(s) generated. Open your IDE and import project.");
           } else {
             // No project files found - continue the process
             logs.push({message: "No project file(s) found - continuing the process."});
