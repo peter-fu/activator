@@ -14,6 +14,17 @@ define(['widgets/modals/modals'], function(modals) {
     }).error(showError("Can not browse "+location+"."));
   }
 
+  function exists(location, callback){
+    return $.ajax({
+      url: '/api/local/browse',
+      type: 'GET',
+      dataType: 'json',
+      data: {
+        location: location
+      }
+    }).always(callback);
+  }
+
   // Reveal / open
   function open(location){
     return $.ajax({
@@ -115,6 +126,7 @@ define(['widgets/modals/modals'], function(modals) {
     return path.replace(window.serverAppModel.location,"");
   }
   function absolute(path) {
+    if (path.slice(0,1) !== "/") path = "/"+path;
     return window.serverAppModel.location + path;
   }
 
@@ -128,6 +140,7 @@ define(['widgets/modals/modals'], function(modals) {
   return {
     search: search,
     browse: browse,
+    exists: exists,
     open: open,
     show: show,
     save: save,

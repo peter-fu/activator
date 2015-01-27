@@ -17,9 +17,11 @@
           <button data-bind="click: clear">Clear</button>
         </div>
       </div>
-      <ul class="logs" data-bind="logScroll: memoLogsScroll, foreach: sbt.logs.stdout">
-        <li data-bind="text: event.entry.message, attr: { 'data-level': event.entry.level, 'data-type': event.entry.type }"></li>
-      </ul>
+      <div class="logs" data-bind="logScroll: memoLogsScroll">
+        <ul data-bind="foreach: sbt.logs.stdout">
+          <li data-bind="text: event.entry.message, attr: { 'data-level': event.entry.level, 'data-type': event.entry.type }"></li>
+        </ul>
+      </div>
     </div>
   </section>
   <!-- /ko -->

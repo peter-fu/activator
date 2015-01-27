@@ -17,6 +17,7 @@ define([
   "commons/settings",
   "css!./code",
   "css!widgets/buttons/button",
+  "css!widgets/modules/modules",
   "css!widgets/help/help"
 ], function(
   fs,
@@ -137,6 +138,9 @@ define([
     idea.generate(true); // boolean flag decides whether or not to override any existing project files
   }
 
+  var eclipseReady = ko.observable(false);
+  var ideaReady = ko.observable(false);
+
   var autoSave = settings.observable("code.autoSave", false);
   document.addEventListener("visibilitychange", function() {
     if (autoSave() && document.hidden){
@@ -151,6 +155,28 @@ define([
     });
   });
 
+  // Rename / Delete events :
+  browser.browserEvent.subscribe(function(e) {
+    switch(e.type){
+      case "renameFolder":
+      case "deleteFolder":
+        openedDocuments().forEach(function(doc) {
+          if (doc.location.indexOf(e.folder.location) === 0){
+            doc.edited(true);
+          }
+        });
+        break;
+      case "renameFile":
+      case "deleteFile":
+        openedDocuments().forEach(function(doc) {
+          if (doc.location === e.file.location){
+            doc.edited(true);
+          }
+        });
+        break;
+    }
+  });
+
   var State = {
     browser: browser,
     editor: editor,
@@ -163,8 +189,10 @@ define([
     closeAll: closeAll,
     saveAll: saveAll,
     autoSave: autoSave,
-    generateEclipseFiles: generateEclipseFiles,
-    generateIdeaFiles: generateIdeaFiles
+    openInEclipse: generateEclipseFiles,
+    openInIdea: generateIdeaFiles,
+    eclipseReady: eclipseReady,
+    ideaReady: ideaReady
   }
 
   return {

@@ -11,7 +11,7 @@ object Dependencies {
   val scala210Version = "2.10.4"
   val luceneVersion = "4.2.1"
 
-  val templateCacheVersion = "1.0-6830c15252733edf977c869af798d113ad5ac80d"
+  val templateCacheVersion = "1.0-f08006ff8edfcfe7462b035c6c06c3623f0c6044"
   val sbtRcVersion = "1.0-b3f1fbe7496a2b58b856460e3a8b50d0db988c63"
 
   val play23Version = "2.3.7"
@@ -19,7 +19,7 @@ object Dependencies {
   val akka23Version = "2.3.8"
   val slickVersion = "2.1.0"
   val echoPluginVersion = "0.1.7"
-  val activatorAnalyticsVersion = "0.1.6"
+  val activatorAnalyticsVersion = "0.1.7"
   val aspectJVersion = "1.8.4"
 
   val activatorCommon      = "com.typesafe.activator" % "activator-common" % templateCacheVersion

@@ -20,6 +20,7 @@ define([
   var generatingFile = 4;
   var restartingSbt = 5;
   var runningCommand = 6;
+  var generator = null;
 
   // Modal Window
   var logs = ko.observableArray([]);
@@ -36,6 +37,7 @@ define([
       this.processTimeoutId = -1;
       this.currentState = idle;
       this.currentExecutionId = 0;
+      this.isInstalled = args.isInstalled;
       this.subscription = websocket.subscribe('type', 'sbt');
       initializeSubscriptions(this.subscription);
     }
@@ -73,12 +75,14 @@ define([
         logs.push({message: "Looking for existing project files."});
 
         // Look for a ".project" file in the home directory to see if there already is an existing Eclipse project
-        ajax.browse(serverAppModel.location + "/" + generator.projectFile).done(function (data) {
-          resetState("Required file(s) exist. Open your IDE and import project.");
-        }).error(function () {
-          // No project files found - continue the process
-          logs.push({message: "No project file(s) found - continuing the process."});
-          checkCommand();
+        ajax.exists(serverAppModel.location + "/" + generator.projectFile, function (status) {
+          if (status === "success") {
+            resetState("Required file(s) generated. Open your IDE and import project.");
+          } else {
+            // No project files found - continue the process
+            logs.push({message: "No project file(s) found - continuing the process."});
+            checkCommand();
+          }
         });
       }
     }
@@ -128,10 +132,12 @@ define([
   };
 
   var resetState = function(msg) {
-    clearInterval(generator.processTimeoutId);
+    if (generator) {
+      clearInterval(generator.processTimeoutId);
+      generator = null;
+    }
     debug && console.log(msg);
     logs.push({message: msg});
-    generator = null;
   };
 
   var failureExecutionHandler = function(msg) {
@@ -152,9 +158,11 @@ define([
       if (generator.currentState === checkingCommand) {
         setNewTimeout();
         logs.push({message: "\'" + generator.sbtCommand + "\' command was available and has been run."});
+        generator.isInstalled(true);
         resetState("Required files generated. Open your IDE and import project.");
       } else if (generator.currentState === runningCommand) {
         logs.push({message: "\'" + generator.sbtCommand + "\' command has been executed."});
+        generator.isInstalled(true);
         resetState("Required files generated. Open your IDE and import project.");
       }
     }
@@ -167,8 +175,7 @@ define([
     }
   };
 
-  var generator = null;
-  var startProcess = function (overrideExisting, projectFile, projectFileLocation, pluginFileContent, sbtCommand) {
+  var startProcess = function (overrideExisting, projectFile, projectFileLocation, pluginFileContent, isInstalled, sbtCommand) {
     if (generator !== null) {
       resetState(); // should this throw an error instead?
     }
@@ -178,6 +185,7 @@ define([
       projectFile: projectFile,
       projectFileLocation: projectFileLocation,
       pluginFileContent: pluginFileContent,
+      isInstalled: isInstalled,
       sbtCommand: sbtCommand
     });
 
