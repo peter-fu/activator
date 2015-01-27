@@ -12,7 +12,8 @@ define([
   // plugin information
   var backgroundRunPluginFileLocation = "/project/sbt-ui.sbt";
   var backgroundRunPluginFileContent = "// This plugin represents functionality that is to be added to sbt in the future\n\n" +
-    "addSbtPlugin(\"com.typesafe.sbtrc\" % \"ui-interface-0-13\" % \"1.0-d5ba9ed9c1d31e3431aeca5e429d290b56cb0b14\")";
+    "addSbtPlugin(\"com.typesafe.sbtrc\" % \"ui-interface-0-13\" % \"1.0-M1\")";
+
   var uiFileEchoSettings = "\n\nfork in run := true";
 
   // this file isn't required to exist, if it doesn't we should create
@@ -24,7 +25,7 @@ define([
 
   var playForkRunPluginFileLocation = "/project/play-fork-run.sbt";
   var playForkRunPluginFileContent = "// This plugin adds forked run capabilities to Play projects which is needed for Activator.\n\n" +
-    "addSbtPlugin(\"com.typesafe.play\" % \"sbt-fork-run-plugin\" % \"2.3.8-65d700c8158a8d3e390380c6a214d85707b96768\")";
+    "addSbtPlugin(\"com.typesafe.play\" % \"sbt-fork-run-plugin\" % \"2.3.8-M1\")";
 
   var addedEchoFile = ko.observable(false);
   var addedBackgroundFile = ko.observable(false);
