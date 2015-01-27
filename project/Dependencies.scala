@@ -14,7 +14,7 @@ object Dependencies {
   val templateCacheVersion = "1.0-f08006ff8edfcfe7462b035c6c06c3623f0c6044"
   val sbtRcVersion = "1.0-b3f1fbe7496a2b58b856460e3a8b50d0db988c63"
 
-  val play23Version = "2.3.7"
+  val play23Version = "2.3.8-M1"
   val akka22Version = "2.2.4"
   val akka23Version = "2.3.9"
   val echoPlayVersion = "2.3.8-M1"
