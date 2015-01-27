@@ -29,6 +29,8 @@ class ActivatorLauncher extends AppMain {
 
     ActivatorProxyAuthenticator.install()
 
+    RepositoryConfig.configureUserRepositories()
+
     // TODO - Detect if we're running against a local project.
     try configuration.arguments match {
       case Array("ui") => RebootToUI(configuration, version = checkForUpdatedVersion.getOrElse(APP_VERSION))
