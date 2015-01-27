@@ -19,7 +19,7 @@ object Dependencies {
   val akka23Version = "2.3.9"
   val echoPlayVersion = "2.3.8-M1"
   val slickVersion = "2.1.0"
-  val echoPluginVersion = "0.1.7"
+  val echoPluginVersion = "0.1.8"
   val activatorAnalyticsVersion = "0.1.7"
   val aspectJVersion = "1.8.4"
 
@@ -169,7 +169,7 @@ object Dependencies {
     resolvers += "Typesafe Maven Releases" at "http://repo.typesafe.com/typesafe/releases/",
     libraryDependencies <+= (sbt.Keys.sbtVersion in sbtPlugin, scalaBinaryVersion in update) { (sbtV, scalaV) =>
       val (dependency,cleanedUpSbtV) = sbtV match {
-        case sbt13HackMatch(m) => ("com.typesafe.play" % "sbt-plugin" % echoPlayVersion,m)
+        case sbt13HackMatch(m) => ("com.typesafe.play" % "sbt-fork-run-plugin" % echoPlayVersion,m)
         case _ => sys.error("Unsupported sbt version: " + sbtV)
       }
       Defaults.sbtPluginExtra(dependency, cleanedUpSbtV, scalaV)

@@ -18,10 +18,7 @@ object EchoPlayRun {
   val supportedPlayVersions = Seq(Play23Version)
 
   def tracePlayDependencies(dependencies: Seq[ModuleID], tracePlayVersion: Option[String], echoVersion: String): Seq[ModuleID] = {
-    val ctp = containsTracePlay(dependencies)
-    println(s"containsTracePlay = $ctp")
-    println(s"tracePlayVersion = $tracePlayVersion")
-    if (ctp) Seq.empty[ModuleID]
+    if (containsTracePlay(dependencies)) Seq.empty[ModuleID]
     else tracePlayVersion match {
       case Some(playVersion) => Seq(tracePlayDependency(playVersion, echoVersion))
       case None => Seq.empty[ModuleID]
