@@ -22,9 +22,14 @@ define([
   var echoPluginFileContent = "// This plugin runs apps with the \"echo\" trace infrastructure which backs up the Inspect functionality in Activator\n\n" +
     "addSbtPlugin(\"com.typesafe.sbt\" % \"sbt-echo\" % \"0.1.7\")";
 
+  var playForkRunPluginFileLocation = "/project/play-fork-run.sbt";
+  var playForkRunPluginFileContent = "// This plugin adds forked run capabilities to Play projects which is needed for Activator.\n\n" +
+    "addSbtPlugin(\"com.typesafe.play\" % \"sbt-fork-run-plugin\" % \"2.3.8-65d700c8158a8d3e390380c6a214d85707b96768\")";
+
   var addedEchoFile = ko.observable(false);
   var addedBackgroundFile = ko.observable(false);
   var addedForkInRun = ko.observable(false);
+  var addedPlayForkRun = ko.observable(false);
 
   function checkFileContent(path, content, callback, appendTofile){
     return $.ajax({
@@ -78,11 +83,16 @@ define([
     }
   }
 
+  checkFileContent(serverAppModel.location+playForkRunPluginFileLocation, playForkRunPluginFileContent, function () {
+    addedPlayForkRun(true);
+  });
+
   return {
     echoInstalledAndReady: echoInstalledAndReady,
     addedEchoFile:         addedEchoFile,
     addedBackgroundFile:   addedBackgroundFile,
     addedForkInRun:        addedForkInRun,
+    addedPlayForkRun:      addedPlayForkRun,
     echoReady:             echoReady
   };
 });
