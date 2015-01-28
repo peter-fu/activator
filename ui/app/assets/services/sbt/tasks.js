@@ -401,7 +401,7 @@ define([
 
   var valueChanged = subTypeEventStream("ValueChanged").map(function(message) {
     var valueOrNull = null;
-    if (message.event.value.success)
+    if (message.event.value.$type.indexOf("Success") >= 0)
       valueOrNull = message.event.value;
     debug && console.log("ValueChanged for ", message.event.key.key.name, valueOrNull, message.event);
     return {
