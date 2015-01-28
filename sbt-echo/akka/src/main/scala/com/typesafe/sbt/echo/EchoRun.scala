@@ -16,7 +16,7 @@ object EchoRun {
   import SbtEcho.EchoKeys._
 
   val Akka22Version = "2.2.4"
-  val Akka23Version = "2.3.8"
+  val Akka23Version = "2.3.9"
   val supportedAkkaVersions = Seq(Akka22Version, Akka23Version)
 
   val EchoTraceCompile = config("echo-trace-compile").extend(Configurations.RuntimeInternal).hide
@@ -71,7 +71,7 @@ object EchoRun {
   }
 
   def containsTrace(dependencies: Seq[ModuleID]): Boolean = dependencies exists { module =>
-    module.organization == "com.typesafe.trace" && module.name.startsWith("trace-akka")
+    module.organization == "com.typesafe.trace" && module.name.startsWith("echo-trace-akka")
   }
 
   def findAkkaVersion(dependencies: Seq[ModuleID]): Option[String] = dependencies find { module =>
@@ -80,7 +80,7 @@ object EchoRun {
 
   def traceAkkaDependencies(akkaVersion: String, echoVersion: String, scalaVersion: String): Seq[ModuleID] = {
     val crossVersion = akkaCrossVersion(akkaVersion, scalaVersion)
-    Seq("com.typesafe.trace" % ("trace-akka-" + akkaVersion) % echoVersion % EchoTraceCompile.name cross crossVersion)
+    Seq("com.typesafe.trace" % ("echo-trace-akka-" + akkaVersion) % echoVersion % EchoTraceCompile.name cross crossVersion)
   }
 
   def akkaCrossVersion(akkaVersion: String, scalaVersion: String): CrossVersion = {
@@ -94,7 +94,7 @@ object EchoRun {
     "org.aspectj" % "aspectjweaver" % version % EchoWeave.name)
 
   def sigarDependencies(version: String) = Seq(
-    "com.typesafe.trace" % "trace-sigar-libs" % version % EchoSigar.name)
+    "com.typesafe.trace" % "echo-sigar-libs" % version % EchoSigar.name)
 
   def collectTracedClasspath(config: Configuration): Initialize[Task[Classpath]] =
     (classpathTypes, update, streams) map { (types, report, s) =>
@@ -110,14 +110,14 @@ object EchoRun {
 
         if (traced.isEmpty) {
           // we always trace akka, but only trace play on play projects
-          if (modulePrefix == "trace-akka")
+          if (modulePrefix == "echo-trace-akka")
             s.log.warn(s"$modulePrefix jars for Inspect have not been added to the classpath.")
         } else if (traced.size > 1) s.log.error(s"Somehow multiple $modulePrefix jars for Inspect are on the classpath: $traced")
         else s.log.info(s"$modulePrefix jar for Inspect is on the echo:run classpath ${traced.head}")
       }
 
-      logFor("trace-akka")
-      logFor("trace-play")
+      logFor("echo-trace-akka")
+      logFor("echo-trace-play")
 
       classpath
     }
@@ -193,7 +193,7 @@ object EchoRun {
   }
 
   def unpackSigar: Initialize[Task[Option[File]]] = (update, echoDirectory) map { (report, dir) =>
-    report.matching(moduleFilter(name = "trace-sigar-libs")).headOption map { jar =>
+    report.matching(moduleFilter(name = "echo-sigar-libs")).headOption map { jar =>
       val unzipped = dir / "sigar"
       IO.unzip(jar, unzipped)
       unzipped

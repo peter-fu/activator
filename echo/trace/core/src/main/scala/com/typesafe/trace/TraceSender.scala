@@ -6,9 +6,9 @@ package com.typesafe.trace
 import com.typesafe.trace.send.{ ProtobufTraceSender }
 
 object TraceSender {
-  def apply(port: Int, capacity: Int, retry: Boolean, daemonic: Boolean, warn: Boolean): TraceSender = {
+  def apply(port: Int, capacity: Int, retry: Boolean, daemonic: Boolean, warn: Boolean, debug: Boolean): TraceSender = {
     try {
-      new ProtobufTraceSender(port, capacity, retry, daemonic, warn)
+      new ProtobufTraceSender(port, capacity, retry, daemonic, warn, debug)
     } catch {
       case e: Exception ⇒
         println("exception: " + e)

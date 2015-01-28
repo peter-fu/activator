@@ -14,11 +14,12 @@ object Dependencies {
   val templateCacheVersion = "1.0-f08006ff8edfcfe7462b035c6c06c3623f0c6044"
   val sbtRcVersion = "1.0-b3f1fbe7496a2b58b856460e3a8b50d0db988c63"
 
-  val play23Version = "2.3.7"
+  val play23Version = "2.3.8-M1"
   val akka22Version = "2.2.4"
-  val akka23Version = "2.3.8"
+  val akka23Version = "2.3.9"
+  val echoPlayVersion = "2.3.8-M1"
   val slickVersion = "2.1.0"
-  val echoPluginVersion = "0.1.7"
+  val echoPluginVersion = "0.1.8"
   val activatorAnalyticsVersion = "0.1.7"
   val aspectJVersion = "1.8.4"
 
@@ -160,16 +161,18 @@ object Dependencies {
 
   val sbtBackgroundRun = Defaults.sbtPluginExtra("com.typesafe.sbtrc" % "ui-interface-0-13" % sbtRcVersion, "0.13", "2.10")
 
+  val sbt13HackMatch = "^(0\\.13)\\.?.*$".r
+
   def playPlugin: Seq[Setting[_]] = Seq(
     resolvers += Classpaths.typesafeSnapshots,
     resolvers += "Typesafe Maven Snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",
     resolvers += "Typesafe Maven Releases" at "http://repo.typesafe.com/typesafe/releases/",
     libraryDependencies <+= (sbt.Keys.sbtVersion in sbtPlugin, scalaBinaryVersion in update) { (sbtV, scalaV) =>
-      val dependency = sbtV match {
-        case "0.13" => "com.typesafe.play" % "sbt-plugin" % play23Version
+      val (dependency,cleanedUpSbtV) = sbtV match {
+        case sbt13HackMatch(m) => ("com.typesafe.play" % "sbt-fork-run-plugin" % echoPlayVersion,m)
         case _ => sys.error("Unsupported sbt version: " + sbtV)
       }
-      Defaults.sbtPluginExtra(dependency, sbtV, scalaV)
+      Defaults.sbtPluginExtra(dependency, cleanedUpSbtV, scalaV)
     }
   )
   // *** END SBT-ECHO DEPENDENCIES ***

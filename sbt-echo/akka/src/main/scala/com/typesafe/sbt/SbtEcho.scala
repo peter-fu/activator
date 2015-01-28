@@ -10,7 +10,7 @@ import java.net.URI
 object SbtEcho extends AutoPlugin {
   import echo.EchoRun._
 
-  val EchoVersion = "0.1.6"
+  val EchoVersion = "0.1.8"
   val AspectjVersion = "1.8.4"
 
   val Echo = config("echo").extend(Compile)
@@ -48,6 +48,7 @@ object SbtEcho extends AutoPlugin {
     // play keys
     val tracePlayVersion = TaskKey[Option[String]]("echo-trace-play-version")
     val echoPlayVersionReport = taskKey[String]("String explaining how actual Play version relates to supported versions")
+    val echoPlayDependencyClasspath = taskKey[Classpath]("Dependency classpath for play rebuilds")
     val weavingClassLoader = TaskKey[(String, Array[URL], ClassLoader) => ClassLoader]("echo-weaving-class-loader")
   }
 
