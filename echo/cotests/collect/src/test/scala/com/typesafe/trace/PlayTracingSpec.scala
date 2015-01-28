@@ -292,7 +292,7 @@ class Play23Scala210NettyPostTracingSpec extends EchoCollectSpec {
       }
     }
     "BAD (file upload) POST /uploadFile" in {
-      eventOneOfCheck[Int](expectedOptions = Map(78 -> 2, 79 -> 3, 80 -> 4, 81 -> 5, 82 -> 6), timeout = timeoutHandler.finiteTimeoutify(10.seconds)) { readBytesCount ⇒
+      eventOneOfCheck[Int](expectedOptions = Map(77 -> 1, 78 -> 2, 79 -> 3, 80 -> 4, 81 -> 5, 82 -> 6), timeout = timeoutHandler.finiteTimeoutify(10.seconds)) { readBytesCount ⇒
         // printTraces
         countTraces should be(1)
         countEventsOf[NettyHttpReceivedStart.type] should be(1)
@@ -647,7 +647,7 @@ class Play23Scala211NettyPostTracingSpec extends EchoCollectSpec {
       }
     }
     "BAD (file upload) POST /uploadFile" in {
-      eventOneOfCheck[Int](expectedOptions = Map(78 -> 2, 79 -> 3, 80 -> 4, 81 -> 5, 82 -> 6), timeout = timeoutHandler.finiteTimeoutify(10.seconds)) { readBytesCount ⇒
+      eventOneOfCheck[Int](expectedOptions = Map(77 -> 1, 78 -> 2, 79 -> 3, 80 -> 4, 81 -> 5, 82 -> 6), timeout = timeoutHandler.finiteTimeoutify(10.seconds)) { readBytesCount ⇒
         // printTraces
         countTraces should be(1)
         countEventsOf[NettyHttpReceivedStart.type] should be(1)
