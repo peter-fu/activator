@@ -14,11 +14,8 @@ object EchoPlayRun {
   import SbtEcho.Echo
   import SbtEcho.EchoKeys._
 
-  val Play23Version = "2.3.7"
+  val Play23Version = "2.3.8-M1"
   val supportedPlayVersions = Seq(Play23Version)
-
-  def echoPlayRunSettings(): Seq[Setting[_]] = Seq(
-    weavingClassLoader in Echo <<= (sigar in Echo) map createWeavingClassLoader) ++ EchoPlaySpecific.echoPlaySpecificSettings
 
   def tracePlayDependencies(dependencies: Seq[ModuleID], tracePlayVersion: Option[String], echoVersion: String): Seq[ModuleID] = {
     if (containsTracePlay(dependencies)) Seq.empty[ModuleID]
@@ -29,7 +26,8 @@ object EchoPlayRun {
   }
 
   def tracePlayDependency(playVersion: String, echoVersion: String): ModuleID =
-    "com.typesafe.trace" % ("trace-play-" + playVersion) % echoVersion % EchoTraceCompile.name cross CrossVersion.binary
+    if (playVersion startsWith "2.3.") "com.typesafe.trace" % ("echo-trace-play-" + playVersion) % echoVersion % EchoTraceCompile.name cross CrossVersion.binary
+    else "com.typesafe.trace" % ("echo-trace-play-" + playVersion) % echoVersion % EchoTraceCompile.name cross CrossVersion.Disabled
 
   def supportedPlayVersion(playVersion: String): Option[String] = {
     if (playVersion startsWith "2.3.") Some(Play23Version)
@@ -51,7 +49,7 @@ object EchoPlayRun {
   }
 
   def containsTracePlay(dependencies: Seq[ModuleID]): Boolean = dependencies exists { module =>
-    module.organization == "com.typesafe.trace" && module.name.startsWith("trace-play")
+    module.organization == "com.typesafe.trace" && module.name.startsWith("echo-trace-play")
   }
 
   def createWeavingClassLoader(sigar: Sigar): ClassLoaderCreator = (name, urls, parent) => new WeavingURLClassLoader(urls, parent) {

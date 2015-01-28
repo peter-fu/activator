@@ -10,7 +10,9 @@ import java.net.{ ConnectException, InetAddress, Socket }
 import java.util.concurrent.atomic.{ AtomicBoolean, AtomicLong }
 import java.util.concurrent.{ LinkedBlockingQueue, ThreadFactory, ThreadPoolExecutor, TimeUnit }
 
-class ProtobufTraceSender(port: Int, capacity: Int, retry: Boolean, daemonic: Boolean, warn: Boolean) extends TraceSender {
+class ProtobufTraceSender(port: Int, capacity: Int, retry: Boolean, daemonic: Boolean, warn: Boolean, debug: Boolean) extends TraceSender {
+
+  println("Starting ProtobufTraceSender:")
 
   val address = InetAddress.getByName(null)
 
@@ -62,19 +64,23 @@ class ProtobufTraceSender(port: Int, capacity: Int, retry: Boolean, daemonic: Bo
   }
 
   private def connect(): Boolean = {
+    println("ProtobufTraceSender: trying to connect - " + address + ":" + port)
     val now = System.currentTimeMillis
     if (now > retryTime && running.get) {
       try {
         socket = new Socket(address, port)
         output = CodedOutputStream.newInstance(socket.getOutputStream)
         resetRetry()
+        println("ProtobufTraceSender: CONNECTED to collector - " + address + ":" + port)
         true
       } catch {
         case e: ConnectException ⇒
+          println("ProtobufTraceSender: FAILED to connect to collector - " + address + ":" + port)
           if (retry) backoffRetry(now) else noRetry()
           false // can't connect
       }
     } else {
+      println("ProtobufTraceSender: waiting for retry - " + address + ":" + port)
       false // waiting for retry
     }
   }
@@ -83,7 +89,10 @@ class ProtobufTraceSender(port: Int, capacity: Int, retry: Boolean, daemonic: Bo
     if (running.get) {
       try {
         executor.execute(new Runnable {
-          def run = write(batch)
+          def run = {
+            if (debug) println("ProtobufTraceSender: sending telemetry batch: " + batch.payload.length + " items")
+            write(batch)
+          }
         })
       } catch {
         case e: Exception ⇒ // assume shutdown
@@ -100,11 +109,15 @@ class ProtobufTraceSender(port: Int, capacity: Int, retry: Boolean, daemonic: Bo
         output.writeRawVarint32(message.getSerializedSize)
         message.writeTo(output)
         output.flush()
+        if (debug) println("ProtobufTraceSender: SUCCESS sending telemetry batch: " + batch.payload.length + " items")
         true
       } catch {
-        case e: Exception ⇒ false // assume disconnected, drop traces
+        case e: Exception ⇒
+          if (debug) println("ProtobufTraceSender: FAILED sending telemetry batch: " + batch.payload.length + " items")
+          false // assume disconnected, drop traces
       }
     } else {
+      if (debug) println("ProtobufTraceSender: NO CONNECTION - cannot send batch")
       false // no connection at this time, drop traces
     }
     connected = sent // volatile write

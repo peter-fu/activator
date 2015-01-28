@@ -27,6 +27,10 @@ object Trace {
 
     val enabled = config.getBoolean("activator.trace.enabled")
 
+    val reportConfig = allCatch.opt(config.getBoolean("activator.trace.report-config")).getOrElse(false)
+
+    val debug = allCatch.opt(config.getBoolean("activator.trace.debug")).getOrElse(false)
+
     val node = TraceEvent.normalizeNode({
       def syntheticNodeName(processId: String) = systemName + "-" + processId + "@" + TraceEvent.HostName
 
@@ -72,7 +76,39 @@ object Trace {
 
     val shutdownTimeout = config.getDuration("activator.trace.shutdown-timeout", TimeUnit.MILLISECONDS)
 
+    def reportString: String = Seq("enabled: " + enabled,
+      "reportConfig: " + reportConfig,
+      "debug: " + debug,
+      "node: " + node,
+      "sendPort: " + sendPort,
+      "sendCapacity: " + sendCapacity,
+      "sendRetry: " + sendRetry,
+      "sendDaemonic: " + sendDaemonic,
+      "sendGlobalDaemonic: " + sendGlobalDaemonic,
+      "sendWarn: " + sendWarn,
+      "zeroContextFutures: " + zeroContextFutures,
+      "zeroContextIteratees: " + zeroContextIteratees,
+      "events: " + events,
+      "localLimit: " + localLimit,
+      "sizeLimit: " + sizeLimit,
+      "timeLimit: " + timeLimit,
+      "maxLengthShortMessage: " + maxLengthShortMessage,
+      "maxLengthLongMessage: " + maxLengthLongMessage,
+      "maxStackTraceSize: " + maxStackTraceSize,
+      "remoteLifeCycle: " + remoteLifeCycle,
+      "useDispatcherMonitor: " + useDispatcherMonitor,
+      "dispatcherPollInterval: " + dispatcherPollInterval,
+      "useSystemMetricsMonitor: " + useSystemMetricsMonitor,
+      "systemMetricsPollInterval: " + systemMetricsPollInterval,
+      "deadlockWatchFrequency: " + deadlockWatchFrequency,
+      "shutdownTimeout: " + shutdownTimeout).mkString("\n")
+
+    def maybeDumpConfig(): Unit =
+      if (reportConfig) println("Trace settings configuartion:\n" + reportString)
+
     override def toString: String = config.root.render
+
+    maybeDumpConfig()
   }
 }
 
@@ -83,7 +119,17 @@ class Trace(val settings: Trace.Settings, global: Boolean = false) {
 
   val daemonic = if (global) (settings.sendGlobalDaemonic || settings.sendDaemonic) else settings.sendDaemonic
 
-  val sender = TraceSender(settings.sendPort, settings.sendCapacity, settings.sendRetry, daemonic, settings.sendWarn)
+  val sender = {
+    if (settings.debug) {
+      println("Starting trace sender:")
+      println("settings.sendPort: " + settings.sendPort)
+      println("settings.sendCapacity: " + settings.sendCapacity)
+      println("settings.sendRetry: " + settings.sendRetry)
+      println("daemonic: " + daemonic)
+      println("settings.sendWarn: " + settings.sendWarn)
+    }
+    TraceSender(settings.sendPort, settings.sendCapacity, settings.sendRetry, daemonic, settings.sendWarn, settings.debug)
+  }
 
   val local = new TraceLocal(settings, sender.send)
 

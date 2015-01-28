@@ -6,6 +6,7 @@ import play.api.libs.json._
 
 import sbt.client._
 import sbt.protocol._
+import sbt.protocol.CoreProtocol._
 
 import scala.concurrent.Future
 import scala.reflect.ClassTag
@@ -23,7 +24,7 @@ class SbtClientActor(val client: SbtClient) extends Actor with ActorLogging {
   val lifeCycleHandler = context.actorOf(SbtClientLifeCycleHandlerActor.props(client), "lifeCycleHandler-" + self.path.name)
   lifeCycleHandler ! SbtClientLifeCycleHandlerActor.Initialize
 
-  def forwardOverSocket[T <: Event: Writes: ClassTag](event: T): Unit = {
+  def forwardOverSocket(event: Event): Unit = {
     context.parent ! NotifyWebSocket(SbtProtocol.wrapEvent(event))
   }
 
