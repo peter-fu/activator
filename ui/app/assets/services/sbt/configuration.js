@@ -20,7 +20,8 @@ define([
 
   var echoPluginFileLocation = "/project/inspect.sbt";
   var echoPluginFileContent = "// This plugin runs apps with the \"echo\" trace infrastructure which backs up the Inspect functionality in Activator\n\n" +
-    "addSbtPlugin(\"com.typesafe.sbt\" % \"sbt-echo\" % \"0.1.7\")";
+    "addSbtPlugin(\"com.typesafe.play\" % \"sbt-fork-run-plugin\" % \"2.3.8-M1\")\n\n" +
+    "addSbtPlugin(\"com.typesafe.sbt\" % \"sbt-echo-play\" % \"0.1.8\")";
 
   var playForkRunPluginFileLocation = "/project/play-fork-run.sbt";
   var playForkRunPluginFileContent = "// This plugin adds forked run capabilities to Play projects which is needed for Activator.\n\n" +
