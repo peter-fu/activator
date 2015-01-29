@@ -83,7 +83,7 @@ class AppWebSocketActor(val config: AppConfig) extends WebSocketActor[JsValue] w
             }
           case AppWebSocketActor.possibleAutoCompletions =>
             context.parent ? PossibleAutoCompletions(payload.serialId, Some(payload.command)) map {
-              case SbtClientResponse(serialId, choicesAny: Set[_], command) =>
+              case SbtClientResponse(serialId, choicesAny: Vector[_], command) =>
                 val choices = choicesAny.map(_.asInstanceOf[sbt.protocol.Completion])
                 sendResult(AppWebSocketActor.possibleAutoCompletions, serialId, JsArray(choices.toList map { Json.toJson(_) }), command)
               case other => log.debug(s"sbt could not execute possible auto completions")
