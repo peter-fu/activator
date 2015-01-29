@@ -46,7 +46,7 @@
       </div>
       <div class="logs" data-bind="logScroll: memoLogsScroll">
         <ul data-bind="foreach: logs, css: { 'show-debug': sbt.app.settings.showLogDebug }">
-          <li data-bind="text: event.entry.message, attr: { 'data-level': event.entry.level, 'data-type': event.entry.type }, click: function(){console.log($data)}"></li>
+          <li data-bind="text: event.entry.message, attr: { 'data-level': event.entry.level, 'data-type': event.entry.$type }, click: function(){console.log($data)}"></li>
         </ul>
       </div>
       <div class="toBottom" data-bind="click: scrollToBottom, css: { hide: memoLogsScroll() == 'stick'}">⤓</div>
