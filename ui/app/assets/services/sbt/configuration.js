@@ -18,9 +18,16 @@ define([
   // this file isn't required to exist, if it doesn't we should create
   var buildFileLocation = "/build.sbt";
 
+  var sbtEchoVersion = "0.1.8";
   var echoPluginFileLocation = "/project/inspect.sbt";
-  var echoPluginFileContent = "// This plugin runs apps with the \"echo\" trace infrastructure which backs up the Inspect functionality in Activator\n\n" +
-    "addSbtPlugin(\"com.typesafe.sbt\" % \"sbt-echo\" % \"0.1.7\")";
+  var echoDefaultPluginFileContent = "// This plugin runs apps with the \"echo\" trace infrastructure which backs up the Inspect functionality in Activator\n\n" +
+    "addSbtPlugin(\"com.typesafe.sbt\" % \"sbt-echo\" % \""+sbtEchoVersion+"\")";
+  var echoPlayPluginFileContent = "// This plugin runs apps with the \"echo\" trace infrastructure (with Play support) which backs up the Inspect functionality in Activator\n\n" +
+    "addSbtPlugin(\"com.typesafe.sbt\" % \"sbt-echo-play\" % \""+sbtEchoVersion+"\")";
+
+  var echoPluginFileContent = ko.computed(function() {
+    return tasks.playHasRunCommand() ? echoPlayPluginFileContent : echoDefaultPluginFileContent;
+  });
 
   var playForkRunPluginFileLocation = "/project/play-fork-run.sbt";
   var playForkRunPluginFileContent = "// This plugin adds forked run capabilities to Play projects which is needed for Activator.\n\n" +
@@ -76,7 +83,7 @@ define([
   function echoInstalledAndReady(callback){
     if (echoReady()) callback();
     else {
-      checkFileContent(serverAppModel.location+echoPluginFileLocation, echoPluginFileContent, function() {
+      checkFileContent(serverAppModel.location+echoPluginFileLocation, echoPluginFileContent(), function() {
         addedEchoFile(true);
       });
       var subscription = echoReady.subscribe(function(ready) {

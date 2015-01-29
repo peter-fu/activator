@@ -141,7 +141,7 @@ class SbtClientLifeCycleHandlerActor(val client: SbtClient) extends Actor with A
   }
 
   def checkPlayAvailable = {
-    client.lookupScopedKey("playBackgroundRunTaskBuilder") map { keys: Seq[ScopedKey] =>
+    client.lookupScopedKey("backgroundRun") map { keys: Seq[ScopedKey] =>
       if (keys.length > 0) {
         context.parent ! SbtClientActor.PlayAvailable(true)
       }
