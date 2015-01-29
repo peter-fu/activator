@@ -236,19 +236,24 @@ define([
   // We hard-code the association between a BackgroundJob and its Execution
   // The Execution that invokes it, ends right after the BackgroundJob started
   // It just makes things easier to force the excution to keep a reference of the job(s)
-  subTypeEventStream("BackgroundJobEvent").each(function(message) {
-    var execution = executionsById[message.event.serialized.executionId];
-    var jobId = message.event.jobId;
-    if (message.event.name === "BackgroundJobStarted"){
-      debug && console.log("BackgroundJobStarted: ", message);
-      executionsByJobId[jobId] = execution;
-      execution.jobIds.push(jobId);
-    } else if (message.event.name === "BackgroundJobFinished") {
-      debug && console.log("BackgroundJobFinished: ", message);
-      postExecutionProcess(execution, true);
-      delete executionsByJobId[jobId];
-    }
+  subTypeEventStream("BackgroundJobStarted").each(function(message) {
+    var execution = executionsById[message.event.executionId];
+    var jobId = message.event.job.id;
+    debug && console.log("BackgroundJobStarted: ", message);
+    executionsByJobId[jobId] = execution;
+    execution.jobIds.push(jobId);
   });
+  subTypeEventStream("BackgroundJobFinished").each(function(message) {
+    console.log(message)
+    var execution = executionsById[message.event.executionId];
+    // TODO: inconsistency if you look at "BackgroundJobStarted", we have message.event.job.id
+    var jobId = message.event.jobId;
+    // /inconsistency
+    debug && console.log("BackgroundJobFinished: ", message);
+    postExecutionProcess(execution, true);
+    delete executionsByJobId[jobId];
+  });
+
 
   subTypeEventStream("ExecutionWaiting").each(function(message) {
 
