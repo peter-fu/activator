@@ -9,7 +9,7 @@ require.config({
 require([
   // Vendors
   'lib/jquery/jquery',
-  'lib/knockout/knockout',
+  (window.debug?'lib/knockout/knockout.debug':'lib/knockout/knockout'),
   'css',
   'text'
 ],function($, ko) {
