@@ -13,9 +13,11 @@
 @className(app: snap.AppConfig) = {@if(app.cachedName.getOrElse(app.id) == model.name) {default} else {}}
 
 <!-- Copyright (C) 2013 Typesafe, Inc <http://typesafe.com> -->
+<!DOCTYPE html>
 <html>
   <head>
     <title>Typesafe Activator</title>
+    <link rel="icon" type="image/png" href="@routes.Assets.at("favicon.ico")" />
     <link href="@routes.Assets.at("main/main.css")" rel="stylesheet" type="text/css">
     <!--[if lt IE 9]>
     <script src='@routes.Assets.at("commons/ie.js")' type='text/javascript'></script>

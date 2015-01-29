@@ -10,14 +10,19 @@
   background: rgba(255, 255, 255, 0.4);
   .modal-wrapper {
     position: absolute;
-    .trbl(0);
-    margin: auto;
+    top: 50%;
+    left: 50%;
+    .center();
     width: 400px;
-    display: table;
     background: @slate;
     border-radius: 4px;
     overflow: hidden;
+
+    &[data-shape="large"] {
+      width: 600px;
+    }
   }
+
 
   .button {
     display: inline-block;
@@ -51,6 +56,12 @@
       &:hover {
         background: @slate;
       }
+    }
+    &[disabled] {
+      background: none;
+      border: 1px solid @grey;
+      color: @grey;
+      opacity: .6;
     }
   }
   header, footer, article {

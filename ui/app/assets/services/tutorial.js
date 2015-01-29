@@ -2,8 +2,10 @@
  Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
  */
 define([
+  'main/router',
   'services/sbt/app'
 ],function(
+  router,
   app
 ) {
 
@@ -14,17 +16,24 @@ define([
       page =          ko.observable(null),
       index =         ko.observable(null);
 
-  // NOTE:
-  // Enclosing the state in the service, to use it in both Plugin and Panel
+    // NOTE:
+    // Enclosing the state in the service, to use it in both Plugin and Panel
 
   var gotoPage = function(id){
-    window.location.hash = "#tutorial/"+id
+    if(router.current().id === "tutorial"){
+      window.location.hash = "#tutorial/"+id;
+    } else {
+      id = parseInt(id);
+      var p = pages()[id];
+      page(p);
+      index(id);
+    }
   }
   var gotoPrevPage = function(){
     if(!noPrevPage()) gotoPage(index()-1);
   }
   var gotoNextPage = function(){
-    if(!noNextPage()) gotoPage(index()!=null?index()+1:0);
+    if(!noNextPage()) gotoPage(index()!==null?index()+1:0);
   }
   var noPrevPage  = ko.computed(function(){
     return index() === 0;
@@ -81,6 +90,7 @@ define([
     pages:        pages,
     page:         page,
     index:        index,
+    gotoPage:     gotoPage,
     gotoPrevPage: gotoPrevPage,
     gotoNextPage: gotoNextPage,
     noPrevPage:   noPrevPage,

@@ -9,7 +9,7 @@
       </div>
       <div class="table-wrapper" data-bind="logScroll: memoTaskScroll">
         <table data-bind="foreach: sbt.tasks.executions">
-          <tr data-bind="css: { active: running, error: error, stopping: stopping, opened: $root.currentExecution() == executionId }, click: $root.openLogs">
+          <tr data-bind="css: { active: running, error: error, stopping: stopping }">
             <td class="status" data-bind="click: $root.rerunTask"><span></span></td>
             <td class="command" data-bind="text: command"></td>
             <td class="data">
@@ -44,12 +44,11 @@
           <button data-bind="click: clear">Clear</button>
         </div>
       </div>
-      <div class="filtering" data-bind="visible: currentExecution">
-        <span class="close" data-bind="click: closeLogs">×</span> Showing logs for <span class="command" data-bind="text: sbt.tasks.findCommandByExecutionId(currentExecution())"></span>
+      <div class="logs" data-bind="logScroll: memoLogsScroll">
+        <ul data-bind="foreach: logs, css: { 'show-debug': sbt.app.settings.showLogDebug }">
+          <li data-bind="text: event.entry.message, attr: { 'data-level': event.entry.level, 'data-type': event.entry.$type }, click: function(){console.log($data)}"></li>
+        </ul>
       </div>
-      <ul class="logs" data-bind="logScroll: memoLogsScroll, foreach: logs, css: { 'show-debug': sbt.app.settings.showLogDebug }">
-        <li data-bind="text: event.entry.message, attr: { 'data-level': event.entry.level, 'data-type': event.entry.type }"></li>
-      </ul>
       <div class="toBottom" data-bind="click: scrollToBottom, css: { hide: memoLogsScroll() == 'stick'}">⤓</div>
     </div>
   </section>

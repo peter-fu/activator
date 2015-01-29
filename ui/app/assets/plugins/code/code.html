@@ -5,6 +5,10 @@
   <div class="hint code">
     <p>Browse your app's code</p>
     <span>You can also open it in your favorite editor the same way</span>
+    <p>
+      <button data-bind="click: openInEclipse">Create Eclipse project</button>
+      <button data-bind="click: openInIdea">Create IntelliJ project</button>
+    </p>
   </div>
   </article>
   <!-- /ko -->
@@ -13,10 +17,26 @@
       <header>
         <dl class="code-options dropdown">
           <dt><svg data-bind="svg: '/assets/icons/gear-mini.svg'"/></dt>
-          <dd>
+          <dd class="prevent">
             <a data-bind="click: closeAll">Close all</a>
             <a data-bind="click: saveAll">Save all</a>
-            <label><input type="checkbox" data-bind="checked: autoSave"> Auto-save</label>
+
+            <p>
+              <label><input type="checkbox" data-bind="checked: autoSave"> Auto-save</label>
+            </p>
+
+            <p>
+              <label>
+                Theme:
+                <select data-bind="options: editor.themes, value: editor.chosenTheme"></select>
+              </label>
+            </p>
+            <p>
+              <label>
+              Font size
+              <select data-bind="options: editor.fontSizes, value: editor.chosenFontSize"></select>
+              </label>
+            </p>
           </dd>
         </dl>
         <ul class="tabs" data-bind="foreach: openedDocuments">

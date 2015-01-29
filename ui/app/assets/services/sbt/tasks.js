@@ -6,12 +6,14 @@ define([
   'commons/stream',
   'commons/types',
   './app',
+  'widgets/modals/modals',
   'services/monitoring/monitoringSolutions'
 ], function(
   websocket,
   Stream,
   types,
   app,
+  modals,
   monitoringSolutions
 ) {
 
@@ -123,6 +125,8 @@ define([
     return false;
   }
 
+  var playApplicationUrl = ko.observable();
+
   /**
   Run command
   */
@@ -224,25 +228,32 @@ define([
     } else if (event.name === "TestEvent") {
       debug && console.log("TestEvent: ", event);
       execution.testResults.push(event.serialized);
+    } else if (event.name === "PlayServerStarted") {
+      if (event.serialized) playApplicationUrl(event.serialized.url);
     }
   });
 
   // We hard-code the association between a BackgroundJob and its Execution
   // The Execution that invokes it, ends right after the BackgroundJob started
   // It just makes things easier to force the excution to keep a reference of the job(s)
-  subTypeEventStream("BackgroundJobEvent").each(function(message) {
-    var execution = executionsById[message.event.serialized.executionId];
-    var jobId = message.event.jobId;
-    if (message.event.name === "BackgroundJobStarted"){
-      debug && console.log("BackgroundJobStarted: ", message);
-      executionsByJobId[jobId] = execution;
-      execution.jobIds.push(jobId);
-    } else if (message.event.name === "BackgroundJobFinished") {
-      debug && console.log("BackgroundJobFinished: ", message);
-      postExecutionProcess(execution, true);
-      delete executionsByJobId[jobId];
-    }
+  subTypeEventStream("BackgroundJobStarted").each(function(message) {
+    var execution = executionsById[message.event.executionId];
+    var jobId = message.event.job.id;
+    debug && console.log("BackgroundJobStarted: ", message);
+    executionsByJobId[jobId] = execution;
+    execution.jobIds.push(jobId);
   });
+  subTypeEventStream("BackgroundJobFinished").each(function(message) {
+    console.log(message)
+    var execution = executionsById[message.event.executionId];
+    // TODO: inconsistency if you look at "BackgroundJobStarted", we have message.event.job.id
+    var jobId = message.event.jobId;
+    // /inconsistency
+    debug && console.log("BackgroundJobFinished: ", message);
+    postExecutionProcess(execution, true);
+    delete executionsByJobId[jobId];
+  });
+
 
   subTypeEventStream("ExecutionWaiting").each(function(message) {
 
@@ -395,8 +406,10 @@ define([
 
   var valueChanged = subTypeEventStream("ValueChanged").map(function(message) {
     var valueOrNull = null;
-    if (message.event.value.success)
-      valueOrNull = message.event.value.serialized;
+
+    if (message.event.value.$type.indexOf("Success") >= 0)
+      valueOrNull = message.event.value;
+
     debug && console.log("ValueChanged for ", message.event.key.key.name, valueOrNull, message.event);
     return {
       key: message.event.key.key.name,
@@ -410,8 +423,8 @@ define([
   // discoveredMainClasses
   valueChanged.matchOnAttribute('key', 'discoveredMainClasses').each(function(message) {
     var discovered = [];
-    if (message.value && message.value.length)
-      discovered = message.value;
+    if (message.value && message.value.serialized && message.value.serialized.length)
+      discovered = message.value.serialized;
     // TODO this is broken, if there are two projects with main classes we'll just
     // pick "last one wins," we need to separately track main classes per-project.
     app.mainClasses(discovered); // All main classes
@@ -452,26 +465,33 @@ define([
     });
   }
 
+<<<<<<< HEAD
   valueChanged.matchOnAttribute('key', 'echoTraceSupported').each(function(message) {
+=======
+  valueChanged.matchOnAttribute('key', 'echo:echoTraceSupported').each(function(message) {
+>>>>>>> wip/sbt-server
     inspectSupported(message.value === true);
   });
 
-  valueChanged.matchOnAttribute('key', 'echoAkkaVersionReport').each(function(message) {
+  valueChanged.matchOnAttribute('key', 'echo:echoAkkaVersionReport').each(function(message) {
+    debug && console.log('echoAkkaVersionReport',message)
     var report = "";
     if (message.value)
       report = message.value;
     inspectAkkaVersionReport(report);
   });
 
-  valueChanged.matchOnAttribute('key', 'echoPlayVersionReport').each(function(message) {
+  valueChanged.matchOnAttribute('key', 'echo:echoPlayVersionReport').each(function(message) {
+    debug && console.log('echoPlayVersionReport',message)
     var report = "";
     if (message.value)
       report = message.value;
     inspectPlayVersionReport(report);
   });
 
-  valueChanged.matchOnAttribute('key', 'echoTracePlayVersion').each(function(message) {
-    if (message.value.value && message.value.value !== '')
+  valueChanged.matchOnAttribute('key', 'echo:echoTracePlayVersion').each(function(message) {
+    debug && console.log('echoTracePlayVersion',message)
+    if (message.value && message.value !== '')
       inspectHasPlayVersion(true);
     else
       inspectHasPlayVersion(false);
@@ -483,9 +503,12 @@ define([
   });
 
   // Application ready
+  var playHasRunCommand = ko.computed(function() {
+    return !app.mainClass() || !isPlayApplication() || playRunnerAvailable();
+  });
   var clientReady = ko.observable(false);
   var applicationReady = ko.computed(function() {
-    return (app.mainClasses().length || app.mainClass() !== null) && clientReady();
+    return (app.mainClasses().length || app.mainClass() !== null) && playHasRunCommand() && clientReady();
   });
   var applicationNotReady = ko.computed(function() { return !applicationReady(); });
   subTypeEventStream('ClientOpened').each(function (msg) {
@@ -648,6 +671,11 @@ define([
     applicationReady:        applicationReady,
     applicationNotReady:     applicationNotReady,
     isPlayApplication:       isPlayApplication,
+    playRunnerAvailable:     playRunnerAvailable,
+    playHasRunCommand:       playHasRunCommand,
+    playApplicationUrl:      playApplicationUrl,
+    inspectSupported:        inspectSupported,
+    whyInspectIsNotSupported: whyInspectIsNotSupported,
     active: {
       turnedOn:     "",
       compiling:    "",
@@ -670,6 +698,16 @@ define([
       run:          function() {
         if (app.settings.automaticResetInspect()){
           resetInspect();
+        }
+        if (monitoringSolutions.inspectActivated() && !inspectSupported()) {
+          // Disactivating
+          monitoringSolutions.monitoringSolution(monitoringSolutions.NO_MONITORING);
+          // Show a popup
+          modals.show({
+            title: "Inspect has been disactivated",
+            text: whyInspectIsNotSupported(),
+            cancel: "close"
+          });
         }
         return requestExecution(runCommand());
       },

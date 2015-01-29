@@ -6,6 +6,7 @@ import play.api.libs.json._
 
 import sbt.client._
 import sbt.protocol._
+import sbt.protocol.CoreProtocol._
 
 import scala.concurrent.Future
 import scala.reflect.ClassTag
@@ -23,7 +24,7 @@ class SbtClientActor(val client: SbtClient) extends Actor with ActorLogging {
   val lifeCycleHandler = context.actorOf(SbtClientLifeCycleHandlerActor.props(client), "lifeCycleHandler-" + self.path.name)
   lifeCycleHandler ! SbtClientLifeCycleHandlerActor.Initialize
 
-  def forwardOverSocket[T <: Event: Writes: ClassTag](event: T): Unit = {
+  def forwardOverSocket(event: Event): Unit = {
     context.parent ! NotifyWebSocket(SbtProtocol.wrapEvent(event))
   }
 
@@ -152,26 +153,21 @@ class SbtClientLifeCycleHandlerActor(val client: SbtClient) extends Actor with A
   // by redoing this
   def setupSubscription = {
     valueSub = Some(new Subscription() {
-      val futureValueSubs: Seq[Future[Seq[Subscription]]] =
+      val valueSubs: Seq[Subscription] =
         Seq("discoveredMainClasses",
-          "mainClasses",
           "mainClass",
           "libraryDependencies",
           "echo:echoTraceSupported",
           "echo:echoPlayVersionReport",
           "echo:echoAkkaVersionReport",
           "echo:echoTracePlayVersion") map { name =>
-            client.lookupScopedKey(name) map { scopeds =>
-              scopeds map { scoped =>
-                log.debug(s"Subscribing to key ${scoped}")
-                client.rawWatch(TaskKey[Seq[String]](scoped)) { (key, result) =>
-                  context.parent ! ValueChanged(key, result)
-                }
-              }
+            client.rawWatch(name) { (key, result) =>
+              context.parent ! ValueChanged(key, result)
             }
           }
+
       override def cancel(): Unit = {
-        futureValueSubs map { futureSubs => futureSubs map { subs => subs map { sub => sub.cancel() } } }
+        valueSubs map { sub => sub.cancel() }
       }
     })
   }

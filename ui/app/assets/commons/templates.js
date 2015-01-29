@@ -177,7 +177,7 @@ define(function() {
           debug && console.log(memo, memos[memo])
           element.scrollLeft = memos[memo][0];
           element.scrollTop  = memos[memo][1];
-        }, 1);// Wait for everything to be displayed
+        }, 10);// Wait for everything to be displayed
       }
     }
   }());
@@ -190,7 +190,7 @@ define(function() {
       }
       setTimeout(function() {
         if (memo() === 'stick'){
-          element.scrollTop = 9e9;
+          element.scrollTop = 99999;
         } else {
           element.scrollTop = memo();
         }
@@ -201,7 +201,7 @@ define(function() {
       // removed when the element is gone.
       element.addEventListener("DOMNodeInserted", function() {
         if (memo() === 'stick'){
-          element.scrollTop = 9e9;
+          element.scrollTop = 99999;
         }
       }, true);
 
@@ -216,7 +216,7 @@ define(function() {
   }
 
   // This allows to style SVG in css (including css transition and animations)
-  var cache = {};
+  var svgcache = {};
   ko.bindingHandlers.svg = {
     init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
       var url = valueAccessor();
@@ -225,12 +225,12 @@ define(function() {
           width: "18px", // putting default small value,
           height: "18px" // to avoid cranky blinking
         });
-      if (cache[url]){
-        $(element).replaceWith(cache[url].clone());
+      if (svgcache[url]){
+        $(element).replaceWith(svgcache[url].clone());
       } else {
         $.get(url, function(data) {
-          cache[url] = $(document.adoptNode(data.querySelector('svg')));
-          $(element).replaceWith(cache[url].clone());
+          svgcache[url] = $(document.adoptNode(data.querySelector('svg')));
+          $(element).replaceWith(svgcache[url].clone());
         }, 'xml');
       }
     }

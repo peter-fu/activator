@@ -48,7 +48,7 @@ define([
     modals.show({
       title: "Lost connection to Activator",
       text: "Click OK to try to reconnect. You may have to refresh this page in your browser.",
-      ok: "Try again",
+      ok: "OK",
       callback: reconnect,
       cancel: "Hide"
     });

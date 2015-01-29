@@ -40,11 +40,12 @@ article.logsPlugin {
       .monospace();
       color: @grey;
       line-height: 16px;
-      white-space: pre;
+      word-break: break-all;
+      white-space: pre-wrap;
     }
 
-    li[data-type='success'] { border-color: #6AB729; color: #D7F3AC; }
-    li[data-type='stderr']  { border-color: #E25758; color: @red-ltr; }
+    li[data-type='sbt.protocol.LogSuccess'] { border-color: #6AB729; color: #D7F3AC; }
+    li[data-type='sbt.protocol.LogStdErr']  { border-color: #E25758; color: @red-ltr; }
     li[data-level='error']  { border-color: #E25758; color: @red-ltr; }
     li[data-level='warn']   { border-color: #F89614; }
     li[data-level='info']   { border-color: #53cdec; }
@@ -57,6 +58,7 @@ article.logsPlugin {
 
   .table-wrapper, .logs {
     .expand();
+    height: 400px; // Default value for IE11
     overflow: auto;
   }
 

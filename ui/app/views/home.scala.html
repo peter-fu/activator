@@ -9,12 +9,14 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <link rel="icon" type="image/png" href="@routes.Assets.at("favicon.ico")" />
     <title>Typesafe Activator</title>
     <!-- Initialize global Javascript values... -->
     <script type="text/javascript">
       window.debug = true;
-      var baseFolder = @Html(JsString(model.userHome).toString())
-      var separator = @Html(JsString(File.separator).toString())
+      var baseFolder = @Html(JsString(model.userHome).toString());
+      var homeFolder = @Html(JsString(model.userHome).toString());
+      var separator = @Html(JsString(File.separator).toString());
       var wsUrl = '@webSocketURLWithCSRF(routes.Application.homeStream)';
       var tags = [
         @Html(model.tags.sorted.map("'"+_+"'").mkString(","))
@@ -35,13 +37,15 @@
         <script>alert("@error")</script>
     }
 
-    <img id="logo" src="/public/images/logo.svg"/>
+    <img id="logo" src="/public/images/activator.svg" height="50" />
 
     <!-- ko include: working --><!-- /ko -->
 
     <!-- ko include: templates --><!-- /ko -->
 
     <!-- ko include: open --><!-- /ko -->
+
+    <!-- ko include: modals --><!-- /ko -->
 
     <a href="http://typesafe.com/legal/softwareterms" class="tos" target="_blank">Terms of Use</a>
         

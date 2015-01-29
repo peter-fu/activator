@@ -3,14 +3,21 @@
  */
 define([
   'commons/settings',
+  'main/router',
   'css!./layoutManager'
 ], function(
-  settings
+  settings,
+  router
 ) {
 
-  var panelShape =       settings.observable("layoutManager.panelShape", "right1");
-  var panelOpened =      settings.observable("layoutManager.panelOpened", false);
+
+  var panelShape =        settings.observable("layoutManager.panelShape", "right1");
+  var panelOpenedSet =    settings.observable("layoutManager.panelOpened", false);
   var navigationOpened =  settings.observable("layoutManager.navigationOpened", true);
+
+  var panelOpened = ko.computed(function() {
+    return panelOpenedSet() && router.current().id !== "tutorial";
+  });
 
   var State = {
     panelShape: panelShape,
@@ -22,7 +29,7 @@ define([
       panelOpened(true);
     },
     panelToggle: function() {
-      panelOpened(!panelOpened());
+      panelOpenedSet(!panelOpenedSet());
     },
     navigationToggle: function() {
       navigationOpened(!navigationOpened());
