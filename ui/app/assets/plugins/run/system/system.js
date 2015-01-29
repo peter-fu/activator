@@ -14,12 +14,18 @@ define([
   sbt
 ) {
 
+  function scrollToBottom() {
+    $(".logs")[0].scrollTop = 99999;
+    State.memoLogsScroll('stick');
+  }
+
   var State = {
     sbt: sbt,
     clear: function() {
       sbt.logs.stdout.removeAll();
     },
-    memoLogsScroll: ko.observable()
+    memoLogsScroll: ko.observable(),
+    scrollToBottom: scrollToBottom
   }
 
   return {
