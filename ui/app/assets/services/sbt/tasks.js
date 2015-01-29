@@ -459,28 +459,28 @@ define([
   });
 
   valueChanged.matchOnAttribute('key', 'echo:echoTraceSupported').each(function(message) {
-    inspectSupported(message.value.serialized === true);
+    inspectSupported(message.value === true);
   });
 
   valueChanged.matchOnAttribute('key', 'echo:echoAkkaVersionReport').each(function(message) {
     debug && console.log('echoAkkaVersionReport',message)
     var report = "";
-    if (message.value.serialized)
-      report = message.value.serialized;
+    if (message.value)
+      report = message.value;
     inspectAkkaVersionReport(report);
   });
 
   valueChanged.matchOnAttribute('key', 'echo:echoPlayVersionReport').each(function(message) {
     debug && console.log('echoPlayVersionReport',message)
     var report = "";
-    if (message.value.serialized)
-      report = message.value.serialized;
+    if (message.value)
+      report = message.value;
     inspectPlayVersionReport(report);
   });
 
   valueChanged.matchOnAttribute('key', 'echo:echoTracePlayVersion').each(function(message) {
     debug && console.log('echoTracePlayVersion',message)
-    if (message.value.serialized && message.value.serialized !== '')
+    if (message.value && message.value !== '')
       inspectHasPlayVersion(true);
     else
       inspectHasPlayVersion(false);
