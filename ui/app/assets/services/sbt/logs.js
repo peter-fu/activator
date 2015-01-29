@@ -17,13 +17,6 @@ define([
   // Websocket Handlers
   var logEvent = websocket.subscribe("type", "sbt");
 
-  function filterDebug(m) {
-    if (m.event.entry && m.event.entry.level)
-      return m.event.entry.level !== "debug" || (app.settings.showLogDebug() || debug);
-    else
-      return true;
-  }
-
   function pushTo(bucket){
     var buffer = ko.buffer();
     return function(message) {
@@ -40,13 +33,11 @@ define([
   Logs, by execution/task
   */
   logEvent.matchOnAttribute("subType", "TaskLogEvent")
-    .filter(filterDebug)
     .each(function(m) {
       logs.push(m);
     });
 
   logEvent.matchOnAttribute("subType", "CoreLogEvent")
-    .filter(filterDebug)
     .each(function(m) {
       logs.push(m);
     });
