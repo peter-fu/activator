@@ -458,11 +458,11 @@ define([
     }
   });
 
-  valueChanged.matchOnAttribute('key', 'echoTraceSupported').each(function(message) {
+  valueChanged.matchOnAttribute('key', 'echo:echoTraceSupported').each(function(message) {
     inspectSupported(message.value.serialized === true);
   });
 
-  valueChanged.matchOnAttribute('key', 'echoAkkaVersionReport').each(function(message) {
+  valueChanged.matchOnAttribute('key', 'echo:echoAkkaVersionReport').each(function(message) {
     debug && console.log('echoAkkaVersionReport',message)
     var report = "";
     if (message.value.serialized)
@@ -470,7 +470,7 @@ define([
     inspectAkkaVersionReport(report);
   });
 
-  valueChanged.matchOnAttribute('key', 'echoPlayVersionReport').each(function(message) {
+  valueChanged.matchOnAttribute('key', 'echo:echoPlayVersionReport').each(function(message) {
     debug && console.log('echoPlayVersionReport',message)
     var report = "";
     if (message.value.serialized)
@@ -478,7 +478,7 @@ define([
     inspectPlayVersionReport(report);
   });
 
-  valueChanged.matchOnAttribute('key', 'echoTracePlayVersion').each(function(message) {
+  valueChanged.matchOnAttribute('key', 'echo:echoTracePlayVersion').each(function(message) {
     debug && console.log('echoTracePlayVersion',message)
     if (message.value.serialized && message.value.serialized !== '')
       inspectHasPlayVersion(true);
