@@ -42,22 +42,23 @@ define(function() {
 
   // -------------
   // Main difference between INCLUDE and INSERT:
-  // include uses its own applybinding, while insert need an "upper" state in argument
+  // include uses its own applybinding, while insert inherits from the current one
   // -------------
 
   ko.bindingHandlers.include = {
     init: function(elem, valueAccessor) {
+      return { controlsDescendantBindings: true };
     },
     update: function(elem, valueAccessor) {
-      var placeholder = ko.virtualElements.firstChild(elem);
-      if (!placeholder){
-        placeholder = document.createComment("placeholder");
-        elem.parentNode.insertBefore(placeholder, elem.nextSibling);
-      }
       var inc = ko.utils.unwrapObservable(valueAccessor());
-      setTimeout(function(){
-        $(placeholder).replaceWith(inc);
-      },0);
+      // Virtual element are followed by a comment (nodeType = 8) <!-- /ko -->
+      if (elem.nextSibling.nodeType !== 8 && elem.parentNode){
+        elem.parentNode.replaceChild(inc, elem.nextSibling);
+      } else if (elem.nextSibling) {
+        elem.parentNode.insertBefore(inc, elem.nextSibling);
+      } else {
+        elem.parentNode.appendChild(inc);
+      }
     }
   }
   ko.virtualElements.allowedBindings.include = true;
@@ -68,7 +69,7 @@ define(function() {
     update: function(elem, valueAccessor) {
       ko.virtualElements.emptyNode(elem);
       if (typeof valueAccessor() === 'string'){
-        elem.parentNode.innerHtml = valueAccessor();
+        elem.parentNode.innerHTML = valueAccessor();
       } else {
         elem.parentNode.insertBefore(valueAccessor(), elem.nextSibling);
       }
@@ -214,6 +215,83 @@ define(function() {
       },true);
     }
   }
+
+  ko.bindingHandlers.logEach = (function(){
+
+    // Creates a function for child elements
+    // that will create a dom object, and bind it to the model
+    function createHandler(element) {
+      var tpl = $(element.innerHTML);
+      var timer, buffer, lastTime = 0;
+
+      function getDomBuffer(){
+        if (!buffer){
+          buffer = document.createDocumentFragment();
+        }
+        return buffer;
+      }
+
+      function append(dom){
+        // Append every log to the dom buffer
+        getDomBuffer().appendChild(dom);
+
+        var now = new Date();
+        if (now - lastTime > 60) {
+          applyBuffer(now);
+        } else {
+          window.clearTimeout(timer);
+          timer = setTimeout(function() {
+            applyBuffer(now);
+          }, 100);
+        }
+      }
+
+      function applyBuffer(now){
+        lastTime = now;
+        element.appendChild(getDomBuffer());
+        buffer = null;
+      }
+
+      return function(item) {
+        var dom = tpl.clone()[0];
+        ko.applyBindings(item, dom);
+        append(dom);
+      }
+
+    }
+
+    return {
+      init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+        var logs = valueAccessor();
+
+        var renderItem = createHandler(element);
+        element.innerHTML = "";
+
+        // Display logs on start
+        logs().forEach(renderItem);
+
+        // Display logs on "push"
+        var subscription = logs.subscribe(function(changes) {
+          changes.forEach(function(c) {
+            if (c.status === "added") {
+              renderItem(c.value);
+            // We are assuming here that all deletion are sequetial from first index
+            } else if (c.status === "deleted") {
+              element.removeChild(element.firstChild);
+            }
+          });
+        }, null, "arrayChange");
+
+        // Cleanup
+        ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+          subscription.dispose();
+        });
+
+        // thank you knockout, but we got the bindings from now on (see how createHandler applyBindings itself)
+        return { controlsDescendantBindings: true };
+      }
+    }
+  }());
 
   // This allows to style SVG in css (including css transition and animations)
   var svgcache = {};

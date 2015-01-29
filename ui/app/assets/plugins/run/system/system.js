@@ -17,7 +17,7 @@ define([
   var State = {
     sbt: sbt,
     clear: function() {
-      sbt.logs.stdout([]);
+      sbt.logs.stdout.removeAll();
     },
     memoLogsScroll: ko.observable()
   }

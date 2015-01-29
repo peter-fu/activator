@@ -30,8 +30,8 @@ define([
       buffer(message, function(messages) {
         bucket.push.apply(bucket, messages);
       });
-      if(bucket().length > 1000) {
-        bucket.splice(0,100); // Remove the first 100 items
+      if(bucket().length > 5000) {
+        bucket.splice(0,1000); // Remove the first 100 items
       }
     }
   }

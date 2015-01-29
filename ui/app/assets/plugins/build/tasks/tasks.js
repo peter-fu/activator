@@ -25,7 +25,7 @@ define([
     logs: sbt.logs.logs,
     scrollToBottom: scrollToBottom,
     clear: function() {
-      sbt.logs.logs([]);
+      sbt.logs.logs.removeAll();
     },
     rerunTask: function(task, e) {
       e.preventDefault();
