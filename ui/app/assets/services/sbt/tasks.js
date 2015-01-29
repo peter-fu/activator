@@ -406,10 +406,8 @@ define([
 
   var valueChanged = subTypeEventStream("ValueChanged").map(function(message) {
     var valueOrNull = null;
-
     if (message.event.value.$type.indexOf("Success") >= 0)
       valueOrNull = message.event.value;
-
     debug && console.log("ValueChanged for ", message.event.key.key.name, valueOrNull, message.event);
     return {
       key: message.event.key.key.name,
@@ -465,11 +463,7 @@ define([
     });
   }
 
-<<<<<<< HEAD
-  valueChanged.matchOnAttribute('key', 'echoTraceSupported').each(function(message) {
-=======
   valueChanged.matchOnAttribute('key', 'echo:echoTraceSupported').each(function(message) {
->>>>>>> wip/sbt-server
     inspectSupported(message.value === true);
   });
 
@@ -682,16 +676,8 @@ define([
       running:      "",
       testing:      ""
     },
-    inspect: {
-      inspectSupported:         inspectSupported,
-      inspectAkkaVersionReport: inspectAkkaVersionReport,
-      inspectPlayVersionReport: inspectPlayVersionReport,
-      inspectHasPlayVersion:    inspectHasPlayVersion,
-      whyInspectIsNotSupported: whyInspectIsNotSupported
-    },
     actions: {
       kill:         killTask,
-      turnOnOff:    function() {},
       compile:      function() {
         requestExecution("compile");
       },
