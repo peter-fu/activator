@@ -51,24 +51,4 @@ object EchoPlayRun {
   def containsTracePlay(dependencies: Seq[ModuleID]): Boolean = dependencies exists { module =>
     module.organization == "com.typesafe.trace" && module.name.startsWith("echo-trace-play")
   }
-
-  def createWeavingClassLoader(sigar: Sigar): ClassLoaderCreator = (name, urls, parent) => new WeavingURLClassLoader(urls, parent) {
-    val sigarLoader = SigarClassLoader(sigar)
-    override def loadClass(name: String, resolve: Boolean): Class[_] = {
-      if (name startsWith "org.hyperic.sigar") sigarLoader.loadClass(name)
-      else super.loadClass(name, resolve)
-    }
-    override def toString = "Weaving" + name + "{" + getURLs.map(_.toString).mkString(", ") + "}"
-  }
-
-  def createRunHook = (sigarLibs in Echo) map { (sigar) => new RunHook(sigar) }
-
-  class RunHook(sigarLibs: Option[File]) extends play.PlayRunHook {
-    override def beforeStarted(): Unit = {
-      System.setProperty("org.aspectj.tracing.factory", "default")
-      sys.props.getOrElseUpdate("config.resource", "application.conf")
-      sigarLibs foreach { s => System.setProperty("org.hyperic.sigar.path", s.getAbsolutePath) }
-    }
-    override def afterStopped(): Unit = {}
-  }
 }
