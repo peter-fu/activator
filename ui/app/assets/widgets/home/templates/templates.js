@@ -45,7 +45,6 @@ define([
       cancel: "Cancel"
     });
   }
-  console.log(askForTypesafeId);
 
   // Memorise last used directory
   var lastFolder = settings.observable("last-folder", window.homeFolder);
