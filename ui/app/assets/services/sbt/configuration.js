@@ -26,7 +26,7 @@ define([
     "addSbtPlugin(\"com.typesafe.sbt\" % \"sbt-echo-play\" % \""+sbtEchoVersion+"\")";
 
   var echoPluginFileContent = ko.computed(function() {
-    return tasks.playHasRunCommand() ? echoPlayPluginFileContent : echoDefaultPluginFileContent;
+    return tasks.isPlayApplication() ? echoPlayPluginFileContent : echoDefaultPluginFileContent;
   });
 
   var playForkRunPluginFileLocation = "/project/play-fork-run.sbt";

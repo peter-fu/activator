@@ -60,11 +60,6 @@ class SbtClientActor(val client: SbtClient) extends Actor with ActorLogging {
     }
     case structure: MinimalBuildStructure =>
       forwardOverSocket(BuildStructureChanged(structure))
-    case PlayAvailable(available) =>
-      context.parent ! NotifyWebSocket(SbtProtocol.wrapEvent(
-        JsObject(Seq(
-          "backgroundRunnerAvailable" -> JsBoolean(available))),
-        "PlayStatus"))
     case req: ClientAppRequest => {
       req match {
         case re: RequestExecution =>
@@ -115,7 +110,6 @@ class SbtClientLifeCycleHandlerActor(val client: SbtClient) extends Actor with A
       handleEvents
       watchBuild
       setupSubscription
-      checkPlayAvailable
   }
 
   override def postStop(): Unit = {
@@ -138,14 +132,6 @@ class SbtClientLifeCycleHandlerActor(val client: SbtClient) extends Actor with A
     buildSub = Some(client.watchBuild { structure =>
       context.parent ! structure
     })
-  }
-
-  def checkPlayAvailable = {
-    client.lookupScopedKey("backgroundRun") map { keys: Seq[ScopedKey] =>
-      if (keys.length > 0) {
-        context.parent ! SbtClientActor.PlayAvailable(true)
-      }
-    }
   }
 
   // this is a hardcoded hack... we need to control the list of things

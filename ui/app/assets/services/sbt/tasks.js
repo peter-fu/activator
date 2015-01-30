@@ -516,16 +516,10 @@ define([
     app.mainClass(message.value);
   });
 
-  // Play related observable: if the correct Play runner exists for the current project
-  var playRunnerAvailable = ko.observable(false);
-
   // Application ready
-  var playHasRunCommand = ko.computed(function() {
-    return !app.mainClass() || !isPlayApplication() || playRunnerAvailable();
-  });
   var clientReady = ko.observable(false);
   var applicationReady = ko.computed(function() {
-    return (app.mainClasses().length || app.mainClass() !== null) && playHasRunCommand() && clientReady();
+    return (app.mainClasses().length || app.mainClass() !== null) && isPlayApplication() && clientReady();
   });
   var applicationNotReady = ko.computed(function() { return !applicationReady(); });
   subTypeEventStream('ClientOpened').each(function (msg) {
@@ -535,13 +529,6 @@ define([
     app.mainClasses([]);
     app.mainClass(null);
     clientReady(false);
-  });
-
-  subTypeEventStream("PlayStatus").each(function(message) {
-    if (message.event.backgroundRunnerAvailable) {
-      debug && console.log("Setting playRunnerAvailable to: ", message.event.backgroundRunnerAvailable);
-      playRunnerAvailable(message.event.backgroundRunnerAvailable);
-    }
   });
 
   // Build status
@@ -685,8 +672,6 @@ define([
     applicationReady:        applicationReady,
     applicationNotReady:     applicationNotReady,
     isPlayApplication:       isPlayApplication,
-    playRunnerAvailable:     playRunnerAvailable,
-    playHasRunCommand:       playHasRunCommand,
     playApplicationUrl:      playApplicationUrl,
     inspectSupported:        inspectSupported,
     whyInspectIsNotSupported: whyInspectIsNotSupported,
