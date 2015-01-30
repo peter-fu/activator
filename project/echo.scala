@@ -70,7 +70,8 @@ object EchoBuild extends Build {
     },
     // reset these per project rather than globally
     scalaBinaryVersion <<= scalaVersion { v => if (v contains "-") v else CrossVersion.binaryScalaVersion(v)},
-    crossScalaVersions <<= Seq(scalaVersion).join
+    crossScalaVersions <<= Seq(scalaVersion).join,
+    publishToPublicRepos
   )
 
   lazy val projectSettings = buildSettings ++ Seq(
@@ -85,6 +86,16 @@ object EchoBuild extends Build {
   )
 
   lazy val defaultSettings = projectSettings
+
+  def publishToPublicRepos = publishToRepos("maven-releases", "maven-snapshots")
+  def publishToRepos(releases: String, snapshots: String) = {
+    publishTo <<= (version) { v => if (v endsWith "SNAPSHOT") typesafeRepo(snapshots) else typesafeRepo(releases) }
+  }
+  def typesafeRepo(name: String) = Some(name at "http://private-repo.typesafe.com/typesafe/" + name)
+  def noPublish = Seq(
+    publish := {},
+    publishLocal := {}
+  )
 
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> COTESTS SETTINGS
 
