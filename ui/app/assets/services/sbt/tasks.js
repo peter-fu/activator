@@ -121,7 +121,6 @@ define([
     if (app.mainClass() && app.mainClass().serialized === "play.core.server.NettyServer") {
       return true;
     }
-
     return false;
   }
 
@@ -132,6 +131,7 @@ define([
   */
   var runCommand = ko.computed(function() {
     var forceRunCommand = false;
+    var prependCommand = monitoringSolutions.prependCommand();
     if (isPlayApplication()) {
       debug && console.log("Using 'run' rather than 'run-main' for Play's server class");
       forceRunCommand = true;
@@ -139,9 +139,9 @@ define([
     }
 
     if (app.currentMainClass() && !forceRunCommand){
-      return (monitoringSolutions.runMainCommand() + " " + app.currentMainClass());
+      return (prependCommand + "backgroundRunMain " + app.currentMainClass());
     } else {
-      return (monitoringSolutions.runCommand());
+      return (prependCommand + "backgroundRun");
     }
   });
 
@@ -388,19 +388,38 @@ define([
     if (pac !== undefined) {
       delete deferredRequests[message.serialId];
       pac.resolve(
-        $.map(message.result, function(completion) {
-        return {
-          title: completion.display,
-          subtitle: "run sbt task " + completion.display,
-          type: "Sbt",
-          url: false,
-          execute: message.partialCommand + completion.append,
-          callback: function () {
-            requestExecution(message.partialCommand + completion.append);
-            window.location.hash = "#build";
+        message.result.map(function(completion) {
+
+          var command = message.partialCommand + completion.append;
+          var redirected;
+
+          // Hard-coded replacement of run -> backgroundRun
+          if (command === "run") {
+            redirected = runCommand();
+            command = "run";
+          } else if (command.slice(0,7) === "runMain") {
+            redirected = "backgroundRunMain" + command.slice(7);
+            command = "runMain";
           }
-        }
-      }));
+
+          return {
+            title: completion.display,
+            subtitle: "run sbt task " + completion.display,
+            type: "Sbt",
+            url: false,
+            execute: command,
+            redirected: redirected,
+            callback: function () {
+              if (redirected) {
+                requestExecution(redirected);
+              } else {
+                requestExecution(command);
+              }
+              window.location.hash = "#build";
+            }
+          }
+        })
+      );
     }
   });
 

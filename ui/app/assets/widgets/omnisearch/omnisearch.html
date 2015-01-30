@@ -7,6 +7,9 @@
     <!-- ko if: $data.type -->
     <li class="option" data-bind="click: function(opt){ $root.exec(opt); }, css: {selected: $root.selected() && subtitle == $root.selected().subtitle }">
       <span class="title" data-bind="text: title || execute"></span>
+      <!-- ko if: !!$data.redirected -->
+        <span class="redirected" data-bind="text: redirected"></span>
+      <!-- /ko -->
     </li>
     <!-- /ko -->
   </ul>

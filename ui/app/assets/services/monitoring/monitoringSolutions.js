@@ -25,24 +25,20 @@ define([
     return monitoringSolution() === INSPECT;
   });
 
-  var runCommand = ko.computed(function() {
+  var prependCommand = ko.computed(function() {
     if (monitoringSolution() === INSPECT) {
-      return "echo:backgroundRun";
+      return "echo:";
     } else if (monitoringSolution() === NEW_RELIC && !isPlayApplication()) {
-      return "newrelic:backgroundRun";
+      return "newrelic:";
     } else if (monitoringSolution() === NEW_RELIC && isPlayApplication()) {
-      return "newrelicplay:backgroundRun";
+      return "newrelicplay:";
     } else if (monitoringSolution() === APP_DYNAMICS && !isPlayApplication()) {
-      return "appdynamics:backgroundRun";
+      return "appdynamics:";
     } else if (monitoringSolution() === APP_DYNAMICS && isPlayApplication()) {
-      return "appdynamicsplay:backgroundRun";
+      return "appdynamicsplay:";
     } else {
-      return "backgroundRun";
+      return "";
     }
-  });
-
-  var runMainCommand = ko.computed(function() {
-    return runCommand() + "Main";
   });
 
   var appDynamicsActivated = ko.computed(function() {
@@ -111,8 +107,7 @@ define([
     addNewRelic           : addNewRelic,
     removeAppDynamics     : removeAppDynamics,
     removeNewRelic        : removeNewRelic,
-    runCommand            : runCommand,
-    runMainCommand        : runMainCommand,
+    prependCommand        : prependCommand,
     provisioningProgress  : provisioningProgress,
     isPlayApplication     : isPlayApplication
   }
