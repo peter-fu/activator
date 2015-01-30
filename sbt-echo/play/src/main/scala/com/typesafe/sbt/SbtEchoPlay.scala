@@ -25,7 +25,8 @@ object SbtEchoPlay extends AutoPlugin with PlayInternalKeys {
   override def requires = Play && PlayForkRun && SbtEcho
 
   def playTraceJavaOptionsTask: Def.Initialize[Task[Seq[String]]] = Def.task {
-    echo.EchoRun.traceJavaOptions(aspectjWeaver.value, sigarLibs.value)
+    echo.EchoRun.traceJavaOptions(aspectjWeaver.value, sigarLibs.value) ++
+      Seq("-Dconfig.resource=application.conf")
   }
 
   def playForkOptionsTask: Def.Initialize[Task[PlayForkOptions]] = Def.task {
