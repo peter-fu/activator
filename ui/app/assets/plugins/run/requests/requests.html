@@ -1,85 +1,199 @@
-<article class="plugin actors">
+<article class="plugin requests" xdata-bind="css: { opened: currentRequest }">
+  <!-- ko if: requests().length -->
   <header>
     <h1>Requests</h1>
   </header>
   <section>
-    <div class="pluginBlock list-col">
+    <div class="pluginBlock list request-list">
       <footer>
-        <p>Show all</p>
+        <dl class="dropdown">
+          <dt>
+            <svg data-bind="svg: '/assets/icons/gear-mini.svg'"></svg>
+          </dt>
+          <dd class="prevent">
+            <p>
+              <label>Limit</label>
+              <select data-bind="options: filters.limitSizeValues, value: filters.limitSize"></select>
+            </p>
+            <p>
+              <label>Order direction</label>
+              <select data-bind="value: filters.orderByDesc">
+                <option value="desc">Descending</option>
+                <option value="asc">Ascending</option>
+              </select>
+            </p>
+            <p>
+              <label><input type="checkbox" data-bind="checked: filters.hideAssets"> Hide Assets controller</label>
+            </p>
+          </dd>
+        </dl>
+        <span>Showing 50 of 277</span>
       </footer>
-      <ul class="list">
-        <li class="queued">
-          <h2><a href="#">Build assets</a>
-          </h2>
-          <p>queued</p>
-        </li>
-        <li class="pending">
-          <h2><a href="#">Build project</a>
-          </h2>
-          <p>running for 8.2s</p>
-        </li>
-        <li class="failed">
-          <h2><a href="#">Build project</a>
-          </h2>
-          <p>failed after 8.2s</p>
-        </li>
-        <li class="completed">
-          <h2><a href="#">Build dependencies</a>
-          </h2>
-          <p>completed in 8.2s</p>
-        </li>
-        <li class="completed">
-          <h2><a href="#">Resolve dependencies</a>
-          </h2>
-          <p>completed in 8.2s</p>
-        </li>
-      </ul>
+
+      <div class="spacer">
+      <!-- 
+      <table class="table-list" xdata-bind="attr: { 'data-ordering': filters.orderBy }">
+        <thead>
+          <tr>
+            <td>Method</td>
+            <th>Route</th>
+            <td>Status</td>
+            <td>Bytes in</td>
+            <td>Bytes out</td>
+          </tr>
+        </thead>
+        <tbody xdata-bind="foreach: actors">
+          <tr xdata-bind="click: $root.openActor, isExactUrl: actorLink">
+            <th></th>
+            <td class="throughput"></td>
+            <td class="maxMailboxSize"></td>
+            <td class="maxTimeInMailbox"></td>
+            <td  class="path"></td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
     </div>
-    <div class="pluginBlock dark stats actor">
+    -->
+
+
+    <table class="table-list">
+      <thead>
+        <tr>
+          <th rowspan="2" xdata-bind="click: changeSort('method'), css: { sortBy: 'method' == sortBy() }" class=""><span>Method</span></th>
+          <th><span>Request</span></th>
+          <th rowspan="2" xdata-bind="click: changeSort('responseCode'), css: { sortBy: 'responseCode' == sortBy() }" class=""><span>Response Code</span></th>
+          <th rowspan="2" xdata-bind="click: changeSort('controller'), css: { sortBy: 'controller' == sortBy() }" class=""><span>Controller</span></th>
+          <th rowspan="2" xdata-bind="click: changeSort('invocationTime'), css: { sortBy: 'invocationTime' == sortBy() }" class=""><span>Invocation Time (ms)</span></th>
+          <th rowspan="2" xdata-bind="click: changeSort('time'), css: { sortBy: 'time' == sortBy() }" class=""><span>Time</span></th>
+        </tr>
+      </thead>
+      <tbody class="listing" data-bind="foreach: {data: requests}">
+        <tr data-bind="click: $root.openRequest, isExactUrl: requestLink, attr: { 'data-response-code': httpResponseCode}">
+          <td class="method" data-bind="text: httpMethod"></td>
+          <td class="path" data-bind="text: path"></td>
+          <td class="response" data-bind="text: httpResponseCode"></td>
+          <td class="controller" data-bind="text: controller"></td>
+          <td class="invocation" data-bind="text: invocationTimeMillis"></td>
+          <td class="time" data-bind="text: startTimeMillis"></td>
+        </tr>
+      </tbody>
+    </table>
+
+      </div>
+    </div>
+
+    <!-- ko if: currentRequest() -->
+    <!-- ko with: currentRequest() -->
+    <div class="pluginBlock dark item-view request">
       <div class="subheader">
-        <h2>Task Name</h2>
+        <h2>GET URL STATUS</h2>
+        <button class="close-view" data-bind="click: $root.closeRequest">
+          <svg data-bind="svg: '/assets/icons/close-mini.svg'"/>
+        </button>
       </div>
-      <h3>Sub tasks</h3>
+      <div class="spacer">
       <div class="table-wrapper">
+
+
+
         <table>
+          <thead>
+            <tr>
+              <th colspan="2">Headers</th>
+            </tr>
+          </thead>
+          <tbody class="listing">
+            <tr>
+              <td>Accept</td>
+              <td xdata-bind="foreach: headers.type.Accept">
+                <span xdata-bind="text: $data">text/css,*/*;q=0.1</span>
+              </td>
+            </tr>
+            <tr>
+              <td>Connection</td>
+              <td xdata-bind="foreach: headers.type.Connection">
+                <span xdata-bind="text: $data">keep-alive</span>
+              </td>
+            </tr>
+            <tr>
+              <td>Cookie</td>
+              <td xdata-bind="foreach: headers.type.Cookie">
+                <span xdata-bind="text: $data">PLAY_SESSION="14dfc10e43e3bbaf09a314783edec302fc19fc7d-csrfToken=41678c98224b917f1fa0d14cf4a1c2dcaf75f30a-1414669689094-b0aa33a778fe31cbb08ba720"; post-login-redirect="/"</span>
+              </td>
+            </tr>
+            <tr>
+              <td>Host</td>
+              <td xdata-bind="foreach: headers.type.Host">
+                <span xdata-bind="text: $data">localhost:9000</span>
+              </td>
+            </tr>
+            <tr>
+              <td>Referer</td>
+              <td xdata-bind="foreach: headers.type.Referer">
+                <span xdata-bind="text: $data">http://localhost:9000/</span>
+              </td>
+            </tr>
+          </tbody>
+          <thead>
+            <tr>
+              <th colspan="2">Network</th>
+            </tr>
+          </thead>
+          <tbody class="listing">
+            <tr><td>Bytes In</td><td xdata-bind="text: bytesIn">730</td></tr>
+            <tr><td>Bytes Out</td><td xdata-bind="text: bytesOut">169</td></tr>
+            <tr><td>Domain</td><td xdata-bind="text: domain">localhost</td></tr>
+            <tr><td>Host</td><td xdata-bind="text: host">pc524.home</td></tr>
+            <tr><td>Node</td><td xdata-bind="text: node">reactive-stocks</td></tr>
+          </tbody>
+          <thead>
+            <tr>
+              <th colspan="2">Request</th>
+            </tr>
+          </thead>
+          <tbody class="listing">
+            <tr><td>Host</td><td xdata-bind="text: host">pc524.home</td></tr>
+            <tr><td>Http Method</td><td xdata-bind="text: httpMethod">GET</td></tr>
+            <tr><td>Id</td><td xdata-bind="text: id">10</td></tr>
+            <tr><td>Path</td><td xdata-bind="text: path">/assets/lib/bootstrap/css/bootstrap.min.css</td></tr>
+            <tr><td>Remote Address</td><td xdata-bind="text: remoteAddress">0:0:0:0:0:0:0:1</td></tr>
+            <tr><td>Uri</td><td xdata-bind="text: uri">/assets/lib/bootstrap/css/bootstrap.min.css</td></tr>
+            <tr><td>Version</td><td xdata-bind="text: version">HTTP/1.1</td></tr>
+          </tbody>
+          <thead>
+            <tr>
+              <th colspan="2">Response</th>
+            </tr>
+          </thead>
+          <tbody class="listing">
+            <tr><td>Code</td><td xdata-bind="text: httpResponseCode, style: {&nbsp;color: httpResponseCode == 400 ? 'red' : ''}">304</td></tr>
+            <tr><td>Controller</td><td xdata-bind="text: controller">controllers.Assets</td></tr>
+            <tr><td>Method</td><td xdata-bind="text: httpMethod">GET</td></tr>
+            <tr><td>Result</td><td xdata-bind="text: summaryType">Normal</td></tr>
+            <tr><td>Type</td><td xdata-bind="text: type">simple</td></tr>
+          </tbody>
+
+          <thead>
           <tr>
-            <th>Updating sbt launch jar</th>
-            <td>Queued</td>
+            <th colspan="2" xdata-bind="visible: $root.actors().length > 0" style="display: none;">Actors</th>
           </tr>
-          <tr>
-            <th>SUB TASK</th>
-            <td>Queued</td>
-          </tr>
-          <tr>
-            <th>SUB TASK</th>
-            <td>Running for 2s</td>
-          </tr>
-          <tr>
-            <th>SUB TASK</th>
-            <td>Running for 2s</td>
-          </tr>
-          <tr class="error">
-            <th>SUB TASK</th>
-            <td>Failed after 2s</td>
-          </tr>
-          <tr>
-            <th>SUB TASK</th>
-            <td>Completed in 2s</td>
-          </tr>
-          <tr>
-            <th>SUB TASK</th>
-            <td>Completed in 2s</td>
-          </tr>
-          <tr>
-            <th>SUB TASK</th>
-            <td>Completed in 2s</td>
-          </tr>
+          </thead>
+          <tbody class="listing" xdata-bind="foreach: {data: $root.actors}"></tbody>
         </table>
+
       </div>
-      <h3>Logs</h3>
-      <ul class="logs">
-        <li class="x">lol</li>
-      </ul>
+      </div>
     </div>
+    <!-- /ko -->
+    <!-- /ko -->
   </section>
+  <!-- /ko -->
+  <!-- ko ifnot: requests().length -->
+  <div class="hint requests">
+    <p>You can see Play requests here</p>
+    <span data-bind="text: $root.inspect.inspectPlayVersionReport"></span>
+  </div>
+  <!-- /ko -->
+
 </article>

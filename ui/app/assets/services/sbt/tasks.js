@@ -473,14 +473,14 @@ define([
       return "The sbt-echo plugin may not be present on this project or may not be enabled.";
   });
 
-  whyInspectIsNotSupported.subscribe(function(why) {
-    if (debug) {
+  if (debug) {
+    whyInspectIsNotSupported.subscribe(function(why) {
       if (inspectSupported())
         console.log("Inspect is supported");
       else
         console.log("Inspect is not supported because ", why);
-    }
-  });
+    });
+  }
 
   valueChanged.matchOnAttribute('key', 'echo:echoTraceSupported').each(function(message) {
     inspectSupported(message.value === true);
@@ -697,7 +697,6 @@ define([
     },
     actions: {
       kill:         killTask,
-      turnOnOff:    function() {},
       compile:      function() {
         requestExecution("compile");
       },

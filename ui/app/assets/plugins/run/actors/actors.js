@@ -141,12 +141,7 @@ define([
     },
 
     keyboard: function(key, meta, e) {
-      if (key === "/"){
-        $("input.fullTextSearch").focus();
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      } else if (key === "ESC"){
+      if (key === "ESC"){
         closeActor();
       }
     }
