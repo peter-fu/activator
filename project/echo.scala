@@ -31,6 +31,7 @@ object EchoBuild extends Build {
       event210Protobuf24, event210Protobuf25,
       event211Protobuf24, event211Protobuf25,
       trace210Protobuf24, trace210Protobuf25,
+      trace211Protobuf24, trace211Protobuf25,
       traceScala210Protobuf24, traceScala210Protobuf25,
       traceScala211Protobuf24, traceScala211Protobuf25,
       traceAkka22, traceAkka23Scala210, traceAkka23Scala211,
@@ -517,7 +518,7 @@ object TraceProjects extends Build {
       settings (defaultSettings: _*)
       settings (aspectjSettings: _*)
       settings(
-      name := "echo-trace-scala-protobuf24-" + Dependencies.scala210Version,
+      name := "echo-trace-scala-protobuf24-2.10",
       normalizedName <<= name,
       target <<= target / "210-protobuf24",
       scalaVersion := Dependencies.scala210Version
@@ -530,7 +531,7 @@ object TraceProjects extends Build {
       settings (defaultSettings: _*)
       settings (aspectjSettings: _*)
       settings(
-      name := "echo-trace-scala-protobuf25-" + Dependencies.scala210Version,
+      name := "echo-trace-scala-protobuf25-2.10",
       normalizedName <<= name,
       target <<= target / "210-protobuf25",
       scalaVersion := Dependencies.scala210Version
@@ -543,7 +544,7 @@ object TraceProjects extends Build {
       settings (defaultSettings: _*)
       settings (aspectjSettings: _*)
       settings(
-      name := "echo-trace-scala-protobuf24-" + Dependencies.scalaVersion,
+      name := "echo-trace-scala-protobuf24-2.11",
       normalizedName <<= name,
       target <<= target / "211-protobuf24",
       scalaVersion := Dependencies.scalaVersion
@@ -556,7 +557,7 @@ object TraceProjects extends Build {
       settings (defaultSettings: _*)
       settings (aspectjSettings: _*)
       settings(
-      name := "echo-trace-scala-protobuf25-" + Dependencies.scalaVersion,
+      name := "echo-trace-scala-protobuf25-2.11",
       normalizedName <<= name,
       target <<= target / "211-protobuf25",
       scalaVersion := Dependencies.scalaVersion
