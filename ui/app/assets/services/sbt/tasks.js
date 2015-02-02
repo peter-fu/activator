@@ -118,7 +118,7 @@ define([
   }
 
   var isPlayApplication = function() {
-    if (app.mainClass() && app.mainClass().serialized === "play.core.server.NettyServer") {
+    if (app.mainClass() && app.mainClass() === "play.core.server.NettyServer") {
       return true;
     }
     return false;
@@ -426,7 +426,7 @@ define([
   var valueChanged = subTypeEventStream("ValueChanged").map(function(message) {
     var valueOrNull = null;
     if (message.event.value.$type.indexOf("Success") >= 0)
-      valueOrNull = message.event.value;
+      valueOrNull = message.event.value.value.serialized;
     debug && console.log("ValueChanged for ", message.event.key.key.name, valueOrNull, message.event);
     return {
       key: message.event.key.key.name,
@@ -440,8 +440,8 @@ define([
   // discoveredMainClasses
   valueChanged.matchOnAttribute('key', 'discoveredMainClasses').each(function(message) {
     var discovered = [];
-    if (message.value && message.value.value && message.value.value.serialized && message.value.value.serialized.length)
-      discovered = message.value.value.serialized;
+    if (message.value && message.value.length)
+      discovered = message.value;
     // TODO this is broken, if there are two projects with main classes we'll just
     // pick "last one wins," we need to separately track main classes per-project.
     app.mainClasses(discovered); // All main classes
@@ -482,28 +482,29 @@ define([
     });
   }
 
-  valueChanged.matchOnAttribute('key', 'echo:echoTraceSupported').each(function(message) {
+  valueChanged.matchOnAttribute('key', 'echoTraceSupported').each(function(message) {
+    debug && console.log('echoTraceSupported',message);
     inspectSupported(message.value === true);
   });
 
-  valueChanged.matchOnAttribute('key', 'echo:echoAkkaVersionReport').each(function(message) {
-    debug && console.log('echoAkkaVersionReport',message)
+  valueChanged.matchOnAttribute('key', 'echoAkkaVersionReport').each(function(message) {
+    debug && console.log('echoAkkaVersionReport',message);
     var report = "";
     if (message.value)
       report = message.value;
     inspectAkkaVersionReport(report);
   });
 
-  valueChanged.matchOnAttribute('key', 'echo:echoPlayVersionReport').each(function(message) {
-    debug && console.log('echoPlayVersionReport',message)
+  valueChanged.matchOnAttribute('key', 'echoPlayVersionReport').each(function(message) {
+    debug && console.log('echoPlayVersionReport',message);
     var report = "";
     if (message.value)
       report = message.value;
     inspectPlayVersionReport(report);
   });
 
-  valueChanged.matchOnAttribute('key', 'echo:echoTracePlayVersion').each(function(message) {
-    debug && console.log('echoTracePlayVersion',message)
+  valueChanged.matchOnAttribute('key', 'echoTracePlayVersion').each(function(message) {
+    debug && console.log('echoTracePlayVersion',message);
     if (message.value && message.value !== '')
       inspectHasPlayVersion(true);
     else
@@ -516,12 +517,9 @@ define([
   });
 
   // Application ready
-  var playHasRunCommand = ko.computed(function() {
-    return !app.mainClass() || !isPlayApplication() || playRunnerAvailable();
-  });
   var clientReady = ko.observable(false);
   var applicationReady = ko.computed(function() {
-    return (app.mainClasses().length || app.mainClass() !== null) && playHasRunCommand() && clientReady();
+    return (app.mainClasses().length || app.mainClass() !== null) && isPlayApplication() && clientReady();
   });
   var applicationNotReady = ko.computed(function() { return !applicationReady(); });
   subTypeEventStream('ClientOpened').each(function (msg) {
@@ -531,16 +529,6 @@ define([
     app.mainClasses([]);
     app.mainClass(null);
     clientReady(false);
-  });
-
-  // Play related observable: if the correct Play runner exists for the current project
-  var playRunnerAvailable = ko.observable(false);
-
-  subTypeEventStream("PlayStatus").each(function(message) {
-    if (message.event.backgroundRunnerAvailable) {
-      debug && console.log("Setting playRunnerAvailable to: ", message.event.backgroundRunnerAvailable);
-      playRunnerAvailable(message.event.backgroundRunnerAvailable);
-    }
   });
 
   // Build status
@@ -684,8 +672,6 @@ define([
     applicationReady:        applicationReady,
     applicationNotReady:     applicationNotReady,
     isPlayApplication:       isPlayApplication,
-    playRunnerAvailable:     playRunnerAvailable,
-    playHasRunCommand:       playHasRunCommand,
     playApplicationUrl:      playApplicationUrl,
     inspectSupported:        inspectSupported,
     whyInspectIsNotSupported: whyInspectIsNotSupported,

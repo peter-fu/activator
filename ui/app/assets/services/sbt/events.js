@@ -116,17 +116,6 @@ define([
       }
     });
 
-  /*
-   * Play command is not available, please upgrade Play version
-   */
-  tasks.playHasRunCommand.subscribe(function() {
-    modals.show({
-      title: "Play version is outdated",
-      text: "Activator doesn't support this version of Play, please update it or use the command line.",
-      cancel: "Hide"
-    });
-  });
-
   return {
     errorCounters:      errorCounters,
     notifications:      notifications,
