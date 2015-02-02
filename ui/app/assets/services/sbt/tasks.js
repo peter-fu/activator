@@ -519,7 +519,7 @@ define([
   // Application ready
   var clientReady = ko.observable(false);
   var applicationReady = ko.computed(function() {
-    return (app.mainClasses().length || app.mainClass() !== null) && isPlayApplication() && clientReady();
+    return (app.mainClasses().length || app.mainClass() !== null) && clientReady();
   });
   var applicationNotReady = ko.computed(function() { return !applicationReady(); });
   subTypeEventStream('ClientOpened').each(function (msg) {
