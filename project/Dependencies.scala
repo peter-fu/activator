@@ -45,7 +45,7 @@ object Dependencies {
 
   val commonsIo            = "commons-io" % "commons-io" % "2.0.1"
 
-  val mimeUtil             = "eu.medsea.mimeutil" % "mime-util" % "2.1.1" exclude("org.slf4j", "slf4j-log4j12") exclude("org.slf4j", "slf4j-api") exclude("log4j", "log4j")
+  val mimeUtil             = "eu.medsea.mimeutil" % "mime-util" % "2.1.3" exclude("org.slf4j", "slf4j-log4j12") exclude("org.slf4j", "slf4j-api") exclude("log4j", "log4j")
 
   val junitInterface       = "com.novocode" % "junit-interface" % "0.7"
   val specs2               = "org.specs2" % "specs2_2.11" % "2.3.11"
