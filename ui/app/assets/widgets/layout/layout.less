@@ -1,26 +1,32 @@
 /*
- Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
+ Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
  */
 @import "../../commons/_base";
 
-// Defaults
-#main {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-}
+// ----------------
+// LAYOUT
+// ----------------
 
-#wrapper {
-  position: fixed;
+// Defaults
+main {
+  position: absolute;
   top: 50px;
   right: 0;
   bottom: 0;
   left: 0;
   overflow: hidden;
-  -webkit-perspective: 2000;
+  .row();
   .transition();
+  > nav {
+    width: @menu-width;
+  }
+  > div, > article {
+    .expand();
+    .column();
+    width: 800px; // Default value for IE11
+    position: relative;
+    z-index: 1;
+  }
 }
 
 #header {
@@ -33,7 +39,27 @@
   position: fixed;
   bottom: 0;
   right: 0;
-  display: none;
+  .transition();
+  [data-shape='right1'] &,
+  [data-shape='right2'] & {
+      top: 0;
+      width: @panel-width;
+      -webkit-transform: translateX(100%);
+      -moz-transform: translateX(100%);
+      transform: translateX(100%);
+  }
+  [data-shape='bottom1'] &,
+  [data-shape='bottom2'] & {
+    left: 0;
+    height: @panel-width;
+    -webkit-transform: translateY(100%);
+    -moz-transform: translateY(100%);
+    transform: translateY(100%);
+  }
+  [data-shape^='bottom'].navigation-opened & {
+    left: @drawer-width;
+  }
+
 }
 
 #navigation {
@@ -44,59 +70,49 @@
 }
 
 // Navigation opened
-body.navigationOpened {
+body.navigation-opened {
   #header, #wrapper {
     left: @drawer-width;
   }
   #navigation {
-    -webkit-transform: translateX(0);
-    -moz-transform: translateX(0);
-    transform: translateX(0);
+    -webkit-transform: none;
+    -moz-transform: none;
+    transform: none;
   }
 }
-body.navigationSneak {
+body.navigation-sneak {
   #navigation {
-    -webkit-transform: translateX(0);
-    -moz-transform: translateX(0);
-    transform: translateX(0);
+    -webkit-transform: none;
+    -moz-transform: none;
+    transform: none;
   }
 }
 
-// Panel opened
-body.panelOpened {
-  #panels {
-    display: block;
-  }
+// panel opened
+body.panel-opened {
   &[data-shape='right1'],
   &[data-shape='right2'] {
-    #header, #wrapper {
+    #header, main {
       right: @panel-width;
     }
     #panels {
-      top: 0;
-      width: @panel-width;
-    }
-    main {
-      left: @panel-width;
+      -webkit-transform: none;
+      -moz-transform: none;
+      transform: none;
     }
   }
   &[data-shape='bottom1'],
   &[data-shape='bottom2'] {
     #panels {
-      height: @panel-width;
-      left: 0;
+      -webkit-transform: none;
+      -moz-transform: none;
+      transform: none;
     }
-    &.navigationOpened {
-      #panels {
-        left: @drawer-width;
-      }
-    }
-    #wrapper {
+    main {
       bottom: @panel-width;
     }
   }
 }
-
 
 .modal {
   position: fixed;
@@ -105,32 +121,4 @@ body.panelOpened {
   left: 0;
   bottom: 0;
   right: 0;
-}
-
-
-.oneColumn {
-  > div, > section {
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 1px;
-  }
-}
-
-.oneColumnAndMenu {
-  > nav {
-    width: @menu-width;
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-  }
-  > div, > section {
-    position: absolute;
-    top: 0;
-    left: @menu-width;
-    bottom: 0;
-    right: 1px;
-  }
 }

@@ -1,7 +1,16 @@
 /*
  Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
  */
-define(['text!./welcome.html', 'css!./welcome.css'], function(template, css){
+define([
+  'text!./welcome.html',
+  'widgets/layout/layout',
+  'widgets/layout/layoutManager',
+  'css!./welcome.css'
+], function(
+  tpl,
+  layout,
+  layoutManager
+){
 
 
   var WelcomeState = (function(){
@@ -12,15 +21,15 @@ define(['text!./welcome.html', 'css!./welcome.css'], function(template, css){
 
     self.loadNews = function() {
       var areq = {
-          url: "http://downloads.typesafe.com/typesafe-activator/" + window.serverAppVersion + "/news.js",
-          type: 'GET',
-          // this is hardcoded for now since our server is just static files
-          // so can't respect a ?callback= query param.
-          jsonpCallback: 'setNewsJson',
-          dataType: 'jsonp' // return type
-        };
-        debug && console.log("sending ajax news request ", areq)
-        return $.ajax(areq);
+        url: "http://downloads.typesafe.com/typesafe-activator/" + window.serverAppVersion + "/news.js",
+        type: 'GET',
+        // this is hardcoded for now since our server is just static files
+        // so can't respect a ?callback= query param.
+        jsonpCallback: 'setNewsJson',
+        dataType: 'jsonp' // return type
+      };
+      debug && console.log("sending ajax news request ", areq)
+      return $.ajax(areq);
     }
     self.setNewsJson = function(json) {
       debug && console.log("setting news json to ", json);
@@ -31,19 +40,22 @@ define(['text!./welcome.html', 'css!./welcome.css'], function(template, css){
       }
     }
 
+    self.presentationMode = function(a,e) {
+      var on = e.target.checked;
+      document.body.style.zoom = on?"75%":"1";
+      document.body.classList.toggle("presentation-mode");
+      layoutManager.panelOpened(false);
+      layoutManager.navigationOpened(!on);
+    }
+
     self.loadNews();
     return self;
   }());
 
-  window.setNewsJson = WelcomeState.setNewsJson.bind(WelcomeState);
-
   return {
     render: function() {
-      var $welcome = $(template)[0];
-      ko.applyBindings(WelcomeState, $welcome);
-      return $welcome;
-    },
-    route: function(){}
+      layout.renderPlugin(ko.bindhtml(tpl, WelcomeState));
+    }
   }
 
 });

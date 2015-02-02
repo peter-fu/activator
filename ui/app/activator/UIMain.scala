@@ -8,7 +8,6 @@ import java.awt._
 import javax.swing._
 import java.net.{ URI, URL }
 import sbt.IO
-import com.typesafe.sbtrc.launching.DefaultSbtProcessLauncher
 import activator.properties.ActivatorProperties._
 import xsbti.GlobalLock
 import java.io.IOException
@@ -105,8 +104,6 @@ class UIMain extends AppMain {
             System.err.println("FOUND REPO = " + x.id + " @ " + uri)
             (x.id, new java.io.File(uri), Some(x.ivyPattern))
         }
-      // locate sbt details and store in a singleton
-      Global.installSbtLauncher(new DefaultSbtProcessLauncher(configuration, optRepositories = optRepositories))
 
       // Start the Play app... (TODO - how do we know when we're done?)
       // TODO - Is this hack ok?

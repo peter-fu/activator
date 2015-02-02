@@ -1,66 +1,114 @@
 /*
- Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
+ Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
  */
-define(['services/build', 'text!./run.html', 'css!./run.css', "widgets/navigation/menu"],
-    function(build, template, LogView, css){
+define([
+  "main/plugins",
+  "services/sbt",
+  "services/inspect/connection",
+  'widgets/echoInstaller/echoInstaller',
+  "widgets/layout/layout",
+  "services/monitoring/monitoringSolutions",
+  "text!./run.html",
+  'widgets/modals/modals',
+  'services/monitoring/appdynamicscontroller',
+  'services/monitoring/newreliccontroller',
+  "css!./run",
+  "css!widgets/buttons/switch",
+  "css!widgets/buttons/button",
+  "css!widgets/menu/menu",
+  "css!widgets/buttons/select"
+], function(
+  plugins,
+  sbt,
+  connection,
+  echoInstaller,
+  layout,
+  monitoringSolutions,
+  tpl,
+  modals
+) {
 
-  var RunState = (function(){
-    var self = {};
-
-    self.title = ko.observable("Run");
-    self.startStopLabel = ko.computed(function() {
-      if (build.run.haveActiveTask())
-        return "Stop";
-      else
-        return "Start";
-    }, this);
-
-    self.log = build.run.outputLog;
-
-    // Limit log size
-    // TODO: factorise this, maybe add a setting
-    self.log.entries.subscribe(function(el) {
-      if (el.length > 120){
-        self.log.entries.splice(0, el.length - 100);
+  var subPlugin = ko.observable();
+  var currentPlugin;
+  var inspects = ko.observable();
+  var sbtExecCommand = function(cmd){
+    sbt.tasks.requestExecution(cmd);
+  }
+  var mainRunAction = function() {
+    if (sbt.tasks.pendingTasks.run()){
+      sbt.tasks.actions.kill("run");
+    } else {
+      if (sbt.app.settings.automaticResetInspect()) {
+        connection.reset();
       }
-    });
-
-    // Aliases so we can use these in our html template.
-    // This is a mess to clean up; we should just alias
-    // 'build' or something then refer to these.
-    // But doing this to keep changes in one commit smaller.
-    // We want to just change the whole 'build' API anyway.
-    self.playAppLink = build.run.playAppLink;
-    self.playAppStarted = build.run.playAppStarted;
-    self.haveActiveTask = build.run.haveActiveTask;
-    self.haveMainClass = build.run.haveMainClass;
-    self.currentMainClass = build.run.currentMainClass;
-    self.mainClasses = build.run.mainClasses;
-    self.rerunOnBuild = build.settings.rerunOnBuild;
-    self.restartPending = build.run.restartPending;
-    self.consoleCompatible = build.app.hasConsole;
-    self.statusMessage = build.run.statusMessage;
-
-    self.update = function(parameters){
+      sbt.tasks.actions.run();
     }
-    self.startStopButtonClicked = function(self) {
-      debug && console.log("Start or Stop was clicked");
-      build.toggleTask('run');
-    }
-    self.restartButtonClicked = function(self) {
-      debug && console.log("Restart was clicked");
-      build.restartTask('run');
-    }
+  }
+  var mainRunName = ko.computed(function() {
+    return sbt.tasks.pendingTasks.run()?"Stop":"Run";
+  });
 
-    return self;
-  }());
+  var toggleInspect = function() {
+    var toActivate = monitoringSolutions.inspectActivated() ? monitoringSolutions.NO_MONITORING : monitoringSolutions.INSPECT;
+    monitoringSolutions.monitoringSolution(toActivate);
+  }
+
+  monitoringSolutions.monitoringSolution.subscribe(function(solution) {
+    if (!monitoringSolutions.inspectActivated() && window.location.hash.indexOf("#run/system") !== 0) {
+      window.location.hash = "run/system";
+    }
+    if(monitoringSolutions.inspectActivated()) {
+      sbt.tasks.actions.kill();
+      echoInstaller(function() {});
+    } else {
+      sbt.tasks.actions.kill();
+    }
+  });
+
+  var inspectActivatedAndAvailable = ko.computed(function() {
+    return monitoringSolutions.inspectActivated() && sbt.tasks.applicationReady() && sbt.tasks.inspectSupported();
+  });
+
+  var State = {
+    subPlugin: subPlugin,
+    sbtExecCommand: sbtExecCommand,
+    inspects: inspects,
+    sbt: sbt,
+    stats: connection.stats,
+    rerunOnBuild: sbt.app.settings.rerunOnBuild,
+    automaticResetInspect: sbt.app.settings.automaticResetInspect,
+    showLogDebug: sbt.app.settings.showLogDebug,
+    monitoringSolutions: monitoringSolutions,
+    inspectActivated: monitoringSolutions.inspectActivated,
+    toggleInspect: toggleInspect,
+    inspectActivatedAndAvailable: inspectActivatedAndAvailable,
+    mainRunAction: mainRunAction,
+    mainRunName: mainRunName,
+    customCommands: sbt.app.customCommands
+  }
+
+  // Subplugins titles
+  var subPlugins = {
+    system:         "Stdout",
+    actors:         "Actors",
+    requests:       "Requests",
+    deviations:     "Deviations"
+  }
 
   return {
-    render: function() {
-      var $run = $(template)[0];
-      ko.applyBindings(RunState, $run);
-      return $run;
+    render: function(url) {
+      layout.renderPlugin(ko.bindhtml(tpl, State))
     },
-    route: function(){}
+    route: plugins.route('run', function(url, breadcrumb, plugin) {
+      subPlugin(plugin.render());
+      currentPlugin = plugin;
+      breadcrumb([['run/', "Run"],['run/'+url.parameters[0], subPlugins[url.parameters[0]]]]);
+    }, "run/system"),
+
+    keyboard: function(key, meta, e) {
+      if (currentPlugin.keyboard) {
+        currentPlugin.keyboard(key, meta, e);
+      }
+    }
   }
 });

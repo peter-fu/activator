@@ -6,9 +6,7 @@ package snap
 import akka.actor._
 import scala.concurrent.duration._
 import java.io.File
-import com.typesafe.sbtrc.EventSourceActor
 import java.io.IOException
-import com.typesafe.sbtrc.InvalidateSbtBuild
 import play.api.libs.json._
 
 sealed trait ProjectWatcherRequest
@@ -25,8 +23,8 @@ sealed trait ProjectWatcherEvent
 // So this actor is responsible for:
 // - telling the client-side JS to reload sources from sbt
 // - telling its child actor to change the set of sbt build sources
-// - invalidating the sbt pool when sbt build sources change
-class ProjectWatcher(val location: File, val newSourcesSocket: ActorRef, val sbtPool: ActorRef)
+// - reloading the sbt build when sbt build sources change
+class ProjectWatcher(val location: File, val newSourcesSocket: ActorRef, val appActor: ActorRef)
   extends EventSourceActor with ActorLogging {
 
   private val interval = 3.seconds
@@ -74,12 +72,11 @@ class ProjectWatcher(val location: File, val newSourcesSocket: ActorRef, val sbt
     case event: FileWatcherEvent => event match {
       case FilesChanged(source) =>
         if (source == sourcesWatcher) {
-          newSourcesSocket ! NotifyWebSocket(JsObject(Seq("type" -> JsString("FilesChanged"))))
+          appActor ! ProjectFilesChanged
         } else if (source == sbtBuildWatcher) {
-          // we need to reset all our sbts
-          sbtPool ! InvalidateSbtBuild
+          appActor ! ReloadSbtBuild
         } else {
-          log.warning("Unknown files changed notification from {}", source)
+          log.debug("Unknown files changed notification from {}", source)
         }
     }
   }
@@ -95,7 +92,7 @@ class ProjectWatcher(val location: File, val newSourcesSocket: ActorRef, val sbt
   }
 
   private def scanBuildDir(dir: File): Set[File] = {
-    (dir.listFiles().toList.map { f =>
+    dir.listFiles().toList.map { f =>
       if (isSource(f) || isSbt(f)) {
         Set(f)
       } else if (f.isDirectory()) {
@@ -103,13 +100,12 @@ class ProjectWatcher(val location: File, val newSourcesSocket: ActorRef, val sbt
       } else {
         Set.empty[File]
       }
-    })
-      .fold(Set.empty[File]) { (sofar: Set[File], next: Set[File]) => sofar ++ next }
+    }.fold(Set.empty[File]) { (sofar: Set[File], next: Set[File]) => sofar ++ next }
   }
 
   // this is inefficient, sue me. if it breaks in practice we can fix it.
   private def scanAnyDir(dir: File): Contents = {
-    (dir.listFiles().toList.map { f =>
+    dir.listFiles().toList.map { f =>
       if (isSource(f)) {
         Contents(projectSources = Set(f), buildSources = Set.empty)
       } else if (isSbt(f)) {
@@ -124,8 +120,7 @@ class ProjectWatcher(val location: File, val newSourcesSocket: ActorRef, val sbt
       } else {
         Contents.empty
       }
-    })
-      .fold(Contents.empty) { (sofar: Contents, c: Contents) => sofar ++ c }
+    }.fold(Contents.empty) { (sofar: Contents, c: Contents) => sofar ++ c }
   }
 
   private def rescan(): Unit = {
@@ -137,14 +132,14 @@ class ProjectWatcher(val location: File, val newSourcesSocket: ActorRef, val sbt
           sbtBuildWatcher ! SetFilesToWatch(newContents.buildSources)
         }
         if (newContents.projectSources != files.projectSources) {
-          // notify client to reload sources to watch and pick up new files
-          newSourcesSocket ! NotifyWebSocket(JsObject(Seq("type" -> JsString("SourcesMayHaveChanged"))))
+          log.debug("Setting {} project source files to watch", newContents.projectSources.size)
+          sourcesWatcher ! SetFilesToWatch(newContents.projectSources)
         }
         files = newContents
       }
     } catch {
       case e: IOException =>
-        log.warning(s"Failed to scan directory $location", e)
+        log.debug(s"Failed to scan directory $location", e)
     }
   }
 

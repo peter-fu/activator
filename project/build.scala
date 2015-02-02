@@ -1,5 +1,7 @@
+import org.apache.tools.ant.taskdefs.Echo
 import sbt._
 import ActivatorBuild._
+import EchoBuild._
 import Dependencies._
 import Packaging.localRepoArtifacts
 import com.typesafe.sbt.S3Plugin._
@@ -55,7 +57,7 @@ object TheActivatorBuild extends Build {
   )
 
   // These are the projects we want in the local repository we deploy.
-  lazy val publishedProjects: Seq[Project] = Seq(ui, uiCommon, launcher, props)
+  lazy val publishedProjects: Seq[Project] = Seq(ui, uiCommon, launcher, props, EchoBuild.echo, SbtEchoBuild.sbtEcho)
 
   // basic project that gives us properties to use in other projects.
   lazy val props = (
@@ -72,16 +74,6 @@ object TheActivatorBuild extends Build {
 
   val verboseSbtTests = false
 
-
-
-  // Helpers to let us grab necessary sbt remote control artifacts, but not actually depend on them at
-  // runtime.
-  lazy val SbtProbesConfig = config("sbtprobes")
-  def makeProbeClasspath(update: sbt.UpdateReport): String = {
-    val probeClasspath = update.matching(configurationFilter(SbtProbesConfig.name))
-    Path.makeString(probeClasspath)
-  }
-
   def configureSbtTest(testKey: Scoped) = Seq(
     // set up embedded sbt for tests, we fork so we can set
     // system properties.
@@ -91,9 +83,7 @@ object TheActivatorBuild extends Build {
       Keys.javaOptions in testKey,
       Keys.update) map {
       (launcher, oldOptions, updateReport) =>
-        oldOptions ++ Seq("-Dsbtrc.no-shims=true",
-                          "-Dsbtrc.launch.jar=" + launcher.getAbsoluteFile.getAbsolutePath,
-                          "-Dsbtrc.controller.classpath=" + makeProbeClasspath(updateReport)) ++
+        oldOptions ++
       (if (verboseSbtTests)
         Seq("-Dakka.loglevel=DEBUG",
             "-Dakka.actor.debug.autoreceive=on",
@@ -111,37 +101,26 @@ object TheActivatorBuild extends Build {
     dependsOnRemote(
       requirejs, jquery, knockout, ace, /*requireCss, requireText,*/ keymage, commonsIo, mimeUtil, activatorAnalytics,
       sbtLauncherInterface % "provided",
-      sbtrcRemoteController % "compile;test->test",
-      // Here we hack our probes into the UI project.
-      sbtrcProbe13 % "sbtprobes->default(compile)",
-      sbtshimUiInterface13 % "sbtprobes->default(compile)"
+      sbtrcClient,
+      sbtrcIntegration % "compile;test->test"
     )
     dependsOn(props, uiCommon)
     settings(PlayKeys.playDefaultPort := 8888)
     settings(Keys.includeFilter in (Assets, LessKeys.less) := "*.less")
     settings(Keys.excludeFilter in (Assets, LessKeys.less) := "_*.less")
-    settings(Keys.initialize ~= { _ => sys.props("scalac.patmat.analysisBudget") = "512" })
     settings(Keys.libraryDependencies ++= Seq(Dependencies.akkaTestkit % "test", Dependencies.specs2 % "test"))
     // set up debug props for forked tests
     settings(configureSbtTest(Keys.test): _*)
     settings(configureSbtTest(Keys.testOnly): _*)
     // set up debug props for "run"
     settings(
-      // Here we hack so that we can see the sbt-rc classes...
-      Keys.ivyConfigurations ++= Seq(SbtProbesConfig),
       Keys.update <<= (
           SbtSupport.sbtLaunchJar,
           Keys.update,
           LocalTemplateRepo.localTemplateCacheCreated in localTemplateRepo) map {
         (launcher, update, templateCache) =>
-          // We register the location after it's resolved so we have it for running play...
-          sys.props("sbtrc.launch.jar") = launcher.getAbsoluteFile.getAbsolutePath
-          // The debug variant of the sbt finder automatically splits the ui + controller jars apart.
-          sys.props("sbtrc.controller.classpath") = makeProbeClasspath(update)
           sys.props("activator.template.cache") = fixFileForURIish(templateCache)
           sys.props("activator.runinsbt") = "true"
-          System.err.println("Updating sbt launch jar: " + sys.props("sbtrc.launch.jar"))
-          System.err.println("Remote probe classpath = " + sys.props("sbtrc.controller.classpath"))
           System.err.println("Template cache = " + sys.props("activator.template.cache"))
           update
       },
@@ -184,7 +163,7 @@ object TheActivatorBuild extends Build {
   lazy val it = (
       ActivatorProject("integration-tests")
       settings(integration.settings:_*)
-      dependsOnRemote(sbtLauncherInterface, sbtIo, sbtrcRemoteController)
+      dependsOnRemote(sbtLauncherInterface, sbtIo, sbtrcClient, sbtrcIntegration)
       dependsOn(props)
       settings(
         org.sbtidea.SbtIdeaPlugin.ideaIgnoreModule := true,
@@ -227,7 +206,7 @@ object TheActivatorBuild extends Build {
         "org.scala-lang" % "scala-compiler" % Dependencies.scalaVersion,
 
         // sbt stuff
-        sbtrcRemoteController,
+        sbtrcClient,
 
         // sbt 0.13 plugins
         playSbt13Plugin,
@@ -257,19 +236,19 @@ object TheActivatorBuild extends Build {
 
         // transient dependencies used in offline mode
         "org.scala-lang" % "jline" % "2.10.4",
-        Defaults.sbtPluginExtra("com.typesafe.play" % "sbt-plugin" % Dependencies.playVersion, "0.13", "2.10"),
+        Defaults.sbtPluginExtra("com.typesafe.play" % "sbt-plugin" % Dependencies.play23Version, "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-coffeescript" % "1.0.0", "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-less" % "1.0.0", "0.13", "2.10"),
         "org.scalaz" % "scalaz-core_2.10" % "7.0.2",
         "org.scalaz" % "scalaz-effect_2.10" % "7.0.2",
-        "com.typesafe.play" % "play-java_2.11" % Dependencies.playVersion,
-        "com.typesafe.play" % "play-java-jdbc_2.11" % Dependencies.playVersion,
-        "com.typesafe.play" % "play-java-ebean_2.11" % Dependencies.playVersion,
-        "com.typesafe.play" % "play-java-ws_2.11" % Dependencies.playVersion,
-        "com.typesafe.play" % "play-cache_2.11" % Dependencies.playVersion,
-        "com.typesafe.play" % "play-docs_2.11" % Dependencies.playVersion,
-        "com.typesafe.play" % "anorm_2.11" % Dependencies.playVersion,
-        "com.typesafe.play" % "play-ws_2.11" % Dependencies.playVersion,
+        "com.typesafe.play" % "play-java_2.11" % Dependencies.play23Version,
+        "com.typesafe.play" % "play-java-jdbc_2.11" % Dependencies.play23Version,
+        "com.typesafe.play" % "play-java-ebean_2.11" % Dependencies.play23Version,
+        "com.typesafe.play" % "play-java-ws_2.11" % Dependencies.play23Version,
+        "com.typesafe.play" % "play-cache_2.11" % Dependencies.play23Version,
+        "com.typesafe.play" % "play-docs_2.11" % Dependencies.play23Version,
+        "com.typesafe.play" % "anorm_2.11" % Dependencies.play23Version,
+        "com.typesafe.play" % "play-ws_2.11" % Dependencies.play23Version,
 
         "org.webjars" % "bootstrap" % "2.3.1",
         "org.webjars" % "flot" % "0.8.0",
@@ -280,7 +259,7 @@ object TheActivatorBuild extends Build {
         "org.webjars" % "squirejs" % "0.1.0",
 
         "com.typesafe.play.extras" % "play-geojson_2.11" % "1.1.0",
-        "com.typesafe.akka" % "akka-contrib_2.11" % Dependencies.akkaVersion,
+        "com.typesafe.akka" % "akka-contrib_2.11" % Dependencies.akka23Version,
         "org.codehaus.plexus" % "plexus-interactivity-api" % "1.0-alpha-6",
         "org.codehaus.plexus" % "plexus-component-api" % "1.0-alpha-16",
         "org.jcraft" % "jsch" % "0.1.38"

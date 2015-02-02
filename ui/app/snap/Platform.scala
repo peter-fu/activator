@@ -26,10 +26,10 @@ private[snap] class Platform(val isWindows: Boolean) {
   }
 
   // TODO - Figure out what to do when windows wants a / in the path....
-  private def mungeWindows(name: String): String =
-    name.replaceAll("\\\\", "/")
-  private def unmungeWindows(name: String): String =
-    name.replaceAll("/", "\\\\")
+  def mungeWindows(name: String): String = name.replaceAll("\\\\", "/")
+
+  private def unmungeWindows(name: String): String = name.replaceAll("/", "\\\\")
+
 }
 
 object Platform extends Platform(sys.props("os.name").toLowerCase.indexOf("win") >= 0)

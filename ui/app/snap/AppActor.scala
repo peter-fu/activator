@@ -3,65 +3,63 @@
  */
 package snap
 
-import com.typesafe.sbtrc._
-import com.typesafe.sbtrc.launching.SbtProcessLauncher
 import akka.actor._
 import java.io.File
-import java.net.URLEncoder
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.duration._
-import console.ClientController.HandleRequest
-import JsonHelper._
 import play.api.libs.json._
-import play.api.libs.json.Json._
-import play.api.libs.functional.syntax._
+import sbt.client._
+import sbt.protocol.CoreProtocol._
+import sbt.protocol._
 
 sealed trait AppRequest
-
-case class GetTaskActor(id: String, description: String) extends AppRequest
 case object GetWebSocketCreated extends AppRequest
 case object CreateWebSocket extends AppRequest
 case class NotifyWebSocket(json: JsObject) extends AppRequest
 case object InitialTimeoutExpired extends AppRequest
-case class ForceStopTask(id: String) extends AppRequest
 case class UpdateSourceFiles(files: Set[File]) extends AppRequest
+case object ReloadSbtBuild extends AppRequest
+case class OpenClient(client: SbtClient) extends AppRequest
+case object CloseClient extends AppRequest
+case object ProjectFilesChanged extends AppRequest
+
+// requests that need an sbt client
+sealed trait ClientAppRequest extends AppRequest {
+  def serialId: Long
+  def command: Option[String] = None
+}
+case class RequestExecution(serialId: Long, override val command: Option[String]) extends ClientAppRequest
+case class CancelExecution(serialId: Long, executionId: Long) extends ClientAppRequest
+case class PossibleAutoCompletions(serialId: Long, override val command: Option[String], detailLevel: Option[Int] = None) extends ClientAppRequest
+case class RequestSelfDestruct(serialId: Long) extends ClientAppRequest
 
 sealed trait AppReply
-
-case class TaskActorReply(ref: ActorRef) extends AppReply
+case class SbtClientResponse(serialId: Long, result: Any, command: Option[String] = None) extends AppReply
 case object WebSocketAlreadyUsed extends AppReply
 case class WebSocketCreatedReply(created: Boolean) extends AppReply
 
-case class InspectRequest(json: JsValue)
-object InspectRequest {
-  val tag = "InspectRequest"
+class InstrumentationRequestException(message: String) extends Exception(message)
 
-  implicit val inspectRequestReads: Reads[InspectRequest] =
-    extractRequest[InspectRequest](tag)((__ \ "location").read[JsValue].map(InspectRequest.apply _))
-
-  implicit val inspectRequestWrites: Writes[InspectRequest] =
-    emitRequest(tag)(in => obj("location" -> in.json))
-
-  def unapply(in: JsValue): Option[InspectRequest] = Json.fromJson[InspectRequest](in).asOpt
-}
-
-class AppActor(val config: AppConfig, val sbtProcessLauncher: SbtProcessLauncher) extends Actor with ActorLogging {
+class AppActor(val config: AppConfig) extends Actor with ActorLogging {
 
   AppManager.registerKeepAlive(self)
 
   def location = config.location
 
-  val childFactory = new DefaultSbtProcessFactory(location, sbtProcessLauncher)
-  val sbts = context.actorOf(Props(new ChildPool(childFactory)), name = "sbt-pool")
-  val socket = context.actorOf(Props(new AppSocketActor()), name = "socket")
-  val projectWatcher = context.actorOf(Props(new ProjectWatcher(location, newSourcesSocket = socket, sbtPool = sbts)),
+  log.debug(s"Creating AppActor for $location")
+
+  var pending = Vector.empty[(ActorRef, ClientAppRequest)]
+
+  // TODO configName/humanReadableName are cut-and-pasted into AppManager, fix
+  val connector = SbtConnector(configName = "activator", humanReadableName = "Activator", location)
+  val socket = context.actorOf(Props(new AppWebSocketActor(config)), name = "socket")
+  val projectWatcher = context.actorOf(Props(new ProjectWatcher(location, newSourcesSocket = socket, appActor = self)),
     name = "projectWatcher")
+  var sbtClientActor: Option[ActorRef] = None
+  var clientCount = 0
 
   var webSocketCreated = false
 
-  var tasks = Map.empty[String, ActorRef]
-
-  context.watch(sbts)
   context.watch(socket)
   context.watch(projectWatcher)
 
@@ -71,41 +69,57 @@ class AppActor(val config: AppConfig, val sbtProcessLauncher: SbtProcessLauncher
 
   override val supervisorStrategy = SupervisorStrategy.stoppingStrategy
 
+  @volatile
+  var startedConnecting = System.currentTimeMillis()
+
+  log.debug("Opening SbtConnector")
+  connector.open({ client =>
+    val now = System.currentTimeMillis()
+    val delta = now - startedConnecting
+
+    log.debug(s"Opened connection to sbt for ${location} AppActor=${self.path.name} after ${delta}ms (${delta.toDouble / 1000.0}s)")
+    produceLog(LogMessage.DEBUG, s"Opened sbt at '${location}'")
+    self ! OpenClient(client)
+  }, { (reconnecting, message) =>
+    startedConnecting = System.currentTimeMillis()
+    log.debug(s"Connection to sbt closed (reconnecting=${reconnecting}: ${message})")
+    produceLog(LogMessage.INFO, s"Lost or failed sbt connection: ${message}")
+    self ! CloseClient
+    if (!reconnecting) {
+      log.debug(s"SbtConnector gave up and isn't reconnecting; killing AppActor ${self.path.name}")
+      self ! PoisonPill
+    }
+  })
+
+  def produceLog(level: String, message: String): Unit = {
+    // self can be null after we are destroyed
+    val selfCopy = self
+    if (selfCopy != null)
+      selfCopy ! NotifyWebSocket(SbtProtocol.synthesizeLogEvent(level, message))
+  }
+
   override def receive = {
     case Terminated(ref) =>
-      if (ref == sbts) {
-        log.info(s"sbt pool terminated, killing AppActor ${self.path.name}")
-        self ! PoisonPill
-      } else if (ref == socket) {
-        log.info(s"socket terminated, killing AppActor ${self.path.name}")
+      if (ref == socket) {
+        log.debug(s"socket terminated, killing AppActor ${self.path.name}")
         self ! PoisonPill
       } else if (ref == projectWatcher) {
-        log.info(s"projectWatcher terminated, killing AppActor ${self.path.name}")
+        log.debug(s"projectWatcher terminated, killing AppActor ${self.path.name}")
         self ! PoisonPill
-      } else {
-        tasks.find { kv => kv._2 == ref } match {
-          case Some((taskId, task)) =>
-            log.debug("forgetting terminated task {} {}", taskId, task)
-            tasks -= taskId
-          case None =>
-            log.warning("other actor terminated (why are we watching it?) {}", ref)
-        }
+      } else if (Some(ref) == sbtClientActor) {
+        log.debug(s"clientActor terminated, dropping it")
+        sbtClientActor = None
+      } else if (ref == socket) {
+        for (p <- pending) p._1 ! Status.Failure(new RuntimeException("app shut down"))
       }
 
     case req: AppRequest => req match {
-      case GetTaskActor(taskId, description) =>
-        val task = context.actorOf(Props(new ChildTaskActor(taskId, description, sbts)),
-          name = "task-" + URLEncoder.encode(taskId, "UTF-8"))
-        tasks += (taskId -> task)
-        context.watch(task)
-        log.debug("created task {} {}", taskId, task)
-        sender ! TaskActorReply(task)
       case GetWebSocketCreated =>
         sender ! WebSocketCreatedReply(webSocketCreated)
       case CreateWebSocket =>
         log.debug("got CreateWebSocket")
         if (webSocketCreated) {
-          log.warning("Attempt to create websocket for app a second time {}", config.id)
+          log.debug("Attempt to create websocket for app a second time {}", config.id)
           sender ! WebSocketAlreadyUsed
         } else {
           webSocketCreated = true
@@ -119,35 +133,60 @@ class AppActor(val config: AppConfig, val sbtProcessLauncher: SbtProcessLauncher
         }
       case InitialTimeoutExpired =>
         if (!webSocketCreated) {
-          log.warning("Nobody every connected to {}, killing it", config.id)
+          log.debug("Nobody ever connected to {}, killing it", config.id)
           self ! PoisonPill
-        }
-      case ForceStopTask(id) =>
-        tasks.get(id).foreach { ref =>
-          log.debug("ForceStopTask for {} sending stop to {}", id, ref)
-          ref ! ForceStop
         }
       case UpdateSourceFiles(files) =>
         projectWatcher ! SetSourceFilesRequest(files)
+      case ReloadSbtBuild =>
+        sbtClientActor.foreach(_ ! RequestSelfDestruct(AppActor.playInternalSerialId))
+      case ProjectFilesChanged =>
+        self ! NotifyWebSocket(AppActor.projectFilesChanged)
+      case OpenClient(client) =>
+        log.debug(s"Old client actor was ${sbtClientActor}")
+        sbtClientActor.foreach(_ ! PoisonPill) // shouldn't happen - paranoia
+
+        log.debug(s"Opening new client actor for sbt client ${client}")
+        clientCount += 1
+        self ! NotifyWebSocket(AppActor.clientOpenedJsonEvent)
+        sbtClientActor = Some(context.actorOf(SbtClientActor.props(client), name = s"client-$clientCount"))
+        sbtClientActor.foreach(context.watch(_))
+        flushPending()
+      case CloseClient =>
+        log.debug(s"Closing client actor ${sbtClientActor}")
+        sbtClientActor.foreach(_ ! PoisonPill) // shouldn't be needed - paranoia
+        sbtClientActor = None
+        self ! NotifyWebSocket(AppActor.clientClosedJsonEvent)
+      case r: ClientAppRequest =>
+        pending = pending :+ (sender -> r)
+        flushPending()
+        if (pending.nonEmpty) {
+          produceLog(LogMessage.DEBUG, s"request pending until connection to sbt opens: ${r}")
+        }
     }
   }
 
+  private def flushPending(): Unit = {
+    while (sbtClientActor.isDefined && pending.nonEmpty) {
+      val req = pending.head
+      pending = pending.tail
+      sbtClientActor.foreach { actor =>
+        produceLog(LogMessage.DEBUG, s"sending request to sbt ${req._2}")
+        actor.tell(req._2, req._1)
+      }
+    }
+    if (pending.nonEmpty)
+      log.debug(s"Requests waiting for sbt client to be connected: ${pending}")
+  }
+
   private def validateEvent(json: JsObject): Boolean = {
-    // we need either a toplevel "type" or a toplevel "taskId"
-    // and then a nested "event" with a "type"
+    // be sure all events have "type" so on the client
+    // side we don't check for that.
     val hasType = json \ "type" match {
       case JsString(t) => true
       case _ => false
     }
-    val hasTaskId = json \ "taskId" match {
-      case JsString(t) =>
-        json \ "event" \ "type" match {
-          case JsString(t) => true
-          case _ => false
-        }
-      case _ => false
-    }
-    hasType || hasTaskId;
+    hasType
   }
 
   override def preRestart(reason: Throwable, message: Option[Any]): Unit = {
@@ -156,120 +195,14 @@ class AppActor(val config: AppConfig, val sbtProcessLauncher: SbtProcessLauncher
   }
 
   override def postStop(): Unit = {
-    log.debug("postStop")
+    log.debug("postStop, closing sbt connector")
+    connector.close()
   }
+}
 
-  // this actor corresponds to one protocol.Request, and any
-  // protocol.Event that are associated with said request.
-  // This is spawned from ChildTaskActor for each request.
-  class ChildRequestActor(val requestor: ActorRef, val sbt: ActorRef, val request: protocol.Request) extends Actor with ActorLogging {
-    sbt ! request
-
-    override def receive = {
-      case response: protocol.Response =>
-        requestor.forward(response)
-        // Response is supposed to arrive at the end,
-        // after all Event
-        log.debug("request responded to, request actor self-destructing")
-        self ! PoisonPill
-      case event: protocol.Event =>
-        requestor.forward(event)
-    }
-  }
-
-  private sealed trait ChildTaskRequest
-  private case object ForceStop extends ChildTaskRequest
-
-  // this actor's lifetime corresponds to one sequence of interactions with
-  // an sbt instance obtained from the sbt pool.
-  // It gets the pool from the app; reserves an sbt in the pool; and
-  // forwards any messages you like to that pool.
-  class ChildTaskActor(val taskId: String, val taskDescription: String, val pool: ActorRef) extends Actor {
-
-    val reservation = SbtReservation(id = taskId, taskName = taskDescription)
-
-    var requestSerial = 0
-    def nextRequestName() = {
-      requestSerial += 1
-      "subtask-" + requestSerial
-    }
-
-    pool ! RequestAnSbt(reservation)
-
-    private def handleRequest(requestor: ActorRef, sbt: ActorRef, request: protocol.Request) = {
-      context.actorOf(Props(new ChildRequestActor(requestor = requestor,
-        sbt = sbt, request = request)), name = nextRequestName())
-    }
-
-    private def errorOnStopped(requestor: ActorRef, request: protocol.Request) = {
-      requestor ! protocol.ErrorResponse(s"Task has been stopped (task ${reservation.id} request ${request})")
-    }
-
-    private def handleTerminated(ref: ActorRef, sbtOption: Option[ActorRef]): Unit = {
-      if (Some(ref) == sbtOption) {
-        log.debug("sbt actor died, task actor self-destructing")
-        self ! PoisonPill // our sbt died
-      }
-    }
-
-    override def receive = gettingReservation(Nil)
-
-    private def gettingReservation(requestQueue: List[(ActorRef, protocol.Request)]): Receive = {
-      case req: ChildTaskRequest => req match {
-        case ForceStop =>
-          pool ! ForceStopAnSbt(reservation.id) // drops our reservation
-          requestQueue.reverse.foreach(tuple => errorOnStopped(tuple._1, tuple._2))
-          context.become(forceStopped(None))
-      }
-      case req: protocol.Request =>
-        context.become(gettingReservation((sender, req) :: requestQueue))
-      case SbtGranted(filled) =>
-        val sbt = filled.sbt.getOrElse(throw new RuntimeException("we were granted a reservation with no sbt"))
-        // send the queue
-        requestQueue.reverse.foreach(tuple => handleRequest(tuple._1, sbt, tuple._2))
-
-        // monitor sbt death
-        context.watch(sbt)
-        // now enter have-sbt mode
-        context.become(haveSbt(sbt))
-
-      // when we die, the reservation should be auto-released by ChildPool
-    }
-
-    private def haveSbt(sbt: ActorRef): Receive = {
-      case req: protocol.Request => handleRequest(sender, sbt, req)
-      case ForceStop => {
-        pool ! ForceStopAnSbt(reservation.id)
-        context.become(forceStopped(Some(sbt)))
-      }
-      case Terminated(ref) => handleTerminated(ref, Some(sbt))
-    }
-
-    private def forceStopped(sbtOption: Option[ActorRef]): Receive = {
-      case req: protocol.Request => errorOnStopped(sender, req)
-      case Terminated(ref) => handleTerminated(ref, sbtOption)
-      case SbtGranted(filled) =>
-        pool ! ReleaseAnSbt(reservation.id)
-    }
-  }
-
-  class AppSocketActor extends WebSocketActor[JsValue] with ActorLogging {
-    override def onMessage(json: JsValue): Unit = {
-      json match {
-        case InspectRequest(m) => for (cActor <- consoleActor) cActor ! HandleRequest(json)
-        case WebSocketActor.Ping(ping) => produce(WebSocketActor.Pong(ping.cookie))
-        case _ => log.info("unhandled message on web socket: {}", json)
-      }
-    }
-
-    override def subReceive: Receive = {
-      case NotifyWebSocket(json) =>
-        log.debug("sending message on web socket: {}", json)
-        produce(json)
-    }
-
-    override def postStop(): Unit = {
-      log.debug("postStop")
-    }
-  }
+object AppActor {
+  val clientOpenedJsonEvent = SbtProtocol.wrapEvent(JsObject(Nil), "ClientOpened")
+  val clientClosedJsonEvent = SbtProtocol.wrapEvent(JsObject(Nil), "ClientClosed")
+  val playInternalSerialId = -1L
+  val projectFilesChanged = SbtProtocol.wrapEvent(JsObject(Nil), "ProjectFilesChanged")
 }

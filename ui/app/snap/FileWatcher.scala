@@ -6,7 +6,6 @@ package snap
 import akka.actor._
 import scala.concurrent.duration._
 import java.io.File
-import com.typesafe.sbtrc.EventSourceActor
 import java.io.IOException
 
 sealed trait FileWatcherRequest

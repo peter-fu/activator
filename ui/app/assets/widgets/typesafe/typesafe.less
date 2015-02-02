@@ -1,0 +1,36 @@
+/*
+ Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
+ */
+@import "../../commons/_base";
+
+#typesafe {
+  background: @slate-dkr;
+  padding: 0 15px;
+  height: 35px;
+  border-top: 1px solid rgba(0,0,0,.2);
+  .row();
+  .align-items();
+  .website {
+    display: block;
+    height: 18px;
+    .expand();
+  }
+  .home {
+    display: block;
+    width: 20px;
+    height: 20px;
+    padding: 1px;
+    border-radius: 10px;
+    border: 1px solid @grey;
+    g {
+      fill: @grey;
+    }
+    &:hover {
+      background: #fff;
+      background: @grey;
+      g {
+        fill: @slate-ltr;
+      }
+    }
+  }
+}

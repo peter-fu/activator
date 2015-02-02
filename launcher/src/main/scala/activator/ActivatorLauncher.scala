@@ -29,6 +29,8 @@ class ActivatorLauncher extends AppMain {
 
     ActivatorProxyAuthenticator.install()
 
+    RepositoryConfig.configureUserRepositories()
+
     // TODO - Detect if we're running against a local project.
     try configuration.arguments match {
       case Array("ui") => RebootToUI(configuration, version = checkForUpdatedVersion.getOrElse(APP_VERSION))
@@ -191,7 +193,7 @@ class ActivatorLauncher extends AppMain {
 
     if (needCheck) {
       downloadLatestVersion() map { version =>
-        if (version != APP_VERSION()) {
+        if (version != APP_VERSION() || !file.exists()) {
           try {
             if (file.getParentFile() != null)
               file.getParentFile().mkdirs()

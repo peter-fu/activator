@@ -3,32 +3,25 @@
  */
 package snap
 
+import java.util.UUID
 import akka.actor._
-import com.typesafe.sbtrc.launching.SbtProcessLauncher
 import java.util.concurrent.atomic.AtomicInteger
 import activator.properties.ActivatorProperties
 import java.net.URLEncoder
 
-class App(val config: AppConfig, val system: ActorSystem, val sbtProcessLauncher: SbtProcessLauncher) extends ActorWrapper {
+final case class AppIdSocketId(appId: String, socketId: UUID)
+
+class App(val id: AppIdSocketId, val config: AppConfig, val system: ActorSystem) extends ActorWrapper {
+  require(config.id == id.appId)
+
   val appInstance = App.nextInstanceId.getAndIncrement()
   override def toString = s"App(${config.id}@$appInstance})"
   val actorName = "app-" + URLEncoder.encode(config.id, "UTF-8") + "-" + appInstance
 
-  val actor = system.actorOf(Props(new AppActor(config, sbtProcessLauncher)),
+  val actor = system.actorOf(Props(new AppActor(config)),
     name = actorName)
 
   system.actorOf(Props(new ActorWatcher(actor, this)), "app-actor-watcher-" + appInstance)
-
-  // TODO - this method is dangerous, as it hits the file system.
-  // Figure out when it should initialize/run.
-  val templateID: Option[String] =
-    try {
-      val props = new java.util.Properties
-      sbt.IO.load(props, new java.io.File(config.location, "project/build.properties"))
-      Option(props.getProperty(ActivatorProperties.TEMPLATE_UUID_PROPERTY_NAME, null))
-    } catch {
-      case e: java.io.IOException => None // TODO - Log?
-    }
 
 }
 

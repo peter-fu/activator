@@ -3,27 +3,27 @@
  */
 package snap
 
+import java.util.UUID
 import scala.concurrent.Future
 import java.io.File
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Promise
 import akka.pattern._
-import com.typesafe.sbtrc.launching.SbtProcessLauncher
-import com.typesafe.sbtrc.DefaultSbtProcessFactory
-import com.typesafe.sbtrc.protocol
 import play.Logger
 import akka.actor._
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import play.api.libs.json.JsObject
 import java.util.concurrent.atomic.AtomicInteger
+import scala.util.{ Failure, Success }
 import scala.util.control.NonFatal
 import activator._
 
 sealed trait AppCacheRequest
 
-case class GetApp(id: String) extends AppCacheRequest
-case class ForgetApp(id: String) extends AppCacheRequest
+case class GetOrCreateApp(id: AppIdSocketId) extends AppCacheRequest
+case class GetApp(socketId: UUID) extends AppCacheRequest
+case class ForgetApp(appId: String) extends AppCacheRequest
 case object Cleanup extends AppCacheRequest
 
 sealed trait AppCacheReply
@@ -31,31 +31,35 @@ sealed trait AppCacheReply
 case class GotApp(app: snap.App) extends AppCacheReply
 case object ForgotApp extends AppCacheReply
 
+private case class CachedApp(appId: String, futureApp: Future[snap.App])
+
 class AppCacheActor extends Actor with ActorLogging {
-  var appCache: Map[String, Future[snap.App]] = Map.empty
+  private var appCache: Map[UUID, CachedApp] = Map.empty
 
   override val supervisorStrategy = SupervisorStrategy.stoppingStrategy
 
   private def cleanup(deadRef: Option[ActorRef]): Unit = {
     appCache = appCache.filter {
-      case (id, futureApp) =>
-        if (futureApp.isCompleted) {
+      case (socketId, cached) =>
+        if (cached.futureApp.isCompleted) {
           try {
             // this should be "instant" but 5 seconds to be safe
-            val app = Await.result(futureApp, 5.seconds)
+            val app = Await.result(cached.futureApp, 5.seconds)
             if (Some(app.actor) == deadRef || app.isTerminated) {
-              log.debug("cleaning up terminated app actor {} {}", id, app.actor)
+              log.debug("cleaning up terminated app actor {} {}", socketId, app.actor)
               false
             } else {
+              //log.debug("keeping live app actor {} {}", id, app.actor)
               true
             }
           } catch {
             case e: Exception =>
-              log.warning("cleaning up app {} which failed to load due to '{}'", id, e.getMessage)
+              log.debug("cleaning up app {} which failed to load due to '{}'", socketId, e.getMessage)
               false
           }
         } else {
           // still pending, keep it
+          log.debug("app actor {} still pending start", socketId)
           true
         }
     }
@@ -66,32 +70,26 @@ class AppCacheActor extends Actor with ActorLogging {
       cleanup(Some(ref))
 
     case req: AppCacheRequest => req match {
-      case GetApp(id) =>
-        appCache.get(id) match {
-          case Some(f) =>
+      case GetOrCreateApp(id) =>
+        appCache.get(id.socketId) match {
+          case Some(cached) =>
             log.debug(s"returning existing app from app cache for $id")
-            f map { a =>
-              log.debug(s"existing app $a terminated=${a.isTerminated}")
+            cached.futureApp map { a =>
+              log.debug(s"existing app ${a.id} terminated=${a.isTerminated}")
               GotApp(a)
             } pipeTo sender
           case None => {
-            val appFuture: Future[snap.App] = RootConfig.user.applications.find(_.id == id) match {
-              case Some(config) =>
-                if (!new java.io.File(config.location, "project/build.properties").exists()) {
-                  Promise.failed(new RuntimeException(s"${config.location} does not contain a valid sbt project")).future
-                } else {
-                  val app = new snap.App(config, snap.Akka.system, AppManager.sbtChildProcessMaker)
-                  log.debug(s"creating a new app for $id, $app")
-                  Promise.successful(app).future
-                }
-              case whatever =>
-                Promise.failed(new RuntimeException("No such app with id: '" + id + "'")).future
+            val appFuture: Future[snap.App] = AppManager.loadConfigFromAppId(id.appId) map { config =>
+              log.debug(s"creating a new app for $id")
+              new snap.App(id, config, snap.Akka.system)
             }
-            appCache += (id -> appFuture)
+
+            appCache += (id.socketId -> CachedApp(id.appId, appFuture))
 
             // set up to watch the app's actor, or forget the future
             // if the app is never created
             appFuture.onComplete { value =>
+              log.debug(s"Completed app future for ${id} with ${value}")
               value.foreach { app =>
                 context.watch(app.actor)
               }
@@ -102,14 +100,26 @@ class AppCacheActor extends Actor with ActorLogging {
             appFuture.map(GotApp(_)).pipeTo(sender)
           }
         }
-      case ForgetApp(id) =>
-        appCache.get(id) match {
+      case GetApp(socketId) =>
+        appCache.get(socketId) match {
+          case Some(cached) =>
+            log.debug(s"returning existing app from app cache for $socketId")
+            cached.futureApp map { a =>
+              log.debug(s"existing app ${a.id} terminated=${a.isTerminated}")
+              GotApp(a)
+            } pipeTo sender
+          case None => {
+            sender ! Status.Failure(new RuntimeException(s"No app found with socket ID $socketId, we have these ids: ${appCache.keys}"))
+          }
+        }
+      case ForgetApp(appId) =>
+        appCache.find(_._2.appId == appId) match {
           case Some(_) =>
-            log.debug("Attempt to forget in-use app")
+            log.debug(s"Attempt to forget in-use app $appId")
             sender ! Status.Failure(new Exception("This app is currently in use"))
           case None =>
             RootConfig.rewriteUser { root =>
-              root.copy(applications = root.applications.filterNot(_.id == id))
+              root.copy(applications = root.applications.filterNot(_.id == appId))
             } map { _ =>
               ForgotApp
             } pipeTo sender
@@ -151,7 +161,7 @@ class KeepAliveActor extends Actor with ActorLogging {
         keepAlives -= ref
         serial += 1
       } else {
-        log.warning("Ref was not in the keep alives set {}", ref)
+        log.debug("Ref was not in the keep alives set {}", ref)
       }
       if (keepAlives.isEmpty) {
         log.debug("scheduling CheckForExit")
@@ -188,11 +198,6 @@ class KeepAliveActor extends Actor with ActorLogging {
 
 object AppManager {
 
-  // this is supposed to be set by the main() launching the UI.
-  // If not, we know we're running inside the build and we need
-  // to use the default "Debug" version.
-  def sbtChildProcessMaker: SbtProcessLauncher = Global.sbtProcessLauncher
-
   private val keepAlive = snap.Akka.system.actorOf(Props(new KeepAliveActor), name = "keep-alive")
 
   def registerKeepAlive(ref: ActorRef): Unit = {
@@ -210,31 +215,17 @@ object AppManager {
   //    Return error
   // If it exists
   //    Return the app
-  def loadApp(id: String): Future[snap.App] = {
+  def getOrCreateApp(id: AppIdSocketId): Future[snap.App] = {
     implicit val timeout = Akka.longTimeoutThatIsAProblem
-    (appCache ? GetApp(id)).map {
+    (appCache ? GetOrCreateApp(id)).map {
       case GotApp(app) => app
     }
   }
 
-  // If the app actor is already in use, disconnect
-  // it and make a new one.
-  def loadTakingOverApp(id: String): Future[snap.App] = {
-    Akka.retryOverMilliseconds(4000) {
-      loadApp(id) flatMap { app =>
-        implicit val timeout = akka.util.Timeout(5.seconds)
-        DeathReportingProxy.ask(Akka.system, app.actor, GetWebSocketCreated) map {
-          case WebSocketCreatedReply(created) =>
-            if (created) {
-              Logger.debug(s"browser tab already connected to $app, disconnecting it")
-              app.actor ! PoisonPill
-              throw new Exception("retry after killing app actor")
-            } else {
-              Logger.debug(s"app looks shiny and new! $app")
-              app
-            }
-        }
-      }
+  def getApp(socketId: UUID): Future[snap.App] = {
+    implicit val timeout = Akka.longTimeoutThatIsAProblem
+    (appCache ? GetApp(socketId)).map {
+      case GotApp(app) => app
     }
   }
 
@@ -253,6 +244,20 @@ object AppManager {
     }
   }
 
+  def loadConfigFromAppId(id: String): Future[snap.AppConfig] = {
+    RootConfig.user.applications.find(_.id == id) match {
+      case Some(config) =>
+        if (!new java.io.File(config.location, "project/build.properties").exists()) {
+          Promise.failed(new RuntimeException(s"${config.location} does not contain a valid sbt project")).future
+        } else {
+
+          Promise.successful(config).future
+        }
+      case whatever =>
+        Promise.failed(new RuntimeException("No such app with id: '" + id + "'")).future
+    }
+  }
+
   def forgetApp(id: String): Future[Unit] = {
     implicit val timeout = Akka.longTimeoutThatIsAProblem
     (appCache ? ForgetApp(id)).map(_ => ())
@@ -268,37 +273,98 @@ object AppManager {
       case None => candidate
     }
   }
+
+  // FIXME we need to send events here or somehow be sure they are displayed
+  // by the client side. Need sbt logs in the UI. Also failure-to-start-sbt
+  // errors should go there.
   private def doInitialAppAnalysis(location: File, eventHandler: Option[JsObject => Unit] = None): Future[ProcessResult[AppConfig]] = {
+    import sbt.client._
+    import sbt.protocol._
+    import sbt.protocol.CoreProtocol._
+    import sbt.serialization._
+
     val validated = ProcessSuccess(location).validate(
       Validation.isDirectory,
       Validation.looksLikeAnSbtProject)
 
     validated flatMapNested { location =>
-      // NOTE -> We have to use the factory to ensure that shims are installed BEFORE we try to load the app.
-      // While we should consolidate all sbt specific code, right now the child factory is the correct entry point.
-      val factory = new DefaultSbtProcessFactory(location, sbtChildProcessMaker)
-      // TODO - we should actually have ogging of this sucker
-      factory.init(akka.event.NoLogging)
-      val sbt = factory.newChild(snap.Akka.system)
       implicit val timeout = Akka.longTimeoutThatIsAProblem;
 
-      val requestManager = snap.Akka.system.actorOf(
-        Props(new RequestManagerActor("learn-project-name", sbt, false)({
-          event =>
-            eventHandler foreach (_ apply event)
-        })), name = "request-manager-" + requestManagerCount.getAndIncrement())
-      val resultFuture: Future[ProcessResult[AppConfig]] =
-        (requestManager ? protocol.NameRequest(sendEvents = true)) map {
-          case protocol.NameResponse(name, _) => {
-            Logger.info("sbt told us the name is: '" + name + "'")
-            name
+      // TODO factor out the configName / humanReadableName to share with
+      // AppActor
+      val connector = SbtConnector(configName = "activator",
+        humanReadableName = "Activator", location)
+
+      val nameFuture = {
+        val namePromise = Promise[String]()
+        val nameFuture = namePromise.future
+        def onConnect(client: SbtClient): Unit = {
+
+          val eventsSub = client.handleEvents({ event =>
+            import sbt.protocol._
+
+            val json = event match {
+              case log: LogEvent => log match {
+                case e: TaskLogEvent => SbtProtocol.wrapEvent(e)
+                case e: CoreLogEvent => SbtProtocol.wrapEvent(e)
+                case e: BackgroundJobLogEvent => SbtProtocol.wrapEvent(e)
+              }
+              case e: BuildFailedToLoad => SbtProtocol.wrapEvent(e)
+              case _ =>
+                SbtProtocol.synthesizeLogEvent(LogMessage.DEBUG, event.toString)
+            }
+            eventHandler.foreach(_.apply(json))
+          })
+          nameFuture.onComplete { _ => eventsSub.cancel() }
+
+          client.lookupScopedKey("name") map { keys =>
+            if (keys.isEmpty) {
+              namePromise.tryFailure(new RuntimeException("Project has no 'name' setting"))
+            } else {
+              val sub =
+                client.watch[String](SettingKey[String](keys.head)) { (key, result) =>
+                  result match {
+                    case Success(name) => namePromise.trySuccess(name)
+                    case Failure(e) => namePromise.tryFailure(new RuntimeException(s"Failed to get name setting from project: ${e.toString}"))
+                  }
+                }
+              nameFuture.onComplete { _ => sub.cancel() }
+            }
           }
-          case protocol.ErrorResponse(error) =>
+        }
+        def onError(reconnecting: Boolean, message: String): Unit = {
+          if (reconnecting) {
+            // error for reason other than close
+            Logger.debug(s"Error connecting to sbt: ${message}")
+          } else {
+            // this happens on our explicit close, but should be a no-op if we've already
+            // gotten the project name
+            Logger.debug(s"Error connecting to sbt (probably just closed): ${message}")
+            namePromise.tryFailure(new RuntimeException("Connection to sbt closed without acquiring name of project"))
+          }
+        }
+
+        connector.open(onConnect, onError)
+
+        nameFuture.onComplete { _ =>
+          Logger.debug("Closing sbt connector used to get project name")
+          connector.close()
+        }
+
+        nameFuture
+      }
+
+      val resultFuture: Future[ProcessResult[AppConfig]] =
+        nameFuture map { name =>
+          Logger.debug("got project name from sbt: '" + name + "'")
+          name
+        } recover {
+          case NonFatal(e) =>
             // here we need to just recover, because if you can't open the app
             // you can't work on it to fix it
-            Logger.info("error getting name from sbt: " + error)
+            Logger.debug(s"error getting name from sbt: ${e.getClass.getName}: ${e.getMessage}")
             val name = location.getName
-            Logger.info("using file basename as app name: " + name)
+            Logger.debug("using file basename as app name: " + name)
             name
         } flatMap { name =>
           RootConfig.rewriteUser { root =>
@@ -316,10 +382,7 @@ object AppManager {
               .validated(s"Somehow failed to save new app at ${location.getPath} in config")
           }
         }
-      resultFuture onComplete { result =>
-        Logger.debug(s"Stopping sbt child because we got our app config or error ${result}")
-        sbt ! PoisonPill
-      }
+
       // change a future-with-exception into a future-with-value
       // where the value is a ProcessFailure
       resultFuture recover {
@@ -330,7 +393,7 @@ object AppManager {
   }
 
   def onApplicationStop() = {
-    Logger.warn("AppManager onApplicationStop is disabled pending some refactoring so it works with FakeApplication in tests")
+    Logger.debug("AppManager onApplicationStop is disabled pending some refactoring so it works with FakeApplication in tests")
     //Logger.debug("Killing app cache actor onApplicationStop")
     //appCache ! PoisonPill
   }
