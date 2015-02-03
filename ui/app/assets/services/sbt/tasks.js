@@ -248,7 +248,7 @@ define([
     execution.jobIds.push(jobId);
   });
   subTypeEventStream("BackgroundJobFinished").each(function(message) {
-    console.log(message)
+    debug && console.log(message);
     var execution = executionsById[message.event.executionId];
     // TODO: inconsistency if you look at "BackgroundJobStarted", we have message.event.job.id
     var jobId = message.event.jobId;
