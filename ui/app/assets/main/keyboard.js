@@ -1,7 +1,7 @@
 /*
  Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
  */
-define(['./router'], function(router) {
+define(['./router', 'services/sbt'], function(router, sbt) {
 
   var isMac = navigator.platform.toUpperCase().indexOf('MAC')>=0;
   var activeKeyboard = true;
@@ -51,6 +51,9 @@ define(['./router'], function(router) {
         } else {
           $(".dropdown.opened").removeClass("opened");
         }
+      // CTRL + D
+      } else if (e.keyCode === 68 && e.ctrlKey) {
+        $("#appStatus .onoff").trigger("click");
       }
     }).keydown(function(e){
       var isMeta = modifierKey(e);
