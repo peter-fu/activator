@@ -1,7 +1,6 @@
 package snap
 
 import sbt.protocol._
-import sbt.protocol.CoreProtocol._
 import sbt.serialization._
 import play.api.libs.json._
 

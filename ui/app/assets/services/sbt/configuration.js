@@ -18,7 +18,7 @@ define([
   // this file isn't required to exist, if it doesn't we should create
   var buildFileLocation = "/build.sbt";
 
-  var sbtEchoVersion = "0.1.8";
+  var sbtEchoVersion = "0.1.9";
   var echoPluginFileLocation = "/project/inspect.sbt";
   var echoDefaultPluginFileContent = "// This plugin runs apps with the \"echo\" trace infrastructure which backs up the Inspect functionality in Activator\n\n" +
     "addSbtPlugin(\"com.typesafe.sbt\" % \"sbt-echo\" % \""+sbtEchoVersion+"\")";
