@@ -12,6 +12,16 @@ define([
   layoutManager
 ){
 
+  var presentationModeStyle = function() {
+    // Create the <style> tag
+    var style = document.createElement("style");
+    // WebKit hack :(
+    style.appendChild(document.createTextNode(""));
+    // Add the <style> element to the page
+    document.head.appendChild(style);
+    style.sheet.insertRule(".presentation-mode .tutorial .page, .presentation-mode .build .logs, .presentation-mode .run .pluginBlock, .presentation-mode .code .editor, .presentation-mode .monitoring .tabs-step { zoom: 141% !important; }");
+    return style;
+  }
 
   var WelcomeState = (function(){
     var self = {};
@@ -44,7 +54,8 @@ define([
       var on = e.target.checked;
       document.body.style.zoom = on?"75%":"1";
       document.body.classList.toggle("presentation-mode");
-      layoutManager.panelOpened(false);
+      document.head.appendChild(presentationModeStyle());
+      layoutManager.panelOpenedSet(false);
       layoutManager.navigationOpened(!on);
     }
 

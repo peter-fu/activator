@@ -21,6 +21,7 @@ define([
 
   var State = {
     panelShape: panelShape,
+    panelOpenedSet: panelOpenedSet,
     panelOpened: panelOpened,
     navigationOpened: navigationOpened,
 
