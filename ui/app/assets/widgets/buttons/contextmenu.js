@@ -13,6 +13,8 @@ define([
         event.stopPropagation();
         event.preventDefault();
 
+        if (event.target.className === 'contextmenu') return;
+
         var dom = $("<div class='contextmenu'></div>");
         dom.css({
           left: (event.clientX - 5)+"px" ,

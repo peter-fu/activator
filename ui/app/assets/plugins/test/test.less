@@ -17,7 +17,19 @@
   }
 
   [data-status="passed"] {
-    color: green;
+    color: @grey;
+    label:after {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      line-height: 18px;
+      border-radius: 10px;
+      background: green;
+      content: "✓";
+      text-align: center;
+      color: #fff;
+      margin: 0 10px;
+    }
   }
   [data-status="failed"] {
     color: #fff;
