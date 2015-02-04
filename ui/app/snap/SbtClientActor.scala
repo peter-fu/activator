@@ -6,7 +6,6 @@ import play.api.libs.json._
 
 import sbt.client._
 import sbt.protocol._
-import sbt.protocol.CoreProtocol._
 
 import scala.concurrent.Future
 import scala.reflect.ClassTag

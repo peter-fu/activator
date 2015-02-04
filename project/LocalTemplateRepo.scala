@@ -13,10 +13,12 @@ object LocalTemplateRepo {
   val latestTemplateCacheHash = taskKey[String]("get the latest template cache hash from the remote URI")
   val checkTemplateCacheHash = taskKey[String]("throw if our configured template cache hash is not the latest, otherwise return the local (and latest) hash")
   val enableCheckTemplateCacheHash = settingKey[Boolean]("true to enable checking we have latest cache before we publish")
+  val overrideWithTemplates = settingKey[String]("templates names to use separated by ,")
 
   def settings: Seq[Setting[_]] = Seq(
     localTemplateCache <<= target(_ / "template-cache"),
-    localTemplateCacheCreated <<= (localTemplateCache, localTemplateCacheHash, Keys.fullClasspath in Runtime, remoteTemplateCacheUri, streams) map makeTemplateCache,
+    overrideWithTemplates := "",
+    localTemplateCacheCreated <<= (localTemplateCache, localTemplateCacheHash, Keys.fullClasspath in Runtime, remoteTemplateCacheUri, streams, overrideWithTemplates) map makeTemplateCache,
     scalaVersion := Dependencies.scalaVersion,
     libraryDependencies += Dependencies.templateCache,
     // TODO - Allow debug version for testing?
@@ -33,8 +35,14 @@ object LocalTemplateRepo {
     enableCheckTemplateCacheHash := true
   )
   
-  def invokeTemplateCacheRepoMakerMain(cl: ClassLoader, dir: File, uri: String): Unit =
-    invokeMainFor(cl, "activator.templates.TemplateCacheSeedGenerator", Array("-remote", uri, dir.getAbsolutePath))
+  def invokeTemplateCacheRepoMakerMain(cl: ClassLoader, dir: File, uri: String, templates: String): Unit =
+    invokeMainFor(
+      cl,
+      "activator.templates.TemplateCacheSeedGenerator",
+      Array(
+        "-remote", uri,
+        "-file", dir.getAbsolutePath,
+        "-templates", templates))
   
   private def makeClassLoaderFor(classpath: Keys.Classpath): java.net.URLClassLoader = {
     val jars = classpath map (_.data.toURL)
@@ -50,7 +58,7 @@ object LocalTemplateRepo {
     mainMethod.invoke(null, args)
   }
 
-  def makeTemplateCache(targetDir: File, hash: String, classpath: Keys.Classpath, uri: String, streams: TaskStreams): File = {
+  def makeTemplateCache(targetDir: File, hash: String, classpath: Keys.Classpath, uri: String, streams: TaskStreams, templates: String): File = {
     val cachePropsFile = targetDir / "cache.properties"
 
     // Delete stale cache.
@@ -79,7 +87,7 @@ object LocalTemplateRepo {
       // Akka requires this crazy
       val old = Thread.currentThread.getContextClassLoader
       Thread.currentThread.setContextClassLoader(cl)
-      try invokeTemplateCacheRepoMakerMain(cl, targetDir, uri)
+      try invokeTemplateCacheRepoMakerMain(cl, targetDir, uri, templates)
       finally Thread.currentThread.setContextClassLoader(old)
     } catch {
       case ex: Exception =>
