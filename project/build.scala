@@ -15,7 +15,6 @@ import com.typesafe.sbt.jse.JsEngineImport.JsEngineKeys
 // NOTE - This file is only used for SBT 0.12.x, in 0.13.x we'll use build.sbt and scala libraries.
 // As such try to avoid putting stuff in here so we can see how good build.sbt is without build.scala.
 
-
 object TheActivatorBuild extends Build {
 
   def fixFileForURIish(f: File): String = {
@@ -39,7 +38,7 @@ object TheActivatorBuild extends Build {
     .noAutoPgp
     .doNotPublish
     aggregate(toReferences(publishedProjects ++
-                           Seq(dist, it, localTemplateRepo, offlinetests)): _*)
+      Seq(dist, it, localTemplateRepo, offlinetests)): _*)
   )
 
   lazy val news: Project = (
@@ -131,6 +130,10 @@ object TheActivatorBuild extends Build {
     )
     settings(
       Keys.compile in Compile <<= (Keys.compile in Compile, Keys.baseDirectory, Keys.streams) map { (oldCompile, baseDir, streams) =>
+        // write version information
+        VersionGenerator.createInformation(baseDir)
+
+        // check for JS errors
         val jsErrors = JsChecker.fixAndCheckAll(baseDir, streams.log)
         for (error <- jsErrors) {
           streams.log.error(error)
