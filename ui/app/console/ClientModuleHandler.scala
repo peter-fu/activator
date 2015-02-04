@@ -27,8 +27,6 @@ object ClientModuleHandler {
   case object LifecycleModule extends Handler("lifecycle")
 
   def fromString(in: String): Option[Handler] = {
-    println(s"---- fromString($in)")
-
     in match {
       case "overview" => Some(OverviewModule)
       case "actors" => Some(ActorsModule)
