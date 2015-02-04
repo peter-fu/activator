@@ -57,7 +57,7 @@ object TheActivatorBuild extends Build {
   )
 
   // These are the projects we want in the local repository we deploy.
-  lazy val publishedProjects: Seq[Project] = Seq(ui, uiCommon, launcher, props, EchoBuild.echo, SbtEchoBuild.sbtEcho)
+  lazy val publishedProjects: Seq[Project] = Seq(ui, uiCommon, launcher, props)
 
   // basic project that gives us properties to use in other projects.
   lazy val props = (
