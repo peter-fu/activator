@@ -217,19 +217,23 @@ define([
     }
   });
 
+  var packageRegexp = new RegExp(".*\\.");
+
   subTypeEventStream("TaskEvent").each(function(message) {
     var event = message.event;
     var execution = executionsById[tasksById[event.taskId].executionId];
     if (!execution) throw "Orphan task detected";
 
-    if (event.name === "CompilationFailure") {
+    var name = event.serialized.$type.replace(packageRegexp, "");
+
+    if (name === "CompilationFailure") {
       debug && console.log("CompilationFailure: ", event);
       execution.compilationErrors.push(event.serialized);
-    } else if (event.name === "TestEvent") {
+    } else if (name === "TestEvent") {
       debug && console.log("TestEvent: ", event);
       execution.testResults.push(event.serialized);
-    } else if (event.name === "PlayServerStarted") {
-      if (event.serialized) playApplicationUrl(event.serialized.url);
+    } else if (name === "PlayServerStarted") {
+      playApplicationUrl(event.serialized.url);
     }
   });
 

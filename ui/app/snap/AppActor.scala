@@ -9,7 +9,6 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.duration._
 import play.api.libs.json._
 import sbt.client._
-import sbt.protocol.CoreProtocol._
 import sbt.protocol._
 
 sealed trait AppRequest

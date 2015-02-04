@@ -280,7 +280,6 @@ object AppManager {
   private def doInitialAppAnalysis(location: File, eventHandler: Option[JsObject => Unit] = None): Future[ProcessResult[AppConfig]] = {
     import sbt.client._
     import sbt.protocol._
-    import sbt.protocol.CoreProtocol._
     import sbt.serialization._
 
     val validated = ProcessSuccess(location).validate(

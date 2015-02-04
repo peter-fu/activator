@@ -46,7 +46,7 @@
       <ul class="suite" data-bind="foreach: results">
         <li data-bind="attr: {'data-status': outcome}">
           <label data-bind="text: name"></label>
-          <p class="error" data-bind="visible: error, text: error"></p>
+          <p class="error" data-bind="visible: error, text: (error && error.message)"></p>
         </li>
       </ul>
     </section>
