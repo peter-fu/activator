@@ -8,8 +8,8 @@ define([
   "main/plugins",
   "commons/format",
   "text!./requests.html",
-  "css!widgets/modules/modules",
-  "css!./requests"
+  "css!./requests",
+  "css!widgets/modules/modules"
 ], function(
   tasks,
   connection,
@@ -67,7 +67,7 @@ define([
 
   function formatRequestsList(_req) {
     var request = $.extend({}, _req);
-    request.requestLink = "#run/requests/"+request.id;
+    request.requestLink = "#run/requests/"+request.traceId;
     return request;
   }
 
@@ -81,12 +81,24 @@ define([
     requests.currentRequest(null);
   }
 
+  function sortByKey(a, b) {
+    var aName = a.key.toLowerCase();
+    var bName = b.key.toLowerCase();
+    return ((aName < bName) ? -1 : ((aName > bName) ? 1 : 0));
+  }
+
+  function extractHeaders(headers) {
+    var hs = $.map(headers,function (v,k) { return {value:v, key:k}; });
+    return hs.sort(sortByKey);
+  }
+
   var State = {
     requests:       filteredRequestsList,
     currentRequest: requests.currentRequest,
     openRequest:    openRequest,
     closeRequest:   closeRequest,
-    inspect:        tasks.inspect,
+    extractHeaders: extractHeaders,
+    inspectPlayVersionReport: tasks.inspectPlayVersionReport,
     filters: {
       isOrdering:      isOrdering,
       toggleOrdering:  toggleOrdering,
@@ -112,7 +124,7 @@ define([
     },
 
     render: function(){
-      return ko.bindhtml(tpl, State)
+      return ko.bindhtml(tpl, State);
     },
 
     keyboard: function(key, meta, e) {

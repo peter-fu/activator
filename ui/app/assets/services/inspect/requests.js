@@ -2,11 +2,12 @@ define([
   './connection',
   'commons/format'
 ],function(
-  connection
+  connection,
+  format
 ){
 
   function setListFilters(filters) {
-    connection.filters.actors($.extend(connection.filters.actors(), filters));
+    connection.filters.requests($.extend(connection.filters.requests(), filters));
   }
   var requestsList = ko.observable([]);
 
@@ -36,13 +37,12 @@ define([
     //   }
     // })
     .map(function(data) {
-      console.log(data)
       requestsList(data);
     });
 
 
-  connection.filters.actors({
-    'name': 'playRequestList',
+  connection.filters.requests({
+    'name': 'requests',
     'scope': {},
     'sortCommand': 'startTime',
     // "startTime"    -- i.startNanoTime
@@ -67,8 +67,9 @@ define([
   function setCurrentRequestId(id) {
     if (id){
       connection.filters.request({
-        'name': 'playRequest',
-        'scope': { 'traceId': id }
+        'name': 'request',
+        'scope': {},
+        'traceId': id
       });
     } else {
       connection.filters.request({});
