@@ -218,54 +218,26 @@ object TheActivatorBuild extends Build {
         echoSbt13Plugin,
         echoPlaySbt13Plugin,
 
-        // featured template deps
+        // featured template dependencies 
         // *** note: do not use %% here ***
-        "com.h2database" % "h2" % "1.3.175",
-        "com.novocode" % "junit-interface" % "0.10",
-        "com.typesafe.slick" % "slick_2.11" % Dependencies.slickVersion,
-        "junit" % "junit" % "4.11",
-        "junit" % "junit" % "3.8.1",
-        "org.slf4j" % "slf4j-nop" % "1.6.4",
-        "org.fusesource.jansi" % "jansi" % "1.11",
-        "org.scalatest" % "scalatest_2.11" % "2.1.6",
-
-        Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-jshint" % "1.0.1", "0.13", "2.10"),
-        Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-rjs" % "1.0.1", "0.13", "2.10"),
-        Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-digest" % "1.0.0", "0.13", "2.10"),
-        Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-mocha" % "1.0.0", "0.13", "2.10"),
-        // reactive maps using an older sbt-gzip, later we should go back to one copy
-        Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-gzip" % "1.0.0", "0.13", "2.10"),
-        Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-gzip" % "1.0.1", "0.13", "2.10"),
-
-        // transient dependencies used in offline mode
+        "com.h2database" % "h2" % "1.3.170",
+        "org.scalatest" % "scalatest_2.11" % "2.2.1",
+        "com.typesafe.trace" % "echo-trace-akka-2.3.9_2.11" % Dependencies.echoPluginVersion,
+        "com.typesafe.trace" % "echo-sigar-libs" % Dependencies.echoPluginVersion,
+        "org.aspectj" % "aspectjweaver" % Dependencies.aspectJVersion,
         "org.scala-lang" % "jline" % "2.10.4",
-        Defaults.sbtPluginExtra("com.typesafe.play" % "sbt-plugin" % Dependencies.play23Version, "0.13", "2.10"),
-        Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-coffeescript" % "1.0.0", "0.13", "2.10"),
-        Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-less" % "1.0.0", "0.13", "2.10"),
-        "org.scalaz" % "scalaz-core_2.10" % "7.0.2",
-        "org.scalaz" % "scalaz-effect_2.10" % "7.0.2",
-        "com.typesafe.play" % "play-java_2.11" % Dependencies.play23Version,
-        "com.typesafe.play" % "play-java-jdbc_2.11" % Dependencies.play23Version,
-        "com.typesafe.play" % "play-java-ebean_2.11" % Dependencies.play23Version,
-        "com.typesafe.play" % "play-java-ws_2.11" % Dependencies.play23Version,
-        "com.typesafe.play" % "play-cache_2.11" % Dependencies.play23Version,
-        "com.typesafe.play" % "play-docs_2.11" % Dependencies.play23Version,
-        "com.typesafe.play" % "anorm_2.11" % Dependencies.play23Version,
-        "com.typesafe.play" % "play-ws_2.11" % Dependencies.play23Version,
-
-        "org.webjars" % "bootstrap" % "2.3.1",
-        "org.webjars" % "flot" % "0.8.0",
         "org.webjars" % "bootstrap" % "3.0.0",
         "org.webjars" % "knockout" % "2.3.0",
         "org.webjars" % "requirejs" % "2.1.11-1",
         "org.webjars" % "leaflet" % "0.7.2",
+        "org.webjars" % "flot" % "0.8.0",
+        "com.typesafe.slick" % "slick_2.11" % "2.1.0",
+        "org.slf4j" % "slf4j-nop" % "1.6.4",
+        "org.webjars" % "rjs" % "2.1.11-1",
         "org.webjars" % "squirejs" % "0.1.0",
-
+        "com.novocode" % "junit-interface" % "0.10",
         "com.typesafe.play.extras" % "play-geojson_2.11" % "1.1.0",
-        "com.typesafe.akka" % "akka-contrib_2.11" % Dependencies.akka23Version,
-        "org.codehaus.plexus" % "plexus-interactivity-api" % "1.0-alpha-6",
-        "org.codehaus.plexus" % "plexus-component-api" % "1.0-alpha-16",
-        "org.jcraft" % "jsch" % "0.1.38"
+        "org.webjars" % "rjs" % "2.1.11-1-trireme"
         ),
       Keys.mappings in S3.upload <<= (Keys.packageBin in Universal, Packaging.minimalDist, Keys.version) map { (zip, minimalZip, v) =>
         Seq(minimalZip -> ("typesafe-activator/%s/typesafe-activator-%s-minimal.zip" format (v, v)),
