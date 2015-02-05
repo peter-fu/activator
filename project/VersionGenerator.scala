@@ -34,6 +34,6 @@ object VersionGenerator {
          |});""".stripMargin
 
     println(s"Generating file: ${path}${fileLocation}")
-    sbt.IO.write(file = new File(path + fileLocation), content = content)
+    Properties.writeIfChanged(file = new File(path + fileLocation), content = content)
   }
 }
