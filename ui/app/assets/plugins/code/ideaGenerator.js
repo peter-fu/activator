@@ -4,17 +4,19 @@
 define([
   './generator',
   'services/ajax',
-  'widgets/openIn/openIn'
+  'widgets/openIn/openIn',
+  'generated/dependencies'
 ], function (
   generator,
   fs,
-  openIn
+  openIn,
+  dependencies
 ) {
 
   var projectFile = ".idea";
   var pluginFileLocation = "/project/idea.sbt";
   var pluginFileContent = "// This plugin adds commands to generate IDE project files\n\n" +
-    "addSbtPlugin(\"com.github.mpeltonen\" % \"sbt-idea\" % \"1.6.0\")";
+    "addSbtPlugin(\"com.github.mpeltonen\" % \"sbt-idea\" % \""+dependencies.ideaVersion+"\")";
   var sbtCommand = "gen-idea";
 
   var isInstalled = ko.observable(false);

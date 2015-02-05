@@ -23,6 +23,10 @@ object Dependencies {
   val activatorAnalyticsVersion = "0.1.7"
   val aspectJVersion = "1.8.4"
 
+  // versions used by build to set dependencies in JS
+  val ideaVersion = "1.6.0"
+  val eclipseVersion = "2.5.0"
+
   val activatorCommon      = "com.typesafe.activator" % "activator-common" % templateCacheVersion
   val templateCache        = "com.typesafe.activator" % "activator-templates-cache" % templateCacheVersion
 

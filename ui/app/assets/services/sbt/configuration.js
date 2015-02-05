@@ -3,27 +3,28 @@
  */
 define([
   './tasks',
-  'services/ajax'
+  'services/ajax',
+  'generated/dependencies'
 ], function (
   tasks,
-  ajax
+  ajax,
+  dependencies
 ) {
 
   // plugin information
   var backgroundRunPluginFileLocation = "/project/sbt-ui.sbt";
   var backgroundRunPluginFileContent = "// This plugin represents functionality that is to be added to sbt in the future\n\n" +
-    "addSbtPlugin(\"com.typesafe.sbtrc\" % \"ui-interface-0-13\" % \"1.0-M2\")";
+    "addSbtPlugin(\"com.typesafe.sbtrc\" % \"ui-interface-0-13\" % \""+dependencies.sbtUIVersion+"\")";
   var uiFileEchoSettings = "\n\nfork in run := true";
 
   // this file isn't required to exist, if it doesn't we should create
   var buildFileLocation = "/build.sbt";
 
-  var sbtEchoVersion = "0.1.9";
   var echoPluginFileLocation = "/project/inspect.sbt";
   var echoDefaultPluginFileContent = "// This plugin runs apps with the \"echo\" trace infrastructure which backs up the Inspect functionality in Activator\n\n" +
-    "addSbtPlugin(\"com.typesafe.sbt\" % \"sbt-echo\" % \""+sbtEchoVersion+"\")";
+    "addSbtPlugin(\"com.typesafe.sbt\" % \"sbt-echo\" % \""+dependencies.echoVersion+"\")";
   var echoPlayPluginFileContent = "// This plugin runs apps with the \"echo\" trace infrastructure (with Play support) which backs up the Inspect functionality in Activator\n\n" +
-    "addSbtPlugin(\"com.typesafe.sbt\" % \"sbt-echo-play\" % \""+sbtEchoVersion+"\")";
+    "addSbtPlugin(\"com.typesafe.sbt\" % \"sbt-echo-play\" % \""+dependencies.echoVersion+"\")";
 
   var echoPluginFileContent = ko.computed(function() {
     return tasks.isPlayApplication() ? echoPlayPluginFileContent : echoDefaultPluginFileContent;
@@ -31,7 +32,7 @@ define([
 
   var playForkRunPluginFileLocation = "/project/play-fork-run.sbt";
   var playForkRunPluginFileContent = "// This plugin adds forked run capabilities to Play projects which is needed for Activator.\n\n" +
-    "addSbtPlugin(\"com.typesafe.play\" % \"sbt-fork-run-plugin\" % \"2.3.8-M2\")";
+    "addSbtPlugin(\"com.typesafe.play\" % \"sbt-fork-run-plugin\" % \""+dependencies.playVersion+"\")";
 
   var addedEchoFile = ko.observable(false);
   var addedBackgroundFile = ko.observable(false);

@@ -4,17 +4,19 @@
 define([
   './generator',
   'services/ajax',
-  'widgets/openIn/openIn'
+  'widgets/openIn/openIn',
+  'generated/dependencies'
 ], function (
   generator,
   fs,
-  openIn
+  openIn,
+  dependencies
 ) {
 
   var projectFile = ".project";
   var pluginFileLocation = "/project/eclipse.sbt";
   var pluginFileContent = "// This plugin adds commands to generate IDE project files\n\n" +
-    "addSbtPlugin(\"com.typesafe.sbteclipse\" % \"sbteclipse-plugin\" % \"2.5.0\")";
+    "addSbtPlugin(\"com.typesafe.sbteclipse\" % \"sbteclipse-plugin\" % \""+dependencies.eclipseVersion+"\")";
   var sbtCommand = "eclipse";
 
   var isInstalled = ko.observable(false);
