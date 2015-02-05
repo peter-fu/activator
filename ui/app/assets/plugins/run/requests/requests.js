@@ -81,11 +81,23 @@ define([
     requests.currentRequest(null);
   }
 
+  function sortByKey(a, b) {
+    var aName = a.key.toLowerCase();
+    var bName = b.key.toLowerCase();
+    return ((aName < bName) ? -1 : ((aName > bName) ? 1 : 0));
+  }
+
+  function extractHeaders(headers) {
+    var hs = $.map(headers,function (v,k) { return {value:v, key:k}; });
+    return hs.sort(sortByKey);
+  }
+
   var State = {
     requests:       filteredRequestsList,
     currentRequest: requests.currentRequest,
     openRequest:    openRequest,
     closeRequest:   closeRequest,
+    extractHeaders: extractHeaders,
     inspectPlayVersionReport: tasks.inspectPlayVersionReport,
     filters: {
       isOrdering:      isOrdering,
