@@ -12,8 +12,15 @@ define([
   var logs = ko.observableArray([]);
   var scroll = ko.observable("stick");
 
+
+  // Cache the dom Logs, for better performances
+  // Not very elegant, but much, much, much more efficient.
+  var logsView = ko.tpl("ul", {logEach: logs, css: "logs", id: "loading-logs"}, [
+    ko.tpl("li", { attr: { 'data-bind': "text: message"} }, [])
+  ]);
+
   var State = {
-    logs: logs,
+    logsView: logsView,
     scroll: scroll
   }
 

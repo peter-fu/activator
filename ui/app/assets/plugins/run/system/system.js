@@ -19,8 +19,15 @@ define([
     State.memoLogsScroll('stick');
   }
 
+  // Cache the dom Logs, for better performances
+  // Not very elegant, but much, much, much more efficient.
+  var logsView = ko.tpl("ul", {logEach: sbt.logs.stdout }, [
+    ko.tpl("li", { attr: { 'data-bind': "text: event.entry.message, attr: { 'data-level': event.entry.level, 'data-type': event.entry['$type'] }"} }, [])
+  ]);
+
   var State = {
     sbt: sbt,
+    logsView: logsView,
     clear: function() {
       sbt.logs.stdout.removeAll();
     },

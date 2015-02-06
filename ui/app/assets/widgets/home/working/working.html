@@ -4,8 +4,6 @@
   </header>
   <article style="overflow: scroll" data-bind="logScroll: scroll">
     <p>This will just take a minute...</p>
-    <ul class="logs" id="loading-logs" data-bind="logEach: logs">
-      <li data-bind="text: message"></li>
-    </ul>
+    <!-- ko include: logsView --><!-- /ko -->
   </article>
 </section>
