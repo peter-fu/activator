@@ -191,7 +191,7 @@ define(function() {
       }
       setTimeout(function() {
         if (memo() === 'stick'){
-          element.scrollTop = 99999;
+          element.scrollTop = 999999;
         } else {
           element.scrollTop = memo();
         }
@@ -202,7 +202,7 @@ define(function() {
       // removed when the element is gone.
       element.addEventListener("DOMNodeInserted", function() {
         if (memo() === 'stick'){
-          element.scrollTop = 99999;
+          element.scrollTop = 999999;
         }
       }, true);
 
@@ -276,7 +276,7 @@ define(function() {
             if (c.status === "added") {
               renderItem(c.value);
             // We are assuming here that all deletion are sequetial from first index
-            } else if (c.status === "deleted") {
+            } else if (c.status === "deleted" && element.firstChild) {
               element.removeChild(element.firstChild);
             }
           });

@@ -14,15 +14,21 @@ define([
 ) {
 
   function scrollToBottom() {
-    $(".logs")[0].scrollTop = 99999;
+    $(".logs")[0].scrollTop = 999999;
     State.memoLogsScroll('stick');
   }
+
+  // Cache the dom Logs, for better performances
+  // Not very elegant, but much, much, much more efficient.
+  var logsView = ko.tpl("ul", {logEach: sbt.logs.logs, css: { 'show-debug': sbt.app.settings.showLogDebug }}, [
+    ko.tpl("li", { attr: { 'data-bind': "text: event.entry.message, attr: { 'data-level': event.entry.level, 'data-type': event.entry.$type }"} }, [])
+  ]);
 
   var State = {
     memoTaskScroll: ko.observable(),
     memoLogsScroll: ko.observable(),
     sbt: sbt,
-    logs: sbt.logs.logs,
+    logsView: logsView,
     scrollToBottom: scrollToBottom,
     clear: function() {
       sbt.logs.logs.removeAll();
@@ -44,7 +50,7 @@ define([
 
     render: function(){
       sbt.events.errorCounters.build(0);
-      return ko.bindhtml(tpl, State)
+      return ko.bindhtml(tpl, State);
     }
   }
 
