@@ -141,7 +141,6 @@ class SbtClientLifeCycleHandlerActor(val client: SbtClient) extends Actor with A
       val valueSubs: Seq[Subscription] =
         Seq("discoveredMainClasses",
           "mainClass",
-          "libraryDependencies",
           "echo:echoTraceSupported",
           "echo:echoPlayVersionReport",
           "echo:echoAkkaVersionReport",
