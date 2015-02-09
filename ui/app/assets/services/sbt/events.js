@@ -3,15 +3,13 @@ define([
   './tasks',
   'services/ajax',
   'main/router',
-  'commons/websocket',
-  'widgets/modals/modals'
+  'commons/websocket'
 ],function(
   app,
   tasks,
   fs,
   router,
-  websocket,
-  modals
+  websocket
 ) {
 
   /**
@@ -44,7 +42,7 @@ define([
           notifications.unshift(new Notification("Test failed", "#test/results", "test", execution));
         }
       } else if (router.current().id !== "build"){
-        if (execution.compilationErrors.length){
+        if (execution.compilationErrors.length && execution.compilationErrors[0].position){
           var url = "#code"+ fs.relative(execution.compilationErrors[0].position.sourcePath)+":"+execution.compilationErrors[0].position.line;
           notifications.unshift(new Notification("Compilation error", url, "code", execution));
         } else {
@@ -85,13 +83,8 @@ define([
 
     // Update Compile/Code counter
     errorCounters.code(execution.compilationErrors.filter(function(m) {
-      return m.severity === "Error";
+      return m.severity === "Error" || m.severity === "Warn";
     }).length);
-
-    // // Failed tasks (Build counter)
-    // if (!execution.succeeded() && router.current().id != "build"){
-    //   errorCounters.build(errorCounters.build()+1);
-    // }
 
     // Run auto-commands
     if (execution.succeeded() && execution.command === "compile") {

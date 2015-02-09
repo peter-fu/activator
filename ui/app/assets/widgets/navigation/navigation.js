@@ -29,9 +29,9 @@ define([
     workingTasks: sbt.tasks.workingTasks,
     showFirstCompileError: function(c, e) {
       e.preventDefault();
-      var ers = sbt.tasks.compilationErrors();
-      if(ers.length){
-        window.location.hash = "#code"+ fs.relative(ers[0].position.sourcePath)+":"+ers[0].position.line;
+      var errors = sbt.tasks.compilationErrors();
+      if(errors.length && errors[0].position){
+        window.location.hash = "#code"+ fs.relative(errors[0].position.sourcePath)+":"+errors[0].position.line;
       }
     }
   }
