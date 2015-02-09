@@ -13,6 +13,7 @@ object Dependencies {
 
   val templateCacheVersion = "1.0-a0afb008ea619bf9d87dc010156cddffa8a6f880"
   val sbtRcVersion = "1.0-M4"
+  val sbtCoreNextVersion = "0.1.0-M3"
 
   val play23Version = "2.3.8-M3"
   val akka22Version = "2.2.4"
@@ -163,7 +164,7 @@ object Dependencies {
   // *** SBT-ECHO DEPENDENCIES ***
   val aspectjTools = "org.aspectj" % "aspectjtools" % aspectJVersion
 
-  val sbtBackgroundRun = Defaults.sbtPluginExtra("com.typesafe.sbtrc" % "ui-interface-0-13" % sbtRcVersion, "0.13", "2.10")
+  val sbtBackgroundRun = Defaults.sbtPluginExtra("org.scala-sbt" % "sbt-core-next" % sbtCoreNextVersion, "0.13", "2.10")
 
   val sbt13HackMatch = "^(0\\.13)\\.?.*$".r
 

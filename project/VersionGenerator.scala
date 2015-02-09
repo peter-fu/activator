@@ -22,14 +22,14 @@ object VersionGenerator {
          |  var echoVersion = "${Dependencies.echoPluginVersion}";
          |  var ideaVersion = "${Dependencies.ideaVersion}";
          |  var eclipseVersion = "${Dependencies.eclipseVersion}";
-         |  var sbtUIVersion = "${Dependencies.sbtRcVersion}";
-         |  
+         |  var sbtCoreNextVersion = "${Dependencies.sbtCoreNextVersion}";
+         |
          |  return {
          |    playVersion: playVersion,
          |    echoVersion: echoVersion,
          |    ideaVersion: ideaVersion,
          |    eclipseVersion: eclipseVersion,
-         |    sbtUIVersion: sbtUIVersion
+         |    sbtCoreNextVersion: sbtCoreNextVersion
          |  };
          |});""".stripMargin
 
