@@ -27,7 +27,7 @@ object PidDetector {
   private def previousPid(lock: GlobalLock): Option[String] =
     lock onBuilder {
       if (ACTIVATOR_PID_FILE.exists)
-        Option(IO.readLines(ACTIVATOR_PID_FILE).head) filterNot (_.isEmpty)
+        IO.readLines(ACTIVATOR_PID_FILE).headOption filterNot (_.isEmpty)
       else None
     }
 
