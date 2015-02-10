@@ -14,21 +14,21 @@
             <td class="command" data-bind="text: command"></td>
             <td class="data">
             <!-- ko if: finished() -->
-              <!-- ko if: compilationErrors.length && (compilationErrors[0].severity === "Error") -->
+              <!-- ko if: compilationErrors().length && (compilationErrors()[0].severity === "Error") -->
               <span class="compilationErrors">
-                <span class="compilationErrorsNumber" data-bind="text: compilationErrors.length"></span>
+                <span class="compilationErrorsNumber" data-bind="text: compilationErrors().length"></span>
                 compilation error(s)
               </span>
               <!-- /ko -->
-              <!-- ko if: compilationErrors.length && (compilationErrors[0].severity === "Warn") -->
+              <!-- ko if: compilationErrors().length && (compilationErrors()[0].severity === "Warn") -->
               <span class="compilationErrors">
-                <span class="compilationErrorsNumber" data-bind="text: compilationErrors.length"></span>
+                <span class="compilationErrorsNumber" data-bind="text: compilationErrors().length"></span>
                 compilation warning(s)
               </span>
               <!-- /ko -->
               <!-- ko if: testResults.length -->
               <span class="testResults">
-                <span class="testResultsNumber" data-bind="text: testResults.filter(function(t){ return t.outcome == 'passed'}).length"></span>/<span class="testResultsNumber" data-bind="text: testResults.length"></span>
+                <span class="testResultsNumber" data-bind="text: testResults.filter(function(t){ return t.outcome == 'passed'}).length"></span>/<span class="testResultsNumber" data-bind="text: testResults().length"></span>
                 test(s) passed
               </span>
               <!-- /ko -->
