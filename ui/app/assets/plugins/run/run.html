@@ -2,7 +2,7 @@
   <nav class="menu">
     <header>
       <h1>Run</h1>
-      <div class="buttons">
+      <div class="buttons" data-bind="tooltip: sbt.events.whyDisabled">
         <dl class="dropdown" data-bind="css: {disabled: sbt.tasks.applicationNotReady}">
           <dt>
             <svg data-bind="svg: '/assets/icons/more.svg'"/>

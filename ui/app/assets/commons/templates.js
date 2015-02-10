@@ -354,6 +354,38 @@ define(function() {
     }
   }
 
+  ko.bindingHandlers.tooltip = {
+    init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+      var value = valueAccessor();
+
+      $(element).on("mouseenter", function(e){
+        var v = ko.isObservable(value)?value():value;
+        if (!v) return;
+        var tooltip = $("<span class='tooltip'></span>").text(v);
+        $(document.body).append(tooltip);
+        $(tooltip).css({
+          top: (e.pageY + 10) + "px",
+          left: (e.pageX + 10) + "px"
+        });
+
+        $(this).on("mousemove.tooltip", function(e) {
+          $(tooltip).css({
+            top: (e.pageY + 10) + "px",
+            left: (e.pageX + 10) + "px"
+          });
+          if (ko.isObservable(value) && !value()) {
+            $(this).trigger("mouseleave.tooltip");
+          }
+        });
+
+        $(this).on("mouseleave.tooltip", function() {
+          $(this).off("mousemove.tooltip mouseup.tooltip");
+          tooltip.remove();
+        });
+      });
+    }
+  }
+
   // Utility functions
   ko.domRemoved = function(target, callback) {
     return setTimeout(function() {
@@ -384,7 +416,6 @@ define(function() {
       subscription.dispose();
     });
   }
-
 
   ko.tpl = function(tag, attrs, children){
     var element = document.createElement(tag);
