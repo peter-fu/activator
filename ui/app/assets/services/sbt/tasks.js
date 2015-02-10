@@ -37,15 +37,18 @@ define([
   Tasks status
   */
   var workingTasks = {
+    // these three are just flags (are they running)
     compile:  ko.observable(false),
     run:      ko.observable(false),
-    test:     ko.observable(false)
-  }
+    test:     ko.observable(false),
+    // this one is the Execution object or null
+    current:  ko.observable(null)
+  };
   var pendingTasks = {
     compile:  ko.observable(false),
     run:      ko.observable(false),
     test:     ko.observable(false)
-  }
+  };
 
   /**
   Stream Events
@@ -290,6 +293,8 @@ define([
     var execution = executionsById[message.event.id];
     if (execution) {
       execution.started(new Date());
+      workingTasks.current(execution);
+
       // Increment active tasks (to make icons glowing)
       switch(execution.commandId){
         case "compile":
@@ -325,6 +330,11 @@ define([
     execution.succeeded(succeeded);
     taskComplete(execution.commandId, succeeded); // Throw an event
     execution.finished(new Date());
+
+    var current = workingTasks.current();
+    if (current !== null && current.executionId === execution.executionId) {
+      workingTasks.current(null);
+    }
 
     // Decrement active tasks (to stop icons glowing if no pending task ;; if counter is 0)
     switch(execution.commandId){

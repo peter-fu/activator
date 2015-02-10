@@ -57,8 +57,11 @@ define([
       return { id: "activity", label: "Testing project", url: "#build/test" }
     } else if(tasks.workingTasks.run()){
       return { id: "activity", label: "Running project", url: "#build/run" }
+    } else if(tasks.workingTasks.current()) {
+      var current = tasks.workingTasks.current();
+      return { id: "activity", label: "Running '" + current.command + "'" , url: "#build/tasks" };
     } else {
-      return { id: "ok", label: "Activator is running smoothly", url: "#build/tasks" }
+      return { id: "ok", label: "No errors or activity right now", url: "#build/tasks" };
     }
   });
 
