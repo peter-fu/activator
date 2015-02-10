@@ -153,7 +153,7 @@ class SbtClientLifeCycleHandlerActor(val client: SbtClient) extends Actor with A
           }
 
       val lazySubs: Seq[Subscription] =
-        Seq("compileIncremental") map { name =>
+        Seq[String]() map { name =>
           client.rawLazyWatch(name)(forward)
         }
 

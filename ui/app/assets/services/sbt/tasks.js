@@ -234,7 +234,13 @@ define([
       // we want to be in the by-id hash before we notify
       // on the tasks array
       tasksById[task.taskId] = task;
-      executionsById[task.executionId].tasks[task.taskId] = task;
+      execution.tasks[task.taskId] = task;
+
+      if (task.key === "compile" || task.key === "compileIncremental") {
+        // for most executions we'll get "compile" AND "compileIncremental",
+        // so this has to be idempotent
+        execution.changedCompileResult = true;
+      }
     } else {
       debug && console.log("Ignoring task for unknown execution " + message.event.executionId)
     }
@@ -495,12 +501,6 @@ define([
     }
   });
 
-  valueChanged.matchOnAttribute('key', 'compileIncremental').each(function(message) {
-    var current = workingTasks.current();
-    if (current)
-      current.changedCompileResult = true;
-  });
-
   // Inspect-related (sbt-echo) observables.
   //
   // FIXME these need to be tracked separately for each project.
@@ -629,8 +629,7 @@ define([
 
     // Data produced:
     self.tasks          = {};
-    // true if during the execution we got a notify on compileIncremental.
-    // note that this becomes true AFTER we get all the errors.
+    // true if during the execution we see a compile task
     self.changedCompileResult = false;
     // if this is non-empty, then changedCompileResult ought to end up true...
     self.compilationErrors  = ko.observableArray([]);
