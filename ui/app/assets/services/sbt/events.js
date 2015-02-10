@@ -36,10 +36,17 @@ define([
     if(!tasks.buildReady()){
       return { id: "buildFailed", label: "Build loading has failed", url: "#build/tasks" }
     } else if(tasks.compilationErrors().length){
-      var ers = tasks.compilationErrors();
-      // Goto first compile error
-      var url = "#code"+ fs.relative(ers[0].position.sourcePath)+":"+ers[0].position.line;
-      return { id: "compilationError", label: ers.length+" compilation error(s)", url: url }
+      var errors = tasks.compilationErrors();
+      // Go to first compile error (if position information exists)
+      var url = "#build/tasks";
+      if (errors[0].position) {
+        url = "#code"+ fs.relative(errors[0].position.sourcePath)+":"+errors[0].position.line;
+      }
+      var label = " compilation error(s)";
+      if (errors[0].severity === "Warn") {
+        label = " compilation warning(s)";
+      }
+      return { id: "compilationError", label: errors.length+label, url: url }
     } else if(tasks.testErrors().length){
       return { id: "testFailed", label: tasks.testErrors().length+" test(s) failed", url: "#test" }
     } else if(!websocket.isOpened()){
