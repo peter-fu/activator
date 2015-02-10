@@ -373,6 +373,9 @@ define(function() {
             top: (e.pageY + 10) + "px",
             left: (e.pageX + 10) + "px"
           });
+          if (ko.isObservable(value) && !value()) {
+            $(this).trigger("mouseleave.tooltip");
+          }
         });
 
         $(this).on("mouseleave.tooltip", function() {
