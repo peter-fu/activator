@@ -40,7 +40,7 @@ class SbtClientActor(val client: SbtClient) extends Actor with ActorLogging {
         log.error(s"Received event which should have been filtered out by SbtClient ${event}")
       case changed: ValueChanged => forwardOverSocket(changed)
       case entry: LogEvent => entry match {
-        case e: CoreLogEvent => forwardOverSocket(e)
+        case e: DetachedLogEvent => forwardOverSocket(e)
         case e: TaskLogEvent => forwardOverSocket(e)
         case e: BackgroundJobLogEvent => forwardOverSocket(e)
       }

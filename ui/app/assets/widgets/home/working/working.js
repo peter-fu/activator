@@ -24,7 +24,7 @@ define([
     scroll: scroll
   }
 
-  websocket.subscribe({type: "sbt", subType: "CoreLogEvent"}).fork().each(function(message) {
+  websocket.subscribe({type: "sbt", subType: "DetachedLogEvent"}).fork().each(function(message) {
     logs.push({
       message: message.event.entry.message,
       type: "info"

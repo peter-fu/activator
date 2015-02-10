@@ -45,7 +45,7 @@ define([
       logs.push(m);
     });
 
-  logEvent.matchOnAttribute("subType", "CoreLogEvent")
+  logEvent.matchOnAttribute("subType", "DetachedLogEvent")
     .filter(filterDebug)
     .each(function(m) {
       logs.push(m);
