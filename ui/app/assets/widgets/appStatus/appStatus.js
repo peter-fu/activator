@@ -40,7 +40,8 @@ define([
     },
     click: function() {
       sbt.tasks.actions.kill();
-    }
+    },
+    disabled: off
   });
 
   var compile = new StatusButton({
@@ -136,7 +137,8 @@ define([
     onoff: onoff,
     compile: compile,
     run: run,
-    testing: testing
+    testing: testing,
+    whyDisabled: sbt.events.whyDisabled
   }
 
   return ko.bindhtml(tpl, State);

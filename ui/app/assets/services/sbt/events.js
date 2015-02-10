@@ -28,6 +28,46 @@ define([
   var notifications = ko.observableArray([]);
 
   /**
+  Full text application status
+  */
+  var appStatus = ko.computed(function() {
+    if(!tasks.buildReady()){
+      return { id: "buildFailed", label: "Build loading has failed", url: "#build/tasks" }
+    } else if(tasks.compilationErrors().length){
+      var errors = tasks.compilationErrors();
+      // Go to first compile error (if position information exists)
+      var url = "#build/tasks";
+      if (errors[0].position) {
+        url = "#code"+ fs.relative(errors[0].position.sourcePath)+":"+errors[0].position.line;
+      }
+      var label = " compilation error(s)";
+      if (errors[0].severity === "Warn") {
+        label = " compilation warning(s)";
+      }
+      return { id: "compilationError", label: errors.length+label, url: url }
+    } else if(tasks.testErrors().length){
+      return { id: "testFailed", label: tasks.testErrors().length+" test(s) failed", url: "#test" }
+    } else if(!websocket.isOpened()){
+      return { id: "disconnected", label: "Connection lost", url: "#build/tasks" }
+    } else if(tasks.applicationNotReady()){
+      return { id: "activity", label: "Building project", url: "#build/tasks" }
+    } else if(tasks.workingTasks.compile()){
+      return { id: "activity", label: "Compiling project", url: "#build/tasks" }
+    } else if(tasks.workingTasks.test()){
+      return { id: "activity", label: "Testing project", url: "#build/test" }
+    } else if(tasks.workingTasks.run()){
+      return { id: "activity", label: "Running project", url: "#build/run" }
+    } else {
+      return { id: "ok", label: "Activator is running smoothly", url: "#build/tasks" }
+    }
+  });
+
+  var whyDisabled = ko.computed(function() {
+    return tasks.applicationNotReady()?appStatus().label:'';
+  });
+
+
+  /**
   Notification object constructor
   */
   function notify(execution) {
@@ -113,7 +153,9 @@ define([
     errorCounters:      errorCounters,
     notifications:      notifications,
     unreadBuildErrors:  unreadBuildErrors,
-    notify:             notify
+    notify:             notify,
+    appStatus:          appStatus,
+    whyDisabled:        whyDisabled
   }
 
 })

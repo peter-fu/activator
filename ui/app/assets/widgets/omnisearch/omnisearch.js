@@ -68,7 +68,7 @@ define([
         } else {
           selected(options()[options().length - 1]);
         }
-        if (!selected().subtitle) repeat(state,e)
+        if (selected() && !selected().subtitle) repeat(state,e)
         scrollToSelected();
         return false;
       }
@@ -80,7 +80,7 @@ define([
         } else {
           selected(options()[0]);
         }
-        if (!selected().subtitle) repeat(state,e)
+        if (selected() && !selected().subtitle) repeat(state,e)
         scrollToSelected();
         return false;
       }

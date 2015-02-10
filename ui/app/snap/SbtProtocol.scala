@@ -11,8 +11,8 @@ object SbtProtocol {
       "event" -> event))
   }
 
-  private def messageJson(message: Message): JsObject =
-    Json.parse(sbt.hack.PickleToJson[Message](message)) match {
+  private def messageJson(message: Message)(implicit pickler: Pickler[Message]): JsObject =
+    Json.parse(SerializedValue(message).toJsonString) match {
       case o: JsObject => o
       case other => throw new RuntimeException(s"message $message should have become a JsObject not $other")
     }
@@ -25,6 +25,6 @@ object SbtProtocol {
   }
 
   def synthesizeLogEvent(level: String, message: String): JsObject = {
-    wrapEvent(CoreLogEvent(LogMessage(level, message)))
+    wrapEvent(DetachedLogEvent(LogMessage(level, message)))
   }
 }

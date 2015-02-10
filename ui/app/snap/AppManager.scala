@@ -305,7 +305,7 @@ object AppManager {
             val json = event match {
               case log: LogEvent => log match {
                 case e: TaskLogEvent => SbtProtocol.wrapEvent(e)
-                case e: CoreLogEvent => SbtProtocol.wrapEvent(e)
+                case e: DetachedLogEvent => SbtProtocol.wrapEvent(e)
                 case e: BackgroundJobLogEvent => SbtProtocol.wrapEvent(e)
               }
               case e: BuildFailedToLoad => SbtProtocol.wrapEvent(e)
