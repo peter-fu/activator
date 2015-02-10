@@ -50,6 +50,9 @@ define([
     test:     ko.observable(false)
   };
 
+  var mostRecentWithCompilationErrors = ko.observable(null);
+  var mostRecentWithTestResults = ko.observable(null);
+
   /**
   Stream Events
   */
@@ -70,13 +73,39 @@ define([
   /**
   Task Event results (compile errors and tests)
   */
-  var testResults = ko.observableArray([]);
+  var testResults = ko.computed(function() {
+    var current = workingTasks.current();
+    var past = mostRecentWithTestResults();
+    // Priority: prefer to stream from current task;
+    // then prefer to show last results we got;
+    // then prefer to show nothing.
+    if (current && current.testResults().length > 0) {
+      return current.testResults();
+    } else if (past) {
+      return past.testResults();
+    } else {
+      return [];
+    }
+  });
   var testErrors = ko.computed(function() {
     return testResults().filter(function(t) {
       return t.outcome === "failed";
     });
   });
-  var compilationErrors = ko.observableArray([]);
+  var compilationErrors = ko.computed(function() {
+    var current = workingTasks.current();
+    var past = mostRecentWithCompilationErrors();
+    // Priority: prefer to stream from current task;
+    // then prefer to show last results we got;
+    // then prefer to show nothing.
+    if (current && (current.compilationErrors().length > 0 || current.changedCompileResult)) {
+      return current.compilationErrors();
+    } else if (past) {
+      return past.compilationErrors();
+    } else {
+      return [];
+    }
+  });
 
   /**
   Temp holder for deferred possible outcomes.
@@ -205,7 +234,13 @@ define([
       // we want to be in the by-id hash before we notify
       // on the tasks array
       tasksById[task.taskId] = task;
-      executionsById[task.executionId].tasks[task.taskId] = task;
+      execution.tasks[task.taskId] = task;
+
+      if (task.key === "compile" || task.key === "compileIncremental") {
+        // for most executions we'll get "compile" AND "compileIncremental",
+        // so this has to be idempotent
+        execution.changedCompileResult = true;
+      }
     } else {
       debug && console.log("Ignoring task for unknown execution " + message.event.executionId)
     }
@@ -331,6 +366,13 @@ define([
     taskComplete(execution.commandId, succeeded); // Throw an event
     execution.finished(new Date());
 
+    if (execution.changedCompileResult) {
+      mostRecentWithCompilationErrors(execution);
+    }
+    if (execution.testResults().length > 0) {
+      mostRecentWithTestResults(execution);
+    }
+
     var current = workingTasks.current();
     if (current !== null && current.executionId === execution.executionId) {
       workingTasks.current(null);
@@ -350,11 +392,6 @@ define([
         workingTasks.test(workingTasks.test()-1);
         pendingTasks.test(pendingTasks.test()-1);
         break;
-    }
-
-    compilationErrors(execution.compilationErrors);
-    if (execution.testResults.length) {
-      testResults(execution.testResults);
     }
 
     ProcessedExecutionsStream.push(execution);
@@ -592,8 +629,11 @@ define([
 
     // Data produced:
     self.tasks          = {};
-    self.compilationErrors  = [];
-    self.testResults    = [];
+    // true if during the execution we see a compile task
+    self.changedCompileResult = false;
+    // if this is non-empty, then changedCompileResult ought to end up true...
+    self.compilationErrors  = ko.observableArray([]);
+    self.testResults    = ko.observableArray([]);
 
     // Statuses
     self.running = ko.computed(function() {

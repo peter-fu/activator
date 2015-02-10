@@ -85,8 +85,8 @@ define([
           notifications.unshift(new Notification("Test failed", "#test/results", "test", execution));
         }
       } else if (router.current().id !== "build"){
-        if (execution.compilationErrors.length && execution.compilationErrors[0].position){
-          var url = "#code"+ fs.relative(execution.compilationErrors[0].position.sourcePath)+":"+execution.compilationErrors[0].position.line;
+        if (execution.compilationErrors().length && execution.compilationErrors()[0].position){
+          var url = "#code"+ fs.relative(execution.compilationErrors()[0].position.sourcePath)+":"+execution.compilationErrors()[0].position.line;
           notifications.unshift(new Notification("Compilation error", url, "code", execution));
         } else {
           notifications.unshift(new Notification("Build error", "#build/tasks/"+execution.executionId, "build", execution));
@@ -118,16 +118,20 @@ define([
   */
   tasks.ProcessedExecutionsStream.each(function(execution) {
     // Update Tests counters
-    if (execution.testResults){
-      errorCounters.test(execution.testResults.filter(function(t) {
+    // TODO errorCounters.test can just be a ko.computed from tasks.testResults
+    if (execution.testResults().length > 0){
+      errorCounters.test(execution.testResults().filter(function(t) {
         return t.outcome === "failed";
       }).length);
     }
 
     // Update Compile/Code counter
-    errorCounters.code(execution.compilationErrors.filter(function(m) {
-      return m.severity === "Error" || m.severity === "Warn";
-    }).length);
+    // TODO errorCounters.code can just be a ko.computed from tasks.compilationErrors
+    if (execution.changedCompileResult) {
+      errorCounters.code(execution.compilationErrors().filter(function(m) {
+        return m.severity === "Error" || m.severity === "Warn";
+      }).length);
+    }
 
     // Run auto-commands
     if (execution.succeeded() && execution.command === "compile") {
