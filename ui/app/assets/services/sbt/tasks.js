@@ -598,7 +598,7 @@ define([
         var status = self.stopping()||self.jobIds().length?"Stopped after":self.succeeded()?"Completed in":"Failed after";
         return status +" "+ time;
       } else if (self.jobIds().length){
-        return "Running in backgound";
+        return "Running in background";
       } else if (self.stopping()) {
         return "Stopping the task...";
       } else if (self.started()) {
