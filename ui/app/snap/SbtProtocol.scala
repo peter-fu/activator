@@ -25,6 +25,6 @@ object SbtProtocol {
   }
 
   def synthesizeLogEvent(level: String, message: String): JsObject = {
-    wrapEvent(CoreLogEvent(LogMessage(level, message)))
+    wrapEvent(DetachedLogEvent(LogMessage(level, message)))
   }
 }
