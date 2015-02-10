@@ -50,6 +50,9 @@ define([
     test:     ko.observable(false)
   };
 
+  var mostRecentWithCompilationErrors = ko.observable(null);
+  var mostRecentWithTestResults = ko.observable(null);
+
   /**
   Stream Events
   */
@@ -70,13 +73,39 @@ define([
   /**
   Task Event results (compile errors and tests)
   */
-  var testResults = ko.observableArray([]);
+  var testResults = ko.computed(function() {
+    var current = workingTasks.current();
+    var past = mostRecentWithTestResults();
+    // Priority: prefer to stream from current task;
+    // then prefer to show last results we got;
+    // then prefer to show nothing.
+    if (current && current.testResults().length > 0) {
+      return current.testResults();
+    } else if (past) {
+      return past.testResults();
+    } else {
+      return [];
+    }
+  });
   var testErrors = ko.computed(function() {
     return testResults().filter(function(t) {
       return t.outcome === "failed";
     });
   });
-  var compilationErrors = ko.observableArray([]);
+  var compilationErrors = ko.computed(function() {
+    var current = workingTasks.current();
+    var past = mostRecentWithCompilationErrors();
+    // Priority: prefer to stream from current task;
+    // then prefer to show last results we got;
+    // then prefer to show nothing.
+    if (current && (current.compilationErrors().length > 0 || current.changedCompileResult)) {
+      return current.compilationErrors();
+    } else if (past) {
+      return past.compilationErrors();
+    } else {
+      return [];
+    }
+  });
 
   /**
   Temp holder for deferred possible outcomes.
@@ -331,6 +360,13 @@ define([
     taskComplete(execution.commandId, succeeded); // Throw an event
     execution.finished(new Date());
 
+    if (execution.changedCompileResult) {
+      mostRecentWithCompilationErrors(execution);
+    }
+    if (execution.testResults().length > 0) {
+      mostRecentWithTestResults(execution);
+    }
+
     var current = workingTasks.current();
     if (current !== null && current.executionId === execution.executionId) {
       workingTasks.current(null);
@@ -350,11 +386,6 @@ define([
         workingTasks.test(workingTasks.test()-1);
         pendingTasks.test(pendingTasks.test()-1);
         break;
-    }
-
-    compilationErrors(execution.compilationErrors);
-    if (execution.testResults.length) {
-      testResults(execution.testResults);
     }
 
     ProcessedExecutionsStream.push(execution);
@@ -462,6 +493,12 @@ define([
     if (!app.currentMainClass() && discovered[0]){
       app.currentMainClass(discovered[0]); // Selected main class, if empty
     }
+  });
+
+  valueChanged.matchOnAttribute('key', 'compileIncremental').each(function(message) {
+    var current = workingTasks.current();
+    if (current)
+      current.changedCompileResult = true;
   });
 
   // Inspect-related (sbt-echo) observables.
@@ -592,8 +629,12 @@ define([
 
     // Data produced:
     self.tasks          = {};
-    self.compilationErrors  = [];
-    self.testResults    = [];
+    // true if during the execution we got a notify on compileIncremental.
+    // note that this becomes true AFTER we get all the errors.
+    self.changedCompileResult = false;
+    // if this is non-empty, then changedCompileResult ought to end up true...
+    self.compilationErrors  = ko.observableArray([]);
+    self.testResults    = ko.observableArray([]);
 
     // Statuses
     self.running = ko.computed(function() {

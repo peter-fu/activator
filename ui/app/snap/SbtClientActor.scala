@@ -138,20 +138,27 @@ class SbtClientLifeCycleHandlerActor(val client: SbtClient) extends Actor with A
   // by redoing this
   def setupSubscription = {
     valueSub = Some(new Subscription() {
-      val valueSubs: Seq[Subscription] =
+
+      private def forward(key: ScopedKey, result: TaskResult): Unit =
+        context.parent ! ValueChanged(key, result)
+
+      val eagerSubs: Seq[Subscription] =
         Seq("discoveredMainClasses",
           "mainClass",
           "echo:echoTraceSupported",
           "echo:echoPlayVersionReport",
           "echo:echoAkkaVersionReport",
           "echo:echoTracePlayVersion") map { name =>
-            client.rawWatch(name) { (key, result) =>
-              context.parent ! ValueChanged(key, result)
-            }
+            client.rawWatch(name)(forward)
           }
 
+      val lazySubs: Seq[Subscription] =
+        Seq("compileIncremental") map { name =>
+          client.rawLazyWatch(name)(forward)
+        }
+
       override def cancel(): Unit = {
-        valueSubs map { sub => sub.cancel() }
+        (eagerSubs ++ lazySubs) map { sub => sub.cancel() }
       }
     })
   }
