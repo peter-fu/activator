@@ -51,6 +51,7 @@ class SbtClientActor(val client: SbtClient) extends Actor with ActorLogging {
       case finished: TaskFinished => forwardOverSocket(finished)
       case started: TaskStarted => forwardOverSocket(started)
       case taskEvent: TaskEvent => forwardOverSocket(taskEvent)
+      case detachedEvent: DetachedEvent => forwardOverSocket(detachedEvent)
       case loaded: BuildLoaded => forwardOverSocket(loaded)
       case failed: BuildFailedToLoad => forwardOverSocket(failed)
       case background: BackgroundJobEvent => forwardOverSocket(background)
