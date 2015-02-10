@@ -15,10 +15,10 @@ object Dependencies {
   val sbtRcVersion = "0.3.0"
   val sbtCoreNextVersion = "0.1.1"
 
-  val play23Version = "2.3.8-M4"
+  val play23Version = "2.3.8-M5"
   val akka22Version = "2.2.4"
   val akka23Version = "2.3.9"
-  val echoPlayVersion = "2.3.8-M4"
+  val echoPlayVersion = "2.3.8-M5"
   val slickVersion = "2.1.0"
   val echoPluginVersion = "0.1.9"
   val activatorAnalyticsVersion = "0.1.7"
