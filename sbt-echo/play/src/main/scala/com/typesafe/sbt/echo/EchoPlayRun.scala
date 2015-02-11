@@ -14,7 +14,7 @@ object EchoPlayRun {
   import SbtEcho.Echo
   import SbtEcho.EchoKeys._
 
-  val Play23Version = "2.3.8-M6"
+  val Play23Version = "2.3.8-M7"
   val supportedPlayVersions = Seq(Play23Version)
 
   def tracePlayDependencies(dependencies: Seq[ModuleID], tracePlayVersion: Option[String], echoVersion: String): Seq[ModuleID] = {
