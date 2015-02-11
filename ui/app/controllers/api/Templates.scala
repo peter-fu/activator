@@ -49,12 +49,13 @@ object Templates extends Controller {
     templateCache.metadata map { m => Ok(Json toJson m) }
   }
 
-  def meta(name: String) = Action.async { request =>
+  def meta(templateId: String) = Action.async { request =>
     import concurrent.ExecutionContext.Implicits._
-    templateCache.metadata.map { m =>
-      val metadata = m.filter(t => t.name == name).headOption
-      if (metadata.isDefined) Ok(Json.toJson(metadata.get))
-      else NotFound
+    templateCache.template(templateId) map { t =>
+      t match {
+        case Some(m) => Ok(Json.toJson(m.metadata))
+        case _ => NotFound
+      }
     }
   }
 
