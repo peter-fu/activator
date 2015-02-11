@@ -42,10 +42,17 @@ define([
     return index() === table().length-1;
   });
 
-  // TODO = provide JSON route, for meta-datas
-  $.getJSON("/api/templates/"+serverAppModel.name+"/meta", function(data){
-    metaData(data);
-  });
+  var retrieveMetadata = function() {
+    if (serverAppModel.template) {
+      $.getJSON("/api/templates/" + serverAppModel.template + "/meta", function(data){
+        metaData(data);
+      });
+    } else {
+      debug && console.log("Missing mandatory serverAppModel.template information to retrieve metadata for the template project.");
+    }
+  };
+
+  retrieveMetadata();
 
   $.get("tutorial/index.html", function(data){
     hasTutorial(true);
