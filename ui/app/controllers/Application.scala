@@ -90,7 +90,7 @@ object Application extends Controller {
       templates = featured,
       otherTemplateCount = tempSeq.length,
       recentApps = getAppsThatExist(config.applications),
-      tags = Seq("reactive", "scala", "java", "java8", "starter", "akka", "play", "slick", "spray", "angular", "javascript", "database", "websocket"))
+      tags = Seq("reactive", "scala", "java", "java8", "starter", "akka", "play", "slick", "spray", "streams", "spark", "angular", "javascript", "database", "websocket"))
   }
 
   def redirectToApp(id: String) = CSRFAddToken {
