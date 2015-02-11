@@ -25,10 +25,12 @@ define([
   }
 
   websocket.subscribe({type: "sbt", subType: "DetachedLogEvent"}).fork().each(function(message) {
-    logs.push({
-      message: message.event.entry.message,
-      type: "info"
-    });
+    if (message.event.entry.level !== "debug") {
+      logs.push({
+        message: message.event.entry.message,
+        type: "info"
+      });
+    }
   });
 
   websocket.subscribe({ response: String }).fork().each(function(message) {
