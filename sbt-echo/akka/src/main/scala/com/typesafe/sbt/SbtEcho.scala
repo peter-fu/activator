@@ -6,11 +6,13 @@ package com.typesafe.sbt
 import sbt._
 import sbt.Keys._
 import java.net.URI
+import sbt.plugins.BackgroundRunPlugin
+import sbt.BackgroundJobServiceKeys
 
 object SbtEcho extends AutoPlugin {
   import echo.EchoRun._
 
-  val EchoVersion = "0.1.9"
+  val EchoVersion = "0.1.10"
   val AspectjVersion = "1.8.4"
 
   val Echo = config("echo").extend(Compile)
@@ -55,7 +57,7 @@ object SbtEcho extends AutoPlugin {
   import EchoKeys._
 
   override def trigger = AllRequirements
-  override def requires = plugins.JvmPlugin
+  override def requires = plugins.JvmPlugin && BackgroundRunPlugin
 
   override lazy val projectSettings: Seq[Setting[_]] = echoCompileSettings
 
@@ -115,8 +117,8 @@ object SbtEcho extends AutoPlugin {
     inTask(run)(Seq(runner <<= echoRunner)).head,
     run <<= Defaults.runTask(fullClasspath, mainClass in run, runner in run),
     runMain <<= Defaults.runMainTask(fullClasspath, runner in run),
-    UIKeys.backgroundRunMain <<= SbtBackgroundRunPlugin.backgroundRunMainTask(fullClasspath, runner in run),
-    UIKeys.backgroundRun <<= SbtBackgroundRunPlugin.backgroundRunTask(fullClasspath, mainClass in run, runner in run))
+    BackgroundJobServiceKeys.backgroundRunMain <<= BackgroundRunPlugin.backgroundRunMainTask(fullClasspath, runner in run),
+    BackgroundJobServiceKeys.backgroundRun <<= BackgroundRunPlugin.backgroundRunTask(fullClasspath, mainClass in run, runner in run))
 
   def echoUnscopedSettings: Seq[Setting[_]] = Seq(
     ivyConfigurations ++= Seq(EchoTraceCompile, EchoTraceTest, EchoWeave, EchoSigar),
