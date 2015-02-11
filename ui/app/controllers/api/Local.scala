@@ -78,8 +78,10 @@ object Local extends Controller {
 
   final val mimeDetector = "eu.medsea.mimeutil.detector.MagicMimeMimeDetector"
 
-  // Magically discover the mime type!
-  def getMimeType(file: File): String = {
+  // Magically discover the mime type! synchronize all our use of this
+  // library in case that's making it flaky (it seems to throw internal
+  // NPEs sometimes)
+  def getMimeType(file: File): String = synchronized {
     import eu.medsea.mimeutil._
     if (MimeUtil.getMimeDetector(mimeDetector) == null) {
       MimeUtil.registerMimeDetector(mimeDetector);
