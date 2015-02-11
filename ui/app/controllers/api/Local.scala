@@ -76,10 +76,14 @@ object Local extends Controller {
     else "binary"
   }
 
+  final val mimeDetector = "eu.medsea.mimeutil.detector.MagicMimeMimeDetector"
+
   // Magically discover the mime type!
   def getMimeType(file: File): String = {
     import eu.medsea.mimeutil._
-    MimeUtil.registerMimeDetector("eu.medsea.mimeutil.detector.MagicMimeMimeDetector");
+    if (MimeUtil.getMimeDetector(mimeDetector) == null) {
+      MimeUtil.registerMimeDetector(mimeDetector);
+    }
     val mimeTypes = MimeUtil getMimeTypes file
     MimeUtil.getFirstMimeType(mimeTypes.toString).toString
   }
