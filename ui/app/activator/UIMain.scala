@@ -101,7 +101,7 @@ class UIMain extends AppMain {
             // Fix UNC path problem on Windows http://www.tomergabel.com/JavaMishandlesUNCPathsOnWindows.aspx
             var uri: URI = x.url.toURI
             if (uri.getAuthority != null) uri = new URI(uri.toString.replace("file://", "file:/"))
-            System.err.println("FOUND REPO = " + x.id + " @ " + uri)
+            System.out.println("Activator will use extra repository " + x.id + " @ " + uri)
             (x.id, new java.io.File(uri), Some(x.ivyPattern))
         }
 
@@ -114,7 +114,7 @@ class UIMain extends AppMain {
       // until we get a OK response code.
       waitForServerStartup()
     } else {
-      System.err.println("Connecting to existing Activator UI server...")
+      System.out.println("Connecting to existing Activator UI server...")
     }
 
     // openBrowser
