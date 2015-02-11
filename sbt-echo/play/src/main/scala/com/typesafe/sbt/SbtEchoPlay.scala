@@ -13,6 +13,8 @@ import play.PlayImport._
 import PlayKeys.playVersion
 import sbt._
 import sbt.Keys._
+import sbt.plugins.BackgroundRunPlugin
+import sbt.BackgroundJobServiceKeys
 
 object SbtEchoPlay extends AutoPlugin with PlayInternalKeys {
   import SbtEcho.Echo
@@ -22,7 +24,7 @@ object SbtEchoPlay extends AutoPlugin with PlayInternalKeys {
   import echo.EchoRun.EchoTraceCompile
 
   override def trigger = AllRequirements
-  override def requires = Play && PlayForkRun && SbtEcho
+  override def requires = Play && PlayForkRun && SbtEcho && BackgroundRunPlugin
 
   def playTraceJavaOptionsTask: Def.Initialize[Task[Seq[String]]] = Def.task {
     echo.EchoRun.traceJavaOptions(aspectjWeaver.value, sigarLibs.value) ++
@@ -52,7 +54,7 @@ object SbtEchoPlay extends AutoPlugin with PlayInternalKeys {
     echoPlayVersionReport := { playVersionReport(Some(playVersion.value)) },
     PlayForkRunKeys.playForkOptions <<= playForkOptionsTask,
     PlayForkRunKeys.playForkConfig <<= playForkConfigTask,
-    UIKeys.backgroundRun in ThisProject <<= PlayForkRun.backgroundForkRunTask
+    BackgroundJobServiceKeys.backgroundRun in ThisProject <<= PlayForkRun.backgroundForkRunTask
   )
 
   override def projectSettings = echoPlaySettings
