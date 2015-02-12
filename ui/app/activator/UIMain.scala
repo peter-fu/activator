@@ -94,16 +94,12 @@ class UIMain extends AppMain {
     val alreadyRunning = PidDetector.checkRunning(lock)
 
     if (!alreadyRunning) {
-      // Locate the local repo if it exists
-      val optRepositories: Seq[(String, java.io.File, Option[String])] =
-        configuration.provider.scalaProvider.launcher.appRepositories collect {
-          case x: xsbti.IvyRepository if (x.id == "activator-local") && (x.url.getProtocol == "file") =>
-            // Fix UNC path problem on Windows http://www.tomergabel.com/JavaMishandlesUNCPathsOnWindows.aspx
-            var uri: URI = x.url.toURI
-            if (uri.getAuthority != null) uri = new URI(uri.toString.replace("file://", "file:/"))
-            System.out.println("Activator will use extra repository " + x.id + " @ " + uri)
-            (x.id, new java.io.File(uri), Some(x.ivyPattern))
-        }
+      // log which repo we are using
+      configuration.provider.scalaProvider.launcher.appRepositories foreach {
+        case x: xsbti.IvyRepository if (x.id == "activator-local" || x.id == "activator-launcher-local") && (x.url.getProtocol == "file") =>
+          System.out.println("Local repository: " + x.id + " @ " + x.url)
+        case _ =>
+      }
 
       // Start the Play app... (TODO - how do we know when we're done?)
       // TODO - Is this hack ok?
