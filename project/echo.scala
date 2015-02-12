@@ -377,6 +377,7 @@ object CollectProjects extends Build {
       .doNotPublish
       dependsOn (event210Protobuf24)
       settings(
+      version := Dependencies.echoPluginVersion,
       sbt.Keys.scalaVersion := Dependencies.scala210Version,
       libraryDependencies ++= Seq(akkaSlf4j22, slf4j, logback, akkaTestKit22, scalaTest, junit)
       )
