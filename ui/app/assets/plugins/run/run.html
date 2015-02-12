@@ -97,7 +97,7 @@
       </li>
       <li class="requests" data-bind="isActiveUrl: '#run/requests'">
         <a href="#run/requests">Requests</a>
-        <span class="counter" data-bind="text: stats().data.metadata.playPatternCount, visible: stats().data.metadata.playPatternCount"></span>
+        <span class="counter" data-bind="text: stats().data.metadata.playPatternCount > 0 ? 'Y' : 'N' ,visible: stats().data.metadata.playPatternCount"></span>
       </li>
       <!-- /ko -->
       <!-- ko if: monitoringSolutions.newRelicActivated() -->
