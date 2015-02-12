@@ -47,8 +47,8 @@ class RepositoryConfigTest {
   @Test
   def createConfigWhenNone(): Unit = {
     val expectedContent = """[repositories]
-  # Activator added these repositories
   local
+  activator-launcher-local: file://${activator.local.repository-${activator.home-${user.home}/.activator}/repository}, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]
   activator-local: file://${activator.local.repository-""" + ActivatorProperties.ACTIVATOR_HOME() + """/repository}, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]
   maven-central
   typesafe-releases: http://repo.typesafe.com/typesafe/releases
@@ -77,8 +77,8 @@ class RepositoryConfigTest {
   components: xsbti
 
 [repositories]
-  # Activator added these repositories
   local
+  activator-launcher-local: file://${activator.local.repository-${activator.home-${user.home}/.activator}/repository}, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]
   activator-local: file://${activator.local.repository-""" + ActivatorProperties.ACTIVATOR_HOME() + """/repository}, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]
   maven-central
   typesafe-releases: http://repo.typesafe.com/typesafe/releases
@@ -151,8 +151,8 @@ class RepositoryConfigTest {
   repository-config: ${sbt.repository.config-${sbt.global.base-${user.home}/.sbt}/repositories}
 
 [repositories]
-  # Activator added these repositories
   local
+  activator-launcher-local: file://${activator.local.repository-${activator.home-${user.home}/.activator}/repository}, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]
   activator-local: file://${activator.local.repository-""" + ActivatorProperties.ACTIVATOR_HOME() + """/repository}, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]
   maven-central
   typesafe-releases: http://repo.typesafe.com/typesafe/releases
@@ -182,7 +182,7 @@ class RepositoryConfigTest {
 
     val expectedContent = """[repositories]
   local
-  # Activator added this local repository
+  activator-launcher-local: file://${activator.local.repository-${activator.home-${user.home}/.activator}/repository}, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]
   activator-local: file://${activator.local.repository-""" + ActivatorProperties.ACTIVATOR_HOME() + """/repository}, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]
   maven-central
   typesafe-releases: http://repo.typesafe.com/typesafe/releases
@@ -205,12 +205,12 @@ class RepositoryConfigTest {
   typesafe-releases: http://repo.typesafe.com/typesafe/releases
   typesafe-ivy-releasez: http://repo.typesafe.com/typesafe/ivy-releases, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]
   activator-local: wrongthinginwrongplace
-
+  activator-launcher-local: alsowrongalsowrongplace
 """
 
     val expectedContent = """[repositories]
   local
-  # Activator added this local repository
+  activator-launcher-local: file://${activator.local.repository-${activator.home-${user.home}/.activator}/repository}, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]
   activator-local: file://${activator.local.repository-""" + ActivatorProperties.ACTIVATOR_HOME() + """/repository}, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]
   maven-central
   typesafe-releases: http://repo.typesafe.com/typesafe/releases

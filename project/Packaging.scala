@@ -184,6 +184,10 @@ object Packaging {
     val tprops = tdir / (name + ".properties")
     // TODO - better caching
     // TODO - Add a local repository for resolving...
+    // NOTE if someone has ever run Activator before, we'll have created
+    // an ~/.sbt/repositories which means the entire [repositories] section
+    // below will be ignored. So the repositories section is purely
+    // for our first startup.
     if(!tprops.exists) IO.write(tprops, """
 [scala]
   version: ${sbt.scala.version-auto}
@@ -198,7 +202,7 @@ object Packaging {
 
 [repositories]
   local
-  activator-local: file://${activator.local.repository-${activator.home-${user.home}/.activator}/repository}, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]
+  activator-launcher-local: file://${activator.local.repository-${activator.home-${user.home}/.activator}/repository}, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]
   maven-central
   typesafe-releases: https://repo.typesafe.com/typesafe/releases
   typesafe-ivy-releasez: https://repo.typesafe.com/typesafe/ivy-releases, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]
