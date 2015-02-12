@@ -17,22 +17,30 @@ import java.io.File
 // Important background:
 //  - there's a default repository configuration embedded in the
 //    launcher, which we generate in project/Packaging.scala
-//  - here we are creating ~/.sbt/repositories
+//  - the launcher also configures a repository-config, which
+//    is an override file for the repositories section in the
+//    launcher
+//  - in this source file we are creating ~/.sbt/repositories
 //  - if ~/.sbt/repositories exists, sbt will IGNORE the entire
 //    embedded config in the launcher, not merge with it.
 //    ~/.sbt/repositories entirely replaces the embedded config.
-//  - activator.home is set to the unpacked activator zip
-//    directory by the activator/activator.bat wrapper scripts
+//    This is how the repository-config is set up in
+//    Packaging.scala.
+//  - activator.home is set to the activator/activator.bat wrapper
+//    scripts' location
 //  - ${activator.home}/repository would be our offline repo
+//    for the "fat" zip
 //  - in the "minimal" zip, ${activator.home}/repository doesn't
 //    exist
+//  - when the activator scripts are copied into an app,
+//    ${activator.home}/repository doesn't exist
 //  - activator.local.repository is a user-configurable override
 //    that replaces ${activator.home}/repository (you would
 //    specify this on the activator command line or in
 //    ~/.sbt/jvmargs)
 //  - if we don't have activator.home we seem to use
 //    ${user.home}/.activator, but with our wrapper scripts it
-//    isn't clear that can ever happen.
+//    isn't clear that can ever happen. (TODO clean up?)
 //
 // With that background, we are trying to handle these cases:
 //  - if you've never run activator and run it the first time,
@@ -41,8 +49,13 @@ import java.io.File
 //  - the second time you run activator, both launcher and sbt
 //    server would use ~/.sbt/repositories
 //  - if you upgrade to a new Activator (which probably moves
-//    activator.home), it uses ~/.sbt/repositories and ignores
-//    the embedded launcher config
+//    activator.home), the first time you run it, it uses
+//    ~/.sbt/repositories which will configure both the previous
+//    version of activator's repository and also the new version's
+//    repository due to activator.home
+//  - if you upgrade, the second time you run it we'll have edited
+//    ~/.sbt/repositories and it will only use the new version's
+//    repo
 //
 // We write two repos to ~/.sbt/repositories; one is hardcoded
 // to the activator path when we created ~/.sbt/repositories,
@@ -60,7 +73,9 @@ import java.io.File
 // that start with activator-.
 //
 // We also only edit ~/.sbt/repositories if we are a "fat" zip,
-// that is if ${activator.home}/repository exists.
+// that is if ${activator.home}/repository exists. If you run
+// an activator from inside an app or from the minimal zip,
+// we use the last "fat" repository you have used.
 object RepositoryConfig {
   private val repositoriesSectionName = "repositories"
 
