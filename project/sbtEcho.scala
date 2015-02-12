@@ -49,7 +49,7 @@ object SbtEchoBuild extends Build {
       name := "sbt-echo",
       version := Dependencies.echoVersion,
       aspectJVersion := Dependencies.aspectJVersion,
-      libraryDependencies ++= Seq(Dependencies.aspectjTools, Dependencies.sbtBackgroundRun),
+      libraryDependencies += Dependencies.sbtBackgroundRun,
       sourceGenerators in Compile <+= buildInfo,
       buildInfoKeys := Seq[BuildInfoKey](version, aspectJVersion),
       buildInfoPackage := "com.typesafe.sbt.echoakka"
