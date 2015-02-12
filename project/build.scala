@@ -222,8 +222,8 @@ object TheActivatorBuild extends Build {
         // *** note: do not use %% here ***
         "com.h2database" % "h2" % "1.3.170",
         "org.scalatest" % "scalatest_2.11" % "2.2.1",
-        "com.typesafe.trace" % "echo-trace-akka-2.3.9_2.11" % Dependencies.echoPluginVersion,
-        "com.typesafe.trace" % "echo-sigar-libs" % Dependencies.echoPluginVersion,
+        "com.typesafe.trace" % "echo-trace-akka-2.3.9_2.11" % Dependencies.echoVersion,
+        "com.typesafe.trace" % "echo-sigar-libs" % Dependencies.echoVersion,
         "org.aspectj" % "aspectjweaver" % Dependencies.aspectJVersion,
         "org.scala-lang" % "jline" % "2.10.4",
         "org.webjars" % "bootstrap" % "3.0.0",

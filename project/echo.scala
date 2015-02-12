@@ -19,7 +19,7 @@ object EchoBuild extends Build {
       settings(
       Keys.resolvers += typesafeIvyReleases,
       parallelExecution in GlobalScope := false,
-      version := Dependencies.echoPluginVersion
+      version := Dependencies.echoVersion
       )
       aggregate(trace, collect, collect211, sigarLibs)
     )
@@ -27,7 +27,7 @@ object EchoBuild extends Build {
   lazy val trace = (
     Project("echo-trace", file("echo/trace"))
       .doNotPublish
-      settings(version := Dependencies.echoPluginVersion)
+      settings(version := Dependencies.echoVersion)
       aggregate(
       protocolProtobuf24, protocolProtobuf25,
       event210Protobuf24, event210Protobuf25,
@@ -45,7 +45,7 @@ object EchoBuild extends Build {
     (Project("echo-sigar-libs", file("echo/sigar"))
       settings (defaultSettings: _*)
       settings(
-      version := Dependencies.echoPluginVersion,
+      version := Dependencies.echoVersion,
       resourceDirectory in Compile <<= baseDirectory / "lib",
       autoScalaLibrary := false,
       pomIncludeRepository := { _ => false},
@@ -78,7 +78,7 @@ object EchoBuild extends Build {
   )
 
   lazy val projectSettings = buildSettings ++ Seq(
-    version := Dependencies.echoPluginVersion,
+    version := Dependencies.echoVersion,
     resolvers += "Typesafe Repo" at "http://repo.typesafe.com/typesafe/releases/",
     // compile options
     scalacOptions <++= scalaVersion map { sv =>
@@ -377,7 +377,7 @@ object CollectProjects extends Build {
       .doNotPublish
       dependsOn (event210Protobuf24)
       settings(
-      version := Dependencies.echoPluginVersion,
+      version := Dependencies.echoVersion,
       sbt.Keys.scalaVersion := Dependencies.scala210Version,
       libraryDependencies ++= Seq(akkaSlf4j22, slf4j, logback, akkaTestKit22, scalaTest, junit)
       )
