@@ -18,7 +18,8 @@ object EchoBuild extends Build {
       settings (LocalTemplateRepo.settings: _*)
       settings(
       Keys.resolvers += typesafeIvyReleases,
-      parallelExecution in GlobalScope := false
+      parallelExecution in GlobalScope := false,
+      version := Dependencies.echoPluginVersion
       )
       aggregate(trace, collect, collect211, sigarLibs)
     )
@@ -26,6 +27,7 @@ object EchoBuild extends Build {
   lazy val trace = (
     Project("echo-trace", file("echo/trace"))
       .doNotPublish
+      settings(version := Dependencies.echoPluginVersion)
       aggregate(
       protocolProtobuf24, protocolProtobuf25,
       event210Protobuf24, event210Protobuf25,
@@ -43,6 +45,7 @@ object EchoBuild extends Build {
     (Project("echo-sigar-libs", file("echo/sigar"))
       settings (defaultSettings: _*)
       settings(
+      version := Dependencies.echoPluginVersion,
       resourceDirectory in Compile <<= baseDirectory / "lib",
       autoScalaLibrary := false,
       pomIncludeRepository := { _ => false},
@@ -75,6 +78,7 @@ object EchoBuild extends Build {
   )
 
   lazy val projectSettings = buildSettings ++ Seq(
+    version := Dependencies.echoPluginVersion,
     resolvers += "Typesafe Repo" at "http://repo.typesafe.com/typesafe/releases/",
     // compile options
     scalacOptions <++= scalaVersion map { sv =>
