@@ -19,7 +19,7 @@ object VersionGenerator {
          |],function (
          |) {
          |  var playVersion = "${Dependencies.play23Version}";
-         |  var echoVersion = "${Dependencies.echoPluginVersion}";
+         |  var echoVersion = "${Dependencies.echoVersion}";
          |  var ideaVersion = "${Dependencies.ideaVersion}";
          |  var eclipseVersion = "${Dependencies.eclipseVersion}";
          |  var sbtCoreNextVersion = "${Dependencies.sbtCoreNextVersion}";
