@@ -5,7 +5,7 @@ object Dependencies {
   // this version is used to publish echo and sbt-echo,
   // and also to set which version of those Activator
   // depends on.
-  val echoVersion = "0.1.11"
+  val echoVersion = "0.1.12"
 
   val sbtVersion = "0.13.8-M3"
   val sbtLibraryVersion = "0.13.8-M3" // for sbtIO on scala 2.11
@@ -63,8 +63,8 @@ object Dependencies {
   val playSbt13Plugin        =  Defaults.sbtPluginExtra("com.typesafe.play" % "sbt-plugin" % play23Version, "0.13", "2.10")
   val eclipseSbt13Plugin     =  Defaults.sbtPluginExtra("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "2.2.0", "0.13", "2.10")
   val ideaSbt13Plugin        =  Defaults.sbtPluginExtra("com.github.mpeltonen" % "sbt-idea" % "1.5.2", "0.13", "2.10")
-  val echoSbt13Plugin        =  Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-echo-play" % echoVersion, "0.13", "2.10")
-  val echoPlaySbt13Plugin    =  Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-echo" % echoVersion, "0.13", "2.10")
+  val echoSbt13Plugin        =  Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-echo" % echoVersion, "0.13", "2.10")
+  val echoPlaySbt13Plugin    =  Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-echo-play" % echoVersion, "0.13", "2.10")
 
   // Embedded databases / index
   val lucene = "org.apache.lucene" % "lucene-core" % luceneVersion
@@ -167,6 +167,8 @@ object Dependencies {
 
   // *** SBT-ECHO DEPENDENCIES ***
   val aspectjTools = "org.aspectj" % "aspectjtools" % aspectJVersion
+
+  val aspectjWeaver = "org.aspectj" % "aspectjweaver" % aspectJVersion
 
   val sbtBackgroundRun = Defaults.sbtPluginExtra("org.scala-sbt" % "sbt-core-next" % sbtCoreNextVersion, "0.13", "2.10")
 

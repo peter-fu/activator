@@ -7,7 +7,6 @@ package echo
 import sbt._
 import sbt.Keys._
 import play.Play.ClassLoaderCreator
-import org.aspectj.weaver.loadtime.WeavingURLClassLoader
 
 object EchoPlayRun {
   import EchoRun._

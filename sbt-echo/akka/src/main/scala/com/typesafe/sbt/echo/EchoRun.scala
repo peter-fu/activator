@@ -8,7 +8,6 @@ import sbt._
 import sbt.Keys._
 import sbt.Project.Initialize
 import java.net.{ URI, URLClassLoader }
-import org.aspectj.weaver.loadtime.WeavingURLClassLoader
 
 object EchoRun {
   import EchoProcess.{ Forked, RunMain }
@@ -200,6 +199,7 @@ object EchoRun {
     }
   }
 
+  // Assuming forked execution ONLY
   def echoRunner: Initialize[Task[ScalaRun]] = Def.task {
     if (!(echoTraceSupported in Echo).value) {
       val message = s"Inspect tracing does not work with this project. ${(echoAkkaVersionReport in Echo).value}"
@@ -209,7 +209,7 @@ object EchoRun {
       val forkConfig = ForkOptions(javaHome.value, outputStrategy.value, Seq.empty, Some(baseDirectory.value), javaOptions.value ++ traceOptions.value, connectInput.value)
       new EchoForkRun(forkConfig)
     } else {
-      new EchoDirectRun(trapExit.value, sigar.value)
+      throw new RuntimeException("Echo only supports operation of forked processes")
     }
   }
 
@@ -239,16 +239,6 @@ object EchoRun {
         sigarLoader = Some(loader)
         loader
       }
-    }
-  }
-
-  class EchoDirectRun(trapExit: Boolean, sigar: Sigar) extends ScalaRun {
-    def run(mainClass: String, classpath: Seq[File], options: Seq[String], log: Logger): Option[String] = {
-      log.info("Running " + mainClass + " " + options.mkString(" "))
-      log.debug("  Classpath:\n\t" + classpath.mkString("\n\t"))
-      System.setProperty("org.aspectj.tracing.factory", "default")
-      val loader = new WeavingURLClassLoader(Path.toURLs(classpath), SigarClassLoader(sigar))
-      (new RunMain(loader, mainClass, options)).run(trapExit, log)
     }
   }
 }
