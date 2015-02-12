@@ -3,6 +3,7 @@ import sbt.Keys._
 import com.typesafe.sbt.SbtGit
 import com.typesafe.sbt.SbtScalariform
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
+import sbtbuildinfo.Plugin._
 
 object SbtEchoBuild extends Build {
   def baseVersions: Seq[Setting[_]] = SbtGit.versionWithGit
@@ -11,6 +12,7 @@ object SbtEchoBuild extends Build {
     Project("sbt-echo", base = file("sbt-echo"))
       settings (noPublishSettings: _*)
       settings (defaultSettings: _*)
+      settings (version := Dependencies.echoPluginVersion)
       aggregate(sbtEchoAkka, sbtEchoPlay)
     )
 
@@ -37,12 +39,20 @@ object SbtEchoBuild extends Build {
     publishLocal := {}
   )
 
+  val aspectJVersion = taskKey[String]("aspectj version to go in buildinfo")
+
   lazy val sbtEchoAkka = (
     Project("sbt-echo-akka", file("sbt-echo/akka"))
       settings (defaultSettings: _*)
+      settings (buildInfoSettings: _*)
       settings(
       name := "sbt-echo",
-      libraryDependencies ++= Seq(Dependencies.aspectjTools, Dependencies.sbtBackgroundRun)
+      version := Dependencies.echoPluginVersion,
+      aspectJVersion := Dependencies.aspectJVersion,
+      libraryDependencies ++= Seq(Dependencies.aspectjTools, Dependencies.sbtBackgroundRun),
+      sourceGenerators in Compile <+= buildInfo,
+      buildInfoKeys := Seq[BuildInfoKey](version, aspectJVersion),
+      buildInfoPackage := "com.typesafe.sbt.echoakka"
       )
     )
 
@@ -52,6 +62,7 @@ object SbtEchoBuild extends Build {
       settings (defaultSettings: _*)
       settings (Dependencies.playPlugin: _*)
       settings (
+      version := Dependencies.echoPluginVersion,
       name := "sbt-echo-play"
       )
     )

@@ -12,8 +12,8 @@ import sbt.BackgroundJobServiceKeys
 object SbtEcho extends AutoPlugin {
   import echo.EchoRun._
 
-  val EchoVersion = "0.1.10"
-  val AspectjVersion = "1.8.4"
+  val EchoVersion = echoakka.BuildInfo.version
+  val AspectjVersion = echoakka.BuildInfo.aspectJVersion
 
   val Echo = config("echo").extend(Compile)
   val EchoTest = config("echo-test").extend(Echo, Test)
