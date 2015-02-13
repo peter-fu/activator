@@ -156,7 +156,14 @@ define([
     return false;
   }
 
-  var playApplicationUrl = ko.observable();
+  var playApplicationUrl = ko.observable(null);
+  var playServerStarted = ko.computed(function() {
+    return workingTasks.run() && playApplicationUrl() !== null;
+  });
+  // Watch whenever any task ends, because we can't target specifically play stop
+  workingTasks.run.subscribe(function(v) {
+    if (!v) playApplicationUrl(null);
+  });
 
   /**
   Run command
@@ -727,6 +734,7 @@ define([
     applicationNotReady:     applicationNotReady,
     isPlayApplication:       isPlayApplication,
     playApplicationUrl:      playApplicationUrl,
+    playServerStarted:        playServerStarted,
     inspectSupported:        inspectSupported,
     whyInspectIsNotSupported: whyInspectIsNotSupported,
     active: {
