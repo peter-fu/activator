@@ -2,14 +2,22 @@
 
 [![Join the chat at https://gitter.im/typesafehub/activator](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/typesafehub/activator?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-This project aims to be the snappiest snaptastic snapster you've every snapping laid eyes on!  And by that, we mean it builds stuff.
-
 For more information on using Activator, visit: [http://typesafe.com/activator](http://typesafe.com/activator)
 
+Activator aims to be a friendly one-stop-shop to bootstrap your
+Scala, Akka, and Play development. It can be used as a wrapper
+script that launches into traditional command line
+[sbt](http://www.scala-sbt.org/0.13/tutorial/Activator-Installation.html),
+but it also includes a template and tutorial system, and an
+optional GUI for getting started.
+
+You can think of Activator as traditional sbt (`activator shell`
+or `activator <sbt command here>`), plus an optional UI mode
+(`activator ui`), plus a template system (`activator new`).
+
+[Get the latest Activator download](http://typesafe.com/get-started).
+
 # Activator Developer Documentation
-
-This project uses [SBT 0.13](http://scala-sbt.org).   Make sure you have an SBT launcher, and run it in the checked out directory.
-
 
 ## Running the UI
 
