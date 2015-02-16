@@ -31,58 +31,32 @@
           <label>Order by</label>
           <select data-bind="options: filters.orderByValues, optionsText: 'text', optionsValue: 'value', value: filters.orderBy"></select>
         </p>
-        <span>Showing 50 of 277</span>
       </footer>
 
       <div class="spacer">
-      <!--
-      <table class="table-list" xdata-bind="attr: { 'data-ordering': filters.orderBy }">
-        <thead>
-          <tr>
-            <td>Method</td>
-            <th>Route</th>
-            <td>Status</td>
-            <td>Bytes in</td>
-            <td>Bytes out</td>
-          </tr>
-        </thead>
-        <tbody xdata-bind="foreach: actors">
-          <tr xdata-bind="click: $root.openActor, isExactUrl: actorLink">
-            <th></th>
-            <td class="throughput"></td>
-            <td class="maxMailboxSize"></td>
-            <td class="maxTimeInMailbox"></td>
-            <td  class="path"></td>
-          </tr>
-        </tbody>
-      </table>
-      </div>
-    </div>
-    -->
 
-
-    <table class="table-list">
-      <thead>
-        <tr>
-          <th rowspan="2" data-bind="click: filters.toggleOrdering('httpMethod'), attr: {'data-orderDir': filters.isOrdering('httpMethod') }" class=""><span>Method</span></th>
-          <th data-bind="click: filters.toggleOrdering('path'), attr: {'data-orderDir': filters.isOrdering('path') }"><span>Request</span></th>
-          <th rowspan="2" data-bind="click: filters.toggleOrdering('httpResponseCode'), attr: {'data-orderDir': filters.isOrdering('httpResponseCode') }" class=""><span>Response Code</span></th>
-          <th rowspan="2" data-bind="click: filters.toggleOrdering('controller'), attr: {'data-orderDir': filters.isOrdering('controller') }" class=""><span>Controller</span></th>
-          <th rowspan="2" data-bind="click: filters.toggleOrdering('invocationTimeMillis'), attr: {'data-orderDir': filters.isOrdering('invocationTimeMillis') }" class=""><span>Invocation Time (ms)</span></th>
-          <th rowspan="2" data-bind="click: filters.toggleOrdering('startTimeMillis'), attr: {'data-orderDir': filters.isOrdering('startTimeMillis') }" class=""><span>Time</span></th>
-        </tr>
-      </thead>
-      <tbody class="listing" data-bind="foreach: {data: requests}">
-        <tr data-bind="click: $root.openRequest, isExactUrl: requestLink, attr: { 'data-response-code': httpResponseCode}">
-          <td class="method" data-bind="text: httpMethod"></td>
-          <td class="path" data-bind="text: path"></td>
-          <td class="response" data-bind="text: httpResponseCode"></td>
-          <td class="controller" data-bind="text: controller"></td>
-          <td class="invocation" data-bind="text: (parseFloat(invocationTimeMillis)/1000)+' ms'"></td>
-          <td class="time" data-bind="formatDate: startTimeMillis"></td>
-        </tr>
-      </tbody>
-    </table>
+        <table class="table-list">
+          <thead>
+            <tr>
+              <th rowspan="2" data-bind="click: filters.toggleOrdering('httpMethod'), attr: {'data-order-dir': filters.isOrdering('httpMethod') }" class=""><span>Method</span></th>
+              <th data-bind="click: filters.toggleOrdering('path'), attr: {'data-order-dir': filters.isOrdering('path') }"><span>Request</span></th>
+              <th rowspan="2" data-bind="click: filters.toggleOrdering('httpResponseCode'), attr: {'data-order-dir': filters.isOrdering('httpResponseCode') }" class=""><span>Response Code</span></th>
+              <th rowspan="2" data-bind="click: filters.toggleOrdering('controller'), attr: {'data-order-dir': filters.isOrdering('controller') }" class=""><span>Controller</span></th>
+              <th rowspan="2" data-bind="click: filters.toggleOrdering('invocationTimeMillis'), attr: {'data-order-dir': filters.isOrdering('invocationTimeMillis') }" class=""><span>Invocation Time (ms)</span></th>
+              <th rowspan="2" data-bind="click: filters.toggleOrdering('startTimeMillis'), attr: {'data-order-dir': filters.isOrdering('startTimeMillis') }" class=""><span>Time</span></th>
+            </tr>
+          </thead>
+          <tbody class="listing" data-bind="foreach: {data: requests}">
+            <tr data-bind="click: $root.openRequest, isExactUrl: requestLink, attr: { 'data-response-code': httpResponseCode}">
+              <td class="method" data-bind="text: httpMethod"></td>
+              <td class="path" data-bind="text: path"></td>
+              <td class="response" data-bind="text: httpResponseCode"></td>
+              <td class="controller" data-bind="text: controller"></td>
+              <td class="invocation" data-bind="text: (parseFloat(invocationTimeMillis)/1000)+' ms'"></td>
+              <td class="time" data-bind="formatDate: startTimeMillis"></td>
+            </tr>
+          </tbody>
+        </table>
 
       </div>
     </div>
