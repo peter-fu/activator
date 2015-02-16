@@ -22,6 +22,31 @@ define([
     test:  ko.observable(0)
   }
 
+  function incrementCounterContextually(context, counter) {
+    return function() {
+      // Only increment the counter if the context is not the current one
+      if (router.current().meta.path.indexOf(context) !== 0) {
+        counter(counter()+1);
+      }
+    }
+  }
+
+  var incrementCounters = {
+    build: incrementCounterContextually("build/tasks", errorCounters.build),
+    run: incrementCounterContextually("run/system", errorCounters.run)
+  }
+
+  // .. on route change
+  router.current.subscribe(function(current) {
+    // Reset build counter when displaying the logs
+    if (router.current().meta.path.indexOf("build/tasks") === 0) {
+      errorCounters.build(0);
+    // Reset run oounter when displaying it
+    } else if (router.current().meta.path.indexOf("run/system") === 0) {
+      errorCounters.run(0);
+    }
+  });
+
   /**
   Notification list
   */
@@ -77,7 +102,7 @@ define([
 
     if (!execution.succeeded()){
       if ((execution.commandId === "run") && router.current().id !== "run"){
-        errorCounters.run(errorCounters.run()+1);
+        incrementCounters.run();
         notifications.unshift(new Notification("Runtime error", "#run/", "run", execution));
       } else if (execution.commandId === "test"){
         // Only show notification if we don't see the result
@@ -89,6 +114,7 @@ define([
           var url = "#code"+ fs.relative(execution.compilationErrors()[0].position.sourcePath)+":"+execution.compilationErrors()[0].position.line;
           notifications.unshift(new Notification("Compilation error", url, "code", execution));
         } else {
+          incrementCounters.build();
           notifications.unshift(new Notification("Build error", "#build/tasks/"+execution.executionId, "build", execution));
         }
       } else {
@@ -158,6 +184,7 @@ define([
 
   return {
     errorCounters:      errorCounters,
+    incrementCounters:  incrementCounters,
     notifications:      notifications,
     unreadBuildErrors:  unreadBuildErrors,
     notify:             notify,

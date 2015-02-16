@@ -17,6 +17,7 @@ define(function() {
     // e.g 'plugins/tutorial/tutorial'
     require([metaInfo.pluginUrl], function(plugin) {
       plugin.id = plugin.id || metaInfo.plugin;
+      plugin.meta = metaInfo;
 
       // if the current plugin is different from the new then we render the new plugin
       if (current().id !== metaInfo.plugin){

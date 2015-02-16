@@ -13,6 +13,7 @@
       <a data-bind="memorizeLinks: '#build', isActiveUrl: '#build'">
         Build
         <span class="stamp" data-bind="visible: workingTasks.compile()"></span>
+        <span class="stamp building" data-bind="visible: building"></span>
         <span class="counter" data-bind="text: counters.build, visible: counters.build()"></span>
       </a>
       <a data-bind="memorizeLinks: '#code', isActiveUrl: '#code'">

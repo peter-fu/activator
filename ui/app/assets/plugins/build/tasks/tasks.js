@@ -49,7 +49,6 @@ define([
     },
 
     render: function(){
-      sbt.events.errorCounters.build(0);
       return ko.bindhtml(tpl, State);
     }
   }

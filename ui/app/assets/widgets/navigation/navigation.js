@@ -27,6 +27,7 @@ define([
     typesafe: typesafe,
     counters: sbt.events.errorCounters,
     workingTasks: sbt.tasks.workingTasks,
+    building: sbt.tasks.applicationNotReady,
     showFirstCompileError: function(c, e) {
       e.preventDefault();
       var errors = sbt.tasks.compilationErrors();
