@@ -52,7 +52,6 @@ define([
 
   function toggleOrdering(name){
     return function() {
-      console.log(name)
       if (orderBy() === name)
         orderByDesc(orderByDesc()==="asc"?"desc":"asc")
       else

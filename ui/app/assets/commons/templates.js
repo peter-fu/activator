@@ -1,7 +1,7 @@
 /*
  Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
  */
-define(function() {
+define(["commons/format"], function(format) {
 
   // jQuery extensions
   var urlChange = ko.observable(window.location.hash);
@@ -357,11 +357,11 @@ define(function() {
     }
   }
 
-  ko.bindingHandlers.formatDate = {
+  ko.bindingHandlers.formatTime = {
     update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
       var value = valueAccessor();
       var date = new Date(value);
-      element.innerText = [date.getHours(),date.getMinutes(),date.getSeconds(),date.getUTCMilliseconds()].join(":");
+      element.innerText = format.formatTime(date, true, true, false);
     }
   }
 
