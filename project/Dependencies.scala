@@ -25,7 +25,7 @@ object Dependencies {
   val akka23Version = "2.3.9"
   val echoPlayVersion = "2.3.8"
   val slickVersion = "2.1.0"
-  val activatorAnalyticsVersion = "0.1.7"
+  val activatorAnalyticsVersion = "0.1.8"
   val aspectJVersion = "1.8.4"
 
   // versions used by build to set dependencies in JS

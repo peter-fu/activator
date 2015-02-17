@@ -22,6 +22,7 @@ define([
   var limitSizeValues = [50, 100, 200, 500];
   var orderByValues = [
     { value: "default",       text: "Invocation Time" },
+    { value: "path",          text: "Path" },
     { value: "method",        text: "Method" },
     { value: "responseCode",  text: "Response Code" },
     { value: "controller",    text: "Controller" },
