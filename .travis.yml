@@ -11,6 +11,7 @@ script:
 
 env:
   - TASKS=test
+  - TASKS=offlineTests
   - TASKS=integrationTestsWithoutOffline
   - TASKS=echo-cotests/test
 
