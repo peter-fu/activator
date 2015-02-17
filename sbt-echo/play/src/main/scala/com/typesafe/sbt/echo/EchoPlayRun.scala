@@ -24,9 +24,13 @@ object EchoPlayRun {
     }
   }
 
-  def tracePlayDependency(playVersion: String, echoVersion: String): ModuleID =
-    if (playVersion startsWith "2.3.") "com.typesafe.trace" % ("echo-trace-play-" + playVersion) % echoVersion % EchoTraceCompile.name cross CrossVersion.binary
-    else "com.typesafe.trace" % ("echo-trace-play-" + playVersion) % echoVersion % EchoTraceCompile.name cross CrossVersion.Disabled
+  def tracePlayDependency(playVersion: String, echoVersion: String): ModuleID = {
+    val nonRpPlayVersion =
+      if (playVersion.contains(rpPattern)) playVersion.substring(0, playVersion.indexOf(rpPattern))
+      else playVersion
+    if (nonRpPlayVersion startsWith "2.3.") "com.typesafe.trace" % ("echo-trace-play-" + nonRpPlayVersion) % echoVersion % EchoTraceCompile.name cross CrossVersion.binary
+    else "com.typesafe.trace" % ("echo-trace-play-" + nonRpPlayVersion) % echoVersion % EchoTraceCompile.name cross CrossVersion.Disabled
+  }
 
   def supportedPlayVersion(playVersion: String): Option[String] = {
     if (playVersion startsWith "2.3.") Some(Play23Version)
