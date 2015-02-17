@@ -61,20 +61,20 @@
     }
   }
 
-  [data-orderDir]{
+  [data-order-dir]{
     color: #fff;
     &:before {
-      content: "";
+      content: " ";
       display: inline-block;
       text-align: left;
       width: 15px;
       opacity: .5;
     }
   }
-  [data-orderDir='asc']:before {
+  [data-order-dir="asc"]:before {
     content: "▲";
   }
-  [data-orderDir='desc']:before {
+  [data-order-dir="desc"]:before {
     content: "▼";
   }
 

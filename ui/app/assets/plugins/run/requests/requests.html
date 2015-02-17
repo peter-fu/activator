@@ -27,58 +27,36 @@
             </p>
           </dd>
         </dl>
-        <span>Showing 50 of 277</span>
+        <p>
+          <label>Order by</label>
+          <select data-bind="options: filters.orderByValues, optionsText: 'text', optionsValue: 'value', value: filters.orderBy"></select>
+        </p>
       </footer>
 
       <div class="spacer">
-      <!--
-      <table class="table-list" xdata-bind="attr: { 'data-ordering': filters.orderBy }">
-        <thead>
-          <tr>
-            <td>Method</td>
-            <th>Route</th>
-            <td>Status</td>
-            <td>Bytes in</td>
-            <td>Bytes out</td>
-          </tr>
-        </thead>
-        <tbody xdata-bind="foreach: actors">
-          <tr xdata-bind="click: $root.openActor, isExactUrl: actorLink">
-            <th></th>
-            <td class="throughput"></td>
-            <td class="maxMailboxSize"></td>
-            <td class="maxTimeInMailbox"></td>
-            <td  class="path"></td>
-          </tr>
-        </tbody>
-      </table>
-      </div>
-    </div>
-    -->
 
-
-    <table class="table-list">
-      <thead>
-        <tr>
-          <th rowspan="2" xdata-bind="click: changeSort('method'), css: { sortBy: 'method' == sortBy() }" class=""><span>Method</span></th>
-          <th><span>Request</span></th>
-          <th rowspan="2" xdata-bind="click: changeSort('responseCode'), css: { sortBy: 'responseCode' == sortBy() }" class=""><span>Response Code</span></th>
-          <th rowspan="2" xdata-bind="click: changeSort('controller'), css: { sortBy: 'controller' == sortBy() }" class=""><span>Controller</span></th>
-          <th rowspan="2" xdata-bind="click: changeSort('invocationTime'), css: { sortBy: 'invocationTime' == sortBy() }" class=""><span>Invocation Time (ms)</span></th>
-          <th rowspan="2" xdata-bind="click: changeSort('time'), css: { sortBy: 'time' == sortBy() }" class=""><span>Time</span></th>
-        </tr>
-      </thead>
-      <tbody class="listing" data-bind="foreach: {data: requests}">
-        <tr data-bind="click: $root.openRequest, isExactUrl: requestLink, attr: { 'data-response-code': httpResponseCode}">
-          <td class="method" data-bind="text: httpMethod"></td>
-          <td class="path" data-bind="text: path"></td>
-          <td class="response" data-bind="text: httpResponseCode"></td>
-          <td class="controller" data-bind="text: controller"></td>
-          <td class="invocation" data-bind="text: invocationTimeMillis"></td>
-          <td class="time" data-bind="text: startTimeMillis"></td>
-        </tr>
-      </tbody>
-    </table>
+        <table class="table-list">
+          <thead>
+            <tr>
+              <th rowspan="2" data-bind="click: filters.toggleOrdering('method'), attr: {'data-order-dir': filters.isOrdering('method') }" class=""><span>Method</span></th>
+              <th><span>Request</span></th>
+              <th rowspan="2" data-bind="click: filters.toggleOrdering('responseCode'), attr: {'data-order-dir': filters.isOrdering('responseCode') }" class=""><span>Response Code</span></th>
+              <th rowspan="2" data-bind="click: filters.toggleOrdering('controller'), attr: {'data-order-dir': filters.isOrdering('controller') }" class=""><span>Controller</span></th>
+              <th rowspan="2" data-bind="click: filters.toggleOrdering('default'), attr: {'data-order-dir': filters.isOrdering('default') }" class=""><span>Invocation Time (ms)</span></th>
+              <th rowspan="2" data-bind="click: filters.toggleOrdering('time'), attr: {'data-order-dir': filters.isOrdering('time') }" class=""><span>Time</span></th>
+            </tr>
+          </thead>
+          <tbody class="listing" data-bind="foreach: {data: requests}">
+            <tr data-bind="click: $root.openRequest, isExactUrl: requestLink, attr: { 'data-response-code': httpResponseCode}">
+              <td class="method" data-bind="text: httpMethod"></td>
+              <td class="path" data-bind="text: path"></td>
+              <td class="response" data-bind="text: httpResponseCode"></td>
+              <td class="controller" data-bind="text: controller"></td>
+              <td class="invocation" data-bind="text: (parseFloat(invocationTimeMillis)/1000)+' ms'"></td>
+              <td class="time" data-bind="formatTime: startTimeMillis"></td>
+            </tr>
+          </tbody>
+        </table>
 
       </div>
     </div>
