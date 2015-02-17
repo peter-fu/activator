@@ -38,12 +38,12 @@
         <table class="table-list">
           <thead>
             <tr>
-              <th rowspan="2" data-bind="click: filters.toggleOrdering('httpMethod'), attr: {'data-order-dir': filters.isOrdering('httpMethod') }" class=""><span>Method</span></th>
-              <th data-bind="click: filters.toggleOrdering('path'), attr: {'data-order-dir': filters.isOrdering('path') }"><span>Request</span></th>
-              <th rowspan="2" data-bind="click: filters.toggleOrdering('httpResponseCode'), attr: {'data-order-dir': filters.isOrdering('httpResponseCode') }" class=""><span>Response Code</span></th>
+              <th rowspan="2" data-bind="click: filters.toggleOrdering('method'), attr: {'data-order-dir': filters.isOrdering('method') }" class=""><span>Method</span></th>
+              <th><span>Request</span></th>
+              <th rowspan="2" data-bind="click: filters.toggleOrdering('responseCode'), attr: {'data-order-dir': filters.isOrdering('responseCode') }" class=""><span>Response Code</span></th>
               <th rowspan="2" data-bind="click: filters.toggleOrdering('controller'), attr: {'data-order-dir': filters.isOrdering('controller') }" class=""><span>Controller</span></th>
-              <th rowspan="2" data-bind="click: filters.toggleOrdering('invocationTimeMillis'), attr: {'data-order-dir': filters.isOrdering('invocationTimeMillis') }" class=""><span>Invocation Time (ms)</span></th>
-              <th rowspan="2" data-bind="click: filters.toggleOrdering('startTimeMillis'), attr: {'data-order-dir': filters.isOrdering('startTimeMillis') }" class=""><span>Time</span></th>
+              <th rowspan="2" data-bind="click: filters.toggleOrdering('default'), attr: {'data-order-dir': filters.isOrdering('default') }" class=""><span>Invocation Time (ms)</span></th>
+              <th rowspan="2" data-bind="click: filters.toggleOrdering('time'), attr: {'data-order-dir': filters.isOrdering('time') }" class=""><span>Time</span></th>
             </tr>
           </thead>
           <tbody class="listing" data-bind="foreach: {data: requests}">
