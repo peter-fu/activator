@@ -24,6 +24,8 @@ object EchoRun {
   val EchoWeave = config("echo-weave").hide
   val EchoSigar = config("echo-sigar").hide
 
+  final val rpPattern = "-bin-"
+
   case class Sigar(dependency: Option[File], nativeLibraries: Option[File])
 
   def targetName(config: Configuration) = {
@@ -77,9 +79,13 @@ object EchoRun {
     module.organization == "com.typesafe.akka" && module.name.startsWith("akka-")
   } map (_.revision)
 
+  def stripBinVersion(version: String): String =
+    if (version.contains(rpPattern)) version.substring(0, version.indexOf(rpPattern))
+    else version
+
   def traceAkkaDependencies(akkaVersion: String, echoVersion: String, scalaVersion: String): Seq[ModuleID] = {
     val crossVersion = akkaCrossVersion(akkaVersion, scalaVersion)
-    Seq("com.typesafe.trace" % ("echo-trace-akka-" + akkaVersion) % echoVersion % EchoTraceCompile.name cross crossVersion)
+    Seq("com.typesafe.trace" % ("echo-trace-akka-" + stripBinVersion(akkaVersion)) % echoVersion % EchoTraceCompile.name cross crossVersion)
   }
 
   def akkaCrossVersion(akkaVersion: String, scalaVersion: String): CrossVersion = {
