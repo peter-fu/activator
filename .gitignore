@@ -16,6 +16,7 @@ RUNNING_PID
 project/boot/
 workspace/
 repository/
+monitoring/
 target/
 logs/
 .settings
