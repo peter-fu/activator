@@ -5,7 +5,7 @@ object Dependencies {
   // this version is used to publish echo and sbt-echo,
   // and also to set which version of those Activator
   // depends on.
-  val echoVersion = "0.1.12"
+  val echoVersion = "0.1.13"
 
   val sbtVersion = "0.13.8-M3"
   val sbtLibraryVersion = "0.13.8-M3" // for sbtIO on scala 2.11
