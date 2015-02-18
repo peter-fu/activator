@@ -36,7 +36,7 @@ define([
   }
   var mainRunAction = function() {
     if (sbt.tasks.pendingTasks.run()){
-      sbt.tasks.actions.kill("run");
+      sbt.tasks.actions.stopRun();
     } else {
       if (sbt.app.settings.automaticResetInspect()) {
         connection.reset();
@@ -45,7 +45,29 @@ define([
     }
   }
   var mainRunName = ko.computed(function() {
-    return sbt.tasks.pendingTasks.run()?"Stop":"Run";
+    if (sbt.tasks.pendingTasks.run()) {
+      return sbt.tasks.pendingTasks.stoppingRun() ? "Stopping" : "Stop";
+    } else {
+      return "Run";
+    }
+  });
+
+  var runEnabled = ko.computed(function() {
+    if (sbt.tasks.applicationReady()) {
+      return !sbt.tasks.pendingTasks.stoppingRun();
+    } else {
+      return false;
+    }
+  });
+
+  var runDisabled = ko.computed(function() { return !runEnabled(); });
+  var playUrl = sbt.tasks.playApplicationUrl;
+  var displayPlayUrl = ko.computed(function() {
+    if ((playUrl() !== null) && !sbt.tasks.pendingTasks.stoppingRun() && sbt.tasks.pendingTasks.run()) {
+      return true;
+    } else {
+      return false;
+    }
   });
 
   var toggleInspect = function() {
@@ -87,7 +109,11 @@ define([
     inspectActivatedAndAvailable: inspectActivatedAndAvailable,
     mainRunAction: mainRunAction,
     mainRunName: mainRunName,
-    customCommands: sbt.app.customCommands
+    customCommands: sbt.app.customCommands,
+    runEnabled: runEnabled,
+    runDisabled: runDisabled,
+    displayPlayUrl: displayPlayUrl,
+    playUrl: playUrl
   }
 
   // Subplugins titles

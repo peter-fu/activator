@@ -47,6 +47,7 @@ define([
   var pendingTasks = {
     compile:  ko.observable(false),
     run:      ko.observable(false),
+    stoppingRun: ko.observable(false),
     test:     ko.observable(false)
   };
 
@@ -162,7 +163,10 @@ define([
   });
   // Watch whenever any task ends, because we can't target specifically play stop
   workingTasks.run.subscribe(function(v) {
-    if (!v) playApplicationUrl(null);
+    if (!v) {
+      pendingTasks.stoppingRun(false);
+      playApplicationUrl(null);
+    }
   });
 
   /**
@@ -735,6 +739,12 @@ define([
     }
   }
 
+  // Helper for stopping run
+  function stopRun() {
+    pendingTasks.stoppingRun(true);
+    killTask("run");
+  }
+
   $("body").on("click","button[data-exec]",function() {
     var command = $(this).attr('data-exec');
     if (command === "run"){
@@ -778,6 +788,7 @@ define([
     },
     actions: {
       kill:         killTask,
+      stopRun:      stopRun,
       compile:      function() {
         requestExecution("compile");
       },
