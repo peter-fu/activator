@@ -7,8 +7,8 @@ object Dependencies {
   // depends on.
   val echoVersion = "0.1.13"
 
-  val sbtVersion = "0.13.8-M3"
-  val sbtLibraryVersion = "0.13.8-M3" // for sbtIO on scala 2.11
+  val sbtVersion = "0.13.8-M5"
+  val sbtLibraryVersion = "0.13.8-M5" // for sbtIO on scala 2.11
 
   val sbtPluginVersion = "0.13"
   val sbtPluginScalaVersion = "2.11.5"
@@ -17,7 +17,7 @@ object Dependencies {
   val luceneVersion = "4.2.1"
 
   val templateCacheVersion = "1.0-a0afb008ea619bf9d87dc010156cddffa8a6f880"
-  val sbtRcVersion = "0.3.1"
+  val sbtRcVersion = "0.3.2"
   val sbtCoreNextVersion = "0.1.1"
 
   val play23Version = "2.3.8"
