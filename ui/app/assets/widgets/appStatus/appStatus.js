@@ -72,7 +72,7 @@ define([
       if (!this.working()){
         sbt.tasks.actions.run();
       } else {
-        sbt.tasks.actions.kill("run");
+        sbt.tasks.actions.stopRun();
       }
     },
     working: sbt.tasks.workingTasks.run,

@@ -14,7 +14,7 @@
             <!-- /ko -->
           </dd>
         </dl>
-        <button data-bind="css: {disabled: sbt.tasks.applicationNotReady}, click: mainRunAction">
+        <button data-bind="css: {disabled: runDisabled}, enable: runEnabled, click: mainRunAction">
           <svg data-bind="svg: '/assets/icons/run.svg'"/>
           <span class="mainAction" data-bind="text: mainRunName"></span>
         </button>
@@ -75,9 +75,9 @@
           </div>
           Reset data on run
         </li>
-        <!-- ko if: sbt.tasks.playApplicationUrl() -->
+        <!-- ko if: displayPlayUrl() -->
         <li class="play-url">
-          <a target="_blank" data-bind="href: sbt.tasks.playApplicationUrl, text: sbt.tasks.playApplicationUrl, css: {'disabled': !sbt.tasks.playServerStarted()}"></a>
+          <a target="_blank" data-bind="href: playUrl, text: playUrl"></a>
         </li>
         <!-- /ko -->
       </ul>
