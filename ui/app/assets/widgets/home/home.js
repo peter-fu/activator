@@ -47,20 +47,20 @@ define([
       warning = "If you are creating Typesafe Reactive Platform project you must add a '<code>typesafe.properties</code>' file in the '<code>&lt;template&gt;/project</code>' folder.</p><p>The file must contain your subscription ID in the format '<code>typesafe.subscription=&lt;YOUR ID&gt;</code>'<br/>To get a free trial subscription ID visit: <a href='https://typesafe.com/account/id'>https://typesafe.com/account/id</a><p>";
     } else if (failedDueToNoSubscriptionId) {
       warning = "If you are creating Typesafe Reactive Platform project, <code>project/typesafe.properties</code> must  contain your subscription ID in the format '<code>typesafe.subscription=&lt;YOUR ID&gt;</code>'<br/>To get a free trial subscription ID visit: <a href='https://typesafe.com/account/id'>https://typesafe.com/account/id</a><p>";
+    } else {
+      warning = "The build configuration for this project did not load correctly.";
     }
 
-    if (warning) {
-      var warningNode = $("<article/>").html(warning)[0];
-      modals.show({
-        shape: "large",
-        title: "Could not load project",
-        body: warningNode,
-        cancel: "Return",
-        onCancel: function() {
-          $('#working, #open, #new').toggle();
-        }
-      });
-    }
+    var warningNode = $("<article/>").html(warning)[0];
+    modals.show({
+      shape: "large",
+      title: "Could not load project",
+      body: warningNode,
+      cancel: "Return",
+      onCancel: function() {
+        $('#working, #open, #new').toggle();
+      }
+    });
   });
 
   var SharedState = {
