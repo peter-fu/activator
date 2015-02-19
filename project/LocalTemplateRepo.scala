@@ -17,13 +17,22 @@ object LocalTemplateRepo {
 
   def settings: Seq[Setting[_]] = Seq(
     localTemplateCache <<= target(_ / "template-cache"),
-    overrideWithTemplates := "",
+    overrideWithTemplates := "minimal-akka-java-seed, " +
+      "minimal-akka-scala-seed, " +
+      "minimal-java, " +
+      "minimal-scala, " +
+      "play-java, " +
+      "play-scala, " +
+      "hello-akka, " +
+      "hello-scala, " +
+      "hello-slick-2.1, " +
+      "reactive-stocks",
     localTemplateCacheCreated <<= (localTemplateCache, localTemplateCacheHash, Keys.fullClasspath in Runtime, remoteTemplateCacheUri, streams, overrideWithTemplates) map makeTemplateCache,
     scalaVersion := Dependencies.scalaVersion,
     libraryDependencies += Dependencies.templateCache,
     // TODO - Allow debug version for testing?
     remoteTemplateCacheUri := "http://downloads.typesafe.com/typesafe-activator",
-    localTemplateCacheHash := "97b197abde85d9b687bd3f23ddba44669c57119b",
+    localTemplateCacheHash := "3009250411defac0c8d4798aa594d6556f1de24f",
     latestTemplateCacheHash := downloadLatestTemplateCacheHash(remoteTemplateCacheUri.value, streams.value),
     checkTemplateCacheHash := {
       if (enableCheckTemplateCacheHash.value)

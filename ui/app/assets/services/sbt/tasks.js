@@ -47,6 +47,7 @@ define([
   var pendingTasks = {
     compile:  ko.observable(false),
     run:      ko.observable(false),
+    stoppingRun: ko.observable(false),
     test:     ko.observable(false)
   };
 
@@ -156,7 +157,17 @@ define([
     return false;
   }
 
-  var playApplicationUrl = ko.observable();
+  var playApplicationUrl = ko.observable(null);
+  var playServerStarted = ko.computed(function() {
+    return workingTasks.run() && playApplicationUrl() !== null;
+  });
+  // Watch whenever any task ends, because we can't target specifically play stop
+  workingTasks.run.subscribe(function(v) {
+    if (!v) {
+      pendingTasks.stoppingRun(false);
+      playApplicationUrl(null);
+    }
+  });
 
   /**
   Run command
@@ -262,6 +273,8 @@ define([
     var execution = executionsById[tasksById[event.taskId].executionId];
     if (!execution) throw "Orphan task detected";
 
+    // TODO quit doing this, in theory we could look at someone
+    // else's unrelated event
     var name = event.serialized.$type.replace(packageRegexp, "");
 
     if (name === "CompilationFailure") {
@@ -272,6 +285,37 @@ define([
       execution.testResults.push(event.serialized);
     } else if (name === "PlayServerStarted") {
       playApplicationUrl(event.serialized.url);
+    }
+  });
+
+  subTypeEventStream("DetachedEvent").each(function(message) {
+    var event = message.event;
+
+    var name = event.serialized.$type;
+    // Some or all of these RP events arrive before the build
+    // successfully loads, so be aware of that. None of them
+    // arrive if the RP plugin isn't installed, so to handle the
+    // case where you remove RP and reload, we will
+    // need to look at whether we have the RP plugin listed
+    // in MinimalBuildStructure and discard all the RP data if we
+    // load a build with no RP plugin present.
+    if (name === "com.typesafe.rp.protocol.SubscriptionIdEvent") {
+      debug && console.log("SubscriptionIdEvent: ", event.serialized);
+      // event.serialized.fileExists
+      // event.serialized.subscriptionId // may be null
+    } else if (name === "com.typesafe.rp.protocol.SubscriptionLevelEvent") {
+      debug && console.log("SubscriptionLevelEvent: ", event.serialized);
+      // event.serialized.authorizedForProduction
+    } else if (name === "com.typesafe.rp.protocol.PlatformRelease") {
+      debug && console.log("PlatformRelease: ", event.serialized);
+      // event.serialized.availableFullVersion
+      // event.serialized.availableMajorVersion
+      // event.serialized.installedFullVersion
+      // event.serialized.installedMajorVersion
+      // event.serialized.fullUpdate // boolean
+      // event.serialized.majorUpdate // boolean
+    } else {
+      debug && console.log("Ignoring DetachedEvent " + name, event.serialized);
     }
   });
 
@@ -567,14 +611,28 @@ define([
     app.mainClass(message.value);
   });
 
-  // Application ready
+  // Did we load build or fail to - they always have opposite
+  // values except *before* we've loaded/failed to load
+  // the build when both are false.
+  // We reset them on losing client connection.
+  var buildReady = ko.observable(false);
+  var buildFailed = ko.observable(false);
+
+  // Are we connected to sbt server?
   var clientReady = ko.observable(false);
+  // Do we have main classes (meaning we've compiled
+  // successfully)? TODO rename this to haveMainClasses
+  // or something, and check that where we use it
+  // makes sense.
   var applicationReady = ko.computed(function() {
     return (app.mainClasses().length || app.mainClass() !== null) && clientReady();
   });
   var applicationNotReady = ko.computed(function() { return !applicationReady(); });
   subTypeEventStream('ClientOpened').each(function (msg) {
     clientReady(true);
+    // reset the build flags
+    buildReady(false);
+    buildFailed(false);
   });
   subTypeEventStream('ClientClosed').each(function (msg) {
     app.mainClasses([]);
@@ -582,13 +640,13 @@ define([
     clientReady(false);
   });
 
-  // Build status
-  var buildReady = ko.observable(true);
   subTypeEventStream("BuildLoaded").each(function(message) {
     buildReady(true);
+    buildFailed(false);
   });
   subTypeEventStream("BuildFailedToLoad").each(function(message) {
     buildReady(false);
+    buildFailed(true);
   });
 
 
@@ -695,6 +753,12 @@ define([
     }
   }
 
+  // Helper for stopping run
+  function stopRun() {
+    pendingTasks.stoppingRun(true);
+    killTask("run");
+  }
+
   $("body").on("click","button[data-exec]",function() {
     var command = $(this).attr('data-exec');
     if (command === "run"){
@@ -723,10 +787,12 @@ define([
     kill:                    killExecution,
     clientReady:             clientReady,
     buildReady:              buildReady,
+    buildFailed:             buildFailed,
     applicationReady:        applicationReady,
     applicationNotReady:     applicationNotReady,
     isPlayApplication:       isPlayApplication,
     playApplicationUrl:      playApplicationUrl,
+    playServerStarted:        playServerStarted,
     inspectSupported:        inspectSupported,
     whyInspectIsNotSupported: whyInspectIsNotSupported,
     active: {
@@ -737,6 +803,7 @@ define([
     },
     actions: {
       kill:         killTask,
+      stopRun:      stopRun,
       compile:      function() {
         requestExecution("compile");
       },

@@ -56,8 +56,14 @@ define([
   Full text application status
   */
   var appStatus = ko.computed(function() {
-    if(!tasks.buildReady()){
-      return { id: "buildFailed", label: "Build loading has failed", url: "#build/tasks" }
+    if(!websocket.isOpened()){
+      return { id: "disconnected", label: "Not connected to Activator backend", url: "#build/tasks" }
+    } else if(!tasks.clientReady()){
+      return { id: "disconnected", label: "Waiting for sbt server to restart", url: "#build/tasks" }
+    } else if(tasks.buildFailed()){
+      return { id: "buildFailed", label: "Failed to load sbt configuration", url: "#build/tasks" }
+    } else if(!tasks.buildReady()){
+      return { id: "activity", label: "Loading sbt configuration", url: "#build/tasks" }
     } else if(tasks.compilationErrors().length){
       var errors = tasks.compilationErrors();
       // Go to first compile error (if position information exists)
@@ -72,12 +78,10 @@ define([
       return { id: "compilationError", label: errors.length+label, url: url }
     } else if(tasks.testErrors().length){
       return { id: "testFailed", label: tasks.testErrors().length+" test(s) failed", url: "#test" }
-    } else if(!websocket.isOpened()){
-      return { id: "disconnected", label: "Connection lost", url: "#build/tasks" }
-    } else if(tasks.applicationNotReady()){
-      return { id: "activity", label: "Building project", url: "#build/tasks" }
     } else if(tasks.workingTasks.compile()){
       return { id: "activity", label: "Compiling project", url: "#build/tasks" }
+    } else if(tasks.applicationNotReady()){
+      return { id: "activity", label: "Building project", url: "#build/tasks" }
     } else if(tasks.workingTasks.test()){
       return { id: "activity", label: "Testing project", url: "#build/test" }
     } else if(tasks.workingTasks.run()){

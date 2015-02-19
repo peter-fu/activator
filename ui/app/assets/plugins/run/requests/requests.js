@@ -21,29 +21,29 @@ define([
 
   var limitSizeValues = [50, 100, 200, 500];
   var orderByValues = [
-    { value: "httpMethod",           text: "Method" },
-    { value: "path",                 text: "Path" },
-    { value: "httpResponseCode",     text: "Response Code" },
-    { value: "controller",           text: "Controller" },
-    { value: "invocationTimeMillis", text: "Invocation Time" },
-    { value: "startTimeMillis",      text: "Time" }
+    { value: "default",       text: "Invocation Time" },
+    { value: "path",          text: "Path" },
+    { value: "method",        text: "Method" },
+    { value: "responseCode",  text: "Response Code" },
+    { value: "controller",    text: "Controller" },
+    { value: "time",          text: "Time" }
   ];
 
+  var limitSize       = ko.observable(limitSizeValues[0]);
+  var orderByDesc     = ko.observable(true);
+  var orderBy         = ko.observable(orderByValues[0]);
+  var hideAssets      = ko.observable(false);
   var listFilters = ko.computed(function() {
     return {
-      // limitSize:      limitSize(),
-      sortDirection:  "orderByDesc",
-      sortCommand:    "orderBy"
-      // hideAssets:  hideAssets()
+      limitSize:      limitSize(),
+      sortDirection:  orderByDesc(),
+      sortCommand:    orderBy(),
+      hideAssets:     hideAssets()
     }
   });
   listFilters.subscribe(function(v) {
     requests.setListFilters(v);
   });
-  var limitSize       = ko.observable(limitSizeValues[0]);
-  var orderByDesc     = ko.observable(true);
-  var orderBy         = ko.observable(orderByValues[0]);
-  var hideAssets      = ko.observable(false);
 
 
   var filteredRequestsList = ko.computed(function() {

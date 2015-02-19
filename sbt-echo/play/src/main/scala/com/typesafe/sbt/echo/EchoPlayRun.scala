@@ -24,13 +24,16 @@ object EchoPlayRun {
     }
   }
 
-  def tracePlayDependency(playVersion: String, echoVersion: String): ModuleID =
-    if (playVersion startsWith "2.3.") "com.typesafe.trace" % ("echo-trace-play-" + playVersion) % echoVersion % EchoTraceCompile.name cross CrossVersion.binary
-    else "com.typesafe.trace" % ("echo-trace-play-" + playVersion) % echoVersion % EchoTraceCompile.name cross CrossVersion.Disabled
+  def tracePlayDependency(playVersion: String, echoVersion: String): ModuleID = {
+    val nonBinPlayVersion = stripBinVersion(playVersion)
+    if (nonBinPlayVersion startsWith "2.3.") "com.typesafe.trace" % ("echo-trace-play-" + nonBinPlayVersion) % echoVersion % EchoTraceCompile.name cross CrossVersion.binary
+    else "com.typesafe.trace" % ("echo-trace-play-" + nonBinPlayVersion) % echoVersion % EchoTraceCompile.name cross CrossVersion.Disabled
+  }
+
+  val compatiblePrefixCheck = "^2\\.3[\\.-]".r
 
   def supportedPlayVersion(playVersion: String): Option[String] = {
-    if (playVersion startsWith "2.3.") Some(Play23Version)
-    else None
+    compatiblePrefixCheck.findFirstIn(playVersion).map(_ => Play23Version)
   }
 
   def playVersionReport(playVersionOption: Option[String]): String = {

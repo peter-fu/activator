@@ -39,12 +39,12 @@
       <table class="table-list" data-bind="attr: { 'data-ordering': filters.orderBy }">
         <thead>
           <tr>
-            <th data-bind="click: filters.toggleOrdering('actorName'), attr: {'data-orderDir': filters.isOrdering('actorName')}">Actor Name</th>
-            <td data-bind="click: filters.toggleOrdering('throughput'), attr: {'data-orderDir': filters.isOrdering('throughput')}" class="throughput" title="Throughput">Throughput</td>
-            <td data-bind="click: filters.toggleOrdering('maxMailboxSize'), attr: {'data-orderDir': filters.isOrdering('maxMailboxSize')}" class="maxMailboxSize" title="Max Mailbox Size">Max Mailbox Size</td>
-            <td data-bind="click: filters.toggleOrdering('maxTimeInMailbox'), attr: {'data-orderDir': filters.isOrdering('maxTimeInMailbox')}" class="maxTimeInMailbox" title="Max Time in Mailbox">Max Time in Mailbox</td>
-            <td data-bind="click: filters.toggleOrdering('actorPath'), attr: {'data-orderDir': filters.isOrdering('actorPath')}" class="path" title="Path">Path</td>
-            <td data-bind="click: filters.toggleOrdering('deviations'), attr: {'data-orderDir': filters.isOrdering('deviations')}" class="deviations" title="Errors">Errors</td>
+            <th data-bind="click: filters.toggleOrdering('actorName'), attr: {'data-order-dir': filters.isOrdering('actorName')}">Actor Name</th>
+            <td data-bind="click: filters.toggleOrdering('throughput'), attr: {'data-order-dir': filters.isOrdering('throughput')}" class="throughput" title="Throughput">Throughput</td>
+            <td data-bind="click: filters.toggleOrdering('maxMailboxSize'), attr: {'data-order-dir': filters.isOrdering('maxMailboxSize')}" class="maxMailboxSize" title="Max Mailbox Size">Max Mailbox Size</td>
+            <td data-bind="click: filters.toggleOrdering('maxTimeInMailbox'), attr: {'data-order-dir': filters.isOrdering('maxTimeInMailbox')}" class="maxTimeInMailbox" title="Max Time in Mailbox">Max Time in Mailbox</td>
+            <td data-bind="click: filters.toggleOrdering('actorPath'), attr: {'data-order-dir': filters.isOrdering('actorPath')}" class="path" title="Path">Path</td>
+            <td data-bind="click: filters.toggleOrdering('deviations'), attr: {'data-order-dir': filters.isOrdering('deviations')}" class="deviations" title="Errors">Errors</td>
           </tr>
         </thead>
         <tbody data-bind="foreach: actors">
