@@ -63,7 +63,8 @@
     <header>
       <h1 data-bind="text: page().title"></h1>
     </header>
-    <section class="typo page" data-bind="html: page().page, memoScroll: 'tutorial-'+page().index">
+    <section class="typo page" data-bind="memoScroll: 'tutorial-'+page().index">
+      <!-- ko include: page().page --><!-- /ko -->
     </section>
   </article>
   <!-- /ko -->

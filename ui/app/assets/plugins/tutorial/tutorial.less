@@ -4,81 +4,160 @@
 @import "../../commons/_base";
 
 .tutorial {
+
+  .plugin section {
+    position: relative;
+  }
   .page {
     background: #fff;
     .typo();
     padding: 0 14px;
   }
-}
-.tutorial .intro {
-  .author {
-    color: @slate;
-    margin: 15px 0 5px;
+
+  .intro {
+    .author {
+      color: @slate;
+      margin: 15px 0 5px;
+    }
+    .training {
+      padding: 20px;
+      overflow: hidden;
+      background: @slate;
+      color: @grey-ltr;
+      h3 {
+        font-size: 18px;
+        margin: 8px 0 5px;
+      }
+      img {
+        background: #fff;
+        margin: 0 20px 0 0;
+        float: left;
+        width: 105px;
+        margin: 10px;
+      }
+    }
   }
-  .training {
+
+  .menu header .buttons button svg {
+    vertical-align: 0px;
+    margin: 0;
+  }
+
+  .menu li {
+    .ellipsis();
+  }
+
+  .no-tutorial {
+    position: absolute;
+    .trbl(0);
+    margin: auto;
+    display: table;
+    height: auto;
+    width: 80%;
+    max-width: 500px;
+    text-align: center;
+    background: @grey-dkr;
+    color: #fff;
     padding: 20px;
-    overflow: hidden;
-    background: @slate;
-    color: @grey-ltr;
-    h3 {
-      font-size: 18px;
-      margin: 8px 0 5px;
-    }
-    img {
-      background: #fff;
-      margin: 0 20px 0 0;
-      float: left;
-      width: 105px;
-      margin: 10px;
+    a {
+      color: @blue;
     }
   }
-}
 
-.tutorial .menu header .buttons button svg {
-  vertical-align: 0px;
-  margin: 0;
-}
-
-.tutorial .menu li {
-  .ellipsis();
-}
-
-.tutorial .no-tutorial {
-  position: absolute;
-  .trbl(0);
-  margin: auto;
-  display: table;
-  height: auto;
-  width: 80%;
-  max-width: 500px;
-  text-align: center;
-  background: @grey-dkr;
-  color: #fff;
-  padding: 20px;
-  a {
-    color: @blue;
-  }
-}
-
-.tutorial button[data-exec] {
-  padding: 0 10px 0 2px;
-  border-radius: 10px;
-  background: @blue;
-  color: white;
-  font-weight: bold;
-  display: inline-block;
-  height: 19px;
-  &:before {
+  button[data-exec] {
+    padding: 0 10px 0 2px;
     border-radius: 10px;
+    background: @blue;
+    color: white;
+    font-weight: bold;
     display: inline-block;
-    content: ">";
-    height: 15px;
-    width: 15px;
-    background: white;
-    color: @blue;
-    margin-right: 4px;
+    height: 19px;
+    &:before {
+      border-radius: 10px;
+      display: inline-block;
+      content: ">";
+      height: 15px;
+      width: 15px;
+      background: white;
+      color: @blue;
+      margin-right: 4px;
+    }
+    &:hover {
+      background: @blue-text;
+    }
   }
-  &:hover {
-    background: @blue-text;
+
+
+  ul.quizz {
+    li {
+      list-style-type: none;
+    }
+    .radio-type {
+      display: inline-block;
+      margin-right: 10px;
+      width: 14px;
+      height: 14px;
+      padding: 2px;
+      border: 2px solid @grey-ltr;
+      line-height: 2px;
+      vertical-align: 2px;
+      border-radius: 10px;
+      &:before {
+        border-radius: 10px;
+        content: " ";
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+      }
+    }
+
+    li.selected .radio-type {
+      border-color: @slate;
+      &:before {
+        background: @slate;
+      }
+    }
+    li.wrong .radio-type {
+      border-color: @blue;
+    }
+
+    li.right .radio-type {
+      border-color: @red;
+      &:before {
+        background: @red;
+      }
+    }
+    li.selected.wrong .radio-type {
+      border-color: @red;
+      &:before {
+        background: none;
+      }
+    }
+    li.selected.right .radio-type {
+      border-color: @blue;
+      &:before {
+        background: @blue;
+      }
+    }
+
+    &.multiple .radio-type {
+      border-radius: 0;
+      &:before {
+        border-radius: 0;
+      }
+    }
   }
+  .quizz-button {
+    float: right;
+  }
+
+  .full-video {
+    iframe {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      .trbl(0);
+    }
+  }
+
 }

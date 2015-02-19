@@ -28,39 +28,12 @@
   &.page {
     font: 16.5px/1.6em "Georgia","Times new roman", serif;
   }
-  p, h1, h2, h3, h4 {
-    margin: 1.5em 0;
+  p, h1, h2, h3, h4, h5 {
+    margin: 1.5em 0 .5em;
   }
-  // a{
-  //   &[href^="#code"] {
-  //     background: url(/assets/images/icons/doc.svg) 0 center no-repeat;
-  //     padding: 0 0 0 14px;
-  //     margin: 0 3px;
-  //   }
-  // }
-  // p code, pre {
-  //   background: @white-ltr;
-  //   border: 1px solid @white-dkr;
-  //   color: @slate-ltr;
-  //   padding: 0 3px;
-  //   margin: 0 3px;
-  // }
-  // pre {
-  //   margin: 12px -5px;
-  //   padding: 3px 5px;
-  // }
-
-
-
-
-
-
-
-
-
-
-
-
+  h1,h2,h3,h4,h5 {
+    .font();
+  }
 
   a {
     color: @blue-text;
@@ -86,6 +59,17 @@
       background: @red;
     }
   }
+  a{
+    &[href^="#code"] {
+      background: url(/assets/images/icons/doc.svg) 0 center no-repeat;
+      padding: 0 0 0 14px;
+      margin: 0 3px;
+      &:before {
+        content: "";
+        display: none;
+      }
+    }
+  }
   .monospace {
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
     font-size: .9em;
@@ -98,12 +82,11 @@
   pre {
     .monospace;
     overflow-x: auto;
-    margin: 12px -5px;
-    padding: 3px 5px;
+    margin: 0 -14px;
+    padding: 0 15px;
   }
   p code, pre {
     background: @white-ltr;
-    border: 1px solid @white-dkr;
     color: @slate-ltr;
   }
   h1, h2, h3 {
@@ -147,5 +130,11 @@
     max-width: 100%;
     height: auto;
     cursor: pointer;
+  }
+  blockquote {
+    margin: 0 -14px;
+    padding: 1px 20px;
+    background: @yellow;
+    color: @yellow-text;
   }
 }

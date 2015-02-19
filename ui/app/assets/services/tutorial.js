@@ -82,13 +82,58 @@ define([
           $(link).addClass("shorcut");
         }
       });
+
+      // Special nodes / trainings
+      $("ul.quizz", el).each(function(j, el) {
+        var answerSource = $(this).attr("data-answer");
+        var answers;
+        var maybeMultiple = answerSource.match(/\[([0-9\,]+)\]/i);
+        // multiple answers
+        if (maybeMultiple) {
+          $(this).addClass("multiple");
+          answers = maybeMultiple[1].split(",").map(function(x){ return parseInt(x); });
+          console.log(answers)
+        } else {
+          answers = [parseInt(answerSource)];
+        }
+        $("li", el).each(function() {
+          $(this).prepend("<span class='radio-type'></span>");
+        }).click(function() {
+          if (!maybeMultiple){
+            $("li", el).removeClass("selected");
+          }
+          $(this).toggleClass("selected");
+        });
+
+        $("<button class='quizz-button button'>Correction</button>").click(function() {
+          correctQuizz(el, answers);
+        }).prependTo(el);
+      });
+
+      $("ul.exercice", el).each(function(j, link) {
+      });
+
+      $("video", el).each(function(j, link) {
+      });
+
+      $("ul.test", el).each(function(j, link) {
+      });
+
       var title = $("h2", el).remove().html() || $(el).text().substring(0,40) + "...";
-      _pages.push({ index: i, title: title, page: el.innerHTML });
+      _pages.push({ index: i, title: title, page: el });
       _table.push(title);
     });
     pages(_pages);
     table(_table);
   });
+
+  function correctQuizz(el, answers) {
+    $("li", el).addClass(function(i) {
+      console.log(i, answers)
+      return answers.indexOf(i) >= 0?"right":"wrong";
+    });
+  }
+
 
   return {
     hasTutorial:  hasTutorial,
