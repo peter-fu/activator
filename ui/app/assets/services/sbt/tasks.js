@@ -611,14 +611,28 @@ define([
     app.mainClass(message.value);
   });
 
-  // Application ready
+  // Did we load build or fail to - they always have opposite
+  // values except *before* we've loaded/failed to load
+  // the build when both are false.
+  // We reset them on losing client connection.
+  var buildReady = ko.observable(false);
+  var buildFailed = ko.observable(false);
+
+  // Are we connected to sbt server?
   var clientReady = ko.observable(false);
+  // Do we have main classes (meaning we've compiled
+  // successfully)? TODO rename this to haveMainClasses
+  // or something, and check that where we use it
+  // makes sense.
   var applicationReady = ko.computed(function() {
     return (app.mainClasses().length || app.mainClass() !== null) && clientReady();
   });
   var applicationNotReady = ko.computed(function() { return !applicationReady(); });
   subTypeEventStream('ClientOpened').each(function (msg) {
     clientReady(true);
+    // reset the build flags
+    buildReady(false);
+    buildFailed(false);
   });
   subTypeEventStream('ClientClosed').each(function (msg) {
     app.mainClasses([]);
@@ -626,13 +640,13 @@ define([
     clientReady(false);
   });
 
-  // Build status
-  var buildReady = ko.observable(true);
   subTypeEventStream("BuildLoaded").each(function(message) {
     buildReady(true);
+    buildFailed(false);
   });
   subTypeEventStream("BuildFailedToLoad").each(function(message) {
     buildReady(false);
+    buildFailed(true);
   });
 
 
@@ -773,6 +787,7 @@ define([
     kill:                    killExecution,
     clientReady:             clientReady,
     buildReady:              buildReady,
+    buildFailed:             buildFailed,
     applicationReady:        applicationReady,
     applicationNotReady:     applicationNotReady,
     isPlayApplication:       isPlayApplication,
