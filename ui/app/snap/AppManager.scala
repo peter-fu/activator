@@ -308,29 +308,38 @@ object AppManager {
                 case e: DetachedLogEvent => SbtProtocol.wrapEvent(e)
                 case e: BackgroundJobLogEvent => SbtProtocol.wrapEvent(e)
               }
+              case e: BuildLoaded => SbtProtocol.wrapEvent(e)
               case e: BuildFailedToLoad => SbtProtocol.wrapEvent(e)
               case e: DetachedEvent => SbtProtocol.wrapEvent(e)
               case _ =>
                 SbtProtocol.synthesizeLogEvent(LogMessage.DEBUG, event.toString)
             }
             eventHandler.foreach(_.apply(json))
-          })
-          nameFuture.onComplete { _ => eventsSub.cancel() }
 
-          client.lookupScopedKey("name") map { keys =>
-            if (keys.isEmpty) {
-              namePromise.tryFailure(new RuntimeException("Project has no 'name' setting"))
-            } else {
-              val sub =
-                client.watch[String](SettingKey[String](keys.head)) { (key, result) =>
-                  result match {
-                    case Success(name) => namePromise.trySuccess(name)
-                    case Failure(e) => namePromise.tryFailure(new RuntimeException(s"Failed to get name setting from project: ${e.toString}"))
+            event match {
+              // if we can load the build, get the name
+              case _: BuildLoaded =>
+                client.lookupScopedKey("name") map { keys =>
+                  if (keys.isEmpty) {
+                    namePromise.tryFailure(new RuntimeException("Project has no 'name' setting"))
+                  } else {
+                    val sub =
+                      client.watch[String](SettingKey[String](keys.head)) { (key, result) =>
+                        result match {
+                          case Success(name) => namePromise.trySuccess(name)
+                          case Failure(e) => namePromise.tryFailure(new RuntimeException(s"Failed to get name setting from project: ${e.toString}"))
+                        }
+                      }
+                    nameFuture.onComplete { _ => sub.cancel() }
                   }
                 }
-              nameFuture.onComplete { _ => sub.cancel() }
+              // if we can't load the build, give up on name
+              case _: BuildFailedToLoad =>
+                namePromise.tryFailure(new RuntimeException("Failed to load the build"))
+              case _ =>
             }
-          }
+          })
+          nameFuture.onComplete { _ => eventsSub.cancel() }
         }
         def onError(reconnecting: Boolean, message: String): Unit = {
           if (reconnecting) {
