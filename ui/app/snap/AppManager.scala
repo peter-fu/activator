@@ -309,6 +309,7 @@ object AppManager {
                 case e: BackgroundJobLogEvent => SbtProtocol.wrapEvent(e)
               }
               case e: BuildFailedToLoad => SbtProtocol.wrapEvent(e)
+              case e: DetachedEvent => SbtProtocol.wrapEvent(e)
               case _ =>
                 SbtProtocol.synthesizeLogEvent(LogMessage.DEBUG, event.toString)
             }
