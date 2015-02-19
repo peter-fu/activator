@@ -84,15 +84,7 @@ object EchoRun {
     else version
 
   def traceAkkaDependencies(akkaVersion: String, echoVersion: String, scalaVersion: String): Seq[ModuleID] = {
-    val crossVersion = akkaCrossVersion(akkaVersion, scalaVersion)
-    Seq("com.typesafe.trace" % ("echo-trace-akka-" + stripBinVersion(akkaVersion)) % echoVersion % EchoTraceCompile.name cross crossVersion)
-  }
-
-  def akkaCrossVersion(akkaVersion: String, scalaVersion: String): CrossVersion = {
-    if (akkaVersion startsWith "2.0.") CrossVersion.Disabled
-    else if (akkaVersion startsWith "2.1.") CrossVersion.Disabled
-    else if (scalaVersion contains "-") CrossVersion.full
-    else CrossVersion.binary
+    Seq("com.typesafe.trace" % ("echo-trace-akka-" + stripBinVersion(akkaVersion)) % echoVersion % EchoTraceCompile.name cross CrossVersion.binary)
   }
 
   def weaveDependencies(version: String) = Seq(
