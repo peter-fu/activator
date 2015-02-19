@@ -30,9 +30,10 @@ object EchoPlayRun {
     else "com.typesafe.trace" % ("echo-trace-play-" + nonBinPlayVersion) % echoVersion % EchoTraceCompile.name cross CrossVersion.Disabled
   }
 
+  val compatiblePrefixCheck = "^2\\.3[\\.-]".r
+
   def supportedPlayVersion(playVersion: String): Option[String] = {
-    if (playVersion startsWith "2.3.") Some(Play23Version)
-    else None
+    compatiblePrefixCheck.findFirstIn(playVersion).map(_ => Play23Version)
   }
 
   def playVersionReport(playVersionOption: Option[String]): String = {
