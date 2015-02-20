@@ -146,10 +146,10 @@ object Dependencies {
 
   val akkaTestKit22 = "com.typesafe.akka" %% "akka-testkit" % akka22Version % "test"
   val akkaTestKit23 = "com.typesafe.akka" %% "akka-testkit" % akka23Version   % "test"
-  val junit       = "junit"               % "junit"         % "4.5"         % "test"
+  val junit       = "junit"               % "junit"         % "4.12"         % "test"
   val logback     = "ch.qos.logback"      % "logback-classic" % "1.0.13"    % "test"
   val playTest23  = "com.typesafe.play"   %% "play-test"    % play23Version   % "test"
-  val scalaTest   = "org.scalatest"       %% "scalatest"    % "2.2.1"       % "test"
+  val scalaTest   = "org.scalatest"       %% "scalatest"    % "2.2.4"       % "test"
 
   def traceAkka(version: String, crossVersion: CrossVersion) = Seq(
     "com.typesafe.akka" % "akka-actor"  % version cross crossVersion,

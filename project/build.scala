@@ -222,7 +222,6 @@ object TheActivatorBuild extends Build {
         // *** note: do not use %% here ***
         "org.scala-lang" % "scala-compiler" % "2.11.0",
         "com.h2database" % "h2" % "1.3.170",
-        "org.scalatest" % "scalatest_2.11" % "2.2.1",
         "org.scalatest" % "scalatest_2.11" % "2.2.4",
         "com.typesafe.trace" % "echo-trace-akka-2.3.9_2.11" % Dependencies.echoVersion,
         "com.typesafe.trace" % "echo-sigar-libs" % Dependencies.echoVersion,
@@ -238,8 +237,8 @@ object TheActivatorBuild extends Build {
         "org.webjars" % "rjs" % "2.1.11-1-trireme",
         "com.typesafe.slick" % "slick_2.11" % "2.1.0",
         "org.slf4j" % "slf4j-nop" % "1.6.4",
-        "com.novocode" % "junit-interface" % "0.10",
-        "com.typesafe.play.extras" % "play-geojson_2.11" % "1.1.0",
+        "com.novocode" % "junit-interface" % "0.11",
+        "junit" % "junit" % "4.12",
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-less" % "1.0.0", "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-less" % "1.0.6", "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-jshint" % "1.0.1", "0.13", "2.10"),
@@ -258,7 +257,6 @@ object TheActivatorBuild extends Build {
         "com.typesafe.play" % "play-java-ws_2.11" % "2.3.8",
         "org.apache.httpcomponents" % "httpcore" % "4.0.1",
         "org.apache.httpcomponents" % "httpclient" % "4.0.1",
-        "com.novocode" % "junit-interface" % "0.11-RC1",
         "org.specs2" % "specs2-analysis_2.11" % "2.3.12",
         "org.specs2" % "specs2-matcher-extra_2.11" % "2.3.12"
       ),
