@@ -202,7 +202,6 @@ object TheActivatorBuild extends Build {
         (Keys.projectID in ref) apply { id => id }
       }).join,
       localRepoArtifacts ++= Seq(
-
         // base dependencies
         "org.scala-sbt" % "sbt" % Dependencies.sbtVersion,
         "org.scala-lang" % "scala-compiler" % Dependencies.sbtPluginScalaVersion,
@@ -220,25 +219,11 @@ object TheActivatorBuild extends Build {
 
         // featured template dependencies
         // *** note: do not use %% here ***
-        "org.scala-lang" % "scala-compiler" % "2.11.0",
-        "com.h2database" % "h2" % "1.3.170",
-        "org.scalatest" % "scalatest_2.11" % "2.2.4",
-        "com.typesafe.trace" % "echo-trace-akka-2.3.9_2.11" % Dependencies.echoVersion,
-        "com.typesafe.trace" % "echo-sigar-libs" % Dependencies.echoVersion,
-        Dependencies.aspectjWeaver,
         "org.scala-lang" % "jline" % "2.10.4",
-        "org.webjars" % "bootstrap" % "3.0.0",
-        "org.webjars" % "knockout" % "2.3.0",
-        "org.webjars" % "requirejs" % "2.1.11-1",
-        "org.webjars" % "leaflet" % "0.7.2",
-        "org.webjars" % "flot" % "0.8.0",
-        "org.webjars" % "squirejs" % "0.1.0",
-        "org.webjars" % "rjs" % "2.1.11-1",
-        "org.webjars" % "rjs" % "2.1.11-1-trireme",
+
         "com.typesafe.slick" % "slick_2.11" % "2.1.0",
-        "org.slf4j" % "slf4j-nop" % "1.6.4",
-        "com.novocode" % "junit-interface" % "0.11",
-        "junit" % "junit" % "4.12",
+        "com.h2database" % "h2" % "1.3.170",
+
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-less" % "1.0.0", "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-less" % "1.0.6", "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-jshint" % "1.0.1", "0.13", "2.10"),
@@ -255,10 +240,22 @@ object TheActivatorBuild extends Build {
         "com.typesafe.play" % "play-java-jdbc_2.11" % "2.3.8",
         "com.typesafe.play" % "play-java-ebean_2.11" % "2.3.8",
         "com.typesafe.play" % "play-java-ws_2.11" % "2.3.8",
+        "org.webjars" % "bootstrap" % "3.0.0",
+        "org.webjars" % "knockout" % "2.3.0",
+        "org.webjars" % "requirejs" % "2.1.11-1",
+        "org.webjars" % "leaflet" % "0.7.2",
+        "org.webjars" % "flot" % "0.8.0",
+        "org.webjars" % "squirejs" % "0.1.0",
+        "org.webjars" % "rjs" % "2.1.11-1",
+        "org.webjars" % "rjs" % "2.1.11-1-trireme",
+
         "org.apache.httpcomponents" % "httpcore" % "4.0.1",
         "org.apache.httpcomponents" % "httpclient" % "4.0.1",
-        "org.specs2" % "specs2-analysis_2.11" % "2.3.12",
-        "org.specs2" % "specs2-matcher-extra_2.11" % "2.3.12"
+
+        "org.slf4j" % "slf4j-nop" % "1.6.4",
+        "com.novocode" % "junit-interface" % "0.11",
+        "junit" % "junit" % "4.12",
+        "org.scalatest" % "scalatest_2.11" % "2.2.4"
       ),
       Keys.mappings in S3.upload <<= (Keys.packageBin in Universal, Packaging.minimalDist, Keys.version) map { (zip, minimalZip, v) =>
         Seq(minimalZip -> ("typesafe-activator/%s/typesafe-activator-%s-minimal.zip" format (v, v)),
