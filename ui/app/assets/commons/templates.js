@@ -271,8 +271,9 @@ define(["commons/format"], function(format) {
         logs().forEach(renderItem);
 
         // Display logs on "push"
-        var subscription = logs.subscribe(function(changes) {
+        logs.subscribe(function(changes) {
           changes.forEach(function(c) {
+            console.log(c.status);
             if (c.status === "added") {
               renderItem(c.value);
             // We are assuming here that all deletion are sequetial from first index
@@ -281,11 +282,6 @@ define(["commons/format"], function(format) {
             }
           });
         }, null, "arrayChange");
-
-        // Cleanup
-        ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
-          subscription.dispose();
-        });
 
         // thank you knockout, but we got the bindings from now on (see how createHandler applyBindings itself)
         return { controlsDescendantBindings: true };
