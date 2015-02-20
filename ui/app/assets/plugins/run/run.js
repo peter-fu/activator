@@ -60,6 +60,10 @@ define([
     }
   });
 
+  var displayMains = ko.computed(function() {
+    return (sbt.tasks.applicationReady() && sbt.app.currentMainClass() && !sbt.tasks.isPlayApplication());
+  });
+
   var runDisabled = ko.computed(function() { return !runEnabled(); });
   var playUrl = sbt.tasks.playApplicationUrl;
   var displayPlayUrl = ko.computed(function() {
@@ -112,6 +116,7 @@ define([
     customCommands: sbt.app.customCommands,
     runEnabled: runEnabled,
     runDisabled: runDisabled,
+    displayMains: displayMains,
     displayPlayUrl: displayPlayUrl,
     playUrl: playUrl
   }
