@@ -85,6 +85,7 @@
     <ul class="list links">
       <li class="system" data-bind="isActiveUrl: '#run/system'">
         <a href="#run/system">Standard out</a>
+        <span class="counter error" data-bind="text: sbt.events.errorCounters.run, visible: sbt.events.errorCounters.run()"></span>
       </li>
       <!-- ko if: inspectActivated -->
       <li class="actors" data-bind="isActiveUrl: '#run/actors'">
