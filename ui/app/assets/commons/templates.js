@@ -360,6 +360,13 @@ define(["commons/format"], function(format) {
     }
   }
 
+  ko.bindingHandlers.formatTimeCounter = {
+    update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+      var value = valueAccessor();
+      var date = new Date(value);
+      element.innerText = [date.getHours(),date.getMinutes(),date.getSeconds(),date.getUTCMilliseconds()].join(":");
+    }
+  }
 
   ko.bindingHandlers.format = {
     update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
