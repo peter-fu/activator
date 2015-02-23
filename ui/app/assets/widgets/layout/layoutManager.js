@@ -30,6 +30,9 @@ define([
       panelOpened(true);
     },
     panelToggle: function() {
+      if (router.current().id === "tutorial" && !panelOpenedSet()){
+        window.location.hash = "#build"
+      }
       panelOpenedSet(!panelOpenedSet());
     },
     navigationToggle: function() {
