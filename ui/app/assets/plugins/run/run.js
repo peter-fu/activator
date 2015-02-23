@@ -131,7 +131,7 @@ define([
     system:         "Stdout",
     actors:         "Actors",
     requests:       "Requests",
-    deviations:     "Deviations"
+    actorIssues:    "Actor Issues"
   }
 
   return {
