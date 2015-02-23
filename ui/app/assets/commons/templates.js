@@ -273,7 +273,6 @@ define(["commons/format"], function(format) {
         // Display logs on "push"
         logs.subscribe(function(changes) {
           changes.forEach(function(c) {
-            console.log(c.status);
             if (c.status === "added") {
               renderItem(c.value);
             // We are assuming here that all deletion are sequetial from first index
