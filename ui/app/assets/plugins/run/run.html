@@ -116,8 +116,8 @@
 
     <!-- ko if: inspectActivated -->
     <footer>
-        <span class="expand">Data collected for</span>
-        <span class="cache counter" data-bind="formatTimeCounter: stats().data.currentStorageTime * 1000">0&ndash;</span>
+      <span class="expand"><span class="reset" data-bind="click: resetData">RESET</span> Data collected for</span>
+      <span class="cache counter" data-bind="formatTimeCounter: stats().data.currentStorageTime * 1000">0&ndash;</span>
     </footer>
     <!-- /ko -->
 
