@@ -98,6 +98,10 @@ define([
   // Start an empty request for echo
   connection.filters.active([]);
 
+  function resetData(){
+    connection.reset();
+  }
+
   var State = {
     subPlugin: subPlugin,
     sbtExecCommand: sbtExecCommand,
@@ -118,7 +122,8 @@ define([
     runDisabled: runDisabled,
     displayMains: displayMains,
     displayPlayUrl: displayPlayUrl,
-    playUrl: playUrl
+    playUrl: playUrl,
+    resetData: resetData
   }
 
   // Subplugins titles
@@ -126,7 +131,7 @@ define([
     system:         "Stdout",
     actors:         "Actors",
     requests:       "Requests",
-    deviations:     "Deviations"
+    actorIssues:    "Actor Issues"
   }
 
   return {

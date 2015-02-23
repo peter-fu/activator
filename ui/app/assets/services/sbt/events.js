@@ -37,15 +37,17 @@ define([
   }
 
   // .. on route change
-  router.current.subscribe(function(current) {
+  window.addEventListener("hashchange", function(e) {
+    var url = window.location.hash.slice(1);
     // Reset build counter when displaying the logs
-    if (router.current().meta.path.indexOf("build/tasks") === 0) {
+    if (url.indexOf("build/tasks") === 0) {
       errorCounters.build(0);
     // Reset run oounter when displaying it
-    } else if (router.current().meta.path.indexOf("run/system") === 0) {
+    } else if (url.indexOf("run/system") === 0) {
       errorCounters.run(0);
     }
   });
+
 
   /**
   Notification list

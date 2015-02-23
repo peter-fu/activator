@@ -20,8 +20,8 @@
   }
   .item-view {
     .expand(5);
-    width: 550px; // Default value for IE11
-    min-width: 550px; // Default value for IE11
+    width: 500px; // Default value for IE11
+    min-width: 400px; // Default value for IE11
     overflow: auto;
   }
   .logs-wrapper {
@@ -117,5 +117,22 @@
     border-color: @grey-text;
     color: @grey-text;
     background: none;
+  }
+}
+
+
+.run .reset {
+  margin: 0 4px;
+  padding: 0 3px;
+  display: inline-block;
+  background: @slate-ltr;
+  border-radius: 2px;
+  height: 14px;
+  line-height: 15px;
+  font-size: 8px;
+  opacity: .5;
+  text-align: center;
+  &:hover {
+    opacity: 1;
   }
 }

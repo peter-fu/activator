@@ -85,6 +85,7 @@
     <ul class="list links">
       <li class="system" data-bind="isActiveUrl: '#run/system'">
         <a href="#run/system">Standard out</a>
+        <span class="counter error" data-bind="text: sbt.events.errorCounters.run, visible: sbt.events.errorCounters.run()"></span>
       </li>
       <!-- ko if: inspectActivated -->
       <li class="actors" data-bind="isActiveUrl: '#run/actors'">
@@ -115,8 +116,8 @@
 
     <!-- ko if: inspectActivated -->
     <footer>
-        <span class="expand">Data collected for</span>
-        <span class="cache counter" data-bind="formatTime: stats().data.currentStorageTime * 1000">0&ndash;</span>
+      <span class="expand"><span class="reset" data-bind="click: resetData">RESET</span> Data collected for</span>
+      <span class="cache counter" data-bind="formatTimeCounter: stats().data.currentStorageTime * 1000">0&ndash;</span>
     </footer>
     <!-- /ko -->
 

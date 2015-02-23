@@ -271,7 +271,7 @@ define(["commons/format"], function(format) {
         logs().forEach(renderItem);
 
         // Display logs on "push"
-        var subscription = logs.subscribe(function(changes) {
+        logs.subscribe(function(changes) {
           changes.forEach(function(c) {
             if (c.status === "added") {
               renderItem(c.value);
@@ -281,11 +281,6 @@ define(["commons/format"], function(format) {
             }
           });
         }, null, "arrayChange");
-
-        // Cleanup
-        ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
-          subscription.dispose();
-        });
 
         // thank you knockout, but we got the bindings from now on (see how createHandler applyBindings itself)
         return { controlsDescendantBindings: true };
@@ -365,6 +360,16 @@ define(["commons/format"], function(format) {
     }
   }
 
+  ko.bindingHandlers.formatTimeCounter = {
+    update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+      var value = valueAccessor();
+      if      (value === 0) element.innerText = "0–"
+      else if (value > 60e6) element.innerText = roundDecimal(value/60e6)+" min"
+      else if (value > 10e5) element.innerText = roundDecimal(value/10e5)+" s"
+      else if (value > 10e2) element.innerText = roundDecimal(value/10e2)+" ms"
+      else                   element.innerText = roundDecimal(value)     +" µs"
+    }
+  }
 
   ko.bindingHandlers.format = {
     update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
