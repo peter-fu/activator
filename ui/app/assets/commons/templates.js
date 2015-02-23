@@ -363,8 +363,11 @@ define(["commons/format"], function(format) {
   ko.bindingHandlers.formatTimeCounter = {
     update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
       var value = valueAccessor();
-      var date = new Date(value);
-      element.innerText = [date.getHours(),date.getMinutes(),date.getSeconds(),date.getUTCMilliseconds()].join(":");
+      if      (value === 0) element.innerText = "0–"
+      else if (value > 60e6) element.innerText = roundDecimal(value/60e6)+" min"
+      else if (value > 10e5) element.innerText = roundDecimal(value/10e5)+" s"
+      else if (value > 10e2) element.innerText = roundDecimal(value/10e2)+" ms"
+      else                   element.innerText = roundDecimal(value)     +" µs"
     }
   }
 
