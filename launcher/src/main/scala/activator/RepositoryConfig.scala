@@ -37,11 +37,7 @@ import java.io.File
 //  - activator.local.repository is a user-configurable override
 //    that replaces ${activator.home}/repository (you would
 //    specify this on the activator command line or in
-//    ~/.sbt/jvmargs)
-//  - if we don't have activator.home we seem to use
-//    ${user.home}/.activator, but with our wrapper scripts it
-//    isn't clear that can ever happen. (TODO clean up?)
-//
+//    ~/.sbt/jvmargs)//
 // With that background, we are trying to handle these cases:
 //  - if you've never run activator and run it the first time,
 //    the launcher uses its embedded repository config, and then
@@ -128,7 +124,7 @@ object RepositoryConfig {
     // that sets activator.home. The launcher only uses its embedded repo
     // config if ~/.sbt/repositories doesn't exist.
     val activatorLauncherLine =
-      """  activator-launcher-local: file://${activator.local.repository-${activator.home-${user.home}/.activator}/repository}, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]"""
+      """  activator-launcher-local: file://${activator.local.repository-${activator.home}/repository}, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]"""
 
     oldOption match {
       case Some(old) =>
