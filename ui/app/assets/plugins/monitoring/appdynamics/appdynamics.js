@@ -72,7 +72,8 @@ define([
     return (!appdynamics.validAccessKey.test(accessKey()));
   });
 
-  var provisionAppDynamics = function() {
+  var provisionAppDynamics = function(x,e) {
+    e.preventDefault();
     error("");
     appdynamics.setObserveProvision(provisionObserver);
     appdynamics.provision(username(), password());
@@ -136,7 +137,8 @@ define([
     return (canSave() && changed());
   });
 
-  var saveConfig = function() {
+  var saveConfig = function(x,e) {
+    e.preventDefault();
     if (appdynamics.validNodeName.test(nodeName()) &&
       appdynamics.validTierName.test(tierName()) &&
       appdynamics.validHostName.test(hostName()) &&

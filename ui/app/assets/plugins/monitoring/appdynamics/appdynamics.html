@@ -50,7 +50,7 @@
             <h3>Enter your AppDynamics account information</h3>
             <p>In order to download the AppDynamics agent you need to supply your AppDynamics credentials (this information will not be stored).<p>
             <p>If you do not have an AppDynamics account, you can <a href="https://portal.appdynamics.com/account/signup/signupForm/" target="_blank">signup here.</a></p>
-            <form>
+            <form data-bind="submit: provisionAppDynamics">
                 <p>
                     <label>Email:</label><input type="text" id="username" data-bind="value: username, valueUpdate: 'input', css: {error: usernameInvalid() }"/>
                 </p>
@@ -75,7 +75,7 @@
         <div class="tabs-step configure" data-bind="css: { opened: selectedTab() == 'configure' }">
             <h2>Agent configuration</h2>
             <p>You must provide some configuration information in order to use AppDynamics.</p>
-            <form style="border: 2px;">
+            <form style="border: 2px;" data-bind="submit: saveConfig">
                 <p>
                     <label for="appDynamicsHostName">Collector host name:</label><input type="text" id="appDynamicsHostName" data-bind="value: hostName, valueUpdate: 'input', css: {error: hostNameInvalid() }"/>
                 </p>
