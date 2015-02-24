@@ -16,16 +16,22 @@ define([
 
   var presentationModeStyle = (function() {
     var added = false;
-    // Create the <style> tag
-    var style = document.createElement("style");
-    // WebKit hack :(
-    style.appendChild(document.createTextNode(""));
-    // Add the <style> element to the page
-    document.head.appendChild(style);
-    style.sheet.insertRule(".presentation-mode .tutorial .page, .presentation-mode .build .logs, .presentation-mode .run .pluginBlock, .presentation-mode .code .editor, .presentation-mode .monitoring .tabs-step { zoom: 141% !important; }");
+    var cssStr = ".presentation-mode .tutorial .page, .presentation-mode .build .logs, .presentation-mode .run .pluginBlock, .presentation-mode .code .editor, .presentation-mode .monitoring .tabs-step { zoom: 141% !important; }";
+    var style;
+
+    try {
+      // Create the <style> tag
+      style = document.createElement("style");
+      // WebKit hack :(
+      style.appendChild(document.createTextNode(""));
+      // Add the <style> element to the page
+      style.sheet.insertRule(cssStr);
+    } catch(e){
+      style = undefined;
+    }
 
     return function() {
-      if (!added) {
+      if (!added && style) {
         document.head.appendChild(style);
         added = true;
       }

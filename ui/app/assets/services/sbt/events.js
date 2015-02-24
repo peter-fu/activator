@@ -25,7 +25,7 @@ define([
   function incrementCounterContextually(context, counter) {
     return function() {
       // Only increment the counter if the context is not the current one
-      if (router.current().meta.path.indexOf(context) !== 0) {
+      if (router.current().meta && router.current().meta.path && router.current().meta.path.indexOf(context) !== 0) {
         counter(counter()+1);
       }
     }
