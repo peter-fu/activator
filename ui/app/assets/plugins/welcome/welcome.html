@@ -1,21 +1,8 @@
 <main id="wrapper" class="welcome">
   <div id="welcome-holder">
-    <div class="message">
-      <h2>
-        Your application is ready!
-      </h2>
-      <div class="news" data-bind="html: newsHtml">
-      </div>
-      <p class="presentation">
-        <label><input type="checkbox" data-bind="event: { change: presentationMode }"/> Activate the <b>Presentation Mode</b></label>
-      </p>
-      <p class="feedback">
-        Problems? <a href="https://github.com/typesafehub/activator/issues" target="_blank">Search &amp; Create Issues</a>
-      </p>
-    </div>
     <div class="features">
       <header>
-        Getting started
+        Your application is ready!
       </header>
       <ul>
         <li><a href="#tutorial">Read the tutorial</a></li>
@@ -24,6 +11,12 @@
         <li><a href="#run">Run and inspect the app</a></li>
         <li><a href="#test">Test the app</a></li>
       </ul>
+      <p class="presentation">
+        <label><input type="checkbox" data-bind="checked: presentationMode"/> Activate the <b>Presentation Mode</b></label>
+      </p>
+      <p class="feedback">
+        Problems? <a href="https://github.com/typesafehub/activator/issues" target="_blank">Search &amp; Create Issues</a>
+      </p>
     </div>
   </div>
   <p class="version-info">
