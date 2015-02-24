@@ -37,7 +37,7 @@ define(function() {
   }
 
   var parseUrl = function(url) {
-    if (!url) url = "welcome"; // Default plugin
+    if (!url || url === "#") url = "welcome"; // Default plugin
     if (url[0] === "#") url = url.slice(1); // Remove extra hash
     var plugin = url.split("/")[0]; // Divide the path in sections
     return {
