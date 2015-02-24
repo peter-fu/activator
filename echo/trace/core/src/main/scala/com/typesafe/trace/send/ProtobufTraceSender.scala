@@ -11,9 +11,7 @@ import java.util.concurrent.atomic.{ AtomicBoolean, AtomicLong }
 import java.util.concurrent.{ LinkedBlockingQueue, ThreadFactory, ThreadPoolExecutor, TimeUnit }
 
 class ProtobufTraceSender(port: Int, capacity: Int, retry: Boolean, daemonic: Boolean, warn: Boolean, debug: Boolean) extends TraceSender {
-
-  println("Starting ProtobufTraceSender:")
-
+  
   val address = InetAddress.getByName(null)
 
   private val executor = {
