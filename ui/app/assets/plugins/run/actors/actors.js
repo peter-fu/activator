@@ -18,14 +18,13 @@ define([
 ) {
 
   var limitSizeValues = [50, 100, 200, 500];
-  // var orderByValues   = ["Name", "Path", "Errors", "Throughput", "Max time in Mailbox", "Max Mailbox Size"];
   var orderByValues = [
     { value: "actorName",        text: "Name" },
     { value: "throughput",       text: "Throughput" },
     { value: "actorPath",        text: "Path" },
     { value: "maxMailboxSize",   text: "Max Mailbox Size" },
     { value: "maxTimeInMailbox", text: "Max time in Mailbox" },
-    { value: "deviations",       text: "Errors" }
+    { value: "deviation",        text: "Error" }
   ]
 
   var fullTextSearch  = ko.observable("");

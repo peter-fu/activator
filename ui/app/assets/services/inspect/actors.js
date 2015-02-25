@@ -43,7 +43,7 @@ define([
       var maxTimeInMailbox  = format.units(actor.maxTimeInMailbox.unit, actor.maxTimeInMailbox.value, formatUnits);
       var maxMailboxSize    = actor.maxMailboxSize;
       var deviationCount    = actor.errorCount + actor.warningCount + actor.deadletterCount + actor.unhandledMessageCount;
-      var deviations        = deviationCount > 0 ? deviationCount : "";
+      var deviation         = deviationCount > 0 ? deviationCount : "";
       // if (!fullActorPath() && path.indexOf('/user/') > -1) path = path.substring(path.indexOf('/user/') + 6);
       return {
         'path': path,
@@ -54,7 +54,7 @@ define([
         'throughput': throughput,
         'maxTimeInMailbox': maxTimeInMailbox,
         'maxMailboxSize': maxMailboxSize,
-        'deviations': deviations
+        'deviation': deviation
       }
     })
     .map(function(data) {
