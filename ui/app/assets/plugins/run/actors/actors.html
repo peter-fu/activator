@@ -44,7 +44,7 @@
             <td data-bind="click: filters.toggleOrdering('maxMailboxSize'), attr: {'data-order-dir': filters.isOrdering('maxMailboxSize')}" class="maxMailboxSize" title="Max Mailbox Size">Max Mailbox Size</td>
             <td data-bind="click: filters.toggleOrdering('maxTimeInMailbox'), attr: {'data-order-dir': filters.isOrdering('maxTimeInMailbox')}" class="maxTimeInMailbox" title="Max Time in Mailbox">Max Time in Mailbox</td>
             <td data-bind="click: filters.toggleOrdering('actorPath'), attr: {'data-order-dir': filters.isOrdering('actorPath')}" class="path" title="Path">Path</td>
-            <td data-bind="click: filters.toggleOrdering('deviations'), attr: {'data-order-dir': filters.isOrdering('deviations')}" class="deviations" title="Errors">Errors</td>
+            <td data-bind="click: filters.toggleOrdering('deviation'), attr: {'data-order-dir': filters.isOrdering('deviation')}" class="deviation" title="Error">Error</td>
           </tr>
         </thead>
         <tbody data-bind="foreach: actors">
@@ -54,7 +54,7 @@
             <td class="maxMailboxSize" data-bind="text: maxMailboxSize"></td>
             <td class="maxTimeInMailbox" data-bind="text: maxTimeInMailbox"></td>
             <td class="path" data-bind="text: path"></td>
-            <td class="deviations" data-bind="text: deviations"></td>
+            <td class="deviations" data-bind="text: deviation"></td>
           </tr>
         </tbody>
       </table>
