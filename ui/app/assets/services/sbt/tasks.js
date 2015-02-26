@@ -816,7 +816,7 @@ define([
           monitoringSolutions.monitoringSolution(monitoringSolutions.NO_MONITORING);
           // Show a popup
           modals.show({
-            title: "Inspect has been disactivated",
+            title: "Inspect has been deactivated",
             text: whyInspectIsNotSupported(),
             cancel: "close"
           });
