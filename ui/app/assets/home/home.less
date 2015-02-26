@@ -127,6 +127,11 @@ section {
   right: 360px;
   .row();
 
+  article {
+    .column();
+    height: 100%;
+  }
+
   .tabs {
     width: 175px;
     background: @grey-ltr;
@@ -190,11 +195,6 @@ section {
 header {
   background: white;
   box-shadow: 0 2px 3px rgba(0,0,0,.1), 0 -2px 3px rgba(0,0,0,.1);
-}
-
-article {
-  .column();
-  height: 100%;
 }
 
 .list {
@@ -639,8 +639,10 @@ article {
 
 
 @media (max-width: 1023px) {
+  html, body {
+    overflow: auto;
+  }
   body {
-    overflow: visible;
     padding-bottom: 40px;
   }
   #license {
