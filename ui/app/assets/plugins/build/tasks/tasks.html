@@ -7,7 +7,7 @@
       <div class="subheader">
         <h2>Tasks</h2>
       </div>
-      <div class="table-wrapper" data-bind="logScroll: memoTaskScroll">
+      <div class="table-wrapper" data-bind="logScroll: memoTaskScroll, pusher: sbt.tasks.executions">
         <table data-bind="foreach: sbt.tasks.executions">
           <tr data-bind="css: { active: running, error: error, stopping: stopping }">
             <td class="status" data-bind="click: $root.rerunTask"><span></span></td>
@@ -50,7 +50,7 @@
           <button data-bind="click: clear">Clear</button>
         </div>
       </div>
-      <div class="logs" data-bind="logScroll: memoLogsScroll">
+      <div class="logs" data-bind="logScroll: memoLogsScroll, pusher: sbt.logs.logs">
         <!-- ko include: logsView --><!-- /ko -->
       </div>
       <div class="toBottom" data-bind="click: scrollToBottom, css: { hide: memoLogsScroll() == 'stick'}">⤓</div>

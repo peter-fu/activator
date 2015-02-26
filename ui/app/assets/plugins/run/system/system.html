@@ -17,7 +17,7 @@
           <button data-bind="click: clear">Clear</button>
         </div>
       </div>
-      <div class="logs" data-bind="logScroll: memoLogsScroll">
+      <div class="logs" data-bind="logScroll: memoLogsScroll, pusher: sbt.logs.stdout">
         <!-- ko include: logsView --><!-- /ko -->
       </div>
       <div class="toBottom" data-bind="click: scrollToBottom, css: { hide: memoLogsScroll() == 'stick'}">⤓</div>
