@@ -22,6 +22,7 @@ define([
   ]);
 
   var State = {
+    logs: logs,
     logsView: logsView,
     scroll: scroll
   };

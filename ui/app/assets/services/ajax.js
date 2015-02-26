@@ -3,6 +3,10 @@
  */
 define(['widgets/modals/modals'], function(modals) {
 
+  $.ajaxSetup({
+    cache : false // IE11 non-sense
+  });
+
   function browse(location) {
     return $.ajax({
       url: '/api/local/browse',

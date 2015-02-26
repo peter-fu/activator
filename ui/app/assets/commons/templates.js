@@ -3,6 +3,9 @@
  */
 define(["commons/format"], function(format) {
 
+  var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+  var cancelAnimationFrame = window.cancelAnimationFrame || window.mozCancelAnimationFrame || window.webkitCancelAnimationFrame || window.msCancelAnimationFrame;
+
   // jQuery extensions
   var urlChange = ko.observable(window.location.hash);
   window.addEventListener("hashchange", function(e) {
@@ -183,36 +186,48 @@ define(["commons/format"], function(format) {
     }
   }());
 
+  var currentFrame, currentFrame2;
   ko.bindingHandlers.logScroll = {
     init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+      var pusher = allBindings().pusher;
       var memo = valueAccessor();
       if (!memo()) {
         memo('stick');
       }
-      setTimeout(function() {
+      requestAnimationFrame(function() {
         if (memo() === 'stick'){
           element.scrollTop = 999999;
         } else {
           element.scrollTop = memo();
         }
-      }, 100);
+      });
 
       // When an element is added to the node, we reactualise the scroll.
-      // This is more efficient than anything else since this callback is
-      // removed when the element is gone.
-      element.addEventListener("DOMNodeInserted", function() {
-        if (memo() === 'stick'){
-          element.scrollTop = 999999;
-        }
-      }, true);
+      var onPush = pusher.subscribe(function() {
+        if (currentFrame) cancelAnimationFrame(currentFrame);
+        currentFrame = requestAnimationFrame(function() {
+          currentFrame = null;
+          if (memo() === 'stick'){
+            element.scrollTop = 999999;
+          }
+        });
+      });
+      // Clear when remove dom node
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+        onPush.dispose();
+      });
 
       element.addEventListener('scroll', function(e) {
-        if ((element.scrollTop + element.offsetHeight) > (element.scrollHeight - 20)) { // 20 is the error margin
-          memo('stick');
-        } else {
-          memo(element.scrollTop);
-        }
-      },true);
+        if (currentFrame2) cancelAnimationFrame(currentFrame);
+        currentFrame2 = requestAnimationFrame(function() {
+          currentFrame2 = null;
+          if ((element.scrollTop + element.offsetHeight) > (element.scrollHeight - 20)) { // 20 is the error margin
+            memo('stick');
+          } else if (!currentFrame && !currentFrame2){
+            memo(element.scrollTop);
+          }
+        });
+      },false);
     }
   }
 
@@ -239,10 +254,10 @@ define(["commons/format"], function(format) {
         if (now - lastTime > 60) {
           applyBuffer(now);
         } else {
-          window.clearTimeout(timer);
-          timer = setTimeout(function() {
+          cancelAnimationFrame(timer);
+          timer = requestAnimationFrame(function() {
             applyBuffer(now);
-          }, 100);
+          });
         }
       }
 
@@ -317,13 +332,13 @@ define(["commons/format"], function(format) {
     return function(item, callback) {
       bufferArray.push(item);
       if (timer) {
-        window.clearTimeout(timer);
+        cancelAnimationFrame(timer);
       }
-      timer = setTimeout(function() {
+      timer = requestAnimationFrame(function() {
         callback(bufferArray);
         bufferArray = [];
         timer = null;
-      }, 20);
+      });
     }
   }
 
