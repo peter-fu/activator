@@ -1,17 +1,14 @@
-import org.apache.tools.ant.taskdefs.Echo
 import sbt._
 import ActivatorBuild._
-import EchoBuild._
 import Dependencies._
 import Packaging.localRepoArtifacts
 import com.typesafe.sbt.S3Plugin._
 import com.typesafe.sbt.SbtNativePackager.Universal
-import com.typesafe.sbt.SbtPgp
 import com.typesafe.sbt.SbtPgp.PgpKeys
 import play.PlayImport.PlayKeys
 import com.typesafe.sbt.less.Import.LessKeys
 import com.typesafe.sbt.web.SbtWeb.autoImport._
-import com.typesafe.sbt.jse.JsEngineImport.JsEngineKeys
+
 // NOTE - This file is only used for SBT 0.12.x, in 0.13.x we'll use build.sbt and scala libraries.
 // As such try to avoid putting stuff in here so we can see how good build.sbt is without build.scala.
 
@@ -38,7 +35,7 @@ object TheActivatorBuild extends Build {
     .noAutoPgp
     .doNotPublish
     aggregate(toReferences(publishedProjects ++
-      Seq(dist, it, localTemplateRepo, offlinetests)): _*)
+      Seq(dist, it, localTemplateRepo, offlinetests, EchoBuild.echo, SbtEchoBuild.sbtEcho)): _*)
   )
 
   lazy val news: Project = (
@@ -214,8 +211,8 @@ object TheActivatorBuild extends Build {
         playSbt13Plugin,
         eclipseSbt13Plugin,
         ideaSbt13Plugin,
-        echoSbt13Plugin,
-        echoPlaySbt13Plugin,
+        Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-echo" % activatorStableVersion, "0.13", "2.10"),
+        Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-echo-play" % activatorStableVersion, "0.13", "2.10"),
 
         // featured template dependencies
         // *** note: do not use %% here ***
