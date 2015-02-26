@@ -2,10 +2,8 @@ import sbt._
 import Keys._
 
 object Dependencies {
-  // this version is used to publish echo and sbt-echo,
-  // and also to set which version of those Activator
-  // depends on.
-  val echoVersion = "0.1.14"
+  // Used for plugins required by this build
+  val activatorStableVersion = "1.3.0"
 
   val sbtVersion = "0.13.8-M5"
   val sbtLibraryVersion = "0.13.8-M5" // for sbtIO on scala 2.11
@@ -63,8 +61,6 @@ object Dependencies {
   val playSbt13Plugin        =  Defaults.sbtPluginExtra("com.typesafe.play" % "sbt-plugin" % play23Version, "0.13", "2.10")
   val eclipseSbt13Plugin     =  Defaults.sbtPluginExtra("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "2.2.0", "0.13", "2.10")
   val ideaSbt13Plugin        =  Defaults.sbtPluginExtra("com.github.mpeltonen" % "sbt-idea" % "1.5.2", "0.13", "2.10")
-  val echoSbt13Plugin        =  Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-echo" % echoVersion, "0.13", "2.10")
-  val echoPlaySbt13Plugin    =  Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-echo-play" % echoVersion, "0.13", "2.10")
 
   // Embedded databases / index
   val lucene = "org.apache.lucene" % "lucene-core" % luceneVersion
