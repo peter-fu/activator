@@ -1,4 +1,5 @@
 import sbt._
+import Keys._
 
 object VersionGenerator {
   final val fileLocation = "/target/web/public/main/public/generated/dependencies.js"
@@ -18,7 +19,7 @@ object VersionGenerator {
          |],function (
          |) {
          |  var playVersion = "${Dependencies.play23Version}";
-         |  var echoVersion = "${Dependencies.activatorStableVersion}";
+         |  var echoVersion = "${Dependencies.echoVersion}";
          |  var ideaVersion = "${Dependencies.ideaVersion}";
          |  var eclipseVersion = "${Dependencies.eclipseVersion}";
          |  var sbtCoreNextVersion = "${Dependencies.sbtCoreNextVersion}";
