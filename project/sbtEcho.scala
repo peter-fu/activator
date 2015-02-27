@@ -12,6 +12,7 @@ object SbtEchoBuild extends Build {
     Project("sbt-echo", base = file("sbt-echo"))
       settings (noPublishSettings: _*)
       settings (defaultSettings: _*)
+      settings (version := Dependencies.echoVersion)
       aggregate(sbtEchoAkka, sbtEchoPlay)
     )
 
@@ -46,6 +47,7 @@ object SbtEchoBuild extends Build {
       settings (buildInfoSettings: _*)
       settings(
       name := "sbt-echo",
+      version := Dependencies.echoVersion,
       aspectJVersion := Dependencies.aspectJVersion,
       libraryDependencies += Dependencies.sbtBackgroundRun,
       sourceGenerators in Compile <+= buildInfo,
@@ -60,6 +62,7 @@ object SbtEchoBuild extends Build {
       settings (defaultSettings: _*)
       settings (Dependencies.playPlugin: _*)
       settings (
+      version := Dependencies.echoVersion,
       name := "sbt-echo-play"
       )
     )
