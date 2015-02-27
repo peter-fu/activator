@@ -3,7 +3,7 @@ import Keys._
 
 object Dependencies {
   // Used for plugins required by this build
-  val activatorStableVersion = "1.3.1"
+  val activatorStableVersion = "1.3.0"
 
   val sbtVersion = "0.13.8-M5"
   val sbtLibraryVersion = "0.13.8-M5" // for sbtIO on scala 2.11
