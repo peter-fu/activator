@@ -18,7 +18,7 @@ define([
 
   var presentationModeStyle = (function() {
     var added = false;
-    var cssStr = ".presentation-mode .tutorial .page, .presentation-mode .build .logs, .presentation-mode .run .pluginBlock, .presentation-mode .code .editor, .presentation-mode .monitoring .tabs-step { zoom: 141% !important; }";
+    var cssStr = ".presentation-mode .tutorial .page, .presentation-mode .build .logs, .presentation-mode .run .pluginBlock, .presentation-mode .code .editor, .presentation-mode .monitoring .tabs-step { zoom: 161% !important; }";
     var style;
 
     try {
