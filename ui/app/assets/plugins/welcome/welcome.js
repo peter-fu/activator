@@ -2,12 +2,14 @@
  Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
  */
 define([
+  'services/sbt',
   'text!./welcome.html',
   'commons/settings',
   'widgets/layout/layout',
   'widgets/layout/layoutManager',
   'css!./welcome.css'
 ], function(
+  sbt,
   tpl,
   settings,
   layout,
@@ -41,9 +43,17 @@ define([
   var WelcomeState = (function(){
     var self = {};
 
-    self.appVersion = window.serverAppVersion
+    self.appVersion = window.serverAppVersion;
+    self.currentStatus = sbt.events.appStatus;
+
+    self.trp = sbt.tasks.platformRelease;
+    self.isTrp = true;
+    self.trpNewVersion = true;
+    self.trpVersion = "1.0";
 
     self.presentationMode = settings.observable("presentationMode", false);
+
+    self.newVersion = false;
 
     ko.computed(function() {
       var on = self.presentationMode();

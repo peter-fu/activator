@@ -288,6 +288,7 @@ define([
     }
   });
 
+  var platformRelease = ko.observable(null);
   subTypeEventStream("DetachedEvent").each(function(message) {
     var event = message.event;
 
@@ -308,6 +309,7 @@ define([
       // event.serialized.authorizedForProduction
     } else if (name === "com.typesafe.rp.protocol.PlatformRelease") {
       debug && console.log("PlatformRelease: ", event.serialized);
+      platformRelease(event.serialized);
       // event.serialized.availableFullVersion
       // event.serialized.availableMajorVersion
       // event.serialized.installedFullVersion
@@ -795,6 +797,7 @@ define([
     playServerStarted:        playServerStarted,
     inspectSupported:        inspectSupported,
     whyInspectIsNotSupported: whyInspectIsNotSupported,
+    platformRelease:         platformRelease,
     active: {
       turnedOn:     "",
       compiling:    "",
