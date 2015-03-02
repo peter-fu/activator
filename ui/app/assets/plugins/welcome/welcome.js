@@ -24,15 +24,13 @@ define([
     try {
       // Create the <style> tag
       style = document.createElement("style");
-      // WebKit hack :(
-      style.appendChild(document.createTextNode(""));
-      // Add the <style> element to the page
-      style.sheet.insertRule(cssStr);
+      style.appendChild(document.createTextNode(cssStr));
     } catch(e){
       style = undefined;
     }
 
     return function() {
+      console.log(added , style)
       if (!added && style) {
         document.head.appendChild(style);
         added = true;
