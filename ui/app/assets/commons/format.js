@@ -261,6 +261,19 @@ define(function() {
       return (nanos / 1000000).toFixed(decimals);
     };
 
+    Format.prototype.markdownLinks = function(str){
+      // html entities
+      str = str.replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+
+      // md links
+      str = str.replace(/\[([^\].]+)\]\((https?\:\/\/[a-z0-9\-]+\.[.^\S^\)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+
+      return str;
+    }
+
     return Format;
 
   })();

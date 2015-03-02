@@ -76,7 +76,7 @@
       <ul class="tags" data-bind="foreach: tags">
         <li data-bind="click: $root.searchTag, text: $data"></li>
       </ul>
-      <p data-bind="trpify: description"></p>
+      <p data-bind="markdownLinkify: description"></p>
       <div class="author">
         <p><cite>by <span data-bind="text: authorName"></span>
           <!-- ko if:authorTwitter -->
@@ -89,7 +89,7 @@
       <div class="promote partner">
         <img data-bind="attr: { src: authorLogo }">
         <h4 data-bind="text: authorName"></h4>
-        <p data-bind="trpify: authorBio"></p>
+        <p data-bind="markdownLinkify: authorBio"></p>
       </div>
       <!-- /ko -->
     </div>

@@ -357,12 +357,14 @@ define(["commons/format"], function(format) {
     }
   }
 
-  ko.bindingHandlers.trpify = {
+  ko.bindingHandlers.markdownLinkify = {
     update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
       var val = valueAccessor();
       var txt = ko.isObservable(val)?val():val;
       $(element).text(txt).html(function(index, text) {
-        return text.replace(/(Typesafe )?Reactive Platform/ig, '<a href="https://typesafe.com/subscription">Typesafe Reactive Platform</a>');
+        text = format.markdownLinks(text);
+        text = text.replace(/(Typesafe )?Reactive Platform/ig, '<a href="https://typesafe.com/subscription">Typesafe Reactive Platform</a>');
+        return text;
       });
     }
   }
