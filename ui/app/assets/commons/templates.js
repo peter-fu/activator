@@ -7,10 +7,10 @@ define(["commons/format"], function(format) {
   var cancelAnimationFrame = window.cancelAnimationFrame || window.mozCancelAnimationFrame || window.webkitCancelAnimationFrame || window.msCancelAnimationFrame;
 
   // jQuery extensions
-  var urlChange = ko.observable(window.location.hash);
+  var urlChange = ko.observable(window.location.hash || "#");
   window.addEventListener("hashchange", function(e) {
     setTimeout(function() {
-      urlChange(window.location.hash);
+      urlChange(window.location.hash || "#");
     },10);
   });
 
