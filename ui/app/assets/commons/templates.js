@@ -361,10 +361,10 @@ define(["commons/format"], function(format) {
     update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
       var val = valueAccessor();
       var txt = ko.isObservable(val)?val():val;
-      $(element).text(txt).html(function(index, text) {
-        text = format.markdownLinks(text);
-        text = text.replace(/(Typesafe )?Reactive Platform/ig, '<a href="https://typesafe.com/subscription">Typesafe Reactive Platform</a>');
-        return text;
+      $(element).text(txt).html(function(index, innerHtml) {
+        innerHtml = format.markdownLinks(innerHtml);
+        innerHtml = innerHtml.replace(/(Typesafe )?Reactive Platform/ig, '<a href="https://typesafe.com/subscription">Typesafe Reactive Platform</a>');
+        return innerHtml;
       });
     }
   }
