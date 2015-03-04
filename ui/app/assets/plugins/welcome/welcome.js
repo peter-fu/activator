@@ -45,12 +45,10 @@ define([
     self.currentStatus = sbt.events.appStatus;
 
     self.trp = sbt.tasks.platformRelease;
-    self.isTrp = true;
-    self.trpNewVersion = true;
-    self.trpVersion = "1.0";
 
     self.presentationMode = settings.observable("presentationMode", false);
 
+    // TODO: Get new version for Activator itself
     self.newVersion = false;
 
     ko.computed(function() {
