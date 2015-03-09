@@ -87,6 +87,12 @@ define([
     setTimeout(connect, 200);
   }
 
+  // Avoid "lost connection" popup flashing, when leaving the page
+  window.onbeforeunload = function() {
+    websocket.removeEventListener("close", onError);
+  }
+
+
   return {
     isOpened: isOpened,
     connect: connect,

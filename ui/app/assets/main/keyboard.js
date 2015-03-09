@@ -1,7 +1,15 @@
 /*
  Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
  */
-define(['./router', 'services/sbt'], function(router, sbt) {
+define([
+  'widgets/help/shortcuts',
+  './router',
+  'services/sbt'
+], function(
+  shortcuts,
+  router,
+  sbt
+) {
 
   var isMac = navigator.platform.toUpperCase().indexOf('MAC')>=0;
   var activeKeyboard = true;
@@ -69,6 +77,10 @@ define(['./router', 'services/sbt'], function(router, sbt) {
           e.preventDefault();
           e.stopPropagation();
           $("#omnisearch input").focus();
+        } else if (key === "/"){
+          e.preventDefault();
+          e.stopPropagation();
+          shortcuts();
         }
       }
     });
