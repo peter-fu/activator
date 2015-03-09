@@ -10,6 +10,11 @@
         <button class="next" data-bind="click: gotoNextPage, css: {disabled: noNextPage}">
           <svg data-bind="svg: '/assets/icons/next.svg'" />
         </button>
+        <!-- ko if: isLocal -->
+          <button data-bind="click: loadTutorial">
+            Reload
+          </button>
+        <!-- /ko -->
       </div>
     </header>
     <ul class="list links" data-bind="foreach: table, memoScroll: 'tutorial-index'">
