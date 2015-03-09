@@ -8,15 +8,23 @@
 // ----------------
 
 // Defaults
-main {
+#app {
   position: absolute;
   top: 50px;
   right: 0;
   bottom: 0;
   left: 0;
+  .transition();
+}
+
+#wrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   overflow: hidden;
   .row();
-  .transition();
   > nav {
     width: @menu-width;
   }
@@ -42,8 +50,7 @@ main {
   .transition();
   [data-shape='right1'] &,
   [data-shape='right2'] & {
-      top: 0;
-      width: @panel-width;
+      top: 50px;
       -webkit-transform: translateX(100%);
       -moz-transform: translateX(100%);
       transform: translateX(100%);
@@ -51,7 +58,6 @@ main {
   [data-shape='bottom1'] &,
   [data-shape='bottom2'] & {
     left: 0;
-    height: @panel-width;
     -webkit-transform: translateY(100%);
     -moz-transform: translateY(100%);
     transform: translateY(100%);
@@ -71,7 +77,7 @@ main {
 
 // Navigation opened
 body.navigation-opened {
-  #header, #wrapper {
+  #header, #app {
     left: @drawer-width;
   }
   #navigation {
@@ -92,9 +98,6 @@ body.navigation-sneak {
 body.panel-opened {
   &[data-shape='right1'],
   &[data-shape='right2'] {
-    #header, main {
-      right: @panel-width;
-    }
     #panels {
       -webkit-transform: none;
       -moz-transform: none;
@@ -107,9 +110,6 @@ body.panel-opened {
       -webkit-transform: none;
       -moz-transform: none;
       transform: none;
-    }
-    main {
-      bottom: @panel-width;
     }
   }
 }

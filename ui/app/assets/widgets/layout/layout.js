@@ -16,7 +16,7 @@ define([
   layoutManager
 ){
 
-  var wrapper = $('<main id="wrapper">');
+  var wrapper = $('<div id="app"><main/></div>');
   var State = {
     navigation: navigation,
     panels: panels,
@@ -33,10 +33,12 @@ define([
       document.body.appendChild(wrapper[0]);
       document.body.appendChild(panels.render());
       document.body.appendChild(modals.render());
+
+      layoutManager.startLayout();
     },
 
     renderPlugin: function(body){
-      $('#wrapper').replaceWith(body);
+      $('#app main').replaceWith(body);
     }
   }
 })

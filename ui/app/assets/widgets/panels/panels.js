@@ -2,10 +2,12 @@
  Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
  */
 define([
+  'widgets/layout/layoutManager',
   'commons/settings',
   "text!./panels.html",
   "css!./panels"
 ], function(
+  layoutManager,
   settings,
   template
 ){
@@ -27,10 +29,42 @@ define([
     });
   }
 
+  // Resizing
+  function startResize(m,e){
+    e.preventDefault();
+    layoutManager.resizing(true);
+    window.addEventListener("mousemove", resize);
+    window.addEventListener("mouseup", stopResize);
+  }
+  function resize(e){
+    e.preventDefault();
+    e.stopPropagation();
+    if (layoutManager.panelShape()[0] === 'r'){
+      var newWidth = (window.innerWidth - e.pageX);
+      if (newWidth > 300 && newWidth < 700){
+        layoutManager.panelWidth(Math.round(newWidth/10)*10);
+      }
+    } else {
+      var newHeight = (window.innerHeight - e.pageY);
+      if (newHeight > 200 && newHeight < 600){
+        layoutManager.panelHeight(Math.round(newHeight/10)*10);
+      }
+    }
+  }
+  function stopResize(e){
+    e.preventDefault();
+    layoutManager.resizing(false);
+    window.removeEventListener("mousemove", resize);
+    window.removeEventListener("mouseup", stopResize);
+  }
+
+
   var PanelState = {
+    panelWidth: layoutManager.panelWidth,
     panels: panels,
     currentPanel: currentPanel,
     switchPanel: switchPanel,
+    startResize: startResize
   };
 
   // Default panel:

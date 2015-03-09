@@ -15,15 +15,58 @@ define([
   var panelOpenedSet =    settings.observable("layoutManager.panelOpened", false);
   var navigationOpened =  settings.observable("layoutManager.navigationOpened", true);
 
+  var panelWidth  = settings.observable("layoutManager.panelWidth", 350);
+  var panelHeight = settings.observable("layoutManager.panelHeight", 300);
+
+  var resizing = ko.observable(false);
+  resizing.subscribe(function(r){
+    var all = $("#panels, #app, main");
+    if (r) {
+      all.css({ // Remove css transition during resize
+        "webkitTransition": "none",
+        "mozTransition": "none",
+        "transition": "none"
+      });
+    } else {
+      all.css({ // Reset css transition
+        "webkitTransition": "",
+        "mozTransition": "",
+        "transition": ""
+      })
+    }
+  });
+
   var panelOpened = ko.computed(function() {
     return panelOpenedSet() && router.current().id !== "tutorial";
   });
 
+  function startLayout(){
+    ko.computed(function(v){
+      var opened = panelOpenedSet();
+      var shape = panelShape()[0] === "r";
+      var w = panelWidth();
+      $("#panels").css('width',shape?w:"auto");
+      $("#app").css('right',opened && shape?w:1);
+    });
+
+    ko.computed(function(v){
+      var opened = panelOpenedSet();
+      var shape = panelShape()[0] === "b";
+      var h = panelHeight();
+      $("#panels").css('height',shape?h:"auto");
+      $("#app").css('bottom',opened && shape?h:1);
+    });
+  }
+
   var State = {
+    resizing: resizing,
+    panelWidth: panelWidth,
+    panelHeight: panelHeight,
     panelShape: panelShape,
     panelOpenedSet: panelOpenedSet,
     panelOpened: panelOpened,
     navigationOpened: navigationOpened,
+    startLayout: startLayout,
 
     panelChange: function(o,e) {
       panelShape(e.target.className);
