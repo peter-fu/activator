@@ -119,7 +119,7 @@ define([
     }
 
     function searchRelevantFileds(o, value) {
-      return JSON.stringify([o.title, o.tags, o.authorName]).toLowerCase().indexOf(value) >= 0;
+      return JSON.stringify([o.title, o.tags, o.authorName, o.name]).toLowerCase().indexOf(value) >= 0;
     }
 
     self.search = function(model,e){
