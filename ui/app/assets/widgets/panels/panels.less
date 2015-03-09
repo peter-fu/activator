@@ -132,7 +132,7 @@
 
   .page {
     position: absolute;
-    top: 100px;
+    top: 50px;
     left: 0;
     right: 0;
     bottom: 0;
@@ -145,4 +145,29 @@
     padding: 0;
   }
 
+  .resize {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 5px;
+    cursor: ew-resize;
+    z-index: 99;
+
+    [data-shape='bottom1'] &,
+    [data-shape='bottom2'] & {
+      top: 0;
+      left: 0;
+      right: 0;
+      width: auto;
+      height: 5px;
+      cursor: n-resize;
+    }
+
+    &:hover {
+      .transition();
+      background: rgba(255,0,0,.2);
+    }
+  }
 }
