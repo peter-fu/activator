@@ -9,15 +9,10 @@ import play.api.libs.json._
 import play.filters.csrf._
 import activator._
 import activator.cache.TemplateMetadata
-import scala.concurrent.duration._
 import scala.concurrent.Future
 import scala.util.control.NonFatal
 
 object Templates extends Controller {
-  // This will load our template cache and ensure all templates are available for the demo.
-  // We should think of an alternative means of loading this in the future.
-  // TODO - We should load timeout from configuration.
-  implicit val timeout = akka.util.Timeout(Duration(12, SECONDS))
   val templateCache = activator.UICacheHelper.makeDefaultCache(snap.Akka.system)
 
   // Here's the JSON rendering of template metadata.
