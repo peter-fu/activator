@@ -22,9 +22,10 @@ class AppWebSocketActor(val config: AppConfig) extends WebSocketActor[JsValue] w
   lazy val typesafeComConfig = TypesafeComProxy.fromConfig(Play.current.configuration.underlying)
   lazy val loginEndpoint = AuthenticationActor.httpDoAuthenticate(typesafeComConfig.login.url, typesafeComConfig.login.timeout, defaultContext)_
   lazy val subsciberEndpoint = SubscriptionDataActor.httpGetSubscriptionData(typesafeComConfig.subscriptionData.url, typesafeComConfig.subscriptionData.timeout, defaultContext)_
+  lazy val uiActor = context.actorOf(UIActor.props(self))
   lazy val typesafeComActor = context.actorOf(TypesafeComProxy.props(initAuth = AuthenticationStates.Unauthenticated,
     initUserProps = UserProperties(),
-    uiActor = self,
+    uiActor = uiActor,
     authenticatorProps = AuthenticationActor.props(loginEndpoint, _, _),
     subscriptionRPCProps = SubscriptionDataActor.props(_, subsciberEndpoint, _, _)))
 

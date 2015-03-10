@@ -43,4 +43,64 @@ object UIActor {
     case class Failure(message: String, sendTo: ActorRef, retryable: Boolean) extends RetryableRequest[Nothing]
   }
 
+  object WebsocketMessages {
+    case object RequestCredentials
+    case object Authenticating
+    case object FetchingSubscriptionData
+    case class Failure(message: String, retryable: Boolean)
+    case object AuthenticationSuccess
+    case object SubscriptionDataSuccess
+    case class Credentials(username: String, password: String)
+    case object Cancel
+    case object Retry
+  }
+
+  def props(websocketsActor: ActorRef): Props = Props(new UIActor(websocketsActor))
+
+}
+
+class UIActor(websocketsActor: ActorRef) extends Actor with ActorLogging {
+  import UIActor._
+
+  def run(outstanding: Option[LocalRequest[_]]): Receive = {
+    case x: CancelableRequests.RequestCredentials =>
+      websocketsActor ! WebsocketMessages.RequestCredentials
+      context.become(run(Some(x)))
+    case x: CancelableRequests.Authenticating =>
+      websocketsActor ! WebsocketMessages.Authenticating
+      context.become(run(Some(x)))
+    case x: CancelableRequests.FetchingSubscriptionData =>
+      websocketsActor ! WebsocketMessages.FetchingSubscriptionData
+      context.become(run(Some(x)))
+    case x: RetryableRequests.Failure =>
+      websocketsActor ! WebsocketMessages.Failure(x.message, x.retryable)
+      context.become(run(Some(x)))
+    case AuthenticationSuccess =>
+      websocketsActor ! WebsocketMessages.AuthenticationSuccess
+      context.become(run(None))
+    case SubscriptionDataSuccess =>
+      websocketsActor ! WebsocketMessages.SubscriptionDataSuccess
+      context.become(run(None))
+    case WebsocketMessages.Credentials(un, pw) =>
+      outstanding match {
+        case Some(x: CancelableRequests.RequestCredentials) => x.credentials(un, pw)
+        case _ =>
+      }
+      context.become(run(None))
+    case WebsocketMessages.Cancel =>
+      outstanding match {
+        case Some(x: CancelableRequest[_]) => x.cancel()
+        case Some(x: RetryableRequest[_]) => x.cancel()
+        case _ =>
+      }
+      context.become(run(None))
+    case WebsocketMessages.Retry =>
+      outstanding match {
+        case Some(x: RetryableRequest[_]) => x.retry()
+        case _ =>
+      }
+      context.become(run(None))
+  }
+
+  def receive: Receive = run(None)
 }
