@@ -11,6 +11,7 @@ import activator.JsonHelper._
 import scala.reflect.ClassTag
 import scala.util.{ Failure, Success }
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import snap.typesafeproxy._
 
 class AppWebSocketActor(val config: AppConfig) extends WebSocketActor[JsValue] with ActorLogging {
   implicit val timeout = WebSocketActor.timeout
@@ -18,6 +19,14 @@ class AppWebSocketActor(val config: AppConfig) extends WebSocketActor[JsValue] w
   lazy val appDynamicsConfig = AppDynamics.fromConfig(Play.current.configuration.underlying)
   lazy val appDynamicsActor: ActorRef = context.actorOf(monitor.AppDynamicsActor.props(appDynamicsConfig, defaultContext))
   lazy val newRelicActor: ActorRef = context.actorOf(monitor.NewRelicActor.props(NewRelic.fromConfig(Play.current.configuration.underlying), defaultContext))
+  lazy val typesafeComConfig = TypesafeComProxy.fromConfig(Play.current.configuration.underlying)
+  lazy val loginEndpoint = AuthenticationActor.httpDoAuthenticate(typesafeComConfig.login.url, typesafeComConfig.login.timeout, defaultContext)_
+  lazy val subsciberEndpoint = SubscriptionDataActor.httpGetSubscriptionData(typesafeComConfig.subscriptionData.url, typesafeComConfig.subscriptionData.timeout, defaultContext)_
+  lazy val typesafeComActor = context.actorOf(TypesafeComProxy.props(initAuth = AuthenticationStates.Unauthenticated,
+    initUserProps = UserProperties(),
+    uiActor = self,
+    authenticatorProps = AuthenticationActor.props(loginEndpoint, _, _),
+    subscriptionRPCProps = SubscriptionDataActor.props(_, subsciberEndpoint, _, _)))
 
   override def onMessage(json: JsValue): Unit = {
     json match {
