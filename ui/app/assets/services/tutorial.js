@@ -78,9 +78,9 @@ define([
           // Open external links in new window.
           if (link.getAttribute('href').indexOf("http://") === 0 && !link.target){
             link.target = "_blank";
-          // Force shorcut class on links to code
+          // Force shortcut class on links to code
           } else if (link.getAttribute('href').indexOf("#code/") === 0){
-            $(link).addClass("shorcut");
+            $(link).addClass("shortcut");
           }
         });
         var title = $("h2", el).remove().html() || $(el).text().substring(0,40) + "...";
@@ -89,6 +89,11 @@ define([
       });
       pages(_pages);
       table(_table);
+      console.log(index())
+      if (index()){
+        window.location.hash = "#tutorial/";
+        gotoPage(index());
+      }
     });
   }
   loadTutorial();
