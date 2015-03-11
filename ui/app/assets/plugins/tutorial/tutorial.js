@@ -27,7 +27,7 @@ define([
     route: function(url, breadcrumb) {
       breadcrumb([['tutorial/', "Tutorial"]]);
       if (TutorialState.hasTutorial()){
-        if (url.parameters[0] === undefined && TutorialState.index()) {
+        if (url.parameters[0] === undefined && TutorialState.index() !== null) {
           window.location.hash = "#tutorial/"+TutorialState.index();
         } else if (url.parameters[0] === undefined || url.parameters[0] === "") {
           TutorialState.page(null);
