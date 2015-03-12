@@ -62,7 +62,7 @@ object TypesafeComProxy {
   def props(initAuth: AuthenticationState,
     initUserProps: UserProperties,
     uiActor: ActorRef,
-    authenticatorProps: (ActorRef, ActorRef) => Props,
+    authenticatorProps: (ActorRef, ActorRef, Option[String]) => Props,
     subscriptionRPCProps: (AuthenticationStates.AuthenticationData, ActorRef, ActorRef) => Props,
     notificationSink: TypesafeComProxy.Notification => Unit = _ => ()): Props =
     Props(new TypesafeComProxy(initAuth, initUserProps, uiActor, authenticatorProps, subscriptionRPCProps, notificationSink))
@@ -71,13 +71,13 @@ object TypesafeComProxy {
 class TypesafeComProxy(initAuth: AuthenticationState,
   initUserProps: UserProperties,
   uiActor: ActorRef,
-  authenticatorProps: (ActorRef, ActorRef) => Props,
+  authenticatorProps: (ActorRef, ActorRef, Option[String]) => Props,
   subscriptionRPCProps: (AuthenticationStates.AuthenticationData, ActorRef, ActorRef) => Props,
   notificationSink: TypesafeComProxy.Notification => Unit) extends Actor with ActorLogging {
   import TypesafeComProxy._
 
-  def doAuthenticate(): Unit = {
-    context.actorOf(authenticatorProps(self, uiActor))
+  def doAuthenticate(message: Option[String] = None): Unit = {
+    context.actorOf(authenticatorProps(self, uiActor, message))
   }
 
   def awaitingAuthentication(pendingRequests: Set[SubscriptionRequest[_]], userProps: UserProperties): Receive = {
@@ -119,7 +119,7 @@ class TypesafeComProxy(initAuth: AuthenticationState,
 
     def onSubscriptionResult(msg: SubscriptionDataActor.Response): Unit = msg match {
       case SubscriptionDataActor.InvalidAuthentication =>
-        doAuthenticate()
+        doAuthenticate(Some("Existing credentials are invalid.  Please login again."))
         context.become(awaitingAuthentication(pendingRequests, userProps))
       case x: SubscriptionDataActor.Failure =>
         pendingRequests.foreach(_.failure(x.error))
@@ -146,5 +146,9 @@ class TypesafeComProxy(initAuth: AuthenticationState,
     }
   }
 
-  def receive: Receive = run(initAuth, initUserProps)
+  def receive: Receive = {
+    uiActor ! UIActor.ProxyActor(self)
+
+    run(initAuth, initUserProps)
+  }
 }

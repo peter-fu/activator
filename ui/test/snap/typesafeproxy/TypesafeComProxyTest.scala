@@ -30,11 +30,11 @@ class TypesafeComProxyTest extends DefaultSpecification {
   def testShouldAuthenticate(): Unit = withHelper { helper =>
     import helper._
     foreachSubscriptionRequest(testActor)(() => withProxy()) { (_, _) =>
-      expectMsgType[UIActor.CancelableRequests.RequestCredentials]
+      expectMsgAllClassOf(classOf[UIActor.ProxyActor], classOf[UIActor.CancelableRequests.RequestCredentials])
     }
 
     foreachSubscriptionRequest(testActor)(() => withProxy(initAuth = AuthenticationStates.Failure(new ProxyFailure("fail")))) { (_, _) =>
-      expectMsgType[UIActor.CancelableRequests.RequestCredentials]
+      expectMsgAllClassOf(classOf[UIActor.ProxyActor], classOf[UIActor.CancelableRequests.RequestCredentials])
     }
   }
 
@@ -42,7 +42,7 @@ class TypesafeComProxyTest extends DefaultSpecification {
   def testShouldRPC(): Unit = withHelper { helper =>
     import helper._
     foreachSubscriptionRequest(testActor)(() => withProxy(initAuth = AuthenticationStates.Authenticated(AuthenticationStates.emptyAuthentication))) { (_, _) =>
-      expectMsg(FakeSubscriptionRPCInit)
+      expectMsgAllClassOf(classOf[UIActor.ProxyActor], FakeSubscriptionRPCInit.getClass)
     }
   }
 
@@ -53,6 +53,7 @@ class TypesafeComProxyTest extends DefaultSpecification {
     val level = SubscriptionLevels.Developer
     val detail = SubscriberData.exampleDetail(id, level)
     foreachSubscriptionRequest(testActor)(() => withProxy(initUserProps = UserProperties(subscriberData = Some(detail)))) { (rec, _) =>
+      expectMsgType[UIActor.ProxyActor]
       rec match {
         case _: TypesafeComProxy.SubscriptionRequests.GetSubscriptionDetail =>
           expectMsg(TypesafeComProxy.SubscriptionResponses.Detail(detail))
@@ -66,6 +67,7 @@ class TypesafeComProxyTest extends DefaultSpecification {
     val example = SubscriberData.exampleNotASubscriber()
 
     foreachSubscriptionRequest(testActor)(() => withProxy(initUserProps = UserProperties(subscriberData = Some(example)))) { (rec, _) =>
+      expectMsgType[UIActor.ProxyActor]
       expectMsg(TypesafeComProxy.SubscriptionResponses.NotASubscriber(example))
     }
   }
@@ -75,13 +77,13 @@ class TypesafeComProxyTest extends DefaultSpecification {
     import helper._
 
     foreachSubscriptionRequest(testActor)(() => withProxy()) { (_, proxy) =>
-      expectMsgType[UIActor.CancelableRequests.RequestCredentials]
+      expectMsgAllClassOf(classOf[UIActor.ProxyActor], classOf[UIActor.CancelableRequests.RequestCredentials])
       proxy ! AuthenticationStates.Authenticated(AuthenticationStates.emptyAuthentication)
       expectMsg(FakeSubscriptionRPCInit)
     }
 
     foreachSubscriptionRequest(testActor)(() => withProxy(initAuth = AuthenticationStates.Failure(new ProxyFailure("fail")))) { (_, proxy) =>
-      expectMsgType[UIActor.CancelableRequests.RequestCredentials]
+      expectMsgAllClassOf(classOf[UIActor.ProxyActor], classOf[UIActor.CancelableRequests.RequestCredentials])
       proxy ! AuthenticationStates.Authenticated(AuthenticationStates.emptyAuthentication)
       expectMsg(FakeSubscriptionRPCInit)
     }
@@ -93,13 +95,13 @@ class TypesafeComProxyTest extends DefaultSpecification {
     val exception = new ProxyFailure("fail")
 
     foreachSubscriptionRequest(testActor)(() => withProxy()) { (_, proxy) =>
-      expectMsgType[UIActor.CancelableRequests.RequestCredentials]
+      expectMsgAllClassOf(classOf[UIActor.ProxyActor], classOf[UIActor.CancelableRequests.RequestCredentials])
       proxy ! AuthenticationStates.Failure(exception)
       expectMsg(TypesafeComProxy.SubscriptionResponses.Failure(exception))
     }
 
     foreachSubscriptionRequest(testActor)(() => withProxy(initAuth = AuthenticationStates.Failure(new ProxyFailure("fail")))) { (_, proxy) =>
-      expectMsgType[UIActor.CancelableRequests.RequestCredentials]
+      expectMsgAllClassOf(classOf[UIActor.ProxyActor], classOf[UIActor.CancelableRequests.RequestCredentials])
       proxy ! AuthenticationStates.Failure(exception)
       expectMsg(TypesafeComProxy.SubscriptionResponses.Failure(exception))
     }
@@ -113,7 +115,7 @@ class TypesafeComProxyTest extends DefaultSpecification {
     val detail = SubscriberData.exampleDetail(id, level)
 
     foreachSubscriptionRequest(testActor)(() => withProxy(initAuth = AuthenticationStates.Authenticated(AuthenticationStates.emptyAuthentication))) { (rec, proxy) =>
-      expectMsg(FakeSubscriptionRPCInit)
+      expectMsgAllClassOf(classOf[UIActor.ProxyActor], FakeSubscriptionRPCInit.getClass)
       proxy ! SubscriptionDataActor.Success(detail)
       rec match {
         case _: TypesafeComProxy.SubscriptionRequests.GetSubscriptionDetail =>
@@ -128,7 +130,7 @@ class TypesafeComProxyTest extends DefaultSpecification {
     val nons = SubscriberData.exampleNotASubscriber()
 
     foreachSubscriptionRequest(testActor)(() => withProxy(initAuth = AuthenticationStates.Authenticated(AuthenticationStates.emptyAuthentication))) { (rec, proxy) =>
-      expectMsg(FakeSubscriptionRPCInit)
+      expectMsgAllClassOf(classOf[UIActor.ProxyActor], FakeSubscriptionRPCInit.getClass)
       proxy ! SubscriptionDataActor.Success(nons)
       expectMsg(TypesafeComProxy.SubscriptionResponses.NotASubscriber(nons))
     }
@@ -140,7 +142,7 @@ class TypesafeComProxyTest extends DefaultSpecification {
     val exception = new ProxyFailure("fail")
 
     foreachSubscriptionRequest(testActor)(() => withProxy(initAuth = AuthenticationStates.Authenticated(AuthenticationStates.emptyAuthentication))) { (rec, proxy) =>
-      expectMsg(FakeSubscriptionRPCInit)
+      expectMsgAllClassOf(classOf[UIActor.ProxyActor], FakeSubscriptionRPCInit.getClass)
       proxy ! SubscriptionDataActor.Failure(exception)
       expectMsg(TypesafeComProxy.SubscriptionResponses.Failure(exception))
     }
@@ -154,7 +156,7 @@ class TypesafeComProxyTest extends DefaultSpecification {
     val detail = SubscriberData.exampleDetail(id, level)
 
     foreachSubscriptionRequest(testActor)(() => withProxy(initAuth = AuthenticationStates.Authenticated(AuthenticationStates.emptyAuthentication))) { (rec, proxy) =>
-      expectMsg(FakeSubscriptionRPCInit)
+      expectMsgAllClassOf(classOf[UIActor.ProxyActor], FakeSubscriptionRPCInit.getClass)
       proxy ! SubscriptionDataActor.InvalidAuthentication
       expectMsgType[UIActor.CancelableRequests.RequestCredentials]
       proxy ! AuthenticationStates.Authenticated(AuthenticationStates.emptyAuthentication)

@@ -35,6 +35,12 @@ object JsonHelper {
   def extractRequest[T](tag: String)(reads: Reads[T]): Reads[T] =
     extractTagged("request", tag)(reads)
 
+  def extractMessage[T](tag: String)(reads: Reads[T]): Reads[T] =
+    extractTagged("tag", tag)(reads)
+
+  def emitMessage[T](tag: String)(bodyFunc: T => JsObject): Writes[T] =
+    emitTagged("tag", tag)(bodyFunc)
+
   def extractResponse[T](tag: String)(reads: Reads[T]): Reads[T] =
     extractTagged("response", tag)(reads)
 
