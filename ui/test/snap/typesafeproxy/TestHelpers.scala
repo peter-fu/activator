@@ -38,7 +38,7 @@ class AkkaTestKitHelper(_system: ActorSystem) extends TestKit(_system) with Impl
     def reply(reply: Any)(implicit sender: ActorRef): Unit = replyTo.tell(message, sender)
   }
 
-  class FakeAuthenticator(replyTo: ActorRef, uiActor: ActorRef) extends Actor {
+  class FakeAuthenticator(replyTo: ActorRef, uiActor: ActorRef, initMessage: Option[String]) extends Actor {
     def receive: Receive = {
       uiActor ! UIActor.CancelableRequests.RequestCredentials(self)
 
@@ -64,8 +64,8 @@ class AkkaTestKitHelper(_system: ActorSystem) extends TestKit(_system) with Impl
     }
   }
 
-  def fakeAuthenticatorProps(replyTo: ActorRef, uiActor: ActorRef): Props =
-    Props(new FakeAuthenticator(replyTo, uiActor))
+  def fakeAuthenticatorProps(replyTo: ActorRef, uiActor: ActorRef, initMessage: Option[String]): Props =
+    Props(new FakeAuthenticator(replyTo, uiActor, initMessage))
 
   def fakeSubscriptionRPCProps(authenticationData: AuthenticationStates.AuthenticationData, replyTo: ActorRef, uiActor: ActorRef): Props =
     Props(new FakeSubscriptionRPC(authenticationData, replyTo, uiActor))
@@ -73,7 +73,7 @@ class AkkaTestKitHelper(_system: ActorSystem) extends TestKit(_system) with Impl
   def withProxy[T](initAuth: AuthenticationState = AuthenticationStates.Unauthenticated,
     initUserProps: UserProperties = UserProperties(),
     uiActor: ActorRef = testActor,
-    authenticatorProps: (ActorRef, ActorRef) => Props = fakeAuthenticatorProps,
+    authenticatorProps: (ActorRef, ActorRef, Option[String]) => Props = fakeAuthenticatorProps,
     subscriptionRPCProps: (AuthenticationStates.AuthenticationData, ActorRef, ActorRef) => Props = fakeSubscriptionRPCProps,
     notificationSink: TypesafeComProxy.Notification => Unit = _ => ())(body: ActorRef => T): T = {
     val proxy = system.actorOf(TypesafeComProxy.props(initAuth, initUserProps, uiActor, authenticatorProps, subscriptionRPCProps, notificationSink))
@@ -105,8 +105,9 @@ class AkkaTestKitHelper(_system: ActorSystem) extends TestKit(_system) with Impl
 
   def withAuthenticationActor[T](doAuthenticate: AuthenticationActor.DoAuthenticate,
     replyTo: ActorRef = testActor,
-    uiActor: ActorRef = testActor)(body: ActorRef => T): T = {
-    val authenticator = system.actorOf(AuthenticationActor.props(doAuthenticate, replyTo, uiActor))
+    uiActor: ActorRef = testActor,
+    initMessage: Option[String] = None)(body: ActorRef => T): T = {
+    val authenticator = system.actorOf(AuthenticationActor.props(doAuthenticate, replyTo, uiActor, initMessage))
     val r = body(authenticator)
     system stop authenticator
     r

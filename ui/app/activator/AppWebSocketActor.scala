@@ -26,12 +26,13 @@ class AppWebSocketActor(val config: AppConfig) extends WebSocketActor[JsValue] w
   lazy val typesafeComActor = context.actorOf(TypesafeComProxy.props(initAuth = AuthenticationStates.Unauthenticated,
     initUserProps = UserProperties(),
     uiActor = uiActor,
-    authenticatorProps = AuthenticationActor.props(loginEndpoint, _, _),
+    authenticatorProps = AuthenticationActor.props(loginEndpoint, _, _, _),
     subscriptionRPCProps = SubscriptionDataActor.props(_, subsciberEndpoint, _, _)))
 
   override def onMessage(json: JsValue): Unit = {
     json match {
       case WebSocketActor.Ping(ping) => produce(WebSocketActor.Pong(ping.cookie))
+      case UIActor.WebsocketMessages.Inbound(req) => uiActor ! req
       case SbtRequest(req) => handleSbtPayload(req.json)
       case InspectRequest(m) => for (cActor <- consoleActor) cActor ! HandleRequest(json)
       case AppDynamicsRequest(m) => handleAppDynamicsRequest(m)
@@ -196,6 +197,8 @@ class AppWebSocketActor(val config: AppConfig) extends WebSocketActor[JsValue] w
     case NotifyWebSocket(json) =>
       log.debug("sending message on web socket: {}", json)
       produce(json)
+    case UIActor.WebsocketMessages.Outbound(msg) =>
+      produce(Json.toJson(msg))
   }
 }
 

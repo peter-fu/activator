@@ -64,12 +64,12 @@ object AuthenticationActor {
 
   }
 
-  def props(doAuthenticate: DoAuthenticate, replyTo: ActorRef, uiActor: ActorRef): Props =
-    Props(new AuthenticationActor(doAuthenticate, replyTo, uiActor))
+  def props(doAuthenticate: DoAuthenticate, replyTo: ActorRef, uiActor: ActorRef, initMessage: Option[String]): Props =
+    Props(new AuthenticationActor(doAuthenticate, replyTo, uiActor, initMessage))
 
 }
 
-class AuthenticationActor(doAuthenticate: AuthenticationActor.DoAuthenticate, replyTo: ActorRef, uiActor: ActorRef) extends Actor with ActorLogging {
+class AuthenticationActor(doAuthenticate: AuthenticationActor.DoAuthenticate, replyTo: ActorRef, uiActor: ActorRef, initMessage: Option[String]) extends Actor with ActorLogging {
   import AuthenticationActor._
   import TypesafeComProxy._
 
@@ -95,7 +95,7 @@ class AuthenticationActor(doAuthenticate: AuthenticationActor.DoAuthenticate, re
         context stop self
       case AuthenticationStates.Failure(e: ProxyInvalidCredentials) =>
         uiActor ! UIActor.RetryableRequests.Failure(e.getMessage, self, true)
-        context.become(onFailure(() => context.become(receive)))
+        context.become(onFailure(() => context.become(run())))
       case AuthenticationStates.Failure(e: ProxyTimeout) =>
         log.error("Timeout during authentication", e)
         uiActor ! UIActor.RetryableRequests.Failure(e.getMessage, self, true)
@@ -121,9 +121,11 @@ class AuthenticationActor(doAuthenticate: AuthenticationActor.DoAuthenticate, re
 
   }
 
-  def receive: Receive = {
-    uiActor ! UIActor.CancelableRequests.RequestCredentials(self)
+  def run(message: Option[String] = None): Receive = {
+    uiActor ! UIActor.CancelableRequests.RequestCredentials(self, message)
     awaitCredentials()
   }
+
+  def receive: Receive = run(initMessage)
 
 }
