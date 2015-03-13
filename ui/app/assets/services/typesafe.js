@@ -1,7 +1,96 @@
 /*
  Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
  */
-define(function() {
+define(['commons/websocket',
+         'commons/stream'
+], function(websocket,Stream) {
+
+  var proxyEventStream = websocket.subscribe('tag','TypesafeComProxy');
+
+  proxyEventStream.each(function(message) {
+    var type = message.type;
+    var state = {
+      type: type
+    };
+    if (type === "requestCredentials") {
+      if (message.message) {
+        state.message = message.message;
+      }
+      state.cancel = function () {
+        sendCancel();
+      }
+      state.credentials = function (username,password) {
+        sendCredentials(username,password);
+      }
+    } else if (type === "authenticating") {
+      state.cancel = function () {
+        sendCancel();
+      }
+    } else if (type === "fetchingSubscriptionData"){
+      state.cancel = function () {
+        sendCancel();
+      }
+    } else if (type === "failure" && message.retryable === true) {
+      state.message = message.message
+      state.cancel = function () {
+        sendCancel();
+      }
+      state.retry = function () {
+        sendRetry();
+      }
+    }
+
+    proxyUiRequestState(state);
+
+  });
+
+  var proxyUiRequestState = ko.observable(null);
+
+  function proxyRequest(type,payload) {
+    var request = {
+      "tag" : "TypesafeComProxy",
+      "type" : type
+    };
+
+    if (payload) {
+      request = $.extend(request,payload);
+    }
+
+    websocket.send(request);
+  }
+
+  function getSubscriptionDetail() {
+    var response = ko.observable();
+    proxyRequest("getSubscriptionDetail",null);
+    var subs = proxyEventStream.each(function(message) {
+      var type = message.type;
+      if (type === "notASubscriber") {
+        response(message);
+      } else if (type === "subscriptionDetails") {
+        response(message);
+      } else if (type === "failure" && message.retryable === false) {
+        response(message);
+      }
+    });
+
+    response.subscribe(function(newValue) {
+      subs.close();
+    });
+    return response;
+  }
+
+  function sendCancel() {
+    proxyRequest("cancel",null);
+  }
+
+  function sendCredentials(username,password) {
+    proxyRequest("credentials",{username: username, password: password});
+  }
+
+  function sendRetry() {
+    proxyRequest("retry",null);
+  }
+
 
   var register = {};
   var receiveMessage = function(event) {
@@ -30,7 +119,9 @@ define(function() {
 
   return {
     subscribe: subscribe,
-    send: send
+    send: send,
+    getSubscriptionDetail: getSubscriptionDetail,
+    proxyUiRequestState: proxyUiRequestState
   }
 
 });

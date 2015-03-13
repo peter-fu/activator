@@ -154,6 +154,10 @@ define(['./types'], function(Types) {
     return this;
   };
 
+  EventStream.prototype.close = function() {
+    this.callbacks = [];
+  };
+
   return function() {
     return new EventStream()
   }
