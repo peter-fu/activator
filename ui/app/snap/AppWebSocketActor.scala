@@ -19,11 +19,11 @@ class AppWebSocketActor(val config: AppConfig) extends WebSocketActor[JsValue] w
   lazy val appDynamicsConfig = AppDynamics.fromConfig(Play.current.configuration.underlying)
   lazy val appDynamicsActor: ActorRef = context.actorOf(monitor.AppDynamicsActor.props(appDynamicsConfig, defaultContext))
   lazy val newRelicActor: ActorRef = context.actorOf(monitor.NewRelicActor.props(NewRelic.fromConfig(Play.current.configuration.underlying), defaultContext))
-  lazy val typesafeComConfig = TypesafeComProxy.fromConfig(Play.current.configuration.underlying)
-  lazy val loginEndpoint = AuthenticationActor.httpDoAuthenticate(typesafeComConfig.login.url, typesafeComConfig.login.timeout, defaultContext)_
-  lazy val subsciberEndpoint = SubscriptionDataActor.httpGetSubscriptionData(typesafeComConfig.subscriptionData.url, typesafeComConfig.subscriptionData.timeout, defaultContext)_
-  lazy val uiActor = context.actorOf(UIActor.props(self))
-  lazy val typesafeComActor = context.actorOf(TypesafeComProxy.props(initAuth = AuthenticationStates.Unauthenticated,
+  val typesafeComConfig = TypesafeComProxy.fromConfig(Play.current.configuration.underlying)
+  val loginEndpoint = AuthenticationActor.httpDoAuthenticate(typesafeComConfig.login.url, typesafeComConfig.login.timeout, defaultContext)_
+  val subsciberEndpoint = SubscriptionDataActor.httpGetSubscriptionData(typesafeComConfig.subscriptionData.url, typesafeComConfig.subscriptionData.timeout, defaultContext)_
+  val uiActor = context.actorOf(UIActor.props(self))
+  val typesafeComActor = context.actorOf(TypesafeComProxy.props(initAuth = AuthenticationStates.Unauthenticated,
     initUserProps = UserProperties(),
     uiActor = uiActor,
     authenticatorProps = AuthenticationActor.props(loginEndpoint, _, _, _),

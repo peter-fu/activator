@@ -47,7 +47,7 @@ object SubscriptionDataActor {
             val j = Json.parse(response.body)
             Success(Json.fromJson[SubscriberData](j).get)
           case 401 => InvalidAuthentication
-          case status => Failure(new ProxyFailure("Unknown response code: $status"))
+          case status => Failure(new ProxyFailure(s"Unknown response code: $status"))
         }
       }
       case TFailure(exception) => respondWith {
