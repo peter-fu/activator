@@ -121,7 +121,8 @@ define(['commons/websocket',
     subscribe: subscribe,
     send: send,
     getSubscriptionDetail: getSubscriptionDetail,
-    proxyUiRequestState: proxyUiRequestState
+    proxyUiRequestState: proxyUiRequestState,
+    sendCredentials: sendCredentials // useful for debugging
   }
 
 });

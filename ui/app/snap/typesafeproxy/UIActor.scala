@@ -98,8 +98,7 @@ object UIActor {
         case AuthenticationSuccess => Json.obj("type" -> "authenticationSuccess")
         case SubscriptionDataSuccess => Json.obj("type" -> "subscriptionDataSuccess")
         case NotASubscriber => Json.obj("type" -> "notASubscriber")
-        case x: SubscriptionDetails => Json.obj("type" -> "subscriptionDetails",
-          "data" -> x.data)
+        case x: SubscriptionDetails => Json.obj("type" -> "subscriptionDetails", "data" -> x.data)
       })
 
     object Inbound {

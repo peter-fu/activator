@@ -51,7 +51,7 @@ object AuthenticationActor {
           case 200 => AuthenticationStates.Authenticated(response.cookie("PLAY_SESSION").get)
           case 401 => AuthenticationStates.Failure(new ProxyInvalidCredentials("Invalid login credentials"))
           case 400 => AuthenticationStates.Failure(new ProxyInvalidCredentials("Missing email or password"))
-          case status => AuthenticationStates.Failure(new ProxyFailure("Unknown response code: $status"))
+          case status => AuthenticationStates.Failure(new ProxyFailure(s"Unknown response code: $status"))
         }
       }
       case Failure(exception) => respondWith {
