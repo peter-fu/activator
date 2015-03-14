@@ -30,18 +30,23 @@ define(['commons/websocket',
       state.cancel = function () {
         sendCancel();
       }
-    } else if (type === "failure" && message.retryable === true) {
-      state.message = message.message
-      state.cancel = function () {
-        sendCancel();
+    } else if (type === "failure") {
+      state.message = message.message;
+      if (message.retryable === true) {
+        state.cancel = function () {
+          sendCancel();
+        }
+        state.retry = function () {
+          sendRetry();
+        }
       }
-      state.retry = function () {
-        sendRetry();
-      }
+    } else {
+      state = null;
     }
 
-    proxyUiRequestState(state);
-
+    if (state) {
+      proxyUiRequestState(state);
+    }
   });
 
   var proxyUiRequestState = ko.observable(null);
@@ -61,8 +66,9 @@ define(['commons/websocket',
 
   function getSubscriptionDetail() {
     var response = ko.observable();
+    var subs = websocket.subscribe('tag','TypesafeComProxy');
     proxyRequest("getSubscriptionDetail",null);
-    var subs = proxyEventStream.each(function(message) {
+    subs.each(function(message) {
       var type = message.type;
       if (type === "notASubscriber") {
         response(message);
