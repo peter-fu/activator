@@ -54,44 +54,54 @@ define([
 
   retrieveMetadata();
 
-  $.get("tutorial/index.html", function(data){
-    hasTutorial(true);
-    // parseHTML dumps the <html> <head> and <body> tags
-    // so we'll get a list with <title> some <div> and some text nodes
-    var htmlNodes = $.parseHTML(data),
-        _pages = [],
-        _table = [];
-    $(htmlNodes).filter("div").each(function(i,el){
-      $("button[data-exec]", el).each(function() {
-        var title = $(this).text();
-        var command = $(this).attr('data-exec');
-        if (command === 'run' || command === 'compile' || command === 'start') return;
-        if (!app.customCommands().filter(function(i) { return i.command === command }).length){
-          app.customCommands.push({
-            command: command,
-            title: title
-          })
-        }
+  function loadTutorial(){
+    $.get("tutorial/index.html", function(data){
+      hasTutorial(true);
+      // parseHTML dumps the <html> <head> and <body> tags
+      // so we'll get a list with <title> some <div> and some text nodes
+      var htmlNodes = $.parseHTML(data),
+          _pages = [],
+          _table = [];
+      $(htmlNodes).filter("div").each(function(i,el){
+        $("button[data-exec]", el).each(function() {
+          var title = $(this).text();
+          var command = $(this).attr('data-exec');
+          if (command === 'run' || command === 'compile' || command === 'start') return;
+          if (!app.customCommands().filter(function(i) { return i.command === command }).length){
+            app.customCommands.push({
+              command: command,
+              title: title
+            })
+          }
+        });
+        $("a", el).each(function(j, link) {
+          // Open external links in new window.
+          if (link.getAttribute('href').indexOf("http://") === 0 && !link.target){
+            link.target = "_blank";
+          // Force shortcut class on links to code
+          } else if (link.getAttribute('href').indexOf("#code/") === 0){
+            $(link).addClass("shortcut");
+          }
+        });
+        var title = $("h2", el).remove().html() || $(el).text().substring(0,40) + "...";
+        _pages.push({ index: i, title: title, page: el.innerHTML });
+        _table.push(title);
       });
-      $("a", el).each(function(j, link) {
-        // Open external links in new window.
-        if (link.getAttribute('href').indexOf("http://") === 0 && !link.target){
-          link.target = "_blank";
-        // Force shorcut class on links to code
-        } else if (link.getAttribute('href').indexOf("#code/") === 0){
-          $(link).addClass("shorcut");
-        }
-      });
-      var title = $("h2", el).remove().html() || $(el).text().substring(0,40) + "...";
-      _pages.push({ index: i, title: title, page: el.innerHTML });
-      _table.push(title);
+      pages(_pages);
+      table(_table);
+      console.log(index())
+      if (index()){
+        window.location.hash = "#tutorial/";
+        gotoPage(index());
+      }
     });
-    pages(_pages);
-    table(_table);
-  });
+  }
+  loadTutorial();
 
   return {
     hasTutorial:  hasTutorial,
+    loadTutorial: loadTutorial,
+    isLocal:      window.serverAppModel.hasLocalTutorial,
     metaData:     metaData,
     table:        table,
     pages:        pages,
