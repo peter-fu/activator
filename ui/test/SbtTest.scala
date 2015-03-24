@@ -15,7 +15,7 @@ import play.api.http._
 import scala.concurrent.{ Await, Future }
 import akka.util.Timeout
 import java.util.concurrent.TimeUnit
-import snap.AppManager
+import activator.AppManager
 import activator.ProcessResult
 import activator.ProcessSuccess
 import activator.ProcessFailure

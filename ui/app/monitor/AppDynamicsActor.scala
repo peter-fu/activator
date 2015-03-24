@@ -7,11 +7,11 @@ package monitor
 import akka.actor._
 import java.io.File
 import akka.util.Timeout
-import snap.HttpHelper._
+import activator.HttpHelper._
 import scala.concurrent.duration._
 import monitor.Provisioning.{ StatusNotifier, DownloadPrepExecutor }
 import play.api.libs.ws.{ WSClient, WSResponse, WSRequestHolder, WSCookie }
-import snap.{ InstrumentationRequestTypes, AppDynamics }
+import activator.{ InstrumentationRequestTypes, AppDynamics }
 import scala.util.{ Success, Failure }
 import scala.concurrent.{ Future, ExecutionContext }
 import akka.event.LoggingAdapter

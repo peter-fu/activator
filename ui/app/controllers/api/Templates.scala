@@ -13,7 +13,7 @@ import scala.concurrent.Future
 import scala.util.control.NonFatal
 
 object Templates extends Controller {
-  val templateCache = activator.UICacheHelper.makeDefaultCache(snap.Akka.system)
+  val templateCache = activator.UICacheHelper.makeDefaultCache(activator.Akka.system)
 
   // Here's the JSON rendering of template metadata.
   implicit object Protocol extends Format[TemplateMetadata] {

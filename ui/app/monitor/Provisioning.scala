@@ -7,11 +7,11 @@ package monitor
 import akka.actor.ActorRef
 import java.io.File
 import play.api.libs.ws.ssl.{ DefaultSSLLooseConfig, DefaultSSLConfig, DefaultSSLConfigParser }
-import snap.HttpHelper.ProgressObserver
+import activator.HttpHelper.ProgressObserver
 
 import scala.concurrent.{ ExecutionContext, Future }
 import play.api.libs.ws._
-import snap.{ JsonHelper, FileHelper }
+import activator.{ JsonHelper, FileHelper }
 import akka.util.Timeout
 import scala.util.{ Failure, Success }
 import play.api.libs.json._
@@ -22,7 +22,7 @@ import play.api.libs.ws.ning._
 import com.ning.http.client.AsyncHttpClientConfig
 
 object Provisioning {
-  import snap.HttpHelper._
+  import activator.HttpHelper._
   val responseTag = "monitoring"
   val responseSubTag = "ProvisioningStatus"
 

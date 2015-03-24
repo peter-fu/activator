@@ -8,7 +8,7 @@ import java.io.File
 
 import akka.actor.{ ActorRef, _ }
 import akka.event.LoggingAdapter
-import snap.NewRelic
+import activator.NewRelic
 
 import scala.concurrent.ExecutionContext
 import scala.util.{ Failure, Success }
