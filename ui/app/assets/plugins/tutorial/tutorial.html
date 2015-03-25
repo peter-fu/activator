@@ -29,7 +29,7 @@
       <!-- ko if: metaData() -->
         <div class="description">
           <h1 data-bind="text: metaData().title"></h1>
-          <p data-bind="text: metaData().description"></p>
+          <p data-bind="markdownLinkify: metaData().description"></p>
           <p class="author">
             <cite>
               by <span data-bind="text: metaData().authorName"></span>
@@ -50,7 +50,7 @@
             <!-- /ko -->
             <h3 data-bind="text: metaData().authorName"></h3>
           </a>
-          <p data-bind="text: metaData().authorBio"></p>
+          <p data-bind="markdownLinkify: metaData().authorBio"></p>
         </div>
         <!-- /ko -->
       <!-- /ko -->

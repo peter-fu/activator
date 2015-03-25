@@ -261,6 +261,23 @@ define(function() {
       return (nanos / 1000000).toFixed(decimals);
     };
 
+    Format.prototype.markdownLinks = function(str){
+      // Search for Html tags, indicating that the text was not escaped.
+      // Should never be reached, but in case we forgot to escape before using that formatter...
+      try {
+        if (str.match(/.*<.*>.*/)) {
+          throw "Unauthorized chars, we are preventing XSS.";
+        }
+      } catch (e) {
+        return "Can't display text.";
+      }
+
+      // md links
+      str = str.replace(/\[([^\].]+)\]\((https?\:\/\/[a-z0-9\-]+\.[.^\S^\)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+
+      return str;
+    }
+
     return Format;
 
   })();
