@@ -1,4 +1,4 @@
-package snap.typesafeproxy
+package activator.typesafeproxy
 
 import akka.actor._
 

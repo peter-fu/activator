@@ -1,4 +1,4 @@
-package snap.typesafeproxy
+package activator.typesafeproxy
 
 import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
@@ -90,4 +90,50 @@ object SubscriberData {
 
 }
 
-case class UserProperties(subscriberData: Option[SubscriberData] = None)
+case class ActivatorLatestInfo(url: String,
+  miniUrl: String,
+  version: String,
+  size: String,
+  miniSize: String,
+  playVersion: String,
+  akkaVersion: String,
+  scalaVersion: String,
+  launcherGeneration: Int)
+object ActivatorLatestInfo {
+
+  private val exampleUrl = "http://downloads.typesafe.com/typesafe-activator/1.3.2/typesafe-activator-1.3.2.zip"
+  private val exampleMiniUrl = "http://downloads.typesafe.com/typesafe-activator/1.3.2/typesafe-activator-1.3.2-minimal.zip"
+  private val exampleVersion = "1.3.2"
+  private val exampleSize = "408M"
+  private val exampleMiniSize = "1M"
+  private val examplePlayVersion = "2.3.8"
+  private val exampleAkkaVersion = "2.3.9"
+  private val exampleScalaVersion = "2.11.5"
+  private val exampleLauncherGeneration = 1
+
+  def exampleDetail(url: String = exampleUrl,
+    miniUrl: String = exampleMiniUrl,
+    version: String = exampleVersion,
+    size: String = exampleSize,
+    miniSize: String = exampleMiniSize,
+    playVersion: String = examplePlayVersion,
+    akkaVersion: String = exampleAkkaVersion,
+    scalaVersion: String = exampleScalaVersion,
+    launcherGeneration: Int = exampleLauncherGeneration): ActivatorLatestInfo =
+    ActivatorLatestInfo(url,
+      miniUrl,
+      version,
+      size,
+      miniSize,
+      playVersion,
+      akkaVersion,
+      scalaVersion,
+      launcherGeneration)
+
+  val activatorLatestInfoReads: Reads[ActivatorLatestInfo] = Json.reads[ActivatorLatestInfo]
+
+  val activatorLatestInfoWrites: Writes[ActivatorLatestInfo] = Json.writes[ActivatorLatestInfo]
+
+  implicit val activatorLatestInfoFormat: Format[ActivatorLatestInfo] = Format[ActivatorLatestInfo](activatorLatestInfoReads, activatorLatestInfoWrites)
+
+}
