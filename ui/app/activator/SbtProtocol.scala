@@ -13,7 +13,18 @@ object SbtProtocol {
 
   private def messageJson(message: Message)(implicit pickler: Pickler[Message]): JsObject =
     Json.parse(SerializedValue(message).toJsonString) match {
-      case o: JsObject => o
+      case o: JsObject =>
+        message match {
+          case log: LogEvent =>
+            // TODO once we're sure the JS never needs the original "message"
+            // we can delete it here and skip sending it over the socket
+            val newEntry = (o \ "entry").as[JsObject] +
+              ("messageHtml" ->
+                JsString(AnsiToHtml.ansiToHtml(log.entry.message)))
+            o + ("entry" -> newEntry)
+          case _ =>
+            o
+        }
       case other => throw new RuntimeException(s"message $message should have become a JsObject not $other")
     }
 

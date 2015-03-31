@@ -21,7 +21,7 @@ define([
   // Cache the dom Logs, for better performances
   // Not very elegant, but much, much, much more efficient.
   var logsView = ko.tpl("ul", {logEach: sbt.logs.logs, css: { 'show-debug': sbt.app.settings.showLogDebug }}, [
-    ko.tpl("li", { attr: { 'data-bind': "text: event.entry.message, attr: { 'data-level': event.entry.level, 'data-type': event.entry.$type }"} }, [])
+    ko.tpl("li", { attr: { 'data-bind': "html: event.entry.messageHtml, attr: { 'data-level': event.entry.level, 'data-type': event.entry.$type }"} }, [])
   ]);
 
   var State = {

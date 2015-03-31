@@ -18,7 +18,7 @@ define([
   // Cache the dom Logs, for better performances
   // Not very elegant, but much, much, much more efficient.
   var logsView = ko.tpl("ul", {logEach: logs, css: "logs", id: "loading-logs"}, [
-    ko.tpl("li", { attr: { 'data-bind': "text: message"} }, [])
+    ko.tpl("li", { attr: { 'data-bind': "html: messageHtml"} }, [])
   ]);
 
   var State = {
@@ -58,6 +58,7 @@ define([
     if (message.event.entry.level !== "debug") {
       logs.push({
         message: message.event.entry.message,
+        messageHtml: message.event.entry.messageHtml,
         type: "info"
       });
     }
@@ -100,6 +101,7 @@ define([
       case 'Status':
         logs.push({
           message: message.info,
+          messageHtml: message.infoHtml,
           type: "info"
         });
         break;

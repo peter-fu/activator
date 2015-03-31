@@ -67,7 +67,8 @@ object HomePageActor {
     def apply(info: String): JsValue =
       JsObject(Seq(
         "response" -> JsString("Status"),
-        "info" -> JsString(info)))
+        "info" -> JsString(info),
+        "infoHtml" -> JsString(AnsiToHtml.ansiToHtml(info))))
   }
   case class Respond(json: JsValue)
 
