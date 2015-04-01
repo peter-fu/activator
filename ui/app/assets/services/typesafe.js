@@ -1,9 +1,15 @@
 /*
  Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
  */
-define(['commons/websocket',
-         'commons/stream'
-], function(websocket,Stream) {
+define([
+  'widgets/login/login',
+  'commons/websocket',
+  'commons/stream'
+], function(
+  login,
+  websocket,
+  Stream
+){
 
   var proxyEventStream = websocket.subscribe('tag','TypesafeComProxy');
 

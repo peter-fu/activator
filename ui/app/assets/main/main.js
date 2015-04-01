@@ -22,7 +22,8 @@ var commons = [
 ]
 
 var services = [
-  'services/sbt'
+  'services/sbt',
+  'services/typesafe'
 ]
 
 var core = [
