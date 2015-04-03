@@ -11,7 +11,7 @@ define(['./types'], function(Types) {
     return function(value) {
       if (callbacks.length > 1) {
         callbacks[0].call(noop, value, EventStreamExecution(callbacks.slice(1)));
-      } else {
+      } else if (callbacks.length === 1) {
         callbacks[0].call(noop, value, noop);
       }
     };
@@ -152,6 +152,10 @@ define(['./types'], function(Types) {
     }
     this.callbacks.push(_call);
     return this;
+  };
+
+  EventStream.prototype.close = function() {
+    this.callbacks = [];
   };
 
   return function() {

@@ -1,5 +1,6 @@
 package activator
 
+import activator.typesafeproxy._
 import akka.actor._
 import akka.event.LoggingAdapter
 import akka.pattern._
@@ -18,10 +19,24 @@ class AppWebSocketActor(val config: AppConfig) extends WebSocketActor[JsValue] w
   lazy val appDynamicsConfig = AppDynamics.fromConfig(Play.current.configuration.underlying)
   lazy val appDynamicsActor: ActorRef = context.actorOf(monitor.AppDynamicsActor.props(appDynamicsConfig, defaultContext))
   lazy val newRelicActor: ActorRef = context.actorOf(monitor.NewRelicActor.props(NewRelic.fromConfig(Play.current.configuration.underlying), defaultContext))
+  val typesafeComConfig = TypesafeComProxy.fromConfig(Play.current.configuration.underlying)
+  val lookupTimeout = typesafeComConfig.lookupTimeout
+  val loginEndpoint = AuthenticationActor.httpDoAuthenticate(typesafeComConfig.login.url, typesafeComConfig.login.timeout, defaultContext)_
+  val subscriberEndpoint = SubscriptionDataActor.httpGetSubscriptionData(typesafeComConfig.subscriptionData.url, typesafeComConfig.subscriptionData.timeout, defaultContext)_
+  val activatorInfoEndpoint = ActivatorLatestActor.httpGetActivatorLatest(typesafeComConfig.activatorInfo.url, typesafeComConfig.activatorInfo.timeout, defaultContext)_
+  val initState = TypesafeComProxy.initialStateBuilder(authGetter = AuthenticationActor.props(loginEndpoint, UIActor.props, _, _, _),
+    subscriberDataGetter = SubscriptionDataActor.props(subscriberEndpoint, UIActor.props, _, _, _),
+    activatorInfoGetter = ActivatorLatestActor.props(activatorInfoEndpoint, UIActor.props, _, _, _))
+  val typesafeComActor = context.actorOf(TypesafeComProxy.props(initialCacheState = initState,
+    webSocketActor = self))
 
   override def onMessage(json: JsValue): Unit = {
     json match {
       case WebSocketActor.Ping(ping) => produce(WebSocketActor.Pong(ping.cookie))
+      case UIActor.WebSocket.Inbound(req) =>
+        context.actorSelection(req.actorPath).resolveOne()(lookupTimeout).onSuccess({ case a => a ! req })
+      case TypesafeComProxyUIActor.Inbound(req) =>
+        context.actorOf(TypesafeComProxyUIActor.props(req, typesafeComActor, self))
       case SbtRequest(req) => handleSbtPayload(req.json)
       case InspectRequest(m) => for (cActor <- consoleActor) cActor ! HandleRequest(json)
       case AppDynamicsRequest(m) => handleAppDynamicsRequest(m)
@@ -186,6 +201,12 @@ class AppWebSocketActor(val config: AppConfig) extends WebSocketActor[JsValue] w
     case NotifyWebSocket(json) =>
       log.debug("sending message on web socket: {}", json)
       produce(json)
+    case UIActor.WebSocket.Outbound(msg) =>
+      import UIActor.WebSocket._
+      produce(Json.toJson(msg))
+    case TypesafeComProxyUIActor.Outbound(msg) =>
+      import TypesafeComProxyUIActor._
+      produce(Json.toJson(msg))
   }
 }
 
