@@ -3,13 +3,16 @@
  */
 package activator
 
+import activator.typesafeproxy.{ TypesafeComProxyUIActor, UIActor, TypesafeComProxy }
 import akka.actor._
+import akka.util.Timeout
 import play.api.libs.json._
 import java.io.File
 import akka.pattern.pipe
 import scala.util.control.NonFatal
 import scala.concurrent.{ Promise, Future }
 import activator._
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 // THE API for the HomePage actor.
 object HomePageActor {
@@ -84,22 +87,32 @@ object HomePageActor {
       }
   }
 }
-class HomePageActor extends WebSocketActor[JsValue] with ActorLogging {
+class HomePageActor(typesafeComActor: ActorRef, lookupTimeout: Timeout) extends WebSocketActor[JsValue] with ActorLogging {
 
   AppManager.registerKeepAlive(self)
 
   import HomePageActor._
   override def onMessage(json: JsValue): Unit = json match {
+    case UIActor.WebSocket.Inbound(req) =>
+      context.actorSelection(req.actorPath).resolveOne()(lookupTimeout).onSuccess({ case a => a ! req })
+    case TypesafeComProxyUIActor.Inbound(req) =>
+      context.actorOf(TypesafeComProxyUIActor.props(req, typesafeComActor, self))
     case WebSocketActor.Ping(ping) => produce(WebSocketActor.Pong(ping.cookie))
     case OpenExistingApplication(msg) => openExistingApplication(msg.location)
     case CreateNewApplication(msg) => createNewApplication(msg.location, msg.templateId, msg.projectName, msg.subscriptionId)
     case _ =>
-      log.debug(s"HomeActor: received unknown msg: $json")
-      produce(BadRequest(json.toString, Seq("Could not parse JSON for request")))
+      log.error(s"HomeActor: received unknown msg: $json")
+      produce(BadRequest(json.toString, Seq(s"Could not parse JSON for request: ${json}")))
   }
 
   override def subReceive: Receive = {
     case Respond(json) => produce(json)
+    case UIActor.WebSocket.Outbound(msg) =>
+      import UIActor.WebSocket._
+      produce(Json.toJson(msg))
+    case TypesafeComProxyUIActor.Outbound(msg) =>
+      import TypesafeComProxyUIActor._
+      produce(Json.toJson(msg))
   }
 
   // Goes off and tries to create/load an application.

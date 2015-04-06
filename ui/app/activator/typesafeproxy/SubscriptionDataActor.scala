@@ -127,12 +127,12 @@ class SubscriptionDataActor(doGetSubscriptionData: SubscriptionDataActor.DoGetSu
     case Authentication.Value(Success(x: AuthenticationStates.Authenticated), authVersion) =>
       context.become(runRequest(x, authVersion))
     case Authentication.Value(Failure(e), authVersion) =>
-      replyTo ! SubscriberDetail.Put(Failure(e), authVersion, self)
+      replyTo ! SubscriberDetail.Put(Failure(e), version, self)
       context.become(doStop())
   }
 
   def getAuthentication(): Receive = {
-    replyTo ! Authentication.Get(self)
+    replyTo ! Authentication.Get(self, websocketActor)
     awaitAuthentication()
   }
 

@@ -3,6 +3,7 @@
  */
 package controllers
 
+import activator.typesafeproxy._
 import play.api.mvc.{ Action, Controller, WebSocket }
 import java.io.File
 import scala.concurrent.Future
@@ -322,9 +323,19 @@ object Application extends Controller {
 
   val homeActorCount = new AtomicInteger(1)
 
+  val typesafeComConfig = TypesafeComProxy.fromConfig(Play.current.configuration.underlying)
+  val lookupTimeout = typesafeComConfig.lookupTimeout
+  val loginEndpoint = AuthenticationActor.httpDoAuthenticate(typesafeComConfig.login.url, typesafeComConfig.login.timeout, defaultContext)_
+  val subscriberEndpoint = SubscriptionDataActor.httpGetSubscriptionData(typesafeComConfig.subscriptionData.url, typesafeComConfig.subscriptionData.timeout, defaultContext)_
+  val activatorInfoEndpoint = ActivatorLatestActor.httpGetActivatorLatest(typesafeComConfig.activatorInfo.url, typesafeComConfig.activatorInfo.timeout, defaultContext)_
+  val initState = TypesafeComProxy.initialStateBuilder(authGetter = AuthenticationActor.props(loginEndpoint, UIActor.props, _, _, _),
+    subscriberDataGetter = SubscriptionDataActor.props(subscriberEndpoint, UIActor.props, _, _, _),
+    activatorInfoGetter = ActivatorLatestActor.props(activatorInfoEndpoint, UIActor.props, _, _, _))
+  val typesafeComActor = activator.Akka.system.actorOf(TypesafeComProxy.props(initialCacheState = initState))
+
   /** Opens a stream for home events. */
   def homeStream =
-    activator.WebSocketActor.create(activator.Akka.system, new activator.HomePageActor, "home-socket-" + homeActorCount.getAndIncrement())
+    activator.WebSocketActor.create(activator.Akka.system, new activator.HomePageActor(typesafeComActor, lookupTimeout), "home-socket-" + homeActorCount.getAndIncrement())
 
   /** The current working directory of the app. */
   val cwd = (new java.io.File(".").getAbsoluteFile.getParentFile)

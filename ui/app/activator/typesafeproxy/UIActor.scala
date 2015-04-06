@@ -87,7 +87,8 @@ object UIActor {
     implicit val websocketReads: Reads[Response] =
       extractMessage[Response](requestTag)(new Reads[Response] {
         def reads(in: JsValue): JsResult[Response] = ((in \ "type"), (in \ "actorPath")) match {
-          case (JsString("cancel"), JsString(ap)) => JsSuccess(Cancel(ap))
+          case (JsString("cancel"), JsString(ap)) =>
+            JsSuccess(Cancel(ap))
           case (JsString("retry"), JsString(ap)) => JsSuccess(Retry(ap))
           case (JsString("credentials"), JsString(ap)) =>
             ((__ \ "username").read[String] and (__ \ "password").read[String])((un, pw) => Credentials.apply(un, pw, ap)).reads(in)

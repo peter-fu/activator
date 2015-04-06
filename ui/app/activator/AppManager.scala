@@ -4,6 +4,8 @@
 package activator
 
 import java.util.UUID
+import akka.util.Timeout
+
 import scala.concurrent.Future
 import java.io.File
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -33,7 +35,8 @@ case object ForgotApp extends AppCacheReply
 
 private case class CachedApp(appId: String, futureApp: Future[activator.App])
 
-class AppCacheActor extends Actor with ActorLogging {
+class AppCacheActor(val typesafeComActor: ActorRef,
+  val lookupTimeout: Timeout) extends Actor with ActorLogging {
   private var appCache: Map[UUID, CachedApp] = Map.empty
 
   override val supervisorStrategy = SupervisorStrategy.stoppingStrategy
@@ -81,7 +84,7 @@ class AppCacheActor extends Actor with ActorLogging {
           case None => {
             val appFuture: Future[activator.App] = AppManager.loadConfigFromAppId(id.appId) map { config =>
               log.debug(s"creating a new app for $id")
-              new activator.App(id, config, activator.Akka.system)
+              new activator.App(id, config, activator.Akka.system, typesafeComActor, lookupTimeout)
             }
 
             appCache += (id.socketId -> CachedApp(id.appId, appFuture))
@@ -204,7 +207,7 @@ object AppManager {
     keepAlive ! RegisterKeepAlive(ref)
   }
 
-  val appCache = activator.Akka.system.actorOf(Props(new AppCacheActor), name = "app-cache")
+  val appCache = activator.Akka.system.actorOf(Props(new AppCacheActor(controllers.Application.typesafeComActor, controllers.Application.lookupTimeout)), name = "app-cache")
 
   val requestManagerCount = new AtomicInteger(1)
 

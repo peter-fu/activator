@@ -20,7 +20,7 @@ define([
     self.disabled = opts.disabled || ko.observable(false);
     self.click = function(e) {
       opts.click.call(self);
-    }
+    };
     self.text = ko.computed(function() {
       if (self.pending()) {
         return opts.labels.working;
@@ -102,13 +102,12 @@ define([
     init: function(element, valueAccessor) {
       var model = valueAccessor();
       ko.applyBindingsToNode(element, { css: {pending: model.pending, working: model.working, disabled: model.disabled},  click: model.click });
-    },
-  }
+    }
+  };
 
   sbt.tasks.taskCompleteEvent.subscribe(function(e) {
     var command;
     switch(e.command){
-      case "compile":
       case "clean":
       case "reload":
       case "compile":
@@ -139,7 +138,7 @@ define([
     run: run,
     testing: testing,
     whyDisabled: sbt.events.whyDisabled
-  }
+  };
 
   return ko.bindhtml(tpl, State);
 

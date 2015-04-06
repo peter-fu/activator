@@ -34,7 +34,7 @@ class TypesafeComProxyTest extends DefaultSpecification {
   def testShouldAuthenticate(): Unit = withHelper { helper =>
     import helper._
     withProxy() { proxy =>
-      proxy ! Authentication.Get(testActor)
+      proxy ! Authentication.Get(testActor, testActor)
       val init = expectMsgType[FakeAuthenticatorInit]
       proxy ! Authentication.Put(authenticated, init.version, testActor)
       val rs = expectMsgAllClassOf(classOf[Authentication.Outcome], classOf[Authentication.Value])
@@ -49,7 +49,7 @@ class TypesafeComProxyTest extends DefaultSpecification {
   def testShouldFailToUpdate(): Unit = withHelper { helper =>
     import helper._
     withProxy() { proxy =>
-      proxy ! Authentication.Get(testActor)
+      proxy ! Authentication.Get(testActor, testActor)
       val init = expectMsgType[FakeAuthenticatorInit]
       proxy ! Authentication.Put(authenticated, init.version + 1, testActor)
       val rs = expectMsgType[Authentication.Outcome]

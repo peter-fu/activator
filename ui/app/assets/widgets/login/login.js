@@ -9,15 +9,14 @@ define([
   modal,
   tpl
 ){
-
-  var State = {
-    username: ko.observable(""),
-    password: ko.observable("")
-  }
-
-  var loginForm = ko.bindhtml(tpl, State);
-
   return function(callback, cancel, error){
+    var State = {
+      username: ko.observable(""),
+      password: ko.observable("")
+    };
+
+    var loginForm = ko.bindhtml(tpl, State);
+
     modal.show({
       text: error,
       title: "Log into your Typesafe account",

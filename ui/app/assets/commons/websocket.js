@@ -32,12 +32,13 @@ define([
   }
 
   function send(msg) {
-    debug && console.debug("Sending:", JSON.stringify(msg))
-    websocket.send(JSON.stringify(msg));
+    var smsg = JSON.stringify(msg);
+    debug && console.debug("Sending:", smsg);
+    websocket.send(smsg);
   }
 
   function onOpen(event) {
-    debug && console.info("WS opened: ", event)
+    debug && console.info("WS opened: ", event);
     isOpened(true);
     Ping();
   }
@@ -90,7 +91,7 @@ define([
   // Avoid "lost connection" popup flashing, when leaving the page
   window.onbeforeunload = function() {
     websocket.removeEventListener("close", onError);
-  }
+  };
 
 
   return {
@@ -100,4 +101,4 @@ define([
     subscribe: subscribe
   }
 
-})
+});

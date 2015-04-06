@@ -17,7 +17,7 @@ define(["commons/format"], function(format) {
 
   $.fn.scrollReveal = function(){
     $("<a href='#'>&nbsp;</a>").insertAfter(this).focus().remove();
-  }
+  };
 
   $.fn.clickOut = function(callback, context){
     return this.each(function(){
@@ -33,7 +33,7 @@ define(["commons/format"], function(format) {
         });
       }, 10);
     });
-  }
+  };
 
   $(document.body).on("click", ".dropdown:not(.dropdownNoEvent)",function(e){
     $(this).toggleClass("opened");
@@ -63,7 +63,7 @@ define(["commons/format"], function(format) {
         elem.parentNode.appendChild(inc);
       }
     }
-  }
+  };
   ko.virtualElements.allowedBindings.include = true;
 
   ko.bindingHandlers.insert = {
@@ -77,7 +77,7 @@ define(["commons/format"], function(format) {
         elem.parentNode.insertBefore(valueAccessor(), elem.nextSibling);
       }
     }
-  }
+  };
   ko.virtualElements.allowedBindings.insert = true;
   // -------------
 
@@ -111,7 +111,7 @@ define(["commons/format"], function(format) {
     },
     update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
     }
-  }
+  };
 
   ko.bindingHandlers.isExactUrl = {
     init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
@@ -123,7 +123,7 @@ define(["commons/format"], function(format) {
     },
     update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
     }
-  }
+  };
 
   // Just pass a function in the template, to call it
   ko.bindingHandlers.exec = {
@@ -145,7 +145,7 @@ define(["commons/format"], function(format) {
     },
     update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
     }
-  }
+  };
 
   ko.bindingHandlers.memorizeLinks = {
     init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
@@ -160,7 +160,7 @@ define(["commons/format"], function(format) {
     },
     update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
     }
-  }
+  };
 
   ko.bindingHandlers.memoScroll = (function(){
     var memos = {}

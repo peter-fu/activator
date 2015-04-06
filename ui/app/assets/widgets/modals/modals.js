@@ -5,7 +5,6 @@ define([
   'text!./modal.html',
   'css!./modals'
 ], function(tpl){
-
   var modal = $('<div id="modal"></div>').hide();
 
   function modalKeyboard(e){
@@ -32,10 +31,13 @@ define([
     $(document.body).on("keydown", modalKeyboard);
   }
 
-  function hide(){
+  function hide(after){
     $(document.body).off("keydown", modalKeyboard);
     modal.fadeOut("fast", function(){
       modal.html("");
+      if (after) {
+        after();
+      }
     });
   }
 
@@ -72,13 +74,11 @@ define([
       bodies.shape = bodies.shape || "normal";
 
       bodies.clickOk = function() {
-        hide();
-        if (bodies.callback) bodies.callback(true);
-      }
+        hide(bodies.callback ? function() {bodies.callback(true);} : null);
+      };
       bodies.clickCancel = function() {
-        hide();
-        if (bodies.onCancel) bodies.onCancel(false);
-      }
+        hide(bodies.onCancel ? function() {bodies.onCancel(false);} : null);
+      };
 
       modal.html("").append(ko.bindhtml(tpl, bodies));
       show();
@@ -95,9 +95,8 @@ define([
     },
 
     hideModal: function() {
-      hide();
+      hide(null);
     }
 
-  }
-
-})
+  };
+});
