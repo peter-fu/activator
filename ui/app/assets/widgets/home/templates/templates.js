@@ -2,6 +2,7 @@
  Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
  */
 define([
+  'services/typesafe',
   'commons/settings',
   'commons/websocket',
   'widgets/fileselection/fileselection',
@@ -9,6 +10,7 @@ define([
   'widgets/modals/modals',
   'css!./templates'
 ], function(
+    typesafe,
   settings,
   websocket,
   FileSelection,
@@ -19,29 +21,23 @@ define([
   var trpInfoSeen = settings.observable("reactive-platform.accepted-license", false);
 
   var typesafeId = settings.observable("TypesafeID", "");
-  var activeOk = ko.observable(!!typesafeId());
-  function saveTypesafeID(e){
-    var id = e.target.value.trim();
-    if (id.length === 36){
-      activeOk(true);
-      typesafeId(id);
-    } else {
-      activeOk(false);
-      typesafeId("");
-    }
-  }
+
   function askForTypesafeId(callback){
-    var message = $("<article/>").html("<p>You are creating Typesafe Reactive Platform project, which requires a Typesafe ID.</p><p>You can retrieve your ID, or sign up for a free trial, on the <a href='https://typesafe.com/product/typesafe-reactive-platform/id' target='_blank'>subscription ID page</a> page.<p><p class='input'></p>")[0];
-    $("<input class='typesafeId-form' type='text' />").change(saveTypesafeID).keyup(saveTypesafeID).val(typesafeId()).appendTo($(".input", message));
+    var message = $("<article/>").html("<p>You are creating Typesafe Reactive Platform project, which requires a Typesafe ID. This requires you to have a valid Typesafe.com account.</p><p>You can sign up for a free trial, on the <a href='https://typesafe.com/product/typesafe-reactive-platform/id' target='_blank'>subscription ID page</a> page.<p>")[0];
     modals.show({
       shape: "large",
       title: "Submit your Typesafe ID",
       body: message,
-      ok: "Submit",
-      okEnabled: activeOk,
+      ok: "Ok",
       callback: function() {
-        callback(typesafeId());
-      },
+          var obs = typesafe.getSubscriptionDetail();
+          obs.subscribe(function (v) {
+            if (v.type === "subscriptionDetails") {
+              typesafeId(v.data.id);
+              callback(typesafeId());
+            }
+          });
+        },
       cancel: "Cancel"
     });
   }
@@ -52,7 +48,7 @@ define([
 
   function formToJson(form) {
     var data = $(form).serializeArray();
-    var o = {}
+    var o = {};
     $.each(data, function() {
       if (o[this.name] !== undefined) {
         if (!o[this.name].push) {
@@ -85,38 +81,38 @@ define([
 
     self.acceptTrp = function(){
       self.trpInfoSeen(true);
-    }
+    };
     self.cancelTrp = function(){
       self.openedTab("templates");
-    }
+    };
 
     // Toggling chosen template view
     self.chooseTemplate = function(app){
       self.currentApp(app);
-    }
+    };
     self.closeTemplate = function(){
       self.currentApp("");
-    }
+    };
 
     // Filtering
     self.searchTag = function(m,e){
       self.filterValue(e.currentTarget.innerHTML);
       self.search();
-    }
+    };
     self.searchSeedTag = function(m,e){
       self.filterValue(e.currentTarget.innerHTML);
       self.search();
-    }
+    };
     self.searchTrpTag = function(m,e){
       self.filterValue(e.currentTarget.innerHTML);
       self.search();
-    }
+    };
 
     self.clearSearch = function(){
       self.filterValue("");
       self.search();
       // filterInput.val("").trigger("search")[0].focus();
-    }
+    };
 
     function searchRelevantFileds(o, value) {
       return JSON.stringify([o.title, o.tags, o.authorName, o.name]).toLowerCase().indexOf(value) >= 0;

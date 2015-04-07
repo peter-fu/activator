@@ -30,14 +30,14 @@ define([
         n.read(true);
       });
     }
-  }
+  };
 
   sbt.tasks.taskCompleteEvent.subscribe(function(e) {
     var el = $("#notifications ."+(e.succeded?"success":"error")).removeClass('animate');
     setTimeout(function(){
       el.addClass('animate');
     },50);
-  })
+  });
 
   return ko.bindhtml(tpl, State);
 

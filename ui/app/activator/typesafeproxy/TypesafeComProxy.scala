@@ -73,7 +73,7 @@ object TypesafeComProxy {
   abstract class ActionPair[T](implicit ev: Manifest[T]) {
     final case class Value(value: Try[T], version: Long) extends Response
     final case class Outcome(result: Try[Unit]) extends Response
-    final case class Get(sendTo: ActorRef) extends LocalRequest[Value] {
+    final case class Get(sendTo: ActorRef, websocketActor: ActorRef) extends LocalRequest[Value] {
       final val key: String = ev.erasure.getName
       final def withValue(value: Try[T], version: Long)(implicit sender: ActorRef) = response(Value(value, version))
     }
@@ -118,13 +118,11 @@ object TypesafeComProxy {
     }
   }
 
-  def props(initialCacheState: TypesafeComProxy.CacheState,
-    webSocketActor: ActorRef): Props =
-    Props(new TypesafeComProxy(initialCacheState, webSocketActor))
+  def props(initialCacheState: TypesafeComProxy.CacheState): Props =
+    Props(new TypesafeComProxy(initialCacheState))
 }
 
-class TypesafeComProxy(initialCacheState: TypesafeComProxy.CacheState,
-  webSocketActor: ActorRef) extends Actor with ActorLogging {
+class TypesafeComProxy(initialCacheState: TypesafeComProxy.CacheState) extends Actor with ActorLogging {
   import TypesafeComProxy._
 
   def run(state: CacheState): Receive = {
@@ -132,7 +130,7 @@ class TypesafeComProxy(initialCacheState: TypesafeComProxy.CacheState,
       state.lookup[T](msg.key).foreach { slot =>
         slot.value match {
           case Empty | Value(Failure(_)) =>
-            val actor = context.actorOf(slot.filler(slot.version, self, webSocketActor))
+            val actor = context.actorOf(slot.filler(slot.version, self, msg.websocketActor))
             context.become(run(state.updateAll(slot.copy(value = Pending(actor), pendingRequests = slot.pendingRequests + msg), false)))
           case Pending(_) =>
             context.become(run(state.updateAll(slot.copy(pendingRequests = slot.pendingRequests + msg), false)))
@@ -239,9 +237,9 @@ class TypesafeComProxyUIActor(request: TypesafeComProxyUIActor.LocalRequest[_ <:
   def receive: Receive = {
     request match {
       case GetActivatorInfo(_) =>
-        typesafeComActor ! TypesafeComProxy.ActivatorInfo.Get(self)
+        typesafeComActor ! TypesafeComProxy.ActivatorInfo.Get(self, websocketsActor)
       case GetSubscriptionDetail(_) =>
-        typesafeComActor ! TypesafeComProxy.SubscriberDetail.Get(self)
+        typesafeComActor ! TypesafeComProxy.SubscriberDetail.Get(self, websocketsActor)
     }
 
     def handleResponse[T](response: TypesafeComProxy.ActionPair[T]#Value): Unit = (response.value, request) match {

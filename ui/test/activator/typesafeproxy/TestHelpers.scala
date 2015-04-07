@@ -108,7 +108,7 @@ class AkkaTestKitHelper(_system: ActorSystem) extends TestKit(_system) with Impl
     subscriberDataGetter = fakeSubscriptionRPCProps,
     activatorInfoGetter = fakeActivatorInfoProps),
     webSocketActor: ActorRef = testActor)(body: ActorRef => T): T = {
-    val proxy = system.actorOf(TypesafeComProxy.props(initialCacheState, webSocketActor))
+    val proxy = system.actorOf(TypesafeComProxy.props(initialCacheState))
     val r = body(proxy)
     system stop proxy
     r

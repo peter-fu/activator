@@ -12,23 +12,16 @@ import activator.JsonHelper._
 import scala.reflect.ClassTag
 import scala.util.{ Failure, Success }
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import akka.util.Timeout
 
-class AppWebSocketActor(val config: AppConfig) extends WebSocketActor[JsValue] with ActorLogging {
+class AppWebSocketActor(val config: AppConfig,
+  val typesafeComActor: ActorRef,
+  val lookupTimeout: Timeout) extends WebSocketActor[JsValue] with ActorLogging {
   implicit val timeout = WebSocketActor.timeout
 
   lazy val appDynamicsConfig = AppDynamics.fromConfig(Play.current.configuration.underlying)
   lazy val appDynamicsActor: ActorRef = context.actorOf(monitor.AppDynamicsActor.props(appDynamicsConfig, defaultContext))
   lazy val newRelicActor: ActorRef = context.actorOf(monitor.NewRelicActor.props(NewRelic.fromConfig(Play.current.configuration.underlying), defaultContext))
-  val typesafeComConfig = TypesafeComProxy.fromConfig(Play.current.configuration.underlying)
-  val lookupTimeout = typesafeComConfig.lookupTimeout
-  val loginEndpoint = AuthenticationActor.httpDoAuthenticate(typesafeComConfig.login.url, typesafeComConfig.login.timeout, defaultContext)_
-  val subscriberEndpoint = SubscriptionDataActor.httpGetSubscriptionData(typesafeComConfig.subscriptionData.url, typesafeComConfig.subscriptionData.timeout, defaultContext)_
-  val activatorInfoEndpoint = ActivatorLatestActor.httpGetActivatorLatest(typesafeComConfig.activatorInfo.url, typesafeComConfig.activatorInfo.timeout, defaultContext)_
-  val initState = TypesafeComProxy.initialStateBuilder(authGetter = AuthenticationActor.props(loginEndpoint, UIActor.props, _, _, _),
-    subscriberDataGetter = SubscriptionDataActor.props(subscriberEndpoint, UIActor.props, _, _, _),
-    activatorInfoGetter = ActivatorLatestActor.props(activatorInfoEndpoint, UIActor.props, _, _, _))
-  val typesafeComActor = context.actorOf(TypesafeComProxy.props(initialCacheState = initState,
-    webSocketActor = self))
 
   override def onMessage(json: JsValue): Unit = {
     json match {

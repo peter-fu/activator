@@ -3,10 +3,12 @@
  */
 define([
   'widgets/login/login',
+  'widgets/error/error',
   'commons/websocket',
   'commons/stream'
 ], function(
   login,
+  error,
   websocket,
   Stream
 ){
@@ -71,6 +73,13 @@ define([
   });
 
   var proxyUiRequestState = ko.observable(null);
+  proxyUiRequestState.subscribe(function (state) {
+    if (state.type === "requestCredentials") {
+      login(state.credentials, state.cancel, state.message);
+    } else if (state.type === "failure") {
+      error("Error",state.message,state.retry,state.cancel);
+    }
+  });
 
   function proxyRequest(type, payload) {
     var request = {

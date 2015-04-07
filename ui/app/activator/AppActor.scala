@@ -5,6 +5,7 @@ package activator
 
 import akka.actor._
 import java.io.File
+import akka.util.Timeout
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.duration._
 import play.api.libs.json._
@@ -39,7 +40,9 @@ case class WebSocketCreatedReply(created: Boolean) extends AppReply
 
 class InstrumentationRequestException(message: String) extends Exception(message)
 
-class AppActor(val config: AppConfig) extends Actor with ActorLogging {
+class AppActor(val config: AppConfig,
+  val typesafeComActor: ActorRef,
+  val lookupTimeout: Timeout) extends Actor with ActorLogging {
 
   AppManager.registerKeepAlive(self)
 
@@ -51,7 +54,7 @@ class AppActor(val config: AppConfig) extends Actor with ActorLogging {
 
   // TODO configName/humanReadableName are cut-and-pasted into AppManager, fix
   val connector = SbtConnector(configName = "activator", humanReadableName = "Activator", location)
-  val socket = context.actorOf(Props(new AppWebSocketActor(config)), name = "socket")
+  val socket = context.actorOf(Props(new AppWebSocketActor(config, typesafeComActor, lookupTimeout)), name = "socket")
   val projectWatcher = context.actorOf(Props(new ProjectWatcher(location, newSourcesSocket = socket, appActor = self)),
     name = "projectWatcher")
   var sbtClientActor: Option[ActorRef] = None

@@ -105,7 +105,7 @@ define([
         break;
       case 'BadRequest':
         // TODO - Do better than an alert!
-        window.alert('Unable to perform request: ' + message.errors.join(' \n'));
+        window.alert('Unable to perform request: ' + JSON.stringify(message));
         $('#working, #open, #new').toggle();
         break;
       case 'RedirectToApplication':

@@ -11,7 +11,7 @@ var vendors = [
   'css',
   'text',
   'lib/ace/src/ace'
-]
+];
 
 var commons = [
   'commons/templates',
@@ -19,19 +19,19 @@ var commons = [
   'commons/utils',
   'commons/settings',
   'commons/stream'
-]
+];
 
 var services = [
   'services/sbt',
   'services/typesafe'
-]
+];
 
 var core = [
   'main/view',
   'main/router',
   'commons/websocket',
   'main/keyboard'
-]
+];
 
 require(vendors, function($, ko) {
   window.ko = ko; // it's used on every page...
@@ -48,4 +48,4 @@ require(vendors, function($, ko) {
       })
     })
   })
-})
+});
