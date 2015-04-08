@@ -35,7 +35,6 @@ define([
     if (typeof message.actionId !== 'undefined' && message.actionId !== null) {
       state.actionId = message.actionId;
     }
-    console.log("Stream value: ",type);
     if (type === "requestCredentials") {
       if (message.message) {
         state.message = message.message;
@@ -125,7 +124,7 @@ define([
 
   function getActivatorInfo() {
     var id = pseudoUniqueId();
-    var response = ko.observable();
+    var response = ko.observable(null);
     var subs = websocket.subscribe('tag','TypesafeComProxy');
     proxyRequest("getActivatorInfo",{requestId: id});
     subs.each(function(message) {

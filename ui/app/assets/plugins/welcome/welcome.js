@@ -42,8 +42,8 @@ define([
 
   var WelcomeState = (function(){
     var self = {};
-    // var activatorInfo = typesafe.getActivatorInfo();
 
+    self.remoteAppVersion = typesafe.getActivatorInfo();
     self.appVersion = window.serverAppVersion;
     self.currentStatus = sbt.events.appStatus;
 
@@ -51,8 +51,16 @@ define([
 
     self.presentationMode = settings.observable("presentationMode", false);
 
-    // TODO: Get new version for Activator itself
-    self.newVersion = false;
+    self.newVersion = ko.computed(function (){
+      var info = self.remoteAppVersion();
+      var result = false;
+      if (info && info.type === "activatorInfo") {
+        if (info.data.version !== window.serverAppVersion) {
+          result = true;
+        }
+      }
+      return result;
+    });
 
     ko.computed(function() {
       var on = self.presentationMode();
