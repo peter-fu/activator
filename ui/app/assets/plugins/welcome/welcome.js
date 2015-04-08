@@ -32,7 +32,6 @@ define([
     }
 
     return function() {
-      console.log(added , style)
       if (!added && style) {
         document.head.appendChild(style);
         added = true;
