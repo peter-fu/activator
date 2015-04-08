@@ -25,6 +25,9 @@ PUT         /api/local/create                            controllers.api.Local.c
 PUT         /api/local/rename                            controllers.api.Local.renameFile
 PUT         /api/local/delete                            controllers.api.Local.deleteFile
 
+# Proxy to typesafe.com
+GET         /api/proxy/*path                             controllers.api.Proxy.getTypesafe(path)
+
 # Base flow ->  Select Template -> Running Application.
 GET         /                                            controllers.Application.index
 GET         /home                                        controllers.Application.forceHome
