@@ -3,6 +3,7 @@
  */
 define([
   'services/sbt',
+  'services/typesafe',
   'text!./welcome.html',
   'commons/settings',
   'widgets/layout/layout',
@@ -10,6 +11,7 @@ define([
   'css!./welcome.css'
 ], function(
   sbt,
+  typesafe,
   tpl,
   settings,
   layout,
@@ -40,6 +42,7 @@ define([
 
   var WelcomeState = (function(){
     var self = {};
+    // var activatorInfo = typesafe.getActivatorInfo();
 
     self.appVersion = window.serverAppVersion;
     self.currentStatus = sbt.events.appStatus;
