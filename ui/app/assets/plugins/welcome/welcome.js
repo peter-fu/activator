@@ -2,12 +2,16 @@
  Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
  */
 define([
+  'services/sbt',
+  'services/typesafe',
   'text!./welcome.html',
   'commons/settings',
   'widgets/layout/layout',
   'widgets/layout/layoutManager',
   'css!./welcome.css'
 ], function(
+  sbt,
+  typesafe,
   tpl,
   settings,
   layout,
@@ -16,16 +20,13 @@ define([
 
   var presentationModeStyle = (function() {
     var added = false;
-    var cssStr = ".presentation-mode .tutorial .page, .presentation-mode .build .logs, .presentation-mode .run .pluginBlock, .presentation-mode .code .editor, .presentation-mode .monitoring .tabs-step { zoom: 141% !important; }";
+    var cssStr = ".presentation-mode .tutorial .page, .presentation-mode .build .logs, .presentation-mode .run .pluginBlock, .presentation-mode .code .editor, .presentation-mode .monitoring .tabs-step { zoom: 161% !important; }";
     var style;
 
     try {
       // Create the <style> tag
       style = document.createElement("style");
-      // WebKit hack :(
-      style.appendChild(document.createTextNode(""));
-      // Add the <style> element to the page
-      style.sheet.insertRule(cssStr);
+      style.appendChild(document.createTextNode(cssStr));
     } catch(e){
       style = undefined;
     }
@@ -41,9 +42,24 @@ define([
   var WelcomeState = (function(){
     var self = {};
 
-    self.appVersion = window.serverAppVersion
+    self.remoteAppVersion = typesafe.getActivatorInfo();
+    self.appVersion = window.serverAppVersion;
+    self.currentStatus = sbt.events.appStatus;
+
+    self.trp = sbt.tasks.platformRelease;
 
     self.presentationMode = settings.observable("presentationMode", false);
+
+    self.newVersion = ko.computed(function (){
+      var info = self.remoteAppVersion();
+      var result = false;
+      if (info && info.type === "activatorInfo") {
+        if (info.data.version !== window.serverAppVersion) {
+          result = true;
+        }
+      }
+      return result;
+    });
 
     ko.computed(function() {
       var on = self.presentationMode();

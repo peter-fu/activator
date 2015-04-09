@@ -4,46 +4,45 @@
 
 @import '../../commons/_base.less';
 
+#wrapper > div {
+  width: 700px;
+  position: absolute;
+  .row();
+}
+
 #welcome-holder {
   .presentation-mode & {
     zoom: 140%;
   }
-  width: 380px;
-  margin-top: -200px;
-  margin-left: -190px;
-  position: absolute;
+  width: 700px;
   top: 50%;
   left: 50%;
-  .row();
+  .transform(translate(-50%,-50%));
   box-shadow: 0px 2px 4px rgba(100, 100, 100, 0.2);
   header {
-    background: #53cdec;
-    .title();
-    font-size: 22px;
-    color: #fff;
-    line-height: 40px;
-    padding: 10px 20px;
+    padding: 20px;
+    border-bottom: 1px solid #e9ecef;
+    h1 {
+      .title();
+      line-height: 30px;
+      font-size: 24px;
+      color: @slate;
+      .ellipsis();
+    }
+    .topheader {
+      line-height: 20px;
+      font-size: 12px;
+      color: @grey;
+      text-transform: uppercase;
+    }
   }
 
 }
 
 #welcome-holder {
 
-  .feedback {
-    background: @red;
-    color: rgba(255,255,255,.8);
-    padding: 5px 20px;
-    a {
-      color: white;
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-  }
   .presentation {
-    background: @slate-ltr;
-    color: @grey-ltr;
-    padding: 5px 20px;
+    padding: 5px 14px;
   }
   h2 {
     .title();
@@ -63,8 +62,64 @@
   }
 }
 
+#welcome-holder .about {
+  background: @slate;
+  width: 300px;
+  .column();
+  .logo {
+    display: block;
+    margin: 30px auto;
+  }
+  em {
+    color: @blue;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+  .about-links {
+    padding: 0 0 20px;
+    text-align: center;
+    .expand();
+    a {
+      display: block;
+      margin: 5px;
+      color: @grey;
+      font-style: italic;
+    }
+  }
+  .feedback {
+    text-align: center;
+    color: @grey;
+    font-style: italic;
+    padding: 10px;
+  }
+  .version-info {
+    padding: 8px 20px 12px 33px;
+    background-color: @slate-ltr;
+    background-position: 10px 10px;
+    background-repeat: no-repeat;
+    background-image: url(/public/icons/uptodate.svg);
+    p {
+      .ellipsis();
+    }
+    a {
+      color: inherit;
+      text-decoration: underline;
+    }
+    &.new-version {
+      background-color: @red;
+      background-image: url(/public/icons/outdated.svg);
+      color: #fff;
+      a {
+        color: rgba(255,255,255,.7);
+      }
+    }
+  }
+}
+
 #welcome-holder .features {
   background: white;
+  .column();
   .expand();
   box-shadow: -1px 0 0 rgba(0,0,0,.1);
   ul {
@@ -74,35 +129,20 @@
         .title();
         font-size: 15px;
         font-weight: 600;
-        border-top: 1px solid #e9ecef;
+        border-bottom: 1px solid #e9ecef;
         display: block;
         padding: 15px 20px;
-        background: url(/public/images/arrow.png) 350px center no-repeat;
+        background: url(/public/images/arrow.png) 370px center no-repeat;
         background-size: 13px 20px;
         color: @blue-text;
         transition: background 100ms ease-in-out !important;
         -webkit-transition: background 100ms ease-in-out !important;
         -moz-transition: background 100ms ease-in-out !important;
         &:hover {
-          background-position: 360px center;
+          background-position: 380px center;
         }
       }
-      &:first-child a { border: none; }
     }
-  }
-}
-
-.welcome .version-info {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  text-align: right;
-  font-style: italic;
-  color: @grey-dkr;
-  padding: 8px;
-  a {
-    color: inherit;
-    text-decoration: underline;
   }
 }
 
@@ -115,5 +155,42 @@
   color: #222222;
   &:hover {
     text-decoration: underline;
+  }
+}
+
+#welcome-holder {
+  .trp-presentation {
+    width: 250px;
+    margin: 10px auto;
+    text-align: center;
+    .expand();
+    h2 {
+      margin: 5px 0;
+      padding: 0;
+      line-height: 20px;
+      color: @slate-ltr;
+    }
+  }
+  .trp-info {
+    padding: 8px 20px 12px 33px;
+    background-color: @blue;
+    color: #fff;
+    background-position: 10px 10px;
+    background-repeat: no-repeat;
+    background-image: url(/public/icons/uptodate.svg);
+    p {
+      .ellipsis();
+    }
+    a {
+      color: inherit;
+      text-decoration: underline;
+    }
+    &.new-version {
+      background-color: @red;
+      background-image: url(/public/icons/outdated.svg);
+      a {
+        color: rgba(255,255,255,.7);
+      }
+    }
   }
 }
