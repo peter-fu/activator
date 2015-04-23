@@ -144,7 +144,10 @@ object ActivatorCli extends ActivatorCliHelper {
 
     // don't wait too long on this remote call, we ignore the
     // result anyway; just don't want to exit the JVM too soon.
-    Await.result(statsRecorded, Duration(5, SECONDS))
+    try Await.result(statsRecorded, Duration(5, SECONDS))
+    catch {
+      case _: Exception =>
+    }
     0
   }
 
