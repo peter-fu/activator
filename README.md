@@ -43,6 +43,19 @@ or just
 
         dist/target/stage/activator
 
+### Troubleshooting
+
+Here are some potential issues with running a local Launcher:
+
+1. Stale cache: On it's own, `sbt stage` and `dist/target/stage/activator` should work. However, there are several caches between the developer and running `dist/target/stage/activator`. If it seems like your built version is not running, try clearing out the following caches:
+
+    `~/.sbt/boot/[current_scala_version]/com.typesafe.activator/activator-launcher/`
+
+    `~/.ivy2/local/com.typesafe.activator/activator-launcher/`
+
+    `~/.ivy2/cache/com.typesafe.activator/activator-launcher/`
+
+Also, the artifacts generated during the build process can become a problem. In your activator repo directory, you can run `git clean -X -d -f` to clear them.
 
 ## Testing
 
