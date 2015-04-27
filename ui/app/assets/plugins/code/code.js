@@ -8,13 +8,13 @@ define([
   "main/plugins",
   "./eclipseGenerator",
   "./ideaGenerator",
-  "text!./code.html",
   "widgets/layout/layout",
   "widgets/browser/browser",
   "./document",
   "./bin-file",
   "widgets/editor/editor",
   "commons/settings",
+  "text!./code.html",
   "css!./code",
   "css!widgets/buttons/button",
   "css!widgets/modules/modules",
@@ -25,20 +25,20 @@ define([
   plugins,
   eclipse,
   idea,
-  tpl,
   layout,
   browser,
   documentState,
   fileState,
   editor,
-  settings
+  settings,
+  tpl
 ){
 
   var openedDocuments = ko.observableArray([]);
   var selectedDocument = ko.observable();
-  selectedDocument.extend({ notify: 'always' });
+  //selectedDocument.extend({ notify: 'always' });
   var visible = ko.computed(function(){
-    return !!openedDocuments().length;
+    return openedDocuments().length > 0;
   });
   editor.setDocument(selectedDocument);
 
@@ -74,7 +74,7 @@ define([
     } else {
       makeActive(doc);
     }
-  }
+  };
 
   var closeFile = function(doc, event) {
     if (event){
@@ -98,7 +98,7 @@ define([
       }
       openedDocuments.splice(docIndex, 1);
     }
-  }
+  };
 
   var makeActive = function(doc) { // doc might be null
     var sel = selectedDocument();
@@ -110,12 +110,12 @@ define([
       window.location.hash = "code/";
     }
     selectedDocument(doc);
-  }
+  };
 
   window.onbeforeunload = function() {
     if (openedDocuments().filter(function(doc) { return doc.edited(); }).length)
       return "You have unsaved files, do you confirm leaving?";
-  }
+  };
 
   function saveAll() {
     openedDocuments().forEach(function(doc) {

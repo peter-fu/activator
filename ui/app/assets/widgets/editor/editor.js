@@ -54,7 +54,7 @@ define([
     "Twilight": "ace/theme/twilight",
     "Vibrant Ink": "ace/theme/vibrant_ink",
     "Xcode": "ace/theme/xcode"
-  }
+  };
 
   var chosenTheme = settings.observable("code.theme", Object.keys(themes)[0]);
   ko.doOnChange(chosenTheme, function(t) {
@@ -66,7 +66,7 @@ define([
     "Medium": "14px",
     "Large": "17px",
     "XLarge": "22px"
-  }
+  };
   var chosenFontSize = settings.observable("code.fontSize", Object.keys(fontSizes)[0]);
   ko.doOnChange(chosenFontSize, function(t) {
     editor.container.style.fontSize = fontSizes[t];
@@ -77,13 +77,19 @@ define([
   // Because ace editor requires them to be attached to an EditSession
   // ------------------------------------------------------
 
-  var State = {
-    themes: Object.keys(themes),
-    chosenTheme: chosenTheme,
-    fontSizes: Object.keys(fontSizes),
-    chosenFontSize: chosenFontSize,
-    editorContainer: editor.container
-  }
+  var State = (function () {
+    var self = {};
+    self.themes = Object.keys(themes);
+    self.chosenTheme = chosenTheme;
+    self.fontSizes = Object.keys(fontSizes);
+    self.chosenFontSize = chosenFontSize;
+    self.editorContainer = editor.container;
+    self.selectedDocument = ko.observable(null);
+    self.hasSelectedDocument = ko.computed(function () {
+      return self.selectedDocument() !== null;
+    });
+    return self;
+  })();
 
   return {
     themes: Object.keys(themes),
@@ -92,10 +98,10 @@ define([
     chosenFontSize: chosenFontSize,
     editorContainer: editor.container,
 
-    setDocument: function(selectedDocument) {
-      State.selectedDocument = selectedDocument;
-      // bind the document
-      ko.doOnChange(selectedDocument, function(doc) {
+    setDocument: function(sd) {
+      sd.subscribe(function (doc) {
+        console.log("got doc: ",doc);
+        State.selectedDocument(doc);
         if (doc && doc.isText) {
           if (doc.session !== editor.getSession()){
             editor.setSession(doc.session);
@@ -115,4 +121,4 @@ define([
     }
   }
 
-})
+});
