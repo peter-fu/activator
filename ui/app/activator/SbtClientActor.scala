@@ -141,7 +141,7 @@ class SbtClientLifeCycleHandlerActor(val client: SbtClient) extends Actor with A
     valueSub = Some(new Subscription() {
 
       private def forward(key: ScopedKey, result: TaskResult): Unit =
-        context.parent ! ValueChanged(key, result)
+        Option(context).foreach(_.parent ! ValueChanged(key, result))
 
       val eagerSubs: Seq[Subscription] =
         Seq("discoveredMainClasses",
