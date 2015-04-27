@@ -10,7 +10,6 @@ define([
   "services/monitoring/monitoringSolutions",
   "text!./run.html",
   'widgets/modals/modals',
-  'services/monitoring/appdynamicscontroller',
   'services/monitoring/newreliccontroller',
   "css!./run",
   "css!widgets/buttons/switch",
