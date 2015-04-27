@@ -92,25 +92,27 @@ define([
     return self;
   })();
 
-  function needToAcceptLicense(callback){
+  function needToAcceptLicense(callback, onCancel){
     var message = $("<article/>").html("<p>You must first accept the <a href='https://typesafe.com/account/id' target='_blank'>Typesafe Subscription Agreement</a> before proceeding.</p><p>After accepting the agreement click 'Continue'</p>")[0];
     modals.show({
       shape: "large",
       title: "Accept the Typesafe Subscription Agreement",
       body: message,
       ok: "Continue",
-      callback: callback
+      callback: callback,
+      onCancel: onCancel
     });
   }
 
-  function updatedAcceptLicense(callback){
+  function updatedAcceptLicense(callback, onCancel){
     var message = $("<article/>").html("<p>There are updated terms for the <a href='https://typesafe.com/account/id' target='_blank'>Typesafe Subscription Agreement</a>.</p>Accept before proceeding.</p><p>After accepting the agreement click 'Continue'</p>")[0];
     modals.show({
       shape: "large",
       title: "Updated terms for the Typesafe Subscription Agreement",
       body: message,
       ok: "Continue",
-      callback: callback
+      callback: callback,
+      onCancel: onCancel
     });
   }
 
@@ -121,10 +123,10 @@ define([
         if (result.data.idCheckResult === "valid") {
           if (result.data.acceptedDate) {
             if (result.data.acceptedDate < result.data.latestTermsDate) {
-              updatedAcceptLicense(function () {doCheckSubscriptionId(id);})
+              updatedAcceptLicense(function () {doCheckSubscriptionId(id);}, function () {})
             }
           } else {
-            needToAcceptLicense(function () {doCheckSubscriptionId(id);})
+            needToAcceptLicense(function () {doCheckSubscriptionId(id);}, function () {})
           }
         } // TODO: else if (result.data.idCheckResult === "invalid") { ... }
       } else if (result.type === "proxyFailure") {
