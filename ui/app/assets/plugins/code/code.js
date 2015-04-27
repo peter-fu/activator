@@ -36,7 +36,7 @@ define([
 
   var openedDocuments = ko.observableArray([]);
   var selectedDocument = ko.observable();
-  //selectedDocument.extend({ notify: 'always' });
+  selectedDocument.extend({ notify: 'always' });
   var visible = ko.computed(function(){
     return openedDocuments().length > 0;
   });
@@ -70,6 +70,8 @@ define([
             makeActive(doc);
             break;
         }
+      }).error(function (r,s,fail) {
+        console.log("openFile error: ",r,s,fail);
       });
     } else {
       makeActive(doc);
