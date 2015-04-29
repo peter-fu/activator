@@ -95,8 +95,8 @@ object NewRelicActor {
         sender ! r.response
       } catch {
         case e: Exception =>
-          log.error(e, "Failure deprovisioning AppDynamics")
-          sender ! r.error(s"Failure deprovisioning AppDynamics: ${e.getMessage}")
+          log.error(e, "Failure deprovisioning New Relic")
+          sender ! r.error(s"Failure deprovisioning New Relic: ${e.getMessage}")
       }
       case r @ InternalAvailable => try {
         sender ! r.response(NewRelic.hasNewRelic(config.extractRoot()))

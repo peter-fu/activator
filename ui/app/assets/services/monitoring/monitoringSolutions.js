@@ -14,7 +14,6 @@ define([
   var NO_MONITORING = 'Disabled';
   var INSPECT       = 'Activator Inspect';
   var NEW_RELIC     = "NewRelic";
-  var APP_DYNAMICS  = "AppDynamics";
 
   // Set up default solutions
   var monitoringSolutions = ko.observableArray([NO_MONITORING,INSPECT]);
@@ -32,17 +31,9 @@ define([
       return "newrelic:";
     } else if (monitoringSolution() === NEW_RELIC && isPlayApplication()) {
       return "newrelicplay:";
-    } else if (monitoringSolution() === APP_DYNAMICS && !isPlayApplication()) {
-      return "appdynamics:";
-    } else if (monitoringSolution() === APP_DYNAMICS && isPlayApplication()) {
-      return "appdynamicsplay:";
     } else {
       return "";
     }
-  });
-
-  var appDynamicsActivated = ko.computed(function() {
-    return monitoringSolution() === APP_DYNAMICS;
   });
 
   var newRelicActivated = ko.computed(function() {
@@ -63,10 +54,8 @@ define([
     }
   }
 
-  var addAppDynamics = addToSolutions(APP_DYNAMICS);
   var addNewRelic = addToSolutions(NEW_RELIC);
 
-  var removeAppDynamics = removeFromSolutions(APP_DYNAMICS);
   var removeNewRelic = removeFromSolutions(NEW_RELIC);
 
   // Weird thing about provisioning (downloading the agents):
@@ -97,15 +86,11 @@ define([
     NO_MONITORING         : NO_MONITORING,
     INSPECT               : INSPECT,
     NEW_RELIC             : NEW_RELIC,
-    APP_DYNAMICS          : APP_DYNAMICS,
     monitoringSolutions   : monitoringSolutions,
     monitoringSolution    : monitoringSolution,
     inspectActivated      : inspectActivated,
-    appDynamicsActivated  : appDynamicsActivated,
     newRelicActivated     : newRelicActivated,
-    addAppDynamics        : addAppDynamics,
     addNewRelic           : addNewRelic,
-    removeAppDynamics     : removeAppDynamics,
     removeNewRelic        : removeNewRelic,
     prependCommand        : prependCommand,
     provisioningProgress  : provisioningProgress,

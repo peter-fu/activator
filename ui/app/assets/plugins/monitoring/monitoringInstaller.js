@@ -19,7 +19,7 @@ define([
       cancel: "close"
     });
 
-    // FIXME : this does not work for AD/NR (we cannot check against "echo" - must use "newrelic"/"appdynamics" instead)
+    // FIXME : this does not work for AD/NR (we cannot check against "echo" - must use "newrelic" instead)
     configuration.echoInstalledAndReady(function() {
       modals.hideModal();
     });

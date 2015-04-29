@@ -27,7 +27,6 @@ define([
 
   // Subplugins titles
   var subPlugins = {
-    appdynamics:      "AppDynamics",
     newrelic:         "New Relic"
   };
 
