@@ -11,9 +11,15 @@ define([
   modals
 ) {
 
-  var WS = ('MozWebSocket' in window) ? window.MozWebSocket : window.WebSocket,
-      websocket,
-      isOpened = ko.observable(false);
+  var WS = ('MozWebSocket' in window) ? window.MozWebSocket : window.WebSocket;
+  var websocket = null;
+  var isOpened = ko.observable(false);
+
+  var withWebSocket = function (wsFunc) {
+    if (isOpened() && websocket) {
+      wsFunc(websocket);
+    }
+  };
 
   var SocketStream = Stream().map(function(evt) {
     return JSON.parse(evt.data);
@@ -32,9 +38,11 @@ define([
   }
 
   function send(msg) {
-    var smsg = JSON.stringify(msg);
-    debug && console.debug("Sending:", smsg);
-    websocket.send(smsg);
+    withWebSocket(function (ws) {
+      var smsg = JSON.stringify(msg);
+      debug && console.debug("Sending:", smsg);
+      ws.send(smsg);
+    });
   }
 
   function onOpen(event) {

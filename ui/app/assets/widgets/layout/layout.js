@@ -6,6 +6,7 @@ define([
   'widgets/navigation/navigation',
   'widgets/panels/panels',
   'widgets/modals/modals',
+  'widgets/typesafeIdForm/typesafeIdForm',
   './layoutManager',
   'css!./layout'
 ], function(
@@ -13,6 +14,7 @@ define([
   navigation,
   panels,
   modals,
+  typesafeIdForm,
   layoutManager
 ){
 
@@ -21,11 +23,11 @@ define([
     navigation: navigation,
     panels: panels,
     layoutManager: layoutManager
-  }
+  };
 
   return {
     render: function() {
-      $(document.body).attr('data-bind',"css: {'navigation-opened': layoutManager.navigationOpened, 'navigation-sneak': navigation.sneak, 'panel-opened': layoutManager.panelOpened}, attr: { 'data-shape': layoutManager.panelShape }");
+      $(document.body).attr('data-bind',"css: {'navigation-opened': layoutManager.navigationOpened, 'banner-opened': layoutManager.bannerOpened, 'navigation-sneak': navigation.sneak, 'panel-opened': layoutManager.panelOpened}, attr: { 'data-shape': layoutManager.panelShape }");
       ko.applyBindings(State);
 
       document.body.appendChild(header);
@@ -33,6 +35,7 @@ define([
       document.body.appendChild(wrapper[0]);
       document.body.appendChild(panels.render());
       document.body.appendChild(modals.render());
+      document.body.appendChild(typesafeIdForm);
 
       layoutManager.startLayout();
     },
@@ -41,4 +44,4 @@ define([
       $('#app main').replaceWith(body);
     }
   }
-})
+});
