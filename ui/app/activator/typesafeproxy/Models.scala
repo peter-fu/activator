@@ -106,7 +106,7 @@ object ActivatorLatestInfo {
   private val exampleVersion = "1.3.2"
   private val exampleSize = "408M"
   private val exampleMiniSize = "1M"
-  private val examplePlayVersion = "2.3.8"
+  private val examplePlayVersion = "2.3.9"
   private val exampleAkkaVersion = "2.3.9"
   private val exampleScalaVersion = "2.11.5"
   private val exampleLauncherGeneration = 1

@@ -5,14 +5,14 @@ object Dependencies {
   // this version is used to publish echo and sbt-echo,
   // and also to set which version of those Activator
   // depends on.
-  val echoVersion = "0.1.14"
+  val echoVersion = "0.1.15"
 
-  val sbtVersion = "0.13.8-M5"
-  val sbtLibraryVersion = "0.13.8-M5" // for sbtIO on scala 2.11
+  val sbtVersion = "0.13.8"
+  val sbtLibraryVersion = "0.13.8" // for sbtIO on scala 2.11
 
   val sbtPluginVersion = "0.13"
   val sbtPluginScalaVersion = "2.11.5"
-  val scalaVersion = "2.11.5"
+  val scalaVersion = "2.11.6"
   val scala210Version = "2.10.4"
   val luceneVersion = "4.2.1"
 
@@ -20,10 +20,10 @@ object Dependencies {
   val sbtRcVersion = "0.3.2"
   val sbtCoreNextVersion = "0.1.1"
 
-  val play23Version = "2.3.8"
+  val play23Version = "2.3.9"
   val akka22Version = "2.2.4"
-  val akka23Version = "2.3.9"
-  val echoPlayVersion = "2.3.8"
+  val akka23Version = "2.3.11"
+  val echoPlayVersion = "2.3.9"
   val slickVersion = "2.1.0"
   val activatorAnalyticsVersion = "0.1.8"
   val aspectJVersion = "1.8.4"

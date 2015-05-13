@@ -32,7 +32,7 @@ object LocalTemplateRepo {
     libraryDependencies += Dependencies.templateCache,
     // TODO - Allow debug version for testing?
     remoteTemplateCacheUri := "http://downloads.typesafe.com/typesafe-activator",
-    localTemplateCacheHash := "2b71892f649dd1a70af913c1f7b96a8a5b2f9397",
+    localTemplateCacheHash := "0c45d90e741a3744f5a93e3f89bb44412d4f43a5",
     latestTemplateCacheHash := downloadLatestTemplateCacheHash(remoteTemplateCacheUri.value, streams.value),
     checkTemplateCacheHash := {
       if (enableCheckTemplateCacheHash.value)
@@ -43,7 +43,7 @@ object LocalTemplateRepo {
     },
     enableCheckTemplateCacheHash := true
   )
-  
+
   def invokeTemplateCacheRepoMakerMain(cl: ClassLoader, dir: File, uri: String, templates: String): Unit =
     invokeMainFor(
       cl,
@@ -52,12 +52,12 @@ object LocalTemplateRepo {
         "-remote", uri,
         "-file", dir.getAbsolutePath,
         "-templates", templates))
-  
+
   private def makeClassLoaderFor(classpath: Keys.Classpath): java.net.URLClassLoader = {
     val jars = classpath map (_.data.toURL)
     new java.net.URLClassLoader(jars.toArray, null)
   }
-  
+
   private def invokeMainFor(cl: ClassLoader, mainClass: String, args: Array[String]): Unit = {
     println("Loading " + mainClass + " from: " + cl)
     val maker = cl.loadClass(mainClass)
