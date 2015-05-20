@@ -22,7 +22,7 @@ object Play23ScalaFakeApp {
 
 object CookieParser {
   // quick and dirty.  AsyncHttpClient fails to parse the Play cookie correctly
-  val playCookie = """.*PLAY_SESSION="(.*)";.*""".r
+  val playCookie = """.*PLAY_SESSION=([^;]*);.*""".r
 }
 
 class Play23Scala210IterateeTracingSpec extends ActionTraceSpec {
