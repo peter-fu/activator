@@ -24,7 +24,7 @@ object Dependencies {
   val akka22Version = "2.2.4"
   val akka23Version = "2.3.11"
   val echoPlayVersion = "2.3.9"
-  val slickVersion = "2.1.0"
+  val slickVersion = "3.0.0"
   val activatorAnalyticsVersion = "0.1.8"
   val aspectJVersion = "1.8.4"
 
