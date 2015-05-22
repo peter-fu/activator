@@ -3,6 +3,8 @@ import sbt.Keys._
 import com.typesafe.sbt.SbtGit
 import com.typesafe.sbt.SbtScalariform
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
+import bintray.Plugin.bintrayPublishSettings
+import bintray.Keys._
 import sbtbuildinfo.Plugin._
 
 object SbtEchoBuild extends Build {
@@ -16,14 +18,17 @@ object SbtEchoBuild extends Build {
       aggregate(sbtEchoAkka, sbtEchoPlay)
     )
 
-  lazy val defaultSettings: Seq[Setting[_]] = baseVersions ++ SbtScalariform.scalariformSettings ++ Seq(
+  lazy val defaultSettings: Seq[Setting[_]] = baseVersions ++ SbtScalariform.scalariformSettings ++
+    bintrayPublishSettings ++ Seq(
     sbtPlugin := true,
     organization := "com.typesafe.sbt",
     version <<= version in ThisBuild,
     publishMavenStyle := false,
-    publishTo <<= isSnapshot { snapshot =>
-      if (snapshot) Some(Classpaths.sbtPluginSnapshots) else Some(Classpaths.sbtPluginReleases)
-    },
+    bintrayOrganization in bintray := Some("typesafe"),
+    repository in bintray := "ivy-releases",
+    licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
+    resolvers += "typesafe-mvn-releases" at "https://repo.typesafe.com/typesafe/releases/",
+    resolvers += Resolver.url("typesafe-ivy-releases", new URL("https://repo.typesafe.com/typesafe/releases/"))(Resolver.ivyStylePatterns),
     ScalariformKeys.preferences in Compile := formatPrefs,
     ScalariformKeys.preferences in Test := formatPrefs
   )

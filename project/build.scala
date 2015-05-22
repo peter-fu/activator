@@ -221,7 +221,7 @@ object TheActivatorBuild extends Build {
         // *** note: do not use %% here ***
         "org.scala-lang" % "jline" % "2.10.4",
 
-        "com.typesafe.slick" % "slick_2.11" % "2.1.0",
+        "com.typesafe.slick" % "slick_2.11" % "3.0.0",
         "com.h2database" % "h2" % "1.3.170",
 
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-less" % "1.0.0", "0.13", "2.10"),
