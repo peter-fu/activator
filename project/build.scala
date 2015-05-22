@@ -7,8 +7,8 @@ import Packaging.localRepoArtifacts
 import com.typesafe.sbt.S3Plugin._
 import com.typesafe.sbt.SbtNativePackager.Universal
 import com.typesafe.sbt.SbtPgp
-import com.typesafe.sbt.SbtPgp.PgpKeys
 import play.PlayImport.PlayKeys
+import com.typesafe.sbt.SbtPgp.autoImport._
 import com.typesafe.sbt.less.Import.LessKeys
 import com.typesafe.sbt.web.SbtWeb.autoImport._
 import com.typesafe.sbt.jse.JsEngineImport.JsEngineKeys

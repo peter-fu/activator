@@ -7,7 +7,7 @@ import com.typesafe.sbt.SbtScalariform
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import com.typesafe.sbt.SbtGit
 import com.typesafe.sbt.SbtPgp
-import com.typesafe.sbt.SbtPgp.PgpKeys
+import com.typesafe.sbt.SbtPgp.autoImport._
 import bintray.Plugin.bintrayPublishSettings
 import bintray.Keys._
 
@@ -64,7 +64,7 @@ object ActivatorBuild {
       makeFixWhitespace(Test),
       compileInputs in (Compile, compile) <<= (compileInputs in (Compile, compile)) dependsOn (fixWhitespace in Compile),
       compileInputs in (Test, compile) <<= (compileInputs in (Test, compile)) dependsOn (fixWhitespace in Test)
-    ) ++ JavaVersionCheck.javacVersionCheckSettings ++ SbtPgp.settings ++
+    ) ++ JavaVersionCheck.javacVersionCheckSettings ++ SbtPgp.projectSettings ++
     net.virtualvoid.sbt.graph.Plugin.graphSettings ++
     // these have to be after SbtPgp.settings
     Seq(
