@@ -121,6 +121,7 @@ Release overview:
  * be sure `test`, `integrationTests`, `offlineTests`, and `checkTemplateCacheHash` are passing.
  * `publishSigned` then `s3Upload`.
  * push the version tag to github
+ * Bump the Heroku configuration for the activator servers so the latest release shows up on typesafe.com and assocaited sites.
 
 We do both `publishSigned` and `s3Upload`. To `publishSigned` you need a GPG key.
 
