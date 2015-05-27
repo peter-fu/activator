@@ -17,6 +17,7 @@ define([
   var FormState = (function(){
     var self = {};
     self.dummyRecompute = ko.observable(1);
+    self.notASubscriber = ko.observable(false);
     self.forceIdCheck = function () {
       var x = self.dummyRecompute();
       self.dummyRecompute(x + 1);
@@ -28,10 +29,11 @@ define([
       return (id && (id.length === 36));
     });
     self.getIDFromTypesafeCom = function() {
-      var obs = typesafe.getSubscriptionDetail();
-      obs.subscribe(function (v) {
+      typesafe.getSubscriptionDetail(function (v) {
         if (v.type === "subscriptionDetails") {
           self.typesafeId(v.data.id);
+        } else if (v.type === "notASubscriber") {
+          self.notASubscriber(true);
         }
       });
     };

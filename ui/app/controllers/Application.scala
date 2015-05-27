@@ -332,7 +332,7 @@ object Application extends Controller {
   val initState = TypesafeComProxy.initialStateBuilder(authGetter = (_, v, r, w) => AuthenticationActor.props(loginEndpoint, UIActor.props, v, r, w),
     subscriberDataGetter = (_, v, r, w) => SubscriptionDataActor.props(subscriberEndpoint, UIActor.props, v, r, w),
     activatorInfoGetter = (_, v, r, w) => ActivatorLatestActor.props(activatorInfoEndpoint, UIActor.props, v, r, w),
-    httpJsonGetter = (req, v, r, w) => JsonGetterActor.props(req.url, httpJsonGetter, req.toPut, UIActor.props, v, r, w))
+    httpJsonGetter = (req, v, r, w) => JsonGetterActor.props(req.url, httpJsonGetter, req.toPut(_, _, _, true), UIActor.props, v, r, w))
   val typesafeComActor = activator.Akka.system.actorOf(TypesafeComProxy.props(initialCacheState = initState))
 
   /** Opens a stream for home events. */
