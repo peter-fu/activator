@@ -79,14 +79,14 @@ object TypesafeComProxy {
     protected trait GetBase extends LocalRequest[Value] {
       def websocketActor: ActorRef
       final val key: String = ev.erasure.getName
-      final def toPut(value: Try[T], version: Long, sendTo: ActorRef): Put = Put(value, version, sendTo)
+      final def toPut(value: Try[T], version: Long, sendTo: ActorRef, cacheValue: Boolean = true): Put = Put(value, version, sendTo, cacheValue)
       final def withValue(value: Try[T], version: Long)(implicit sender: ActorRef) = response(Value(value, version))
     }
 
     type Get <: GetBase
     final case class Value(value: Try[T], version: Long) extends Response
     final case class Outcome(result: Try[Unit]) extends Response
-    final case class Put(value: Try[T], version: Long, sendTo: ActorRef) extends LocalRequest[Outcome] {
+    final case class Put(value: Try[T], version: Long, sendTo: ActorRef, cacheValue: Boolean = true) extends LocalRequest[Outcome] {
       final val key: String = ev.erasure.getName
       final def success()(implicit sender: ActorRef) = response(Outcome(Success(())))
       final def failed()(implicit sender: ActorRef) =
@@ -169,7 +169,7 @@ class TypesafeComProxy(initialCacheState: TypesafeComProxy.CacheState) extends A
         if (slot.version == msg.version) {
           slot.pendingRequests.foreach(x => x.withValue(msg.value, slot.version + 1))
           msg.success()
-          if (slot.cacheValue) context.become(run(state.updateAll(slot.copy(value = Value(msg.value), pendingRequests = Set.empty[ActionPair[T]#Get]))))
+          if (slot.cacheValue && msg.cacheValue) context.become(run(state.updateAll(slot.copy(value = Value(msg.value), pendingRequests = Set.empty[ActionPair[T]#Get]))))
           else context.become(run(state.updateAll(slot.copy(value = Empty, pendingRequests = Set.empty[ActionPair[T]#Get]))))
         } else {
           msg.failed()

@@ -10,16 +10,16 @@ sealed trait SubscriptionLevel {
 }
 object SubscriptionLevels {
   sealed abstract class NamedSubscription(override val name: String) extends SubscriptionLevel
-  case object Developer extends NamedSubscription("developer")
-  case object Production extends NamedSubscription("production")
-  case object TwentyFourSeven extends NamedSubscription("twentyFourSeven")
+  case object Developer extends NamedSubscription("developerSubscriber")
+  case object Production extends NamedSubscription("productionSubscriber")
+  case object TwentyFourSeven extends NamedSubscription("twentyFourSevenSubscriber")
 
   val subscriptionLevelReads: Reads[SubscriptionLevel] = new Reads[SubscriptionLevel] {
     def reads(in: JsValue): JsResult[SubscriptionLevel] = in match {
       case JsString(Developer.name) => JsSuccess(Developer)
       case JsString(Production.name) => JsSuccess(Production)
       case JsString(TwentyFourSeven.name) => JsSuccess(TwentyFourSeven)
-      case v => JsError(s"Expected one of 'developer', 'production', or 'twentyFourSeven' got: $v")
+      case v => JsError(s"Expected one of 'developerSubscriber', 'productionSubscriber', or 'twentyFourSevenSubscriber' got: $v")
     }
   }
 
@@ -58,8 +58,8 @@ object SubscriberData {
   val subscriberDataReads: Reads[SubscriberData] = new Reads[SubscriberData] {
     def reads(in: JsValue): JsResult[SubscriberData] = {
       val id = Json.fromJson[String](in \ "id").asOpt
-      val subscription = Json.fromJson[Option[SubscriptionLevel]](in \ "subscription").asOpt
-      val isPaidSubscriber = Json.fromJson[Boolean](in \ "isPaidSubscriber").asOpt
+      val subscription = Json.fromJson[Option[SubscriptionLevel]](in \ "primarySubscriberRole").asOpt
+      val isPaidSubscriber = Json.fromJson[Boolean](in \ "isSubscriber").asOpt
       val acceptedDate = Json.fromJson[Option[DateTime]](in \ "acceptedDate").asOpt
       val majorVersion = Json.fromJson[String](in \ "majorVersion").asOpt
       val currentReleaseVersion = Json.fromJson[String](in \ "currentReleaseVersion").asOpt
@@ -78,7 +78,7 @@ object SubscriberData {
     def writes(in: SubscriberData): JsValue = in match {
       case NotASubscriber(m) => Json.obj("message" -> m)
       case Detail(id, s, ips, ad, mv, crv) => Json.obj("id" -> id,
-        "subscription" -> s,
+        "primarySubscriberRole" -> s,
         "isPaidSubscriber" -> ips,
         "acceptedDate" -> ad,
         "majorVersion" -> mv,

@@ -93,10 +93,14 @@ define([
     websocket.send(request);
   }
 
-  function getSubscriptionDetail() {
+  function getSubscriptionDetail(subscriptionFunc) {
     var id = pseudoUniqueId();
     var response = ko.observable();
+    response.subscribe(subscriptionFunc);
     var subs = websocket.subscribe('tag','TypesafeComProxy');
+    response.subscribe(function(newValue) {
+      subs.close();
+    });
     proxyRequest("getSubscriptionDetail",{requestId: id});
     subs.each(function(message) {
       var type = message.type;
@@ -116,9 +120,6 @@ define([
       }
     });
 
-    response.subscribe(function(newValue) {
-      subs.close();
-    });
     return response;
   }
 

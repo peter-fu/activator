@@ -86,6 +86,7 @@ define([
       self.installedMajorVersion(null);
       self.fullUpdate(false);
       self.majorUpdate(false);
+      self.typesafeId("");
       self.isReactivePlatformProject(false);
       self.typesafeIdFormVisible(false);
     };

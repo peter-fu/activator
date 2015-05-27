@@ -85,8 +85,12 @@ class SubscriptionDataActor(doGetSubscriptionData: SubscriptionDataActor.DoGetSu
   }
 
   def handleResult(auth: AuthenticationStates.Authenticated, result: Try[SubscriberData], endReport: UIActor.ReportEndAction, authVersion: Long): Unit = result match {
-    case x @ Success(_) =>
+    case x @ Success(_: SubscriberData.Detail) =>
       replyTo ! SubscriberDetail.Put(x, version, self)
+      context.become(doStop())
+    case x @ Success(_) =>
+      replyTo ! Authentication.Put(Failure(new ProxyInvalidCredentials("Resetting authentication")), authVersion, self)
+      replyTo ! SubscriberDetail.Put(x, version, self, false)
       context.become(doStop())
     case Failure(e: ProxyInvalidCredentials) =>
       replyTo ! Authentication.Put(Failure(e), authVersion, self)
@@ -97,7 +101,7 @@ class SubscriptionDataActor(doGetSubscriptionData: SubscriptionDataActor.DoGetSu
       uiActor ! UIActor.RetryableRequests.Failure(e.getMessage, self, retryable = true)
       context.become(onFailure(() => context.become(runRequest(auth, authVersion))))
     case x @ Failure(e) =>
-      log.error("Unknown exception during fetching subscriber data", e)
+      log.error("Unknown exception during fetching subscriber data: ", e)
       uiActor ! UIActor.RetryableRequests.Failure(e.getMessage, self, retryable = false)
       replyTo ! SubscriberDetail.Put(x, version, self)
       context.become(doStop())
