@@ -1,6 +1,0 @@
-<aspectj>
-  <weaver options="">
-    <include within="com.typesafe.trace..*"/>
-    <include within="scala.concurrent..*"/>
-  </weaver>
-</aspectj>

@@ -145,11 +145,7 @@ class SbtClientLifeCycleHandlerActor(val client: SbtClient) extends Actor with A
 
       val eagerSubs: Seq[Subscription] =
         Seq("discoveredMainClasses",
-          "mainClass",
-          "echo:echoTraceSupported",
-          "echo:echoPlayVersionReport",
-          "echo:echoAkkaVersionReport",
-          "echo:echoTracePlayVersion") map { name =>
+          "mainClass") map { name =>
             client.rawWatch(name)(forward)
           }
 

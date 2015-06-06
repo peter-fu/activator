@@ -1,11 +1,11 @@
 import org.apache.tools.ant.taskdefs.Echo
 import sbt._
 import ActivatorBuild._
-import EchoBuild._
 import Dependencies._
 import Packaging.localRepoArtifacts
 import com.typesafe.sbt.S3Plugin._
 import com.typesafe.sbt.SbtNativePackager.Universal
+import com.typesafe.sbt.packager.archetypes.JavaAppPackaging
 import com.typesafe.sbt.SbtPgp
 import play.PlayImport.PlayKeys
 import com.typesafe.sbt.SbtPgp.autoImport._
@@ -214,8 +214,6 @@ object TheActivatorBuild extends Build {
         playSbt13Plugin,
         eclipseSbt13Plugin,
         ideaSbt13Plugin,
-        echoSbt13Plugin,
-        echoPlaySbt13Plugin,
 
         // featured template dependencies
         // *** note: do not use %% here ***
@@ -232,15 +230,15 @@ object TheActivatorBuild extends Build {
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-mocha" % "1.0.2", "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-coffeescript" % "1.0.0", "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.play" % "sbt-plugin" % "2.3.8", "0.13", "2.10"),
-        "com.typesafe.play" % "play-jdbc_2.11" % "2.3.9",
-        "com.typesafe.play" % "anorm_2.11" % "2.3.9",
-        "com.typesafe.play" % "play-cache_2.11" % "2.3.9",
-        "com.typesafe.play" % "play-docs_2.11" % "2.3.9",
-        "com.typesafe.play" % "play-test_2.11" % "2.3.9",
-        "com.typesafe.play" % "play-java_2.11" % "2.3.9",
-        "com.typesafe.play" % "play-java-jdbc_2.11" % "2.3.9",
-        "com.typesafe.play" % "play-java-ebean_2.11" % "2.3.9",
-        "com.typesafe.play" % "play-java-ws_2.11" % "2.3.9",
+        "com.typesafe.play" % "play-jdbc_2.11" % "2.4.0",
+        "com.typesafe.play" % "anorm_2.11" % "2.4.0",
+        "com.typesafe.play" % "play-cache_2.11" % "2.4.0",
+        "com.typesafe.play" % "play-docs_2.11" % "2.4.0",
+        "com.typesafe.play" % "play-test_2.11" % "2.4.0",
+        "com.typesafe.play" % "play-java_2.11" % "2.4.0",
+        "com.typesafe.play" % "play-java-jdbc_2.11" % "2.4.0",
+        "com.typesafe.play" % "play-java-ebean_2.11" % "2.4.0",
+        "com.typesafe.play" % "play-java-ws_2.11" % "2.4.0",
         "com.typesafe.akka" % "akka-slf4j_2.11" % "2.3.11",
         "org.webjars" % "bootstrap" % "3.0.0",
         "org.webjars" % "knockout" % "2.3.0",
@@ -278,5 +276,5 @@ object TheActivatorBuild extends Build {
         log.info(s"Minimal:  http://downloads.typesafe.com/typesafe-activator/${version}/typesafe-activator-${version}-minimal.zip")
       }
     )
-  )
+  ).enablePlugins(JavaAppPackaging)
 }

@@ -92,7 +92,7 @@ define([
       provider: "New Relic",
       addingFile: "project/sbt-nr.sbt",
       addedFile: newrelic.available,
-      echoReady: sbt.tasks.echoReady
+      prepReady: sbt.tasks.prepReady
     });
   };
 

@@ -228,19 +228,6 @@ define([
     return sbtRequest('RequestExecution', command);
   }
 
-  /**
-   * Reset inspect data
-   */
-  function resetInspect() {
-    debug && console.log("Resetting Inspect data")
-    websocket.send({
-      "commands": [{
-        "module": "lifecycle",
-        "command": "reset"
-      }]
-    });
-  }
-
   var isPlayApplication = function() {
     if (app.mainClass() && app.mainClass() === "play.core.server.NettyServer") {
       return true;
@@ -639,67 +626,6 @@ define([
     }
   });
 
-  // Inspect-related (sbt-echo) observables.
-  //
-  // FIXME these need to be tracked separately for each project.
-  // FIXME logically these go in run.js, but they can't go there
-  // because it loads lazily so would miss ValueChanged events.
-
-  // Note: this is whether inspect WORKS on the project;
-  // It may not be enabled by the user.
-  var inspectSupported = ko.observable(false);
-  var inspectAkkaVersionReport = ko.observable("");
-  var inspectPlayVersionReport = ko.observable("");
-  var inspectHasPlayVersion = ko.observable(false);
-  var whyInspectIsNotSupported = ko.computed(function() {
-    if (inspectSupported())
-      return "";
-    else if (inspectHasPlayVersion())
-      return inspectPlayVersionReport();
-    else if (inspectAkkaVersionReport() !== "")
-      return inspectAkkaVersionReport();
-    else
-      return "The sbt-echo plugin may not be present on this project or may not be enabled.";
-  });
-
-  if (debug) {
-    whyInspectIsNotSupported.subscribe(function(why) {
-      if (inspectSupported())
-        console.log("Inspect is supported");
-      else
-        console.log("Inspect is not supported because ", why);
-    });
-  }
-
-  valueChanged.matchOnAttribute('key', 'echoTraceSupported').each(function(message) {
-    debug && console.log('echoTraceSupported',message);
-    inspectSupported(message.value === true);
-  });
-
-  valueChanged.matchOnAttribute('key', 'echoAkkaVersionReport').each(function(message) {
-    debug && console.log('echoAkkaVersionReport',message);
-    var report = "";
-    if (message.value)
-      report = message.value;
-    inspectAkkaVersionReport(report);
-  });
-
-  valueChanged.matchOnAttribute('key', 'echoPlayVersionReport').each(function(message) {
-    debug && console.log('echoPlayVersionReport',message);
-    var report = "";
-    if (message.value)
-      report = message.value;
-    inspectPlayVersionReport(report);
-  });
-
-  valueChanged.matchOnAttribute('key', 'echoTracePlayVersion').each(function(message) {
-    debug && console.log('echoTracePlayVersion',message);
-    if (message.value && message.value !== '')
-      inspectHasPlayVersion(true);
-    else
-      inspectHasPlayVersion(false);
-  });
-
   // mainClass
   valueChanged.matchOnAttribute('key', 'mainClass').each(function(message) {
     app.mainClass(message.value);
@@ -887,8 +813,6 @@ define([
     isPlayApplication:       isPlayApplication,
     playApplicationUrl:      playApplicationUrl,
     playServerStarted:        playServerStarted,
-    inspectSupported:        inspectSupported,
-    whyInspectIsNotSupported: whyInspectIsNotSupported,
     reactivePlatform:        reactivePlatform,
     active: {
       turnedOn:     "",
@@ -903,25 +827,11 @@ define([
         requestExecution("compile");
       },
       run:          function() {
-        if (app.settings.automaticResetInspect()){
-          resetInspect();
-        }
-        if (monitoringSolutions.inspectActivated() && !inspectSupported()) {
-          // Disactivating
-          monitoringSolutions.monitoringSolution(monitoringSolutions.NO_MONITORING);
-          // Show a popup
-          modals.show({
-            title: "Inspect has been deactivated",
-            text: whyInspectIsNotSupported(),
-            cancel: "close"
-          });
-        }
         return requestExecution(runCommand());
       },
       test:         function() {
         requestExecution("test");
-      },
-      resetInspect: resetInspect
+      }
     }
   }
 

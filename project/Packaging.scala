@@ -5,6 +5,8 @@ import com.typesafe.sbt.packager.Keys.{
   makeBashScript, makeBatScript
 }
 
+import com.typesafe.sbt.packager.universal.UniversalPlugin.autoImport.useNativeZip
+
 import com.typesafe.sbt.license._
 
 package sbt {
@@ -40,9 +42,9 @@ object Packaging {
   val minimalDist = taskKey[File]("dist without the bundled repository and templates")
 
   // This is dirty, but play has stolen our keys, and we must mimc them here.
-  val stage = TaskKey[Unit]("stage")
+  val stage = TaskKey[File]("stage")
   val dist = TaskKey[File]("dist")
-  
+
   // Shared settings to make a local repository.
   def makeLocalRepoSettings(lrepoName: String): Seq[Setting[_]] = Seq(
     localRepo <<= target(_ / "local-repository"),
@@ -59,8 +61,8 @@ object Packaging {
       LicenseReport.dumpReport(LicenseReport(config.licenses, null), println = msg => s.log.info(msg.toString))
     }
   )
-  
-  def settings: Seq[Setting[_]] = packagerSettings ++ useNativeZip ++ makeLocalRepoSettings(localRepoName) ++ Seq(
+
+  def settings: Seq[Setting[_]] = useNativeZip ++ makeLocalRepoSettings(localRepoName) ++ Seq(
     name in Universal := s"activator-${version.value}",
     wixConfig := <wix/>,
     maintainer := "Josh Suereth <joshua.suereth@typesafe.com>",
@@ -72,6 +74,7 @@ object Packaging {
       IO.copy(copies)
       // Now set scripts to executable as a hack thanks to Java's lack of understanding of permissions
       (to / "activator").setExecutable(true, true)
+      to
     },
     dist <<= packageBin in Universal,
     minimalDist := minimalZip((target in Universal).value, (mappings in Universal).value, version.value),
@@ -130,7 +133,7 @@ object Packaging {
       output
     }
   )
-  
+
 
   // TODO - Use SBT caching API for this.
   def repackageJar(target: File, launcher: File, replacements: Seq[(File, String)] = Seq.empty): File = IO.withTemporaryDirectory { tmp =>
@@ -142,15 +145,15 @@ object Packaging {
 
     // Copy new files
     val copys =
-      for((file, path) <- replacements) 
+      for((file, path) <- replacements)
       yield file -> (jardir / path)
     IO.copy(copys, overwrite=true, preserveLastModified=false)
 
-    // Create new launcher jar    
+    // Create new launcher jar
     val tmplauncher = tmp / "activator-launcher.jar"
     val files = (jardir.*** --- jardir) x relativeTo(jardir)
     IO.zip(files, tmplauncher)
-    
+
     // Put new launcher jar in new location.
     val nextlauncher = target / "activator-launcher.jar"
     if(nextlauncher.exists) IO.delete(nextlauncher)
@@ -160,7 +163,7 @@ object Packaging {
 
   def copyBashTemplate(from: File, to: File, version: String): File = {
     val fileContents = IO read from
-    val nextContents = fileContents.replaceAll("""\$\{\{template_declares\}\}""", 
+    val nextContents = fileContents.replaceAll("""\$\{\{template_declares\}\}""",
                                                """|declare -r app_version="%s"
                                                   |""".stripMargin format (version))
     IO.write(to, nextContents)

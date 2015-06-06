@@ -20,21 +20,10 @@ define([
   // this file isn't required to exist, if it doesn't we should create
   var buildFileLocation = "/build.sbt";
 
-  var echoPluginFileLocation = "/project/inspect.sbt";
-  var echoDefaultPluginFileContent = "// This plugin runs apps with the \"echo\" trace infrastructure which backs up the Inspect functionality in Activator\n\n" +
-    "addSbtPlugin(\"com.typesafe.sbt\" % \"sbt-echo\" % \""+dependencies.echoVersion+"\")";
-  var echoPlayPluginFileContent = "// This plugin runs apps with the \"echo\" trace infrastructure (with Play support) which backs up the Inspect functionality in Activator\n\n" +
-    "addSbtPlugin(\"com.typesafe.sbt\" % \"sbt-echo-play\" % \""+dependencies.echoVersion+"\")";
-
-  var echoPluginFileContent = ko.computed(function() {
-    return tasks.isPlayApplication() ? echoPlayPluginFileContent : echoDefaultPluginFileContent;
-  });
-
   var playForkRunPluginFileLocation = "/project/play-fork-run.sbt";
   var playForkRunPluginFileContent = "// This plugin adds forked run capabilities to Play projects which is needed for Activator.\n\n" +
     "addSbtPlugin(\"com.typesafe.play\" % \"sbt-fork-run-plugin\" % \""+dependencies.playVersion+"\")";
 
-  var addedEchoFile = ko.observable(false);
   var addedBackgroundFile = ko.observable(false);
   var addedForkInRun = ko.observable(false);
   var addedPlayForkRun = ko.observable(false);
@@ -72,22 +61,19 @@ define([
     addedPlayForkRun(true);
   });
 
-  var echoReady = ko.computed(function() {
+  var prepReady = ko.computed(function() {
     // TODO this is completely broken because applicationReady is probably true to begin with,
-    // then temporarily false AFTER we edit all the build files, but echoReady is going to
+    // then temporarily false AFTER we edit all the build files, but prepReady is going to
     // be briefly true before we restart (when we want it to be true only after).
     // I think we should replace applicationReady with checking that the needed tasks are
     // present in the build.
-    return (tasks.applicationReady() && addedEchoFile() && addedBackgroundFile() && addedForkInRun() && addedPlayForkRun());
+    return (tasks.applicationReady() && addedBackgroundFile() && addedForkInRun() && addedPlayForkRun());
   });
 
-  function echoInstalledAndReady(callback){
-    if (echoReady()) callback();
+  function prepedAndReady(callback){
+    if (prepReady()) callback();
     else {
-      checkFileContent(serverAppModel.location+echoPluginFileLocation, echoPluginFileContent(), function() {
-        addedEchoFile(true);
-      });
-      var subscription = echoReady.subscribe(function(ready) {
+      var subscription = prepReady.subscribe(function(ready) {
         if (ready){
           callback();
           subscription.dispose();
@@ -97,8 +83,7 @@ define([
   }
 
   return {
-    echoInstalledAndReady: echoInstalledAndReady,
-    addedEchoFile:         addedEchoFile,
-    echoReady:             echoReady
+    prepedAndReady: prepedAndReady,
+    prepReady:      prepReady
   };
 });
