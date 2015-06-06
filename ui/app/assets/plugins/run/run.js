@@ -66,6 +66,7 @@ define([
   });
 
   var State = {
+    subPlugin: subPlugin,
     sbtExecCommand: sbtExecCommand,
     sbt: sbt,
     rerunOnBuild: sbt.app.settings.rerunOnBuild,
@@ -81,6 +82,11 @@ define([
     playUrl: playUrl
   }
 
+  // Subplugins titles
+  var subPlugins = {
+    system:         "Stdout"
+  }
+
   return {
     render: function(url) {
       layout.renderPlugin(ko.bindhtml(tpl, State))
@@ -88,7 +94,7 @@ define([
     route: plugins.route('run', function(url, breadcrumb, plugin) {
       subPlugin(plugin.render());
       currentPlugin = plugin;
-      breadcrumb([['run/', "Run"],['run/'+url.parameters[0]]]);
+      breadcrumb([['run/', "Run"],['run/'+url.parameters[0], subPlugins[url.parameters[0]]]]);
     }, "run/system"),
 
     keyboard: function(key, meta, e) {
