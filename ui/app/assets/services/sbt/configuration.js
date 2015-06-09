@@ -21,8 +21,10 @@ define([
   var buildFileLocation = "/build.sbt";
 
   var playForkRunPluginFileLocation = "/project/play-fork-run.sbt";
-  var playForkRunPluginFileContent = "// This plugin adds forked run capabilities to Play projects which is needed for Activator.\n\n" +
-    "addSbtPlugin(\"com.typesafe.play\" % \"sbt-fork-run-plugin\" % \""+dependencies.playVersion+"\")";
+  var playForkRunPluginFileContent = function (version) {
+    return "// This plugin adds forked run capabilities to Play projects which is needed for Activator.\n\n" +
+           "addSbtPlugin(\"com.typesafe.play\" % \"sbt-fork-run-plugin\" % \""+version+"\")";
+  }
 
   var addedBackgroundFile = ko.observable(false);
   var addedForkInRun = ko.observable(false);
@@ -40,7 +42,8 @@ define([
       ajax.create(path, false, content).then(callback);
     }).success(function(data) {
       // File is here
-      if (data.indexOf(content) >= 0){
+      var index = data.indexOf(content);
+      if (index >= 0){
         callback();
       } else {
         ajax.save(path, appendTofile?data+content:content).success(callback);
@@ -57,11 +60,23 @@ define([
     addedForkInRun(true);
   }, true);
 
-  checkFileContent(serverAppModel.location+playForkRunPluginFileLocation, playForkRunPluginFileContent, function () {
-    addedPlayForkRun(true);
-  });
+  function checkPlayFileContent() {
+    var callback = function () {
+      addedPlayForkRun(true);
+    };
+    var path = serverAppModel.location+playForkRunPluginFileLocation;
+    var ispa = tasks.isPlayApplication();
+    if (ispa) {
+      var playVersion = tasks.playVersion();
+      var content = playForkRunPluginFileContent(playVersion);
+      checkFileContent(path, content, callback);
+    } else {
+      callback();
+    }
+  }
 
   var prepReady = ko.computed(function() {
+    checkPlayFileContent();
     // TODO this is completely broken because applicationReady is probably true to begin with,
     // then temporarily false AFTER we edit all the build files, but prepReady is going to
     // be briefly true before we restart (when we want it to be true only after).

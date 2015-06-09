@@ -60,6 +60,38 @@ define([
     test:     ko.observable(false)
   };
 
+  var findPlayVersion = function(bdc) {
+    var playVersion = null;
+    if ((bdc !== undefined && bdc !== null) && bdc.length > 0) {
+      var i = 0;
+      while (i < bdc.length && playVersion == null) {
+        playVersion = bdc[i].match(/\/com\.typesafe\.play\/sbt-plugin\/jars\/sbt-plugin-(.+)\.jar$/);
+        i++;
+      }
+    }
+    if (playVersion) {
+      return playVersion[1];
+    } else {
+      return null;
+    }
+  }
+
+  var findPlayPlugin = function(plugins) {
+    var playPlugin = null;
+    if (plugins !== undefined && plugins.length > 0) {
+      var i = 0;
+      while (i < plugins.length && playPlugin == null) {
+        playPlugin = plugins[i].match(/^(?:play\.sbt\.Play)|(?:play.Play)$/);
+        i++;
+      }
+    }
+    if (playPlugin) {
+      return playPlugin[0];
+    } else {
+      return null;
+    }
+  }
+
   var reactivePlatform = (function() {
     var self = {};
     self.platformRelease = ko.observable(null);
@@ -228,12 +260,17 @@ define([
     return sbtRequest('RequestExecution', command);
   }
 
-  var isPlayApplication = function() {
-    if (app.mainClass() && app.mainClass() === "play.core.server.NettyServer") {
-      return true;
-    }
-    return false;
-  };
+
+  var buildDataClasspath = ko.observable([]);
+  var hasPlayPlugin = ko.observable(false);
+
+  var playVersion = ko.computed(function () {
+    return findPlayVersion(buildDataClasspath());
+  });
+
+  var isPlayApplication = ko.computed(function () {
+    return ((playVersion() !== null) && hasPlayPlugin());
+  });
 
   var playApplicationUrl = ko.observable(null);
   var playServerStarted = ko.computed(function() {
@@ -523,9 +560,17 @@ define([
 
   subTypeEventStream("BuildStructureChanged").each(function(message) {
     var projects = message.event.structure.projects;
+    var buildsData = message.event.structure.buildsData;
+    buildDataClasspath(null);
+    hasPlayPlugin(false);
+    if (buildsData !== undefined && buildsData.length > 0) {
+      buildDataClasspath(buildsData[0].classpath);
+    }
     if (projects !== undefined && projects.length > 0) {
       reactivePlatform.reset();
       app.removeExistingProjects();
+
+      hasPlayPlugin(findPlayPlugin(projects[0].plugins) !== null);
 
       $.each(projects, function(i, v) {
         app.projects.push(v.id.name);
@@ -811,6 +856,8 @@ define([
     applicationReady:        applicationReady,
     applicationNotReady:     applicationNotReady,
     isPlayApplication:       isPlayApplication,
+    buildDataClasspath:      buildDataClasspath,
+    playVersion:             playVersion,
     playApplicationUrl:      playApplicationUrl,
     playServerStarted:        playServerStarted,
     reactivePlatform:        reactivePlatform,
