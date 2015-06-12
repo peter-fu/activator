@@ -4,8 +4,6 @@
 define([
   "main/plugins",
   "services/sbt",
-  "services/inspect/connection",
-  'widgets/echoInstaller/echoInstaller',
   "widgets/layout/layout",
   "services/monitoring/monitoringSolutions",
   "text!./run.html",
@@ -19,8 +17,6 @@ define([
 ], function(
   plugins,
   sbt,
-  connection,
-  echoInstaller,
   layout,
   monitoringSolutions,
   tpl,
@@ -29,7 +25,6 @@ define([
 
   var subPlugin = ko.observable();
   var currentPlugin;
-  var inspects = ko.observable();
   var sbtExecCommand = function(cmd){
     sbt.tasks.requestExecution(cmd);
   }
@@ -37,9 +32,6 @@ define([
     if (sbt.tasks.pendingTasks.run()){
       sbt.tasks.actions.stopRun();
     } else {
-      if (sbt.app.settings.automaticResetInspect()) {
-        connection.reset();
-      }
       sbt.tasks.actions.run();
     }
   }
@@ -73,47 +65,13 @@ define([
     }
   });
 
-  var toggleInspect = function() {
-    var toActivate = monitoringSolutions.inspectActivated() ? monitoringSolutions.NO_MONITORING : monitoringSolutions.INSPECT;
-    monitoringSolutions.monitoringSolution(toActivate);
-  }
-
-  monitoringSolutions.monitoringSolution.subscribe(function(solution) {
-    if (!monitoringSolutions.inspectActivated() && window.location.hash.indexOf("#run/system") !== 0) {
-      window.location.hash = "run/system";
-    }
-    if(monitoringSolutions.inspectActivated()) {
-      sbt.tasks.actions.kill();
-      echoInstaller(function() {});
-    } else {
-      sbt.tasks.actions.kill();
-    }
-  });
-
-  var inspectActivatedAndAvailable = ko.computed(function() {
-    return monitoringSolutions.inspectActivated() && sbt.tasks.applicationReady() && sbt.tasks.inspectSupported();
-  });
-
-  // Start an empty request for echo
-  connection.filters.active([]);
-
-  function resetData(){
-    connection.reset();
-  }
-
   var State = {
     subPlugin: subPlugin,
     sbtExecCommand: sbtExecCommand,
-    inspects: inspects,
     sbt: sbt,
-    stats: connection.stats,
     rerunOnBuild: sbt.app.settings.rerunOnBuild,
-    automaticResetInspect: sbt.app.settings.automaticResetInspect,
     showLogDebug: sbt.app.settings.showLogDebug,
     monitoringSolutions: monitoringSolutions,
-    inspectActivated: monitoringSolutions.inspectActivated,
-    toggleInspect: toggleInspect,
-    inspectActivatedAndAvailable: inspectActivatedAndAvailable,
     mainRunAction: mainRunAction,
     mainRunName: mainRunName,
     customCommands: sbt.app.customCommands,
@@ -121,16 +79,12 @@ define([
     runDisabled: runDisabled,
     displayMains: displayMains,
     displayPlayUrl: displayPlayUrl,
-    playUrl: playUrl,
-    resetData: resetData
+    playUrl: playUrl
   }
 
   // Subplugins titles
   var subPlugins = {
-    system:         "Stdout",
-    actors:         "Actors",
-    requests:       "Requests",
-    actorIssues:    "Actor Issues"
+    system:         "Stdout"
   }
 
   return {

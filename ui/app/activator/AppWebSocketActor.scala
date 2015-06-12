@@ -30,7 +30,6 @@ class AppWebSocketActor(val config: AppConfig,
       case TypesafeComProxyUIActor.Inbound(req) =>
         context.actorOf(TypesafeComProxyUIActor.props(req, typesafeComActor, self))
       case SbtRequest(req) => handleSbtPayload(req.json)
-      case InspectRequest(m) => for (cActor <- consoleActor) cActor ! HandleRequest(json)
       case NewRelicRequest(m) => handleNewRelicRequest(m)
       case WriteTypesafeProperties(msg) =>
         AppWebSocketActor.bestEffortCreateTypesafeProperties(config.location, msg.subscriptionId)
@@ -191,8 +190,6 @@ object AppWebSocketActor {
 
 }
 
-case class InspectRequest(json: JsValue)
-
 case class SbtRequest(json: JsValue)
 
 case class SbtPayload(serialId: Long, requestType: String, command: String, executionId: Option[Long])
@@ -209,18 +206,6 @@ object WriteTypesafeProperties {
     emitRequest(tag)(in => obj("subscriptionId" -> in.subscriptionId))
 
   def unapply(in: JsValue): Option[WriteTypesafeProperties] = Json.fromJson[WriteTypesafeProperties](in).asOpt
-}
-
-object InspectRequest {
-  val tag = "InspectRequest"
-
-  implicit val inspectRequestReads: Reads[InspectRequest] =
-    extractRequest[InspectRequest](tag)((__ \ "location").read[JsValue].map(InspectRequest.apply _))
-
-  implicit val inspectRequestWrites: Writes[InspectRequest] =
-    emitRequest(tag)(in => obj("location" -> in.json))
-
-  def unapply(in: JsValue): Option[InspectRequest] = Json.fromJson[InspectRequest](in).asOpt
 }
 
 object SbtRequest {

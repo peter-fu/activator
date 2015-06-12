@@ -18,15 +18,13 @@ object VersionGenerator {
          |define([
          |],function (
          |) {
-         |  var playVersion = "${Dependencies.play23Version}";
-         |  var echoVersion = "${Dependencies.echoVersion}";
+         |  var playVersion = "${Dependencies.shimPlayVersion}";
          |  var ideaVersion = "${Dependencies.ideaVersion}";
          |  var eclipseVersion = "${Dependencies.eclipseVersion}";
          |  var sbtCoreNextVersion = "${Dependencies.sbtCoreNextVersion}";
          |
          |  return {
          |    playVersion: playVersion,
-         |    echoVersion: echoVersion,
          |    ideaVersion: ideaVersion,
          |    eclipseVersion: eclipseVersion,
          |    sbtCoreNextVersion: sbtCoreNextVersion

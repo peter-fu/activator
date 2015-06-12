@@ -2,11 +2,6 @@ import sbt._
 import Keys._
 
 object Dependencies {
-  // this version is used to publish echo and sbt-echo,
-  // and also to set which version of those Activator
-  // depends on.
-  val echoVersion = "0.1.15"
-
   val sbtVersion = "0.13.8"
   val sbtLibraryVersion = "0.13.8" // for sbtIO on scala 2.11
 
@@ -17,13 +12,13 @@ object Dependencies {
   val luceneVersion = "4.2.1"
 
   val templateCacheVersion = "1.0-a0afb008ea619bf9d87dc010156cddffa8a6f880"
-  val sbtRcVersion = "0.3.2"
+  val sbtRcVersion = "0.3.5"
   val sbtCoreNextVersion = "0.1.1"
 
+  val shimPlayVersion = "2.4.0"
   val play23Version = "2.3.9"
   val akka22Version = "2.2.4"
   val akka23Version = "2.3.11"
-  val echoPlayVersion = "2.3.9"
   val slickVersion = "3.0.0"
   val activatorAnalyticsVersion = "0.1.8"
   val aspectJVersion = "1.8.4"
@@ -60,11 +55,9 @@ object Dependencies {
   val specs2               = "org.specs2" % "specs2_2.11" % "2.3.11"
 
   // SBT 0.13 required plugins
-  val playSbt13Plugin        =  Defaults.sbtPluginExtra("com.typesafe.play" % "sbt-plugin" % play23Version, "0.13", "2.10")
+  val playSbt13Plugin        =  Defaults.sbtPluginExtra("com.typesafe.play" % "sbt-plugin" % shimPlayVersion, "0.13", "2.10")
   val eclipseSbt13Plugin     =  Defaults.sbtPluginExtra("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "2.2.0", "0.13", "2.10")
   val ideaSbt13Plugin        =  Defaults.sbtPluginExtra("com.github.mpeltonen" % "sbt-idea" % "1.5.2", "0.13", "2.10")
-  val echoSbt13Plugin        =  Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-echo" % echoVersion, "0.13", "2.10")
-  val echoPlaySbt13Plugin    =  Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-echo-play" % echoVersion, "0.13", "2.10")
 
   // Embedded databases / index
   val lucene = "org.apache.lucene" % "lucene-core" % luceneVersion
@@ -172,19 +165,10 @@ object Dependencies {
 
   val sbtBackgroundRun = Defaults.sbtPluginExtra("org.scala-sbt" % "sbt-core-next" % sbtCoreNextVersion, "0.13", "2.10")
 
-  val sbt13HackMatch = "^(0\\.13)\\.?.*$".r
-
   def playPlugin: Seq[Setting[_]] = Seq(
     resolvers += Classpaths.typesafeSnapshots,
     resolvers += "Typesafe Maven Snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",
-    resolvers += "Typesafe Maven Releases" at "http://repo.typesafe.com/typesafe/releases/",
-    libraryDependencies <+= (sbt.Keys.sbtVersion in sbtPlugin, scalaBinaryVersion in update) { (sbtV, scalaV) =>
-      val (dependency,cleanedUpSbtV) = sbtV match {
-        case sbt13HackMatch(m) => ("com.typesafe.play" % "sbt-fork-run-plugin" % echoPlayVersion,m)
-        case _ => sys.error("Unsupported sbt version: " + sbtV)
-      }
-      Defaults.sbtPluginExtra(dependency, cleanedUpSbtV, scalaV)
-    }
+    resolvers += "Typesafe Maven Releases" at "http://repo.typesafe.com/typesafe/releases/"
   )
   // *** END SBT-ECHO DEPENDENCIES ***
 

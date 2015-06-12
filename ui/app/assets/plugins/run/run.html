@@ -44,15 +44,6 @@
           </dl>
         </li>
         <!-- /ko -->
-        <!-- ko if: monitoringSolutions.monitoringSolutions().length == 2 -->
-        <li>
-          <h4>Monitoring</h4>
-          <div class="switch" data-bind="css: { 'active': inspectActivatedAndAvailable, 'activating': inspectActivated }, click: toggleInspect">
-            <div class="inner"></div>
-          </div>
-          Activator Inspect
-        </li>
-        <!-- /ko -->
         <!-- ko if: monitoringSolutions.monitoringSolutions().length > 2 -->
         <li>
           <h4>Monitoring</h4>
@@ -69,12 +60,6 @@
           </dl>
         </li>
         <!-- /ko -->
-        <li data-bind="visible: inspectActivated">
-          <div class="switch" data-bind="switchButton: automaticResetInspect">
-            <div class="inner"></div>
-          </div>
-          Reset data on run
-        </li>
         <!-- ko if: displayPlayUrl() -->
         <li class="play-url">
           <a target="_blank" data-bind="href: playUrl, text: playUrl"></a>
@@ -87,33 +72,12 @@
         <a href="#run/system">Standard out</a>
         <span class="counter error" data-bind="text: sbt.events.errorCounters.run, visible: sbt.events.errorCounters.run()"></span>
       </li>
-      <!-- ko if: inspectActivated -->
-      <li class="actors" data-bind="isActiveUrl: '#run/actors'">
-        <a href="#run/actors">Actors</a>
-        <span class="counter" data-bind="text: stats().data.metadata.actorPathCount, visible: stats().data.metadata.actorPathCount"></span>
-      </li>
-      <li class="actorIssues" data-bind="isActiveUrl: '#run/actorIssues'">
-        <a href="#run/actorIssues">Actor Issues</a>
-        <span class="counter error" data-bind="text: stats().data.deviations.deviationCount, visible: stats().data.deviations.deviationCount"></span>
-      </li>
-      <li class="requests" data-bind="isActiveUrl: '#run/requests'">
-        <a href="#run/requests">Requests</a>
-        <span class="counter" data-bind="text: stats().data.metadata.playPatternCount > 0 ? 'Y' : 'N' ,visible: stats().data.metadata.playPatternCount"></span>
-      </li>
-      <!-- /ko -->
       <!-- ko if: monitoringSolutions.newRelicActivated() -->
       <li class="actors" data-bind="isActiveUrl: '#monitoring/newrelic'">
         <a href="#monitoring/newrelic">Configure NewRelic</a>
       </li>
       <!-- /ko -->
     </ul>
-
-    <!-- ko if: inspectActivated -->
-    <footer>
-      <span class="expand"><span class="reset" data-bind="click: resetData">RESET</span> Data collected for</span>
-      <span class="cache counter" data-bind="formatTimeCounter: stats().data.currentStorageTime * 1000">0&ndash;</span>
-    </footer>
-    <!-- /ko -->
 
   </nav>
   <!-- ko if: subPlugin() -->
