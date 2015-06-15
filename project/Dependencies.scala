@@ -126,43 +126,6 @@ object Dependencies {
     }
   }
 
-  // *** ECHO DEPENDENCIES ***
-  val akkaSlf4j22 = "com.typesafe.akka"   %% "akka-slf4j"   % akka22Version
-  val akkaSlf4j23 = "com.typesafe.akka"   %% "akka-slf4j"   % akka23Version
-  val config      = "com.typesafe"        % "config"        % "1.2.1"
-  val play23      = "com.typesafe.play"   %% "play"         % play23Version
-  val play23ws    = "com.typesafe.play"   %% "play-ws"      % play23Version
-  val protobuf24  = "com.google.protobuf" % "protobuf-java" % "2.4.1"
-  val protobuf25  = "com.google.protobuf" % "protobuf-java" % "2.5.0"
-  val sigar       = "org.fusesource"      % "sigar"         % "1.6.4"
-  val slf4j       = "org.slf4j"           % "slf4j-api"     % "1.7.5"
-
-  val akkaTestKit22 = "com.typesafe.akka" %% "akka-testkit" % akka22Version % "test"
-  val akkaTestKit23 = "com.typesafe.akka" %% "akka-testkit" % akka23Version   % "test"
-  val junit       = "junit"               % "junit"         % "4.12"         % "test"
-  val logback     = "ch.qos.logback"      % "logback-classic" % "1.0.13"    % "test"
-  val playTest23  = "com.typesafe.play"   %% "play-test"    % play23Version   % "test"
-  val scalaTest   = "org.scalatest"       %% "scalatest"    % "2.2.4"       % "test"
-
-  def traceAkka(version: String, crossVersion: CrossVersion) = Seq(
-    "com.typesafe.akka" % "akka-actor"  % version cross crossVersion,
-    "com.typesafe.akka" % "akka-remote" % version cross crossVersion,
-    "com.typesafe.akka" % "akka-slf4j"  % version cross crossVersion,
-    sigar
-  )
-
-  val traceAkkaExcludes = {
-    <dependencies>
-      <exclude module="slf4j-simple"/>
-    </dependencies>
-  }
-  // *** END ECHO DEPENDENCIES ***
-
-  // *** SBT-ECHO DEPENDENCIES ***
-  val aspectjTools = "org.aspectj" % "aspectjtools" % aspectJVersion
-
-  val aspectjWeaver = "org.aspectj" % "aspectjweaver" % aspectJVersion
-
   val sbtBackgroundRun = Defaults.sbtPluginExtra("org.scala-sbt" % "sbt-core-next" % sbtCoreNextVersion, "0.13", "2.10")
 
   def playPlugin: Seq[Setting[_]] = Seq(
