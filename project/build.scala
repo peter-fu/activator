@@ -160,7 +160,8 @@ object TheActivatorBuild extends Build {
     settings(
       // This hack removes the project resolver so we don't resolve stub artifacts.
       Keys.fullResolvers <<= (Keys.externalResolvers, Keys.sbtResolver) map (_ :+ _),
-      Keys.resolvers += Resolver.url("sbt-plugin-releases", new URL("http://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/"))(Resolver.ivyStylePatterns)
+      Keys.resolvers += Resolver.url("sbt-plugin-releases", new URL("http://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/"))(Resolver.ivyStylePatterns),
+      Keys.resolvers += "Scalaz Bintray Repo" at "https://dl.bintray.com/scalaz/releases"
     )
   )
   lazy val it = (
@@ -224,16 +225,22 @@ object TheActivatorBuild extends Build {
 
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-less" % "1.0.0", "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-less" % "1.0.6", "0.13", "2.10"),
+        Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-less" % "1.1.0", "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-jshint" % "1.0.3", "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-rjs" % "1.0.7", "0.13", "2.10"),
-        Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-digest" % "1.0.0", "0.13", "2.10"),
-        Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-mocha" % "1.0.2", "0.13", "2.10"),
+        Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-digest" % "1.1.0", "0.13", "2.10"),
+        Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-mocha" % "1.1.0", "0.13", "2.10"),
+        Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-play-enhancer" % "1.1.0", "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-coffeescript" % "1.0.0", "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.play" % "sbt-plugin" % "2.3.8", "0.13", "2.10"),
         "com.typesafe.play" % "play-jdbc_2.11" % "2.4.0",
         "com.typesafe.play" % "anorm_2.11" % "2.4.0",
         "com.typesafe.play" % "play-cache_2.11" % "2.4.0",
         "com.typesafe.play" % "play-docs_2.11" % "2.4.0",
+        "com.typesafe.play" % "play-specs2_2.11" % "2.4.0",
+        "com.typesafe.play" % "play-omnidoc_2.11" % "2.4.0",
+        "org.scalaz.stream" % "scalaz-stream_2.11" % "0.7a",
+        "org.specs2" % "specs2-matcher-extra_2.11" % "3.6",
         "com.typesafe.play" % "play-test_2.11" % "2.4.0",
         "com.typesafe.play" % "play-java_2.11" % "2.4.0",
         "com.typesafe.play" % "play-java-jdbc_2.11" % "2.4.0",
@@ -241,6 +248,7 @@ object TheActivatorBuild extends Build {
         "com.typesafe.play" % "play-java-ws_2.11" % "2.4.0",
         "com.typesafe.akka" % "akka-slf4j_2.11" % "2.3.11",
         "org.webjars" % "bootstrap" % "3.0.0",
+        "org.webjars" % "bootstrap" % "2.3.2",
         "org.webjars" % "knockout" % "2.3.0",
         "org.webjars" % "requirejs" % "2.1.11-1",
         "org.webjars" % "leaflet" % "0.7.2",
