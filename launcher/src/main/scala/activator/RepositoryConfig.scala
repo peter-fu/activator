@@ -119,6 +119,9 @@ object RepositoryConfig {
       old
   }
 
+  // Under Windows `file://` is considered a UNC path.  Adding the extra '/' or '//'
+  // solves the problem that the current user's authorization is sufficient
+  // to access the target file.
   private lazy val fileMarker = if (isWindows) "file:////" else "file://"
 
   private def newRepositorySection(oldOption: Option[Section]): Section = {
