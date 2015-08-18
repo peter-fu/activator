@@ -75,6 +75,8 @@ import java.io.File
 object RepositoryConfig {
   private val repositoriesSectionName = "repositories"
 
+  private val isWindows = sys.props("os.name").toLowerCase.indexOf("win") >= 0
+
   // configure your per-user repos to have the offline
   // repo in activator.home, if possible.
   def configureUserRepositories(): Unit =
@@ -92,10 +94,15 @@ object RepositoryConfig {
       System.err.println(s"Configuring Activator offline repository failed: ${e.getMessage}")
   }
 
+  private final val fileMatcher = "^file://*".r
+  private final val fileScheme = "file://"
+
   private def quoteForFileURI(path: String): String = {
     val uriString = (new java.io.File(path)).toURI.toASCIIString()
-    if (uriString.startsWith("file://"))
-      uriString.substring("file://".length)
+    if (isWindows && fileMatcher.findFirstIn(uriString).isDefined)
+      fileMatcher.replaceFirstIn(uriString, "")
+    else if (!isWindows && uriString.startsWith(fileScheme))
+      uriString.substring(fileScheme.length)
     else
       path // give up, hope for best?
   }
@@ -112,30 +119,36 @@ object RepositoryConfig {
       old
   }
 
+  // Under Windows `file://` is considered a UNC path.  Adding the extra '/' or '//'
+  // solves the problem that the current user's authorization is sufficient
+  // to access the target file.
+  private lazy val fileMarker = if (isWindows) "file:////" else "file://"
+
   private def newRepositorySection(oldOption: Option[Section]): Section = {
     // this repo is primarily for sbt server - hardcoded activator.home
     // based on the most recent Activator to run.
-    val activatorLocalLine =
-      """  activator-local: file://${activator.local.repository-""" +
-        quoteForFileURI(ACTIVATOR_HOME) +
-        """/repository}, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]"""
+    val activatorLocalLine = """  activator-local: """ + fileMarker + """${activator.local.repository-""" +
+      quoteForFileURI(ACTIVATOR_HOME) +
+      """/repository}, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]"""
 
     // this repo is for the launcher, which is run by a wrapper script
     // that sets activator.home. The launcher only uses its embedded repo
     // config if ~/.sbt/repositories doesn't exist.
-    val activatorLauncherLine =
-      """  activator-launcher-local: file://${activator.local.repository-${activator.home-${user.home}/.activator}/repository}, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]"""
+    val activatorLauncherLine = """  activator-launcher-local: """ + fileMarker + """${activator.local.repository-${activator.home-${user.home}/.activator}/repository}, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]"""
 
     oldOption match {
       case Some(old) =>
+        // if (!isWindows) {
         val withActivatorLocal =
           replaceRepoLine(old, "local", "activator-local", activatorLocalLine)
         replaceRepoLine(withActivatorLocal, "local", "activator-launcher-local", activatorLauncherLine)
+      // } else stripRepoLines(old, Set("activator-local", "activator-launcher-local"))
       case None =>
         // create the entire repositories section
-        val allRepoLines = """  local
+        val header = """  local
 """ + activatorLauncherLine + """
-""" + activatorLocalLine + """
+""" + activatorLocalLine
+        val allRepoLines = header + """
   maven-central
   typesafe-releases: http://repo.typesafe.com/typesafe/releases
   typesafe-ivy-releasez: http://repo.typesafe.com/typesafe/ivy-releases, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]"""
