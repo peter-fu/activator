@@ -6,8 +6,8 @@ object Dependencies {
   val sbtLibraryVersion = "0.13.8" // for sbtIO on scala 2.11
 
   val sbtPluginVersion = "0.13"
-  val sbtPluginScalaVersion = "2.11.5"
-  val scalaVersion = "2.11.6"
+  val sbtPluginScalaVersion = "2.11.7"
+  val scalaVersion = "2.11.7"
   val scala210Version = "2.10.4"
   val luceneVersion = "4.2.1"
 
@@ -15,7 +15,7 @@ object Dependencies {
   val sbtRcVersion = "0.3.5"
   val sbtCoreNextVersion = "0.1.1"
 
-  val shimPlayVersion = "2.4.0"
+  val shimPlayVersion = "2.4.2"
   val play23Version = "2.3.9"
   val akka22Version = "2.2.4"
   val akka23Version = "2.3.11"
