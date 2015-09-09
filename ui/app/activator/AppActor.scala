@@ -11,7 +11,7 @@ import scala.concurrent.duration._
 import play.api.libs.json._
 import sbt.client._
 import sbt.protocol._
-import sbt.client.actors.{SbtConnectionProxy, SbtClientProxy}
+import sbt.client.actors.{SbtConnectionProxy, SbtClientProxy, WithAskAdapter}
 
 sealed trait AppRequest
 case object GetWebSocketCreated extends AppRequest
@@ -44,10 +44,11 @@ class InstrumentationRequestException(message: String) extends Exception(message
 class AppActor(val config: AppConfig,
   val typesafeComActor: ActorRef,
   val lookupTimeout: Timeout,
+  val commandTimeout: Timeout,
   val sbtConnectorProps: SbtConnector => Props,
   val projectWatcherProps: (File, ActorRef, ActorRef) => Props,
   val webSocketProps: (AppConfig, ActorRef, Timeout) => Props,
-  val projectPreprocessor: (ActorRef, ActorRef, AppConfig) => Unit) extends Actor with ActorLogging with Stash {
+  val projectPreprocessor: (ActorRef, ActorRef, AppConfig) => Unit) extends Actor with ActorLogging with Stash with WithAskAdapter {
 
   import AppActor.RunningState
 
@@ -85,6 +86,7 @@ class AppActor(val config: AppConfig,
       log.error("Attempt to send invalid event {}", package.json)
     }
   }
+
   private final def handleEvent(event:Event, socket:ActorRef):Unit = event match {
     case _: ClosedEvent =>
       self ! PoisonPill
@@ -356,23 +358,52 @@ class AppActor(val config: AppConfig,
   override def receive = waitWebSocket()
 
   private def flushPending(state: RunningState): RunningState = {
+    import SbtClientProxy._
+
     var pending: Vector[(ActorRef, ClientAppRequest)] = state.pending
+    def askBuilder[T](requestBuilder:ActorRef => Request[T]):Future[T] =
+        asAsk(state.sbtClientActor)(requestBuilder)(commandTimeout)
+
     while (pending.nonEmpty) {
       val (command,sendTo) = pending.head
       pending = pending.tail
-      state.sbtClientActor.foreach { actor =>
-        produceLog(LogMessage.DEBUG, s"sending request to sbt ${req._2}")
-        command match {
-          case r:RequestExecution =>
-            actor ! SbtClientProxy.RequestExecution(r.command.get,None,sendTo)
-          case r:CancelExecution =>
-            actor ! SbtClientProxy.RequestExecution(r.executionId,sendTo)
-          case r:PossibleAutoCompletions =>
-            actor ! SbtClientProxy.PossibleAutoCompletions(r.command.get,r.detailLevel.getOrElse(0),sendTo)
-          case _:RequestSelfDestruct =>
-            actor ! SbtClientProxy.RequestExecution.ByCommandOrTask("exit",None)
-        }
+      produceLog(LogMessage.DEBUG, s"sending request to sbt ${command}")
+      val result = command match {
+        case r:RequestExecution =>
+          futureFold(askBuilder(SbtClientProxy.RequestExecution.ByCommandOrTask(r.command.get,None,_)))(
+            success = {
+              case ExecutionId(Success(id),_) => SbtClientResponse(r.serialId,id,r.command)
+              case ExecutionId(Failure(e),_) => Status.Failure(e)
+            },
+            failure = Status.Failure.apply
+          )
+        case r:CancelExecution =>
+          futureFold(askBuilder(SbtClientProxy.CancelExecution(r.executionId,_)))(
+            success = {
+              case CancelExecutionResponse(_,Success(result)) => SbtClientResponse(r.serialId,result,r.command)
+              case CancelExecutionResponse(_,Failure(e)) => Status.Failure(e)
+            },
+            failure = Status.Failure.apply
+          )
+        case r:PossibleAutoCompletions =>
+          futureFold(askBuilder(SbtClientProxy.PossibleAutoCompletions(r.command.get,r.detailLevel.getOrElse(0),_)))(
+            success = {
+              case AutoCompletions(Success(result)) => SbtClientResponse(r.serialId,result,r.command)
+              case AutoCompletions(Failure(e)) => Status.Failure(e)
+            },
+            failure = Status.Failure.apply
+          )
+        case _:RequestSelfDestruct =>
+          futureFold(askBuilder(SbtClientProxy.RequestExecution.ByCommandOrTask("exit",None,_)))(
+            success = {
+              case ExecutionId(Success(id),_) => SbtClientResponse(r.serialId,id,r.command)
+              case ExecutionId(Failure(e),_) => Status.Failure(e)
+            },
+            failure = Status.Failure.apply
+          )
       }
+
+      result pipeTo sendTo
     }
 
     state.copy(pending = Vector.empty[(ActorRef, ClientAppRequest)])
@@ -395,6 +426,10 @@ class AppActor(val config: AppConfig,
 }
 
 object AppActor {
+
+  def futureFold[T,Z](in:Future[T])(success:T => Z,failure:Throwable => Z):Future[Z] =
+    in.recover(failure).map(success)
+
   final case class AwaitingClientState(pending: Vector[(ActorRef, ClientAppRequest)],
     connectorActor: ActorRef,
     socket: ActorRef,

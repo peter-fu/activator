@@ -12,7 +12,7 @@ object Dependencies {
   val luceneVersion = "4.2.1"
 
   val templateCacheVersion = "1.0-a0afb008ea619bf9d87dc010156cddffa8a6f880"
-  val sbtRcVersion = "0.3.5"
+  val sbtRcVersion = "1.0-b3320eb1a5c8e7a7da1f3ce79c997a052d1803cc"
   val sbtCoreNextVersion = "0.1.1"
 
   val shimPlayVersion = "2.4.2"
