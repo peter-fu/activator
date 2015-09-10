@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import scala.util.{ Failure, Success }
 import scala.util.control.NonFatal
 import activator._
+import sbt.client.SbtConnector
 
 sealed trait AppCacheRequest
 
@@ -36,7 +37,12 @@ case object ForgotApp extends AppCacheReply
 private case class CachedApp(appId: String, futureApp: Future[activator.App])
 
 class AppCacheActor(val typesafeComActor: ActorRef,
-  val lookupTimeout: Timeout) extends Actor with ActorLogging {
+  val lookupTimeout: Timeout,
+  val commandTimeout: Timeout,
+  val sbtConnectorProps: SbtConnector => Props,
+  val projectWatcherProps: (File, ActorRef, ActorRef) => Props,
+  val webSocketProps: (AppConfig, ActorRef, Timeout) => Props,
+  val projectPreprocessor: (ActorRef, ActorRef, AppConfig) => Unit) extends Actor with ActorLogging {
   private var appCache: Map[UUID, CachedApp] = Map.empty
 
   override val supervisorStrategy = SupervisorStrategy.stoppingStrategy
@@ -84,7 +90,8 @@ class AppCacheActor(val typesafeComActor: ActorRef,
           case None => {
             val appFuture: Future[activator.App] = AppManager.loadConfigFromAppId(id.appId) map { config =>
               log.debug(s"creating a new app for $id")
-              new activator.App(id, config, activator.Akka.system, typesafeComActor, lookupTimeout)
+              val appActorBuilder: AppConfig => Props = AppActor.props(_, typesafeComActor, lookupTimeout, commandTimeout, sbtConnectorProps, projectWatcherProps, webSocketProps, projectPreprocessor)
+              new activator.App(id, config, activator.Akka.system, appActorBuilder, ActorWatcher.props)
             }
 
             appCache += (id.socketId -> CachedApp(id.appId, appFuture))
@@ -199,7 +206,26 @@ class KeepAliveActor extends Actor with ActorLogging {
   }
 }
 
+object AppCacheActor {
+  def props(typesafeComActor: ActorRef,
+    lookupTimeout: Timeout,
+    commandTimeout: Timeout,
+    sbtConnectorProps: SbtConnector => Props,
+    projectWatcherProps: (File, ActorRef, ActorRef) => Props,
+    webSocketProps: (AppConfig, ActorRef, Timeout) => Props,
+    projectPreprocessor: (ActorRef, ActorRef, AppConfig) => Unit): Props =
+    Props(new AppCacheActor(typesafeComActor,
+      lookupTimeout,
+      commandTimeout,
+      sbtConnectorProps,
+      projectWatcherProps,
+      webSocketProps,
+      projectPreprocessor))
+}
+
 object AppManager {
+
+  import sbt.client.actors.SbtConnectionProxy
 
   private val keepAlive = activator.Akka.system.actorOf(Props(new KeepAliveActor), name = "keep-alive")
 
@@ -207,7 +233,13 @@ object AppManager {
     keepAlive ! RegisterKeepAlive(ref)
   }
 
-  val appCache = activator.Akka.system.actorOf(Props(new AppCacheActor(controllers.Application.typesafeComActor, controllers.Application.lookupTimeout)), name = "app-cache")
+  val appCache = activator.Akka.system.actorOf(AppCacheActor.props(controllers.Application.typesafeComActor,
+    controllers.Application.lookupTimeout,
+    controllers.Application.commandTimeout,
+    SbtConnectionProxy.props(_),
+    ProjectWatcher.props _,
+    AppWebSocketActor.props _,
+    (_, _, _) => ()), name = "app-cache")
 
   val requestManagerCount = new AtomicInteger(1)
 

@@ -41,6 +41,7 @@ object Dependencies {
 
   // sbtrc projects
   val sbtrcClient          = "com.typesafe.sbtrc" % "client-2-11" % sbtRcVersion
+  val sbtrcActorClient     = "com.typesafe.sbtrc" % "actor-client-2-11" % sbtRcVersion
   val sbtrcIntegration     = "com.typesafe.sbtrc" % "integration-tests" % sbtRcVersion
 
   val akkaActor            = "com.typesafe.akka" %% "akka-actor" % akka23Version

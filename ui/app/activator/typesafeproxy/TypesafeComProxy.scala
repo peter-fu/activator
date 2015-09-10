@@ -122,7 +122,7 @@ object TypesafeComProxy {
   case class SubscriptionConfig(url: String, timeout: FiniteDuration) extends RpcEndpoint
   case class ActivatorInfoConfig(url: String, timeout: FiniteDuration) extends RpcEndpoint
 
-  case class Config(lookupTimeout: Timeout, login: LoginConfig, subscriptionData: SubscriptionConfig, activatorInfo: ActivatorInfoConfig)
+  case class Config(lookupTimeout: Timeout, commandTimeout: Timeout, login: LoginConfig, subscriptionData: SubscriptionConfig, activatorInfo: ActivatorInfoConfig)
 
   def withTypesafeComConfig[T](in: TSConfig)(body: TSConfig => T): T = {
     val c = in.getConfig("activator.typesafe-com-proxy")
@@ -132,10 +132,12 @@ object TypesafeComProxy {
   def fromConfig(in: TSConfig): Config = {
     withTypesafeComConfig(in) { configRoot =>
       val lookupTimeout = Timeout(configRoot.getDuration("lookup-timeout", TimeUnit.MILLISECONDS).intValue.millis)
+      val commandTimeout = Timeout(configRoot.getDuration("command-timeout", TimeUnit.MILLISECONDS).intValue.millis)
       val login = configRoot.getConfig("login")
       val subscriptionData = configRoot.getConfig("subscriber-data")
       val activatorInfo = configRoot.getConfig("activator-info")
       Config(lookupTimeout = lookupTimeout,
+        commandTimeout = commandTimeout,
         login = LoginConfig(login.getString("url"), login.getDuration("timeout", TimeUnit.MILLISECONDS).intValue.millis),
         subscriptionData = SubscriptionConfig(subscriptionData.getString("url"), subscriptionData.getDuration("timeout", TimeUnit.MILLISECONDS).intValue.millis),
         activatorInfo = ActivatorInfoConfig(activatorInfo.getString("url"), activatorInfo.getDuration("timeout", TimeUnit.MILLISECONDS).intValue.millis))

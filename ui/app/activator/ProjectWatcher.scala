@@ -150,3 +150,7 @@ class ProjectWatcher(val location: File, val newSourcesSocket: ActorRef, val app
     timer.cancel()
   }
 }
+
+object ProjectWatcher {
+  def props(location: File, newSourcesSocket: ActorRef, appActor: ActorRef): Props = Props(new ProjectWatcher(location, newSourcesSocket, appActor))
+}

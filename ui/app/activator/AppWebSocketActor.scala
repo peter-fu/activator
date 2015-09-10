@@ -164,6 +164,8 @@ object AppWebSocketActor {
   val cancelExecution = "CancelExecution"
   val possibleAutoCompletions = "PossibleAutoCompletions"
 
+  def props(config: AppConfig, typesafeComActor: ActorRef, lookupTimeout: Timeout): Props = Props(new AppWebSocketActor(config, typesafeComActor, lookupTimeout))
+
   def bestEffortCreateTypesafeProperties(location: java.io.File, subscriptionId: String): Unit = {
     val sid = subscriptionId.trim
     if (sid.nonEmpty) {

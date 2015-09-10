@@ -3,7 +3,7 @@
  */
 package activator
 
-import akka.actor.{ PoisonPill, Terminated, Actor, ActorRef }
+import akka.actor.{ PoisonPill, Terminated, Actor, ActorRef, Props }
 
 trait ActorWrapper {
   @volatile var isTerminated = false
@@ -22,4 +22,8 @@ class ActorWatcher(watchee: ActorRef, watcher: ActorWrapper) extends Actor {
       watcher.actorTerminated()
       self ! PoisonPill
   }
+}
+
+object ActorWatcher {
+  def props(watchee: ActorRef, watcher: ActorWrapper): Props = Props(new ActorWatcher(watchee, watcher))
 }

@@ -325,6 +325,7 @@ object Application extends Controller {
 
   val typesafeComConfig = TypesafeComProxy.fromConfig(Play.current.configuration.underlying)
   val lookupTimeout = typesafeComConfig.lookupTimeout
+  val commandTimeout = typesafeComConfig.commandTimeout
   val loginEndpoint = AuthenticationActor.httpDoAuthenticate(typesafeComConfig.login.url, typesafeComConfig.login.timeout, defaultContext)_
   val subscriberEndpoint = SubscriptionDataActor.httpGetSubscriptionData(typesafeComConfig.subscriptionData.url, typesafeComConfig.subscriptionData.timeout, defaultContext)_
   val activatorInfoEndpoint = ActivatorLatestActor.httpGetActivatorLatest(typesafeComConfig.activatorInfo.url, typesafeComConfig.activatorInfo.timeout, defaultContext)_

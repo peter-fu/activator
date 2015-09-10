@@ -101,6 +101,7 @@ object TheActivatorBuild extends Build {
       requirejs, jquery, knockout, ace, /*requireCss, requireText,*/ keymage, commonsIo, mimeUtil, activatorAnalytics,
       sbtLauncherInterface % "provided",
       sbtrcClient,
+      sbtrcActorClient,
       sbtrcIntegration % "compile;test->test"
     )
     dependsOn(props, uiCommon)
@@ -167,7 +168,7 @@ object TheActivatorBuild extends Build {
   lazy val it = (
       ActivatorProject("integration-tests")
       settings(integration.settings:_*)
-      dependsOnRemote(sbtLauncherInterface, sbtIo, sbtrcClient, sbtrcIntegration)
+      dependsOnRemote(sbtLauncherInterface, sbtIo, sbtrcClient, sbtrcActorClient, sbtrcIntegration)
       dependsOn(props)
       settings(
         org.sbtidea.SbtIdeaPlugin.ideaIgnoreModule := true,
@@ -210,6 +211,7 @@ object TheActivatorBuild extends Build {
 
         // sbt stuff
         sbtrcClient,
+        sbtrcActorClient,
 
         // sbt 0.13 plugins
         playSbt13Plugin,
