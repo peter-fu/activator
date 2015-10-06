@@ -36,7 +36,8 @@ case object ForgotApp extends AppCacheReply
 private case class CachedApp(appId: String, futureApp: Future[activator.App])
 
 class AppCacheActor(val typesafeComActor: ActorRef,
-  val lookupTimeout: Timeout) extends Actor with ActorLogging {
+  val lookupTimeout: Timeout,
+  val projectPreprocessor: (ActorRef, ActorRef, AppConfig) => Unit) extends Actor with ActorLogging {
   private var appCache: Map[UUID, CachedApp] = Map.empty
 
   override val supervisorStrategy = SupervisorStrategy.stoppingStrategy
@@ -84,7 +85,8 @@ class AppCacheActor(val typesafeComActor: ActorRef,
           case None => {
             val appFuture: Future[activator.App] = AppManager.loadConfigFromAppId(id.appId) map { config =>
               log.debug(s"creating a new app for $id")
-              new activator.App(id, config, activator.Akka.system, typesafeComActor, lookupTimeout)
+              val appActorBuilder: AppConfig => Props = AppActor.props(_, typesafeComActor, lookupTimeout, projectPreprocessor)
+              new activator.App(id, config, activator.Akka.system, appActorBuilder)
             }
 
             appCache += (id.socketId -> CachedApp(id.appId, appFuture))
@@ -207,7 +209,7 @@ object AppManager {
     keepAlive ! RegisterKeepAlive(ref)
   }
 
-  val appCache = activator.Akka.system.actorOf(Props(new AppCacheActor(controllers.Application.typesafeComActor, controllers.Application.lookupTimeout)), name = "app-cache")
+  val appCache = activator.Akka.system.actorOf(Props(new AppCacheActor(controllers.Application.typesafeComActor, controllers.Application.lookupTimeout, ProjectPreprocessor.defaultPreprocessor _)), name = "app-cache")
 
   val requestManagerCount = new AtomicInteger(1)
 
