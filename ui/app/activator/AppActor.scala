@@ -42,7 +42,8 @@ class InstrumentationRequestException(message: String) extends Exception(message
 
 class AppActor(val config: AppConfig,
   val typesafeComActor: ActorRef,
-  val lookupTimeout: Timeout) extends Actor with ActorLogging {
+  val lookupTimeout: Timeout,
+  val projectPreprocessor: (ActorRef, ActorRef, AppConfig) => Unit) extends Actor with Stash with ActorLogging {
 
   AppManager.registerKeepAlive(self)
 
@@ -100,20 +101,36 @@ class AppActor(val config: AppConfig,
       selfCopy ! NotifyWebSocket(SbtProtocol.synthesizeLogEvent(level, message))
   }
 
-  override def receive = {
-    case Terminated(ref) =>
-      if (ref == socket) {
-        log.debug(s"socket terminated, killing AppActor ${self.path.name}")
-        self ! PoisonPill
-      } else if (ref == projectWatcher) {
-        log.debug(s"projectWatcher terminated, killing AppActor ${self.path.name}")
-        self ! PoisonPill
-      } else if (Some(ref) == sbtClientActor) {
-        log.debug(s"clientActor terminated, dropping it")
-        sbtClientActor = None
-      } else if (ref == socket) {
-        for (p <- pending) p._1 ! Status.Failure(new RuntimeException("app shut down"))
-      }
+  private final def handleNotify(body: Receive): Receive =
+    ({
+      case notify: NotifyWebSocket =>
+        if (validateEvent(notify.json)) {
+          socket.forward(notify)
+        } else {
+          log.error("Attempt to send invalid event {}", notify.json)
+        }
+    }: Receive) orElse body
+
+  private final def handleTerminate(body: Receive): Receive =
+    ({
+      case Terminated(ref) =>
+        if (ref == socket) {
+          log.debug(s"socket terminated, killing AppActor ${self.path.name}")
+          self ! PoisonPill
+        } else if (ref == projectWatcher) {
+          log.debug(s"projectWatcher terminated, killing AppActor ${self.path.name}")
+          self ! PoisonPill
+        } else if (Some(ref) == sbtClientActor) {
+          log.debug(s"clientActor terminated, dropping it")
+          sbtClientActor = None
+        } else if (ref == socket) {
+          for (p <- pending) p._1 ! Status.Failure(new RuntimeException("app shut down"))
+        }
+    }: Receive) orElse body
+
+  private final def handleCommon(body: Receive): Receive = handleNotify(handleTerminate(body))
+
+  private final def running: Receive = handleCommon {
 
     case req: AppRequest => req match {
       case GetWebSocketCreated =>
@@ -127,12 +144,6 @@ class AppActor(val config: AppConfig,
           webSocketCreated = true
           socket.tell(GetWebSocket, sender)
         }
-      case notify: NotifyWebSocket =>
-        if (validateEvent(notify.json)) {
-          socket.forward(notify)
-        } else {
-          log.error("Attempt to send invalid event {}", notify.json)
-        }
       case InitialTimeoutExpired =>
         if (!webSocketCreated) {
           log.debug("Nobody ever connected to {}, killing it", config.id)
@@ -142,6 +153,7 @@ class AppActor(val config: AppConfig,
         projectWatcher ! SetSourceFilesRequest(files)
       case ReloadSbtBuild =>
         sbtClientActor.foreach(_ ! RequestSelfDestruct(AppActor.playInternalSerialId))
+        context.become(preprocess)
       case ProjectFilesChanged =>
         self ! NotifyWebSocket(AppActor.projectFilesChanged)
       case OpenClient(client) =>
@@ -167,6 +179,19 @@ class AppActor(val config: AppConfig,
         }
     }
   }
+
+  private final def preprocess: Receive = handleCommon {
+    projectPreprocessor(self, socket, config)
+
+    {
+      case ProjectPreprocessor.Finished =>
+        context.become(running)
+        unstashAll()
+      case req: AppRequest => stash()
+    }
+  }
+
+  override def receive = preprocess
 
   private def flushPending(): Unit = {
     while (sbtClientActor.isDefined && pending.nonEmpty) {
@@ -207,4 +232,14 @@ object AppActor {
   val clientClosedJsonEvent = SbtProtocol.wrapEvent(JsObject(Nil), "ClientClosed")
   val playInternalSerialId = -1L
   val projectFilesChanged = SbtProtocol.wrapEvent(JsObject(Nil), "ProjectFilesChanged")
+
+  def props(config: AppConfig,
+    typesafeComActor: ActorRef,
+    lookupTimeout: Timeout,
+    projectPreprocessor: (ActorRef, ActorRef, AppConfig) => Unit): Props =
+    Props(new AppActor(config,
+      typesafeComActor,
+      lookupTimeout,
+      projectPreprocessor))
+
 }
