@@ -210,7 +210,7 @@ public class ActivatorProperties {
         // We first look for a filename that matches our own version,
         // and if that fails, we glob for any activator-launch-*.jar
         // in the activator home.
-        File home = new File(value);
+        File home = new File(value, "libexec");
         File jar = new File(home, jarname);
         if (jar.exists()) {
           return jar;

@@ -76,7 +76,7 @@ Whenever you save changes to a source file in the application, the changes will 
 
 ### Re-Launching Activator
 
-To make it easy to re-launch Activator (either from a file browser or command line) after you've shut it down, you can either launch it the same way you did the first time, or you can launch it from the new application's root directory.  If you launch it from the application's root directory then the UI will automatically launch with the application open.  Otherwise you will need to open the existing application.  To make it easy for others to launch Activator for your application you can put the `activator`, `activator.bat`, and `activator-launch-VERSION.jar` files in your SCM.
+To make it easy to re-launch Activator (either from a file browser or command line) after you've shut it down, you can either launch it the same way you did the first time, or you can launch it from the new application's root directory.  If you launch it from the application's root directory then the UI will automatically launch with the application open.  Otherwise you will need to open the existing application.  To make it easy for others to launch Activator for your application you can put the `bin/activator`, `bin/activator.bat`, and `libexec/activator-launch-VERSION.jar` files in your SCM.
 
 
 ## Activator Configuration
