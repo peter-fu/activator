@@ -162,7 +162,7 @@ object ProjectPreprocessor {
           util.warn("Possible Play project, but cannot detect play version")
         case (Some(pv), pfrv) if pv.epoch == 2 =>
           pv.major match {
-            case 4 => util.info(s"Using Play $pv -> OK")
+            case 5 | 4 => util.info(s"Using Play $pv -> OK")
             case 3 if pv.minor >= 8 => util.info(s"Using Play $pv -> OK")
             case 3 if pv.minor < 8 =>
               util.warn(s"Using Play < 2.3.8 -> will update to $targetPlay23Version")
