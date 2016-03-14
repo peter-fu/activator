@@ -79,10 +79,10 @@ object Packaging {
     dist <<= packageBin in Universal,
     minimalDist := minimalZip((target in Universal).value, (mappings in Universal).value, version.value),
     mappings in Universal <+= (repackagedLaunchJar, version) map { (jar, v) =>
-      jar -> ("activator-launch-%s.jar" format (v))
+      jar -> ("libexec/activator-launch-%s.jar" format (v))
     },
-    mappings in Universal ++= makeBashScript.value.toSeq map (_ -> "activator"),
-    mappings in Universal ++= makeBatScript.value.toSeq map (_ -> "activator.bat"),
+    mappings in Universal ++= makeBashScript.value.toSeq map (_ -> "bin/activator"),
+    mappings in Universal ++= makeBatScript.value.toSeq map (_ -> "bin/activator.bat"),
     mappings in Universal += makeReadmeHtml.value -> "README.html",
     mappings in Universal += makeLicensesHtml.value -> "LICENSE.html",
     mappings in Universal ++= {
@@ -226,7 +226,7 @@ object Packaging {
   def minimalZip(destDir: File, mappings: Seq[(File, String)], activatorVersion: String): File = {
     val minimalDirName = s"activator-${activatorVersion}-minimal"
     val dest = destDir / s"${minimalDirName}.zip"
-    val sourceNames = Seq(s"activator-launch-${activatorVersion}.jar", "activator", "activator.bat")
+    val sourceNames = Seq(s"libexec/activator-launch-${activatorVersion}.jar", "bin/activator", "bin/activator.bat")
     val sources = mappings filter {
         case (file, name) => sourceNames.contains(name)
     } map {
