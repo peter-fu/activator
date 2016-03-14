@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 Typesafe <http://typesafe.com/>
+ * Copyright (C) 2016 Lightbend, Inc <http://www.lightbend.com>
  */
 package controllers.api
 
@@ -13,7 +13,7 @@ object Proxy extends Controller {
   import play.api.Play.current
 
   def getTypesafe(path: String) = Action.async { request =>
-    val holder = WS.url(s"https://typesafe.com/$path")
+    val holder = WS.url(s"https://lightbend.com/$path")
       .withHeaders("Accept" -> "text/html")
       .withRequestTimeout(25000)
       .withFollowRedirects(true)

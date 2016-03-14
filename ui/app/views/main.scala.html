@@ -12,11 +12,11 @@
 }
 @className(app: activator.AppConfig) = {@if(app.cachedName.getOrElse(app.id) == model.name) {default} else {}}
 
-<!-- Copyright (C) 2013 Typesafe, Inc <http://typesafe.com> -->
+<!-- Copyright (C) 2016 Lightbend, Inc <http://www.lightbend.com> -->
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Typesafe Activator</title>
+    <title>Lightbend Activator</title>
     <link rel="icon" type="image/png" href="@routes.Assets.at("favicon.ico")" />
     <link href="@routes.Assets.at("main/main.css")" rel="stylesheet" type="text/css">
     <!--[if lt IE 9]>
@@ -53,7 +53,7 @@
     <p>This <i>Reactive Platform</i> project needs a <span class='properties-filename'>typesafe.properties</span> file, click <button class="button" data-bind='click: remedy'>here</button> to add one</p>
   </script>
   <script id="missingId" type="text/html">
-    <p>This <i>Reactive Platform</i> project is using an invalid Typesafe subscription ID. Click <button class="button" data-bind='click: remedy'>here</button> to fix.</p>
+    <p>This <i>Reactive Platform</i> project is using an invalid Lightbend subscription ID. Click <button class="button" data-bind='click: remedy'>here</button> to fix.</p>
   </script>
   <script id="noError" type="text/html">
     <p></p>

@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
+ Copyright (C) 2016 Lightbend, Inc <http://www.lightbend.com>
  */
 define([
   'commons/settings',
@@ -126,10 +126,10 @@ define([
   })();
 
   function needToAcceptLicense(callback, onCancel){
-    var message = $("<article/>").html("<p>You must first accept the <a href='https://typesafe.com/account/id' target='_blank'>Typesafe Subscription Agreement</a> before proceeding.</p><p>After accepting the agreement click 'Continue'</p>")[0];
+    var message = $("<article/>").html("<p>You must first accept the <a href='https://lightbend.com/account/id' target='_blank'>Lightbend Subscription Agreement</a> before proceeding.</p><p>After accepting the agreement click 'Continue'</p>")[0];
     modals.show({
       shape: "large",
-      title: "Accept the Typesafe Subscription Agreement",
+      title: "Accept the Lightbend Subscription Agreement",
       body: message,
       ok: "Continue",
       callback: callback,
@@ -138,10 +138,10 @@ define([
   }
 
   function updatedAcceptLicense(callback, onCancel){
-    var message = $("<article/>").html("<p>There are updated terms for the <a href='https://typesafe.com/account/id' target='_blank'>Typesafe Subscription Agreement</a>.</p>Accept before proceeding.</p><p>After accepting the agreement click 'Continue'</p>")[0];
+    var message = $("<article/>").html("<p>There are updated terms for the <a href='https://lightbend.com/account/id' target='_blank'>Lightbend Subscription Agreement</a>.</p>Accept before proceeding.</p><p>After accepting the agreement click 'Continue'</p>")[0];
     modals.show({
       shape: "large",
-      title: "Updated terms for the Typesafe Subscription Agreement",
+      title: "Updated terms for the Lightbend Subscription Agreement",
       body: message,
       ok: "Continue",
       callback: callback,
@@ -163,7 +163,7 @@ define([
           }
         } // TODO: else if (result.data.idCheckResult === "invalid") { ... }
       } else if (result.type === "proxyFailure") {
-        error("Error","Unable to determine if Typesafe Subscription Agreement has been signed",null,null);
+        error("Error","Unable to determine if Lightbend Subscription Agreement has been signed",null,null);
       }
     });
   }

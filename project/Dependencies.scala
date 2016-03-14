@@ -2,8 +2,8 @@ import sbt._
 import Keys._
 
 object Dependencies {
-  val sbtVersion = "0.13.8"
-  val sbtLibraryVersion = "0.13.8" // for sbtIO on scala 2.11
+  val sbtVersion = "0.13.11"
+  val sbtLibraryVersion = "0.13.11" // for sbtIO on scala 2.11
 
   val sbtPluginVersion = "0.13"
   val sbtPluginScalaVersion = "2.11.7"
@@ -33,7 +33,8 @@ object Dependencies {
   // 2.10 sbt
   val sbtIo210             = "org.scala-sbt" % "io" % sbtVersion
   // launcher interface is pure Java, no scala versioning
-  val sbtLauncherInterface = "org.scala-sbt" % "launcher-interface" % sbtVersion
+//  val sbtLauncherInterface = "org.scala-sbt" % "launcher-interface" % sbtVersion
+  val sbtLauncherInterface = "org.scala-sbt" % "launcher-interface" % "1.0.0-M1"
 
   // 2.11 sbt
   val sbtIo                = "org.scala-sbt" %% "io" % sbtLibraryVersion
@@ -130,8 +131,8 @@ object Dependencies {
 
   def playPlugin: Seq[Setting[_]] = Seq(
     resolvers += Classpaths.typesafeSnapshots,
-    resolvers += "Typesafe Maven Snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",
-    resolvers += "Typesafe Maven Releases" at "http://repo.typesafe.com/typesafe/releases/"
+    resolvers += "Lightbend Maven Snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",
+    resolvers += "Lightbend Maven Releases" at "http://repo.typesafe.com/typesafe/releases/"
   )
   // *** END SBT-ECHO DEPENDENCIES ***
 

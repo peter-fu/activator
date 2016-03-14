@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 Typesafe <http://typesafe.com/>
+ * Copyright (C) 2016 Lightbend <http://www.lightbend.com/>
  */
 package activator
 
@@ -64,7 +64,7 @@ object ActivatorCli extends ActivatorCliHelper {
 
         if (validated.isEmpty) {
           System.err.println(s"Try these template names: ${suggested.mkString(", ")}")
-          System.err.println(s"or see all templates at http://typesafe.com/activator/templates or with 'activator list-templates'")
+          System.err.println(s"or see all templates at http://lightbend.com/activator/templates or with 'activator list-templates'")
         }
 
         validated

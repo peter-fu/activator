@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
+ Copyright (C) 2016 Lightbend, Inc <http://www.lightbend.com>
  */
 define(['css!./overlay.css', 'text!./overlay.html', 'lib/knockout/knockout', 'commons/widget', 'commons/utils'], function(css, template, ko, Widget, utils){
 

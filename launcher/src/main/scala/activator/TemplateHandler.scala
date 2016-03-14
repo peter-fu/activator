@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014 Typesafe <http://typesafe.com/>
+ * Copyright (C) 2016 Lightbend <http://www.lightbend.com/>
  */
 package activator
 
@@ -31,7 +31,7 @@ object TemplateHandler extends ActivatorCliHelper {
         // fall back to just using whatever we have in the local cache
         System.out.println()
         System.out.println("Could not fetch the updated list of templates.  Using the local cache.")
-        System.out.println("Check your proxy settings or increase the timeout.  For more details see:\nhttp://typesafe.com/activator/docs")
+        System.out.println("Check your proxy settings or increase the timeout.  For more details see:\nhttp://lightbend.com/activator/docs")
         System.out.println()
 
         val localOnlyCache = UICacheHelper.makeLocalOnlyCache(ActorSystem("fallback"))
@@ -68,7 +68,7 @@ object TemplateHandler extends ActivatorCliHelper {
     }
 
     val options = suggested.sorted.zipWithIndex map { case (v, i) => (i + 1) -> v }
-    System.out.println("Browse the list of templates: http://typesafe.com/activator/templates")
+    System.out.println("Browse the list of templates: http://lightbend.com/activator/templates")
     if (suggested.isEmpty) {
       System.out.println("Enter a template name (hit tab to see a list)")
     } else {

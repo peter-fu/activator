@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
+ Copyright (C) 2016 Lightbend, Inc <http://www.lightbend.com>
  */
 define([
   'services/sbt',
@@ -89,13 +89,13 @@ define([
     self.typesafeIdError = ko.computed(function() {
       switch(self.acceptedTrpState()) {
         case "needsUpdate":
-          return "Updated terms for the <a href='https://www.typesafe.com/account/id' target='_blank'>Typesafe Subscription Agreement</a> are available.  Please agree and continue.";
+          return "Updated terms for the <a href='https://www.lightbend.com/account/id' target='_blank'>Lightbend Subscription Agreement</a> are available.  Please agree and continue.";
         case "needsAccept":
-          return "You need to accept the terms of the <a href='https://www.typesafe.com/account/id' target='_blank'>Typesafe Subscription Agreement</a> to continue.";
+          return "You need to accept the terms of the <a href='https://www.lightbend.com/account/id' target='_blank'>Lightbend Subscription Agreement</a> to continue.";
         case "invalid":
-          return "The Typesafe Subscription ID you have provided is invalid.  Please correct to continue.";
+          return "The Lightbend Subscription ID you have provided is invalid.  Please correct to continue.";
         case "error":
-          return "Unable to check the status of your Typesafe Subscription ID";
+          return "Unable to check the status of your Lightbend Subscription ID";
         default:
           return "";
       }

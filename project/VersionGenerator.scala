@@ -7,7 +7,7 @@ object VersionGenerator {
   def createInformation(path: File): Unit = {
     val content =
       s"""/**
-         | * Copyright (C) 2015 Typesafe <http://typesafe.com/>
+         | * Copyright (C) 2016 Lightbend <http://www.lightbend.com/>
          | */
          |
          |// *** AUTO GENERATED FILE - DO NOT CHANGE ****************************

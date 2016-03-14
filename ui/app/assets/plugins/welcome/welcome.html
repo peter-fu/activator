@@ -3,9 +3,9 @@
     <div class="about">
       <img class="logo" src="/public/images/activator.svg" height="50" />
       <p class="about-links">
-        <a href="https://typesafe.com/community/core-tools/activator-and-sbt" target="_blank">Activator on Typesafe.com</a>
-        <a href="https://typesafe.com/products/typesafe-reactive-platform" target="_blank">Get Certified builds</a>
-        <a href="https://typesafe.com/activator/docs" target="_blank">Read the docs</a>
+        <a href="https://lightbend.com/community/core-tools/activator-and-sbt" target="_blank">Activator on Lightbend.com</a>
+        <a href="https://lightbend.com/products/typesafe-reactive-platform" target="_blank">Get Certified builds</a>
+        <a href="https://lightbend.com/activator/docs" target="_blank">Read the docs</a>
         <a href="https://github.com/typesafehub/activator/issues" target="_blank"><em>Problems?</em> Search &amp; Create Issues</a>
       </p>
       <p class="presentation">
@@ -14,12 +14,12 @@
       <div class="version-info" data-bind="css: { 'new-version': newVersion }">
         <p>Version <span data-bind="text: appVersion"></span></p>
         <!-- ko ifnot: newVersion -->
-          <p>Typesafe Activator is up-to-date</p>
+          <p>Lightbend Activator is up-to-date</p>
         <!-- /ko -->
         <!-- ko if: newVersion -->
           <p>A newer version is available</p>
         <!-- /ko -->
-        </p><a href="https://typesafe.com/legal/subscriptionagreement" class="tos" target="_blank">Subscription Agreement</a></p>
+        </p><a href="https://lightbend.com/legal/subscriptionagreement" class="tos" target="_blank">Subscription Agreement</a></p>
       </div>
     </div>
     <div class="features">
@@ -44,18 +44,18 @@
       <!-- ko if: trp -->
         <div class="trp-presentation">
           <h2>Reactive Platform</h2>
-          <p>You are running a Certified build of the <a href="https://typesafe.com/products/typesafe-reactive-platform" target="_blank">Typesafe Reactive Platform</a></p>
-          <p>See your account on <a href="https://typesafe.com/account" target="_blank">Typesafe.com</a>.</p>
+          <p>You are running a Certified build of the <a href="https://lightbend.com/products/typesafe-reactive-platform" target="_blank">Lightbend Reactive Platform</a></p>
+          <p>See your account on <a href="https://lightbend.com/account" target="_blank">Lightbend.com</a>.</p>
         </div>
         <div class="trp-info" data-bind="css: { 'new-version': trp().fullUpdate }">
           <p>Version <span data-bind="text: trp().installedFullVersion"></span></p>
           <!-- ko ifnot: trp().fullUpdate -->
-            <p>Typesafe Reactive Platform is up-to-date</p>
+            <p>Lightbend Reactive Platform is up-to-date</p>
           <!-- /ko -->
           <!-- ko if: trp().fullUpdate -->
             <p>A newer version is available (<span data-bind="text: trp().availableFullVersion"></span>)</p>
           <!-- /ko -->
-          </p><a href="http://typesafe.com/legal/softwareterms" class="tos" target="_blank">Terms of Use</a></p>
+          </p><a href="http://lightbend.com/legal/softwareterms" class="tos" target="_blank">Terms of Use</a></p>
         </div>
       <!-- /ko -->
     </div>

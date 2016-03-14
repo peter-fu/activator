@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
+ Copyright (C) 2016 Lightbend, Inc <http://www.lightbend.com>
  */
 define([
   'widgets/modals/modals',
@@ -19,7 +19,7 @@ define([
 
     modal.show({
       text: error,
-      title: "Log into your Typesafe account",
+      title: "Log into your Lightbend account",
       body: loginForm,
       ok: "Login",
       cancel: "cancel",

@@ -4,7 +4,7 @@
 
 This is the process for committing code into master. There are of course exceptions to these rules, for example minor changes to comments and documentation, fixing a broken build etc.
 
-1. Make sure you have signed the [Typesafe CLA](http://www.typesafe.com/contribute/cla), if not, sign it online.
+1. Make sure you have signed the [Lightbend CLA](http://www.lightbend.com/contribute/cla), if not, sign it online.
 2. You should always perform your work in a Git feature branch or
 GitHub fork. The branch should be given a descriptive name that explains its intent.
 3. When the feature or fix is completed you should open a [Pull Request](https://help.github.com/articles/using-pull-requests) on GitHub.
@@ -26,7 +26,7 @@ For a Pull Request to be considered at all it has to meet these requirements:
 2. There should be tests if feasible and appropriate. For
 Activator we don't have a good way to test the HTML/JS UI unfortunately.
 3. Copyright:
-   -  All source files in the project must have a Typesafe copyright header in the style of ``Copyright (C) 2011-2013 Typesafe Inc. <http://www.typesafe.com>``. Never delete or change existing copyright notices, just add additional info.
+   -  All source files in the project must have a Lightbend copyright header in the style of ``Copyright (C) 2011-2016 Lightbend Inc. <http://www.lightbend.com>``. Never delete or change existing copyright notices, just add additional info.
 
 If these requirements are not met then the code should **not** be merged into master, or even reviewed - regardless of how good or important it is. No exceptions.
 

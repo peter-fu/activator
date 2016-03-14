@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
+ Copyright (C) 2016 Lightbend, Inc <http://www.lightbend.com>
  */
 define(['services/log','text!./log.html', 'commons/widget', 'commons/utils'], function(Log, template, Widget, utils){
 
