@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
+ Copyright (C) 2016 Lightbend, Inc <http://www.lightbend.com>
  */
 define('ace/theme/activator-light', ['require', 'exports', 'module' , 'ace/lib/dom'], function(require, exports, module) {
 

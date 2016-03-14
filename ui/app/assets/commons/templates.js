@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
+ Copyright (C) 2016 Lightbend, Inc <http://www.lightbend.com>
  */
 define(["commons/format"], function(format) {
 
@@ -363,7 +363,7 @@ define(["commons/format"], function(format) {
       var txt = ko.isObservable(val)?val():val;
       $(element).text(txt).html(function(index, innerHtml) {
         innerHtml = format.markdownLinks(innerHtml);
-        innerHtml = innerHtml.replace(/(Typesafe )?Reactive Platform/ig, '<a href="https://typesafe.com/subscription">Typesafe Reactive Platform</a>');
+        innerHtml = innerHtml.replace(/(Lightbend )?Reactive Platform/ig, '<a href="https://lightbend.com/subscription">Lightbend Reactive Platform</a>');
         return innerHtml;
       });
     }

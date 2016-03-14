@@ -1,10 +1,10 @@
-# Typesafe Activator Documentation
+# Lightbend Activator Documentation
 
 > Activator can be used from a web browser or from a command line.
 
 ## Launch Instructions
 
-Once installed you can run Typesafe Activator's UI either from a file browser or from a command line.  If you run the Activator UI from within an application's root directory that application will be automatically opened.  The `activator` command is a wrapper around [sbt](http://www.scala-sbt.org/) when used from an existing application's root directory.  When used outside of a application directory you can either create a new application by running `activator new` or launch the UI.
+Once installed you can run Lightbend Activator's UI either from a file browser or from a command line.  If you run the Activator UI from within an application's root directory that application will be automatically opened.  The `activator` command is a wrapper around [sbt](http://www.scala-sbt.org/) when used from an existing application's root directory.  When used outside of a application directory you can either create a new application by running `activator new` or launch the UI.
 
 ### Launch the UI on Windows
 
@@ -49,7 +49,7 @@ Once you have launched the UI it can be reached in your browser at: [http://loca
 
 ### Creating New Applications
 
-If you have launched the UI outside of a application's root directory you can now create a new application based on one of the templates.  Both Typesafe and the community have contributed templates to Activator.  [Learn more about how to contribute your own template](http://typesafe.com/activator/template/contribute)
+If you have launched the UI outside of a application's root directory you can now create a new application based on one of the templates.  Both Lightbend and the community have contributed templates to Activator.  [Learn more about how to contribute your own template](http://lightbend.com/activator/template/contribute)
 
 Once you have selected a template and optionally entered a name and location, select the *Create* button to have your new application created.
 
@@ -97,7 +97,7 @@ When running activator behind a proxy, some additional configuration is needed. 
     #-Dhttp.proxyPassword=PUT YOUR PROXY PASSWORD HERE
 
 ### Increasing the Network Timeout
-                        
+
 By default Activator has a 10 second timeout to fetch the latest templates and check for a new version.  On slow internet connections it might be necessary to increase that timeout.  You can do that from the command line by including a `-Dactivator.timeout=30s` parameter or by putting that parameter into your `~/.activator/activatorconfig.txt` file.
 
 ## Activator Resources
@@ -106,4 +106,4 @@ By default Activator has a 10 second timeout to fetch the latest templates and c
 
 ## License
 
-Typesafe Activator is licensed under [Apache License, Version 2.0](http://opensource.org/licenses/Apache-2.0); including the command-line Launcher, HTML & JavaScript UI, Play Framework based server, and all tests included in the project. The templates available in Typesafe Activator are licensed individually by the owner.  Refer to template source code or owner for license information.
+Lightbend Activator is licensed under [Apache License, Version 2.0](http://opensource.org/licenses/Apache-2.0); including the command-line Launcher, HTML & JavaScript UI, Play Framework based server, and all tests included in the project. The templates available in Lightbend Activator are licensed individually by the owner.  Refer to template source code or owner for license information.

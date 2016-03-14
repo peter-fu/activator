@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2015 Typesafe, Inc <http://typesafe.com>
+ Copyright (C) 2016 Lightbend, Inc <http://www.lightbend.com>
  */
 define([
   'main/plugins',
@@ -18,7 +18,7 @@ define([
   };
 
   var onError = function() {
-    State.partnerHtml("<div class='hint'>Failed to load partner information from <a href='https://typesafe.com/partners/activator'>https://typesafe.com/partners/activator</a></div>");
+    State.partnerHtml("<div class='hint'>Failed to load partner information from <a href='https://lightbend.com/partners/activator'>https://lightbend.com/partners/activator</a></div>");
   };
 
   var onGotHtml = function(data) {

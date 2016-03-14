@@ -67,7 +67,7 @@ object Packaging {
     wixConfig := <wix/>,
     maintainer := "Josh Suereth <joshua.suereth@typesafe.com>",
     packageSummary := "Activator",
-    packageDescription := """Helps developers get started with Typesafe technologies quickly and easily.""",
+    packageDescription := """Helps developers get started with Lightbend technologies quickly and easily.""",
     stage <<= (target, mappings in Universal) map { (t, m) =>
       val to = t / "stage"
       val copies = m collect { case (f, p) => f -> (to / p) }

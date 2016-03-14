@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 Typesafe <http://typesafe.com/>
+ * Copyright (C) 2016 Lightbend <http://www.lightbend.com/>
  */
 // This test just makes sure our integration test framework itself works.
 // If this fails, the build is all hosed in some fashion.

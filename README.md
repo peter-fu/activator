@@ -1,8 +1,8 @@
-# Typesafe Activator
+# Lightbend Activator
 
 [![Join the chat at https://gitter.im/typesafehub/activator](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/typesafehub/activator?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-For more information on using Activator, visit: [http://typesafe.com/activator](http://typesafe.com/activator)
+For more information on using Activator, visit: [http://lightbend.com/activator](http://lightbend.com/activator)
 
 Activator aims to be a friendly one-stop-shop to bootstrap your
 Scala, Akka, and Play development. It can be used as a wrapper
@@ -15,7 +15,7 @@ You can think of Activator as traditional sbt (`activator shell`
 or `activator <sbt command here>`), plus an optional UI mode
 (`activator ui`), plus a template system (`activator new`).
 
-[Get the latest Activator download](http://typesafe.com/get-started).
+[Get the latest Activator download](http://lightbend.com/get-started).
 
 # Activator Developer Documentation
 
@@ -89,7 +89,7 @@ This also runs offlineTests.
 
 or just
 
-    sbt> stage 
+    sbt> stage
 
 *Note: just stage will also run `activator-ui/stage`*
 
@@ -138,7 +138,7 @@ Then you can run simply:
 *OR*
 
     sbt> s3Upload
-    
+
 
 ## Publishing NEWS to versions
 

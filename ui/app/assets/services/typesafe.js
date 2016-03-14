@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2014 Typesafe, Inc <http://typesafe.com>
+ Copyright (C) 2016 Lightbend, Inc <http://www.lightbend.com>
  */
 define([
   'widgets/login/login',
@@ -198,7 +198,7 @@ define([
 
   var register = {};
   var receiveMessage = function(event) {
-    if (event.origin === "https://typesafe.com") { // TODO change to typesafe.com
+    if (event.origin === "https://lightbend.com") { // TODO change to typesafe.com
       var obj = JSON.parse(event.data);
       debug && console.log("received message:", obj);
       for (var eventType in register){
@@ -219,7 +219,7 @@ define([
   }
 
   function send(target, msg){
-    target.postMessage(JSON.stringify(msg), "https://typesafe.com");
+    target.postMessage(JSON.stringify(msg), "https://lightbend.com");
   }
 
   return {

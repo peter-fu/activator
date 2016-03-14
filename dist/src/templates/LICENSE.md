@@ -1,8 +1,8 @@
-# TYPESAFE ACTIVATOR LICENSE
+# LIGHTBEND ACTIVATOR LICENSE
 
-## Typesafe Activator is licensed under Apache License, Version 2.0; including the command-line Launcher, HTML & JavaScript UI, Play Framework based server, and all tests included in this project
+## Lightbend Activator is licensed under Apache License, Version 2.0; including the command-line Launcher, HTML & JavaScript UI, Play Framework based server, and all tests included in this project
 
-## [Software Terms of Use](http://typesafe.com/legal/softwareterms)
+## [Software Terms of Use](http://lightbend.com/legal/softwareterms)
 
 ## License
 

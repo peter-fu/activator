@@ -176,7 +176,7 @@ object AppWebSocketActor {
           val props = new java.util.Properties()
           props.setProperty("typesafe.subscription", sid)
           val stream = new java.io.FileOutputStream(propertiesFile)
-          props.store(stream, "Typesafe Reactive Platform subscription ID, see https://typesafe.com/subscription")
+          props.store(stream, "Lightbend Reactive Platform subscription ID, see https://www.lightbend.com/subscription")
           stream.close()
         } else {
           System.out.println(s"Not writing project/typesafe.properties to $location ${if (location.exists) s"($location does not exist)"} ${if (propertiesFile.exists) s"($propertiesFile already exists)"}")

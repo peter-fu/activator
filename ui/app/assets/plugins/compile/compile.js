@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2013 Typesafe, Inc <http://typesafe.com>
+ Copyright (C) 2016 Lightbend, Inc <http://www.lightbend.com>
  */
 define(['text!./compile.html', 'main/plugins', 'services/build', 'css!./compile.css', "widgets/navigation/menu"],
   function(template, plugins, build, LogView) {

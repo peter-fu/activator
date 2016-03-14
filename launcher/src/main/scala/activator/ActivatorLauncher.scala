@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 Typesafe <http://typesafe.com/>
+ * Copyright (C) 2016 Lightbend <http://www.lightbend.com/>
  */
 package activator
 
@@ -53,7 +53,7 @@ class ActivatorLauncher extends AppMain {
     val readmeUrl = if (file.exists()) {
       file.toURI
     } else {
-      new URI("http://typesafe.com/activator/docs")
+      new URI("http://lightbend.com/activator/docs")
     }
 
     def iCannaeDoIt(): Unit =
@@ -169,7 +169,7 @@ class ActivatorLauncher extends AppMain {
         if (currentLauncherGeneration == latestLauncherGeneration) {
           versionOption
         } else {
-          System.out.println(s"   ... Please download a new Activator by hand at http://typesafe.com/ (the latest version ${version} isn't compatible with this launcher, generation ${currentLauncherGeneration} vs. ${latestLauncherGeneration}).")
+          System.out.println(s"   ... Please download a new Activator by hand at http://lightbend.com/ (the latest version ${version} isn't compatible with this launcher, generation ${currentLauncherGeneration} vs. ${latestLauncherGeneration}).")
           None
         }
       }

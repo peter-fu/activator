@@ -194,7 +194,7 @@ object TheActivatorBuild extends Build {
     settings(
       Keys.scalaBinaryVersion <<= Keys.scalaBinaryVersion in ui,
       Keys.resolvers ++= Seq(
-        "Typesafe repository" at "https://repo.typesafe.com/typesafe/releases/",
+        "Lightbend repository" at "https://repo.typesafe.com/typesafe/releases/",
         Resolver.url("typesafe-ivy-releases", new URL("https://repo.typesafe.com/typesafe/releases/"))(Resolver.ivyStylePatterns),
         Resolver.url("sbt-plugin-releases", new URL("http://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/"))(Resolver.ivyStylePatterns)
       ),
@@ -222,6 +222,7 @@ object TheActivatorBuild extends Build {
 
         "com.typesafe.slick" % "slick_2.11" % "3.0.0",
         "com.h2database" % "h2" % "1.3.170",
+        "org.jboss.logging" % "jboss-logging" % "3.1.1.GA",
 
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-less" % "1.0.0", "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-less" % "1.0.6", "0.13", "2.10"),

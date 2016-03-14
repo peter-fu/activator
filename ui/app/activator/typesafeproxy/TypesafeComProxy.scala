@@ -111,7 +111,7 @@ object TypesafeComProxy {
     }
   }
 
-  def getFromTypesafeCom(): GetFromRemote = GetFromRemote("https://www.typesafe.com/")
+  def getFromTypesafeCom(): GetFromRemote = GetFromRemote("https://www.lightbend.com/")
 
   sealed trait RpcEndpoint {
     def url: String
@@ -125,7 +125,7 @@ object TypesafeComProxy {
   case class Config(lookupTimeout: Timeout, login: LoginConfig, subscriptionData: SubscriptionConfig, activatorInfo: ActivatorInfoConfig)
 
   def withTypesafeComConfig[T](in: TSConfig)(body: TSConfig => T): T = {
-    val c = in.getConfig("activator.typesafe-com-proxy")
+    val c = in.getConfig("activator.lightbend-com-proxy")
     body(c)
   }
 

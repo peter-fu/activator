@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 Typesafe <http://typesafe.com/>
+ * Copyright (C) 2016 Lightbend <http://www.lightbend.com/>
  */
 package activator.properties;
 
@@ -168,7 +168,7 @@ public class ActivatorProperties {
 
   // where to get the latest version
   public static String ACTIVATOR_LATEST_URL() {
-    return lookupOr("activator.latest.url", "https://typesafe.com/activator/latest");
+    return lookupOr("activator.latest.url", "https://lightbend.com/activator/latest");
   }
 
   // We will consume latest versions only if they match this.
