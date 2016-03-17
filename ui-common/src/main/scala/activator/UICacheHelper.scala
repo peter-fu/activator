@@ -52,15 +52,7 @@ object UICacheHelper {
 
   /** Grabs the additional script files we should clone with templates, if they are available in our environment. */
   def scriptFilesForCloning: Seq[(File, String)] = {
-    def fileFor(loc: String, name: String): Option[(File, String)] = {
-      val x = Option(loc)
-      System.err.println(s"loc: $loc -- x: $x")
-      x
-    } map (new File(_)) filter { x =>
-      val e = x.exists
-      System.err.println(s"File: $x -- exists: $e")
-      e
-    } map (_ -> name)
+    def fileFor(loc: String, name: String): Option[(File, String)] = Option(loc) map (new File(_)) filter (_.exists) map (_ -> name)
 
     val batFile = fileFor(ActivatorProperties.ACTIVATOR_LAUNCHER_BAT("/bin/"), "bin/" + SCRIPT_NAME + ".bat")
     val jarFile = fileFor(ActivatorProperties.ACTIVATOR_LAUNCHER_JAR("libexec"), "libexec/" + ActivatorProperties.ACTIVATOR_LAUNCHER_JAR_NAME("libexec"))

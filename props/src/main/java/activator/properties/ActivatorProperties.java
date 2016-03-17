@@ -122,9 +122,7 @@ public class ActivatorProperties {
 
   /** Returns the distribution home directory (or local project) as a URI string. */
   public static String ACTIVATOR_HOME() {
-    String h = requirePropertyWithOverrides("activator.home");
-    System.err.println("activator.home: "+h);
-    return h;
+    return requirePropertyWithOverrides("activator.home");
   }
 
   public static String GLOBAL_USER_HOME() {
