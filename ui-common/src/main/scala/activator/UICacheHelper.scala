@@ -62,7 +62,6 @@ object UICacheHelper {
       e
     } map (_ -> name)
 
-    throw new Exception("FUCK NO!!!")
     val batFile = fileFor(ActivatorProperties.ACTIVATOR_LAUNCHER_BAT("/bin/"), "bin/" + SCRIPT_NAME + ".bat")
     val jarFile = fileFor(ActivatorProperties.ACTIVATOR_LAUNCHER_JAR("libexec"), "libexec/" + ActivatorProperties.ACTIVATOR_LAUNCHER_JAR_NAME("libexec"))
     val bashFile = fileFor(ActivatorProperties.ACTIVATOR_LAUNCHER_BASH("/bin/"), "bin/" + SCRIPT_NAME)
