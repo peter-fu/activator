@@ -39,7 +39,7 @@ abstract class IntegrationTest extends DelayedInit with xsbti.AppMain {
       "-Dsbt.boot.directory=" + sys.props("sbt.boot.directory"),
       "-Dactivator.home=" + cleanUriFileString(sys.props("activator.home")),
       "-jar",
-      activator.properties.ActivatorProperties.ACTIVATOR_LAUNCHER_JAR) ++ args
+      activator.properties.ActivatorProperties.ACTIVATOR_LAUNCHER_JAR(null)) ++ args
     sys.process.Process(fullArgs, cwd)
   }
 }
