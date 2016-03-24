@@ -201,66 +201,80 @@ public class ActivatorProperties {
 
   // this class is a trick to get a lazy singleton
   private static class LauncherJarHolder {
-    private static File findLauncherJar() {
-      String value = ACTIVATOR_HOME_FILENAME();
+    private static File doFindLauncherJar(String jarname, File home) {
+      File jar = new File(home, jarname);
+      if (jar.exists()) {
+        return jar;
+      } else {
+        File[] matches = home.listFiles(new FilenameFilter() {
+          @Override
+          public boolean accept(File dir, String name) {
+            return name.startsWith("activator-launch-") && name.endsWith(".jar");
+          }
+        });
+        if (matches != null && matches.length > 0) {
+          return matches[0];
+        } else {
+          // this really shouldn't happen, so go ahead and spam stderr
+          System.err.println("No activator-launch-*.jar in " + home);
+          return null;
+        }
+      }
+    }
+
+    private static File findLauncherJar(File home) {
       String jarname = ACTIVATOR_LAUNCHER_JAR_MATCHING_VERSION_NAME();
-      if(value != null && jarname != null) {
+      if(jarname != null) {
         // The Activator homedir may be from an older version of
         // activator due to auto-updates.
         // We first look for a filename that matches our own version,
         // and if that fails, we glob for any activator-launch-*.jar
         // in the activator home.
-        File home = new File(value, "libexec");
-        File jar = new File(home, jarname);
-        if (jar.exists()) {
-          return jar;
-        } else {
-          File[] matches = home.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-              return name.startsWith("activator-launch-") && name.endsWith(".jar");
-            }
-          });
-          if (matches != null && matches.length > 0) {
-            return matches[0];
-          } else {
-            // this really shouldn't happen, so go ahead and spam stderr
-            System.err.println("No activator-launch-*.jar in " + value);
-            return null;
-          }
-        }
+        return doFindLauncherJar(jarname,home);
       }
       return null;
     }
 
-    public static final File launcherJar = findLauncherJar();
+    public static File launcherJar(String prefix) {
+      String value = ACTIVATOR_HOME_FILENAME();
+      if(value != null) {
+        if (prefix != null && !prefix.isEmpty()) {
+          return findLauncherJar(new File(value, prefix));
+        } else {
+          return findLauncherJar(new File(value));
+        }
+      }
+      return null;
+    }
   }
 
-  public static String ACTIVATOR_LAUNCHER_JAR_NAME() {
-    if (LauncherJarHolder.launcherJar != null)
-      return LauncherJarHolder.launcherJar.getName();
+  public static String ACTIVATOR_LAUNCHER_JAR_NAME(String prefix) {
+    File lj = LauncherJarHolder.launcherJar(prefix);
+    if (lj != null)
+      return lj.getName();
     else
       return null;
   }
 
-  public static String ACTIVATOR_LAUNCHER_JAR() {
-    if (LauncherJarHolder.launcherJar != null)
-      return LauncherJarHolder.launcherJar.getPath();
+  public static String ACTIVATOR_LAUNCHER_JAR(String prefix) {
+    File lj = LauncherJarHolder.launcherJar(prefix);
+    if (lj != null)
+      return lj.getPath();
     else
       return null;
   }
 
-  public static String ACTIVATOR_LAUNCHER_BAT() {
+  public static String ACTIVATOR_LAUNCHER_BAT(String prefix) {
     String value = ACTIVATOR_HOME_FILENAME();
     if(value != null) {
-      value = value+"/"+SCRIPT_NAME+".bat";
+      value = value+prefix+SCRIPT_NAME+".bat";
     }
     return value;
   }
-  public static String ACTIVATOR_LAUNCHER_BASH() {
+  public static String ACTIVATOR_LAUNCHER_BASH(String prefix) {
     String value = ACTIVATOR_HOME_FILENAME();
     if(value != null) {
-      value = value+"/"+SCRIPT_NAME;
+      value = value+prefix+SCRIPT_NAME;
     }
     return value;
   }
