@@ -218,11 +218,11 @@ object TheActivatorBuild extends Build {
 
         // featured template dependencies
         // *** note: do not use %% here ***
-        // "org.scala-lang" % "jline" % "2.10.4",
+        "org.scala-lang" % "jline" % "2.10.4",
         "org.scala-lang" % "jline" % "2.10.6",
 
         "com.typesafe.slick" % "slick_2.11" % "3.0.0",
-        "com.h2database" % "h2" % "1.3.170",
+        "com.h2database" % "h2" % "1.3.175",
         "org.jboss.logging" % "jboss-logging" % "3.1.1.GA",
 
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-less" % "1.0.0", "0.13", "2.10"),
@@ -234,7 +234,6 @@ object TheActivatorBuild extends Build {
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-mocha" % "1.1.0", "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-play-enhancer" % "1.1.0", "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.sbt" % "sbt-coffeescript" % "1.0.0", "0.13", "2.10"),
-        Defaults.sbtPluginExtra("com.typesafe.play" % "sbt-plugin" % "2.3.9", "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.play" % "sbt-plugin" % "2.4.4", "0.13", "2.10"),
         Defaults.sbtPluginExtra("com.typesafe.play" % "sbt-plugin" % "2.5.0", "0.13", "2.10"),
         Defaults.sbtPluginExtra("org.irundaia.sbt" % "sbt-sassify" % "1.4.2", "0.13", "2.10"),
