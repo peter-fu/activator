@@ -52,10 +52,25 @@ rem Detect if we were double clicked, although theoretically A user could
 rem manually run cmd /c
 for %%x in (%cmdcmdline%) do if %%~x==/c set DOUBLECLICKED=1
 
+set SBT_HOME=%BIN_DIRECTORY
+
+rem Detect if we were double clicked, although theoretically A user could
+rem manually run cmd /c
+for %%x in (%cmdcmdline%) do if %%~x==/c set DOUBLECLICKED=1
+
+rem FIRST we load the config file of extra options.
+set FN=%SBT_HOME%\..\conf\sbtconfig.txt
+set CFG_OPTS=
+FOR /F "tokens=* eol=# usebackq delims=" %%i IN ("%FN%") DO (
+  set DO_NOT_REUSE_ME=%%i
+  rem ZOMG (Part #2) WE use !! here to delay the expansion of
+  rem CFG_OPTS, otherwise it remains "" for this loop.
+  set CFG_OPTS=!CFG_OPTS! !DO_NOT_REUSE_ME!
+)
+
 rem FIRST we load a config file of extra options (if there is one)
 set "CFG_FILE_HOME=%UserProfile%\.activator\activatorconfig.txt"
 set "CFG_FILE_VERSION=%UserProfile%\.activator\%APP_VERSION%\activatorconfig.txt"
-set CFG_OPTS=
 if exist %CFG_FILE_VERSION% (
   FOR /F "tokens=* eol=# usebackq delims=" %%i IN ("%CFG_FILE_VERSION%") DO (
     set DO_NOT_REUSE_ME=%%i
@@ -166,7 +181,7 @@ if not "%~1"=="" (
   rem This is done since batch considers "=" to be a delimiter so we need to circumvent this behavior with a small hack.
   set arg1=%~1
   if "!arg1:~0,2!"=="-D" (
-   	set "args=%args% "%~1"="%~2""
+     set "args=%args% "%~1"="%~2""
     shift
     shift
     goto argsloop
