@@ -7,7 +7,7 @@ object Dependencies {
 
   val sbtPluginVersion = "0.13"
   val sbtPluginScalaVersion = "2.11.7"
-  val scalaVersion = "2.11.7"
+  val scalaVersion = "2.11.8"
   val scala210Version = "2.10.4"
   val luceneVersion = "4.2.1"
 
