@@ -143,6 +143,13 @@ addResidual () {
 addDebugger () {
   addJava "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=$1"
 }
+addConfigOpts () {
+  dlog "[addConfigOpts] arg = '$*'"
+  for item in $*
+  do
+    addJava "$item"
+  done
+}
 
 get_mem_opts () {
   # if we detect any of these settings in ${JAVA_OPTS} we need to NOT output our settings.
