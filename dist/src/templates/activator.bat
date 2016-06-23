@@ -39,7 +39,7 @@ if defined var1 (
 @REM determine ACTIVATOR_HOME environment variable
 set BIN_DIRECTORY=%~dp0
 set BIN_DIRECTORY=%BIN_DIRECTORY:~0,-1%
-for %%d in (%BIN_DIRECTORY%) do set ACTIVATOR_HOME=%%~dpd
+for %%d in ("%BIN_DIRECTORY%") do set ACTIVATOR_HOME=%%~dpd
 set ACTIVATOR_HOME=%ACTIVATOR_HOME:~0,-1%
 
 echo ACTIVATOR_HOME=%ACTIVATOR_HOME%
@@ -98,7 +98,7 @@ if "%_JAVACMD%"=="" (
     if exist "%JAVA_HOME%\bin\java.exe" set "_JAVACMD=%JAVA_HOME%\bin\java.exe"
 
     rem if there is a java home set we make sure it is the first picked up when invoking 'java'
-    SET PATH="%JAVA_HOME%\bin";%PATH%
+    SET PATH="%JAVA_HOME%\bin";"%PATH%"
   )
 )
 
