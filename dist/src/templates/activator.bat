@@ -98,7 +98,7 @@ if "%_JAVACMD%"=="" (
     if exist "%JAVA_HOME%\bin\java.exe" set "_JAVACMD=%JAVA_HOME%\bin\java.exe"
 
     rem if there is a java home set we make sure it is the first picked up when invoking 'java'
-    SET PATH="%JAVA_HOME%\bin";"%PATH%"
+    SET "PATH=%JAVA_HOME%\bin;%PATH%"
   )
 )
 
